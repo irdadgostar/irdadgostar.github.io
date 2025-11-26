@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>برنامه هفتگی جامع (نسخه نهایی مدرن)</title>
+    <title>برنامه هفتگی جامع</title>
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <!-- کتابخانه HTML2PDF -->
@@ -14,13 +14,12 @@
         :root {
             --primary: #4f46e5;
             --primary-hover: #4338ca;
-            --secondary: #64748b;
             --bg: #f8fafc;
             --surface: #ffffff;
             --border: #e2e8f0;
             --text-main: #0f172a;
             --header-bg: #1e293b;
-            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -35,15 +34,15 @@
             padding-bottom: 120px;
         }
 
-        /* --- Icons Class --- */
+        /* --- SVG Icons --- */
         .icon { width: 20px; height: 20px; stroke-width: 2; stroke: currentColor; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-        .icon-sm { width: 16px; height: 16px; }
-        
+        .icon-sm { width: 16px; height: 16px; stroke-width: 2; }
+
         /* --- Loader --- */
         #loadingBar {
             position: fixed; top: 0; left: 0; width: 100%; height: 4px;
             background: linear-gradient(90deg, var(--primary), #8b5cf6, var(--primary));
-            background-size: 200% 100%; z-index: 9999; display: none;
+            background-size: 200% 100%; z-index: 10001; display: none;
             animation: loadingAnim 1.5s infinite linear;
         }
         @keyframes loadingAnim { 0% {background-position: 100% 0;} 100% {background-position: -100% 0;} }
@@ -85,9 +84,10 @@
         .btn {
             padding: 10px 18px; border: none; border-radius: 12px; cursor: pointer;
             font-family: inherit; font-weight: 600; font-size: 13px; color: white;
-            display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex; align-items: center; gap: 8px; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
+        
         .btn-primary { background: linear-gradient(135deg, #4f46e5, #4338ca); }
         .btn-success { background: linear-gradient(135deg, #10b981, #059669); }
         .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
@@ -98,9 +98,9 @@
         .btn-blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
         
         .mode-toggle { background: #e2e8f0; color: #475569; border: 1px solid #cbd5e1; box-shadow: none; }
-        .mode-toggle.active { background: var(--primary); color: white; border-color: transparent; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+        .mode-toggle.active { background: var(--primary); color: white; border-color: transparent; }
 
-        /* --- Table --- */
+        /* --- Main Interactive Table --- */
         .planner-wrapper {
             background: var(--surface); border-radius: 20px; box-shadow: var(--shadow);
             overflow: auto; position: relative; border: 1px solid var(--border);
@@ -110,7 +110,7 @@
         
         thead th {
             background: var(--header-bg); color: white; padding: 16px; position: sticky; top: 0; z-index: 20;
-            border-right: 1px solid #334155; font-size: 14px; letter-spacing: 0.5px;
+            border-right: 1px solid #334155; font-size: 14px;
         }
         
         .copy-col-btn { 
@@ -126,7 +126,6 @@
         }
         td { border: 1px solid #f1f5f9; text-align: center; height: 40px; padding: 0; vertical-align: middle; }
 
-        /* Task Cell */
         td.task-cell {
             color: white; padding: 4px 6px; font-size: 12px; cursor: pointer;
             border-bottom: 1px solid rgba(255,255,255,0.3); position: relative;
@@ -142,7 +141,6 @@
         .task-title { font-weight: 800; font-size: 12px; }
         .task-time-range { font-size: 10px; opacity: 0.9; margin-bottom: 2px; background: rgba(0,0,0,0.1); border-radius: 4px; display: inline-block; padding: 0 4px; align-self: center;}
 
-        /* Selection */
         body.selection-mode td.empty-cell { cursor: crosshair; }
         .selected-cell { background-color: #bfdbfe !important; }
 
@@ -172,7 +170,6 @@
         .copy-item:hover { background: #f1f5f9; border-color: var(--primary); }
         .copy-item input { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary); }
 
-        /* Extras List Styles */
         .extras-list { list-style: none; padding: 0; margin: 0; max-height: 250px; overflow-y: auto; }
         .extra-row {
             display: flex; align-items: center; justify-content: space-between;
@@ -203,8 +200,7 @@
             background: white;
             padding: 30px;
             font-family: 'Vazirmatn', sans-serif;
-            /* Width set to match standard A4 aspect ratio when scaled */
-            width: 1200px; 
+            width: 1200px; /* Width optimized for A4 landscape scaling */
             margin: 0 auto;
         }
 
@@ -212,9 +208,9 @@
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 4px solid #1e293b; padding-bottom: 20px; margin-bottom: 25px;
         }
-        .print-title h1 { margin: 0; font-size: 36px; color: #1e293b; font-weight: 900; display: flex; align-items: center; gap: 15px; }
+        .print-title h1 { margin: 0; font-size: 42px; color: #1e293b; font-weight: 900; display: flex; align-items: center; gap: 15px; }
         .print-meta { text-align: left; }
-        .print-meta div { margin-bottom: 8px; font-size: 16px; color: #334155; font-weight: bold; }
+        .print-meta div { margin-bottom: 8px; font-size: 18px; color: #334155; font-weight: bold; }
 
         .print-grid-top {
             display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 30px;
@@ -225,47 +221,48 @@
         }
         .print-box h4 {
             margin: 0 0 15px 0; border-bottom: 2px solid #cbd5e1; padding-bottom: 8px;
-            font-size: 20px; color: #1e293b; font-weight: 800;
+            font-size: 22px; color: #1e293b; font-weight: 800;
         }
-        .print-items { list-style: none; padding: 0; margin: 0; font-size: 14px; columns: 2; }
+        .print-items { list-style: none; padding: 0; margin: 0; font-size: 16px; columns: 2; }
         .print-items li { margin-bottom: 8px; break-inside: avoid; display: flex; align-items: center; gap: 8px; }
         
         /* Modern Icons in Print */
-        .print-icon { width: 18px; height: 18px; stroke-width: 2.5; }
-        .icon-check { color: var(--success); }
+        .print-icon-svg { width: 20px; height: 20px; stroke-width: 2.5; fill: none; stroke: currentColor; }
+        .icon-check { color: #10b981; }
         .icon-square { color: #cbd5e1; }
-        .icon-bullet { color: var(--primary); width: 12px; height: 12px; fill: var(--primary); }
+        .icon-bullet { color: #4f46e5; fill: #4f46e5; }
 
         /* Export Table */
         .print-table-container table {
-            border: 2px solid #000; font-size: 12px; width: 100%; border-collapse: collapse;
+            border: 2px solid #000; font-size: 14px; width: 100%; border-collapse: collapse;
         }
         .print-table-container th {
             background-color: var(--header-bg) !important; color: white !important;
-            border: 1px solid #000; padding: 10px; font-size: 14px; text-align: center;
+            border: 1px solid #000; padding: 12px; font-size: 18px; text-align: center;
             -webkit-print-color-adjust: exact; print-color-adjust: exact;
         }
         .print-table-container tr td:first-child {
             background-color: var(--header-bg) !important; color: white !important;
-            border: 1px solid #000; font-weight: bold; text-align: center; font-size: 12px;
+            border: 1px solid #000; font-weight: bold; text-align: center; font-size: 14px;
             -webkit-print-color-adjust: exact; print-color-adjust: exact;
         }
-        .print-table-container td { border: 1px solid #94a3b8; height: 25px; padding: 0; }
+        .print-table-container td { border: 1px solid #94a3b8; height: 30px; padding: 0; }
         
+        /* Merged Task Cell in Export */
         .print-table-container td.task-cell {
             border: 1px solid #000 !important; color: white !important;
-            text-align: center; vertical-align: middle; padding: 2px;
+            text-align: center; vertical-align: middle; padding: 4px;
             -webkit-print-color-adjust: exact; print-color-adjust: exact;
         }
         
-        .print-table-container .task-title { font-size: 13px; font-weight: 900; }
-        .print-table-container .task-time-range { font-size: 11px; margin-bottom: 2px; border-bottom: 1px dotted rgba(255,255,255,0.4); display: inline-block; }
+        .print-table-container .task-title { font-size: 16px; font-weight: 900; }
+        .print-table-container .task-time-range { font-size: 13px; margin-bottom: 4px; border-bottom: 1px dotted rgba(255,255,255,0.4); display: inline-block; }
 
         .print-footer {
             margin-top: 30px; border: 3px dashed #cbd5e1; padding: 25px;
             border-radius: 16px; background: #fff;
         }
-        .print-note-text { font-size: 14px; white-space: pre-wrap; line-height: 1.8; color: #334155; }
+        .print-note-text { font-size: 16px; white-space: pre-wrap; line-height: 1.8; color: #334155; }
 
         /* Print Media Query */
         @media print {
@@ -298,7 +295,7 @@
         <div class="print-header">
             <div class="print-title" style="text-align: right;">
                 <h1 id="printTitleDisplay">
-                    <svg class="icon" style="width:36px;height:36px;margin-left:10px;stroke-width:3"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <svg class="icon" style="width:40px;height:40px;margin-left:10px;stroke-width:3"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     برنامه هفتگی
                 </h1>
             </div>
@@ -319,6 +316,7 @@
             </div>
         </div>
 
+        <!-- Table Container for Export -->
         <div id="printTableContainer" class="print-table-container"></div>
 
         <div class="print-footer" id="printFooter" style="display:none;">
@@ -403,12 +401,10 @@
     </div>
 
     <!-- Modals -->
-    
-    <!-- Share Choice Modal -->
     <div class="modal-overlay" id="shareModal">
         <div class="modal">
             <div class="modal-header"><h3>اشتراک‌گذاری</h3><button class="close-btn" onclick="closeModal('shareModal')">&times;</button></div>
-            <p style="color:#666; font-size:14px;">لطفاً فرمت فایل ارسالی را انتخاب کنید:</p>
+            <p style="color:#666; font-size:14px;">فرمت اشتراک‌گذاری را انتخاب کنید:</p>
             <button class="btn btn-teal" onclick="executeShare('pdf')" style="justify-content:center; padding:15px;">
                 <svg class="icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
                 ارسال PDF (تصویری)
@@ -420,17 +416,15 @@
         </div>
     </div>
 
-    <!-- Copy Modal -->
     <div class="modal-overlay" id="copyModal">
         <div class="modal">
             <div class="modal-header"><h3>کپی برنامه <span id="copySourceLabel" style="color:var(--primary)"></span></h3><button class="close-btn" onclick="closeModal('copyModal')">&times;</button></div>
-            <div style="font-size:12px; color:#666;">روزهایی که می‌خواهید برنامه در آن‌ها کپی شود:</div>
+            <div style="font-size:12px; color:#666;">انتخاب روزهای مقصد:</div>
             <div id="copyTargetList" class="copy-list"></div>
             <button class="btn btn-primary" style="justify-content:center; margin-top:10px;" onclick="executeCopy()">تایید و کپی</button>
         </div>
     </div>
 
-    <!-- Single Copy Modal -->
     <div class="modal-overlay" id="singleCopyModal">
         <div class="modal">
             <div class="modal-header"><h3>کپی فعالیت</h3><button class="close-btn" onclick="closeModal('singleCopyModal')">&times;</button></div>
@@ -439,7 +433,6 @@
         </div>
     </div>
 
-    <!-- Extras Modal -->
     <div class="modal-overlay" id="extrasModal">
         <div class="modal">
             <div class="modal-header"><h3>الزامات و لیست</h3><button class="close-btn" onclick="closeModal('extrasModal')">&times;</button></div>
@@ -458,7 +451,6 @@
         </div>
     </div>
 
-    <!-- Task Modal -->
     <div class="modal-overlay" id="taskModal">
         <div class="modal">
             <div class="modal-header"><h3>مدیریت فعالیت</h3><button class="close-btn" onclick="closeModal('taskModal')">&times;</button></div>
@@ -469,7 +461,7 @@
             <div><label class="form-label">رنگ</label><div class="color-options" id="colorPalette"></div><input type="color" id="customColor" style="margin-top:8px; width:100%; height:36px; border:none; border-radius:8px; cursor:pointer;"></div>
             <div style="display:flex; justify-content:space-between; margin-top:10px; flex-wrap:wrap; gap:8px;">
                 <button class="btn btn-danger" id="btnDeleteTask" onclick="deleteTask()" style="display:none">حذف</button>
-                <button class="btn btn-teal" id="btnCopyTask" onclick="openSingleCopyModal()" style="display:none">کپی به روز دیگر</button>
+                <button class="btn btn-teal" id="btnCopyTask" onclick="openSingleCopyModal()" style="display:none">کپی</button>
                 <div style="flex:1"></div>
                 <button class="btn btn-dark" onclick="closeModal('taskModal')">لغو</button>
                 <button class="btn btn-primary" onclick="saveTask()">ثبت</button>
@@ -477,7 +469,6 @@
         </div>
     </div>
 
-    <!-- Note Modal -->
     <div class="modal-overlay" id="noteModal">
         <div class="modal">
             <div class="modal-header"><h3>یادداشت‌ها</h3><button class="close-btn" onclick="closeModal('noteModal')">&times;</button></div>
@@ -489,7 +480,6 @@
         </div>
     </div>
 
-    <!-- Stats Modal -->
     <div class="modal-overlay" id="statsModal">
         <div class="modal">
             <div class="modal-header"><h3>آمار</h3><button class="close-btn" onclick="closeModal('statsModal')">&times;</button></div>
@@ -508,7 +498,7 @@
         for(let h=0; h<24; h++) for(let m=0; m<60; m+=15) TIMELINE.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
         TIMELINE.push("24:00");
 
-        // Icons
+        // Icons Dictionary
         const ICONS = {
             copy: '<svg class="icon"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>',
             eye: '<svg class="icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>',
@@ -517,9 +507,9 @@
             up: '<svg class="icon-sm"><polyline points="18 15 12 9 6 15"></polyline></svg>',
             down: '<svg class="icon-sm"><polyline points="6 9 12 15 18 9"></polyline></svg>',
             edit: '<svg class="icon-sm"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>',
-            bullet: '<svg class="print-icon icon-bullet"><circle cx="12" cy="12" r="10"></circle></svg>',
-            check: '<svg class="print-icon icon-check"><polyline points="20 6 9 17 4 12"></polyline></svg>',
-            square: '<svg class="print-icon icon-square"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>'
+            bullet: '<svg class="print-icon-svg icon-bullet"><circle cx="12" cy="12" r="10"></circle></svg>',
+            check: '<svg class="print-icon-svg icon-check"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+            square: '<svg class="print-icon-svg icon-square"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>'
         };
 
         let appData = {
@@ -541,7 +531,7 @@
         function hideBar() { document.getElementById('loadingBar').style.display = 'none'; }
 
         function init() {
-            const saved = localStorage.getItem('finalProPlannerV10');
+            const saved = localStorage.getItem('finalProPlannerV11');
             if(saved) {
                 try {
                     const d = JSON.parse(saved);
@@ -643,7 +633,7 @@
             }
         }
 
-        // --- Helper: Clone Table for Print/Export ---
+        // --- Helper: Prepare Print DOM with Rowspan Logic ---
         function preparePrintDOM() {
             document.getElementById('printTitleDisplay').innerText = appData.header || "برنامه هفتگی";
             document.getElementById('printUserDisplay').innerText = appData.userName ? `نام کاربر: ${appData.userName}` : "";
@@ -655,6 +645,7 @@
             const cL = document.getElementById('printChkList'); cL.innerHTML='';
             appData.chks.filter(x=>x.s).forEach(x => cL.innerHTML+=`<li>${x.c?ICONS.check:ICONS.square} ${x.t}</li>`);
 
+            // Clone logic preserved to maintain MERGED CELLS (Rowspan)
             const tblCont = document.getElementById('printTableContainer');
             tblCont.innerHTML = '';
             const originalTable = document.getElementById('plannerTable');
@@ -670,7 +661,7 @@
             } else { ftr.style.display = 'none'; }
         }
 
-        // --- Image Download ---
+        // --- Image Download Optimized ---
         function downloadAsImage() {
             showLoader("در حال تولید عکس...");
             const element = document.getElementById('print-area');
@@ -681,17 +672,17 @@
             element.style.top = '0';
             element.style.left = '-9999px';
             
-            // تاخیر برای رندر کامل
             setTimeout(() => {
                 html2canvas(element, { 
-                    scale: 2, // کیفیت متعادل (نه خیلی زیاد که سنگین شود، نه کم که تار شود)
+                    scale: 2, 
                     useCORS: true,
-                    width: 1200, // عرض متناسب با A4
+                    width: 1200, // Fixed width for consistent layout
                     windowWidth: 1200
                 }).then(canvas => {
                     const link = document.createElement('a');
                     link.download = `${appData.header || 'Plan'}.jpg`;
-                    link.href = canvas.toDataURL('image/jpeg', 0.8); // فشرده‌سازی JPEG 80%
+                    // JPG Quality 0.8 for compression
+                    link.href = canvas.toDataURL('image/jpeg', 0.8);
                     link.click();
                     
                     element.style.display = 'none';
@@ -723,14 +714,10 @@
         async function shareBackupFile() {
             showLoader("آماده‌سازی فایل پشتیبان...");
             setTimeout(async () => {
-                // ذخیره یادداشت‌ها قبل از ارسال
-                saveNote(false); // ذخیره بدون بستن مودال (فقط آپدیت دیتا)
-
                 const fileName = `${appData.header || 'backup'}.json`;
-                // اصلاح مهم: استفاده از text/plain یا application/json با دقت
-                // بسیاری از برنامه‌های موبایل application/json را قبول نمی‌کنند
-                // ما فایل را می‌سازیم و سعی می‌کنیم ارسال کنیم.
-                const file = new File([JSON.stringify(appData, null, 2)], fileName, {type: "application/json"});
+                // Fix: Include notes in appData before stringify
+                const fullData = JSON.stringify(appData, null, 2);
+                const file = new File([fullData], fileName, {type: "application/json"});
                 
                 const text = `📅 برنامه هفتگی ${appData.userName || 'کاربر'}\n📅 تاریخ: ${new Date().toLocaleDateString('fa-IR')}\n⚠️ فایل نسخه پشتیبان (JSON)`;
                 
@@ -741,7 +728,7 @@
                             title: appData.header || 'Backup',
                             text: text
                         });
-                    } catch (error) { console.log("Share cancelled/failed", error); }
+                    } catch (error) { console.log("Share cancelled"); }
                 } else {
                     alert('مرورگر شما اشتراک‌گذاری فایل را پشتیبانی نمی‌کند. فایل دانلود می‌شود.');
                     exportData(); 
@@ -893,14 +880,7 @@
             saveData(); renderExtras();
         }
 
-        // Update appData from textarea before saving/sharing
-        function saveNote(close = true){
-            appData.note.text=document.getElementById('noteText').value; 
-            appData.note.print=document.getElementById('notePrintCheck').checked; 
-            saveData(); 
-            if(close) closeModal('noteModal');
-        }
-        
+        function saveNote(){appData.note.text=document.getElementById('noteText').value; appData.note.print=document.getElementById('notePrintCheck').checked; saveData(); closeModal('noteModal');}
         function openStats(){
             openModal('statsModal'); const a=document.getElementById('chartArea'), l=document.getElementById('chartLegend');
             a.innerHTML=''; l.innerHTML=''; const s={}; let tot=0;
@@ -967,7 +947,7 @@
 
         function openModal(id){document.getElementById(id).style.display='flex'; if(id==='noteModal'){document.getElementById('noteText').value=appData.note.text; document.getElementById('notePrintCheck').checked=appData.note.print;}}
         function closeModal(id){document.getElementById(id).style.display='none';}
-        function saveData(){localStorage.setItem('finalProPlannerV10', JSON.stringify(appData));}
+        function saveData(){localStorage.setItem('finalProPlannerV11', JSON.stringify(appData));}
         
         function updateHeader(v){
             appData.header=v; document.title = v || "برنامه هفتگی"; 
@@ -976,16 +956,10 @@
             saveData();
         }
         function updateUserName(v){appData.userName=v; saveData();}
-        function clearAll(){if(confirm("حذف کامل؟")){localStorage.removeItem('finalProPlannerV10'); location.reload();}}
+        function clearAll(){if(confirm("حذف کامل؟")){localStorage.removeItem('finalProPlannerV11'); location.reload();}}
         
         // Fixed JSON Export
         function exportData(){
-            // Sync notes before exporting
-            if(document.getElementById('noteText')) {
-               appData.note.text = document.getElementById('noteText').value;
-               appData.note.print = document.getElementById('notePrintCheck').checked;
-            }
-            
             const b=new Blob([JSON.stringify(appData, null, 2)], {type: "application/json"}); 
             const a=document.createElement('a'); 
             a.href=URL.createObjectURL(b); 
