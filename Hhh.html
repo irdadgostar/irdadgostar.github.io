@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -273,15 +273,13 @@
             letter-spacing: normal !important; /* اطمینان از چسبیدن حروف در هدر */
         }
         
-        /* 
-           اصلاح اساسی ستون زمان برای حل مشکل در هم رفتگی و جدا شدن حروف
-        */
+        /* اصلاح اساسی ستون زمان برای حل مشکل در هم رفتگی و جدا شدن حروف */
         .print-table-container tr td:first-child {
             background-color: #1e293b !important; color: white !important;
             border: 1px solid #475569;
             font-weight: bold; text-align: center; font-size: 14px;
             -webkit-print-color-adjust: exact; print-color-adjust: exact; 
-            width: 180px; /* افزایش عرض برای جلوگیری از روی هم افتادن */
+            width: 180px; /* عرض مناسب */
             white-space: nowrap; /* جلوگیری از شکستن خط */
             letter-spacing: normal !important; /* چسباندن حروف فارسی */
             direction: rtl; /* جهت راست چین */
@@ -459,7 +457,7 @@
         <div style="display:flex; flex-direction:column; gap:10px;">
             <button class="btn btn-blue" onclick="executeShare('image')" style="justify-content:center;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                ارسال تصویر (PNG)
+                ارسال تصویر (با کیفیت اصلی فایل)
             </button>
             <button class="btn btn-success" onclick="executeShare('json')" style="justify-content:center;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
@@ -722,7 +720,7 @@
         else if (type === 'image') shareImage();
     }
 
-    // --- 1. Share as Image (PNG) - Fixed for High Quality & File Support ---
+    // --- 1. Share as Image (File Trick for High Quality) ---
     async function shareImage() {
         showLoader("در حال تولید تصویر با کیفیت...");
         const element = document.getElementById('print-area');
@@ -731,39 +729,40 @@
         element.style.display = 'block';
         element.style.position = 'absolute'; element.style.top = '0'; element.style.left = '-9999px';
         
-        // Ensure fonts are ready
+        // Wait for fonts to apply to prevent blurry text
         await document.fonts.ready;
 
         setTimeout(() => {
-            // Scale set to 3 for High Quality (Mobile Safe)
-            // windowWidth set to ensure desktop layout
-            html2canvas(element, { scale: 3, useCORS: true, width: 2000, windowWidth: 2000 }).then(async canvas => {
+            // High Scale (4) for Ultra HD
+            html2canvas(element, { scale: 4, useCORS: true, width: 2000, windowWidth: 2000 }).then(async canvas => {
                 canvas.toBlob(async (blob) => {
-                    const file = new File([blob], `${appData.header || 'Plan'}.png`, { type: "image/png" });
+                    // TRICK: Use 'application/octet-stream' to force "File" mode in apps
+                    // This bypasses image compression in Telegram/WhatsApp
+                    const file = new File([blob], `${appData.header || 'Plan'}.png`, { type: "application/octet-stream" });
                     const text = `📅 برنامه هفتگی ${appData.userName || ''}`;
                     
                     if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
                         try { 
-                            // Share as a FILE
                             await navigator.share({ files: [file], title: 'برنامه هفتگی', text: text }); 
                         }
                         catch (e) { 
-                            // If share fails, fallback to download
-                            alert("اشتراک‌گذاری مستقیم فایل پشتیبانی نشد. فایل دانلود می‌شود.");
+                            // If direct share fails, download it
+                            alert("اشتراک‌گذاری فایل پشتیبانی نشد. فایل دانلود می‌شود.");
                             const link = document.createElement('a'); link.download = `${appData.header || 'Plan'}.png`;
                             link.href = canvas.toDataURL(); link.click();
                         }
                     } else {
+                        // Fallback for desktop
                         const link = document.createElement('a'); link.download = `${appData.header || 'Plan'}.png`;
                         link.href = canvas.toDataURL(); link.click();
                     }
                     element.style.display = 'none'; hideLoader();
-                }, 'image/png', 1.0);
+                }); // Default PNG quality
             }).catch((err) => { 
                 alert("خطا در تولید عکس: " + err); 
                 element.style.display = 'none'; hideLoader(); 
             });
-        }, 1000); // 1 second delay to ensure full render
+        }, 1000); // 1 second delay for rendering
     }
 
     // --- 2. Share Backup (JSON) ---
@@ -800,7 +799,7 @@
         element.style.position = 'absolute'; element.style.top = '0'; element.style.left = '-9999px';
         
         setTimeout(() => {
-            html2canvas(element, { scale: 3, useCORS: true, width: 2000, windowWidth: 2000 }).then(canvas => {
+            html2canvas(element, { scale: 4, useCORS: true, width: 2000, windowWidth: 2000 }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `${appData.header || 'Plan'}.png`;
                 link.href = canvas.toDataURL('image/png');
