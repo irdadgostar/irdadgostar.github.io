@@ -3,17 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>برنامه ریزی جامع (نسخه موبایل پیشرفته)</title>
+    <title>پلنر جامع نسخه تجاری (PRO)</title>
     <style>
         :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --bg: #f1f5f9;
+            --primary: #2563eb;       /* آبی اصلی */
+            --primary-dark: #1e40af;
+            --accent: #f59e0b;        /* نارنجی برای یادداشت */
+            --success: #10b981;       /* سبز */
+            --danger: #ef4444;        /* قرمز */
+            --bg: #f8fafc;
             --surface: #ffffff;
             --border: #cbd5e1;
             --text: #334155;
-            --select-bg: #bfdbfe; /* رنگ انتخاب محدوده */
+            --select-bg: #bfdbfe;
         }
+
+        * { box-sizing: border-box; outline: none; }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, sans-serif;
@@ -22,289 +27,301 @@
             padding: 15px;
             color: var(--text);
             font-size: 13px;
-            padding-bottom: 100px;
-            -webkit-tap-highlight-color: transparent; /* حذف هایلایت آبی پیشفرض موبایل */
+            padding-bottom: 120px;
+            -webkit-tap-highlight-color: transparent;
         }
-
-        /* --- هدر پرینت (فقط در پرینت دیده می‌شود) --- */
-        #print-header-display { display: none; }
 
         /* --- نوار ابزار --- */
         .toolbar {
             background: var(--surface);
             padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            margin-bottom: 15px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px -3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
             border: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
 
-        .toolbar-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
+        .toolbar-top {
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+        }
+
+        .app-brand {
+            font-weight: 800; font-size: 16px; color: var(--primary-dark);
+            display: flex; align-items: center; gap: 8px;
         }
 
         .toolbar-input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            margin-top: 5px;
-            font-family: inherit;
+            width: 100%; padding: 10px; border: 1px solid var(--border);
+            border-radius: 8px; font-family: inherit; transition: 0.2s;
         }
+        .toolbar-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
 
         /* دکمه‌ها */
         button {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: inherit;
-            font-weight: 600;
-            font-size: 12px;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: 0.2s;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            white-space: nowrap;
+            padding: 8px 14px; border: none; border-radius: 8px; cursor: pointer;
+            font-family: inherit; font-weight: 600; font-size: 12px; color: white;
+            display: flex; align-items: center; gap: 6px; transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+        button:active { transform: scale(0.98); }
+        button svg { width: 16px; height: 16px; }
 
-        .btn-primary { background-color: var(--primary); }
-        .btn-success { background-color: #10b981; }
-        .btn-danger { background-color: #ef4444; }
-        .btn-dark { background-color: #475569; }
-        .btn-note { background-color: #f59e0b; }
-        
-        /* دکمه سوییچ حالت انتخاب */
+        .btn-primary { background: var(--primary); }
+        .btn-success { background: var(--success); }
+        .btn-danger { background: var(--danger); }
+        .btn-dark { background: #475569; }
+        .btn-accent { background: var(--accent); }
+        .btn-purple { background: #8b5cf6; }
+
+        /* دکمه حالت انتخاب */
         .mode-switch {
-            background-color: #e2e8f0;
-            color: #334155;
-            border: 1px solid #cbd5e1;
+            background: #e2e8f0; color: #475569; border: 1px solid #cbd5e1; box-shadow: none;
         }
         .mode-switch.active {
-            background-color: var(--primary);
-            color: white;
-            border-color: var(--primary-dark);
+            background: var(--primary); color: white; border-color: var(--primary-dark);
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
         }
 
         /* --- جدول --- */
-        .table-wrapper {
-            background: var(--surface);
-            border-radius: 12px;
+        .table-container {
+            background: var(--surface); border-radius: 12px;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            overflow: auto; /* اسکرول */
-            position: relative;
-            border: 1px solid var(--border);
-            max-height: 80vh;
-            overscroll-behavior: contain; /* جلوگیری از رفرش صفحه در موبایل */
+            overflow: auto; position: relative; border: 1px solid var(--border);
+            max-height: 75vh; overscroll-behavior: contain;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-            min-width: 800px; /* حداقل عرض برای خوانایی در موبایل */
-        }
-
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 850px; }
+        
         thead { position: sticky; top: 0; z-index: 20; }
-
         th {
-            background-color: #1e293b;
-            color: white;
-            padding: 10px;
-            border: 1px solid #334155;
-            font-size: 12px;
-            user-select: none;
+            background: #1e293b; color: white; padding: 10px;
+            border: 1px solid #334155; user-select: none;
         }
 
         /* دکمه کپی در هدر */
-        .copy-day-btn {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            border-radius: 4px;
-            padding: 2px 6px;
-            margin-right: 5px;
-            cursor: pointer;
-            font-size: 10px;
-            color: white;
+        .copy-btn {
+            background: rgba(255,255,255,0.15); padding: 2px 6px; border-radius: 4px;
+            font-size: 10px; margin-left: 5px; cursor: pointer; color: #fff;
         }
-        .copy-day-btn:hover { background: rgba(255,255,255,0.4); }
+        .copy-btn:hover { background: rgba(255,255,255,0.3); }
 
         th:first-child, td:first-child {
-            width: 60px;
-            background-color: #f8fafc;
-            color: #64748b;
-            font-weight: bold;
-            font-size: 10px;
-            position: sticky;
-            right: 0;
-            z-index: 30;
-            border-left: 2px solid #cbd5e1;
-            text-align: center;
+            width: 65px; background: #f1f5f9; color: #64748b; font-weight: bold;
+            font-size: 10px; position: sticky; right: 0; z-index: 30;
+            border-left: 2px solid #cbd5e1; text-align: center;
         }
 
         td {
-            border: 1px solid #e2e8f0;
-            text-align: center;
-            height: 25px; /* ارتفاع هر ربع ساعت */
-            padding: 0;
-            vertical-align: middle;
-            touch-action: auto; /* پیشفرض */
+            border: 1px solid #e2e8f0; text-align: center; height: 26px;
+            padding: 0; vertical-align: middle; touch-action: auto;
         }
 
-        /* --- حالت انتخاب --- */
-        /* وقتی حالت انتخاب فعال است، اسکرول روی سلول‌ها غیرفعال می‌شود تا بتوان درگ کرد */
-        body.selection-mode td.empty-cell {
-            touch-action: none; 
-            cursor: crosshair;
-        }
-
-        td.selected-range {
-            background-color: var(--select-bg) !important;
-        }
-
-        /* --- تسک‌ها --- */
+        /* سلول تسک */
         td.task-cell {
-            color: white;
-            padding: 2px;
-            font-size: 11px;
-            border-bottom: 1px solid rgba(255,255,255,0.3);
-            box-sizing: border-box;
-            position: relative;
-            cursor: pointer;
-            overflow: hidden;
+            color: white; padding: 2px; font-size: 11px; cursor: pointer;
+            box-sizing: border-box; overflow: hidden; position: relative;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
         }
+        .task-content { pointer-events: none; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; }
+
+        /* حالت انتخاب */
+        body.selection-mode td.empty-cell { touch-action: none; cursor: crosshair; }
+        .selected-range { background-color: var(--select-bg) !important; }
+
+        /* --- بخش مدیریت افزودنی‌ها (منو) --- */
+        .extras-list {
+            list-style: none; padding: 0; margin: 0; max-height: 200px; overflow-y: auto;
+            border: 1px solid #eee; border-radius: 8px; margin-top: 10px;
+        }
+        .extra-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 10px; border-bottom: 1px solid #f1f5f9; background: #fff;
+        }
+        .extra-item:last-child { border-bottom: none; }
+        .extra-controls { display: flex; align-items: center; gap: 8px; }
         
-        .task-inner {
-            width: 100%; height: 100%;
-            display: flex; flex-direction: column; justify-content: center;
-            pointer-events: none;
-        }
+        /* سوییچ نمایش/عدم نمایش */
+        .toggle-eye { cursor: pointer; opacity: 0.4; transition: 0.2s; }
+        .toggle-eye.visible { opacity: 1; color: var(--primary); }
+        .toggle-eye:hover { transform: scale(1.1); }
 
         /* --- مودال‌ها --- */
         .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(3px);
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 2000;
+            justify-content: center; align-items: center; backdrop-filter: blur(4px);
         }
-
         .modal {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 350px;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-height: 90vh;
-            overflow-y: auto;
+            background: white; padding: 20px; border-radius: 16px; width: 90%; max-width: 400px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); display: flex; flex-direction: column; gap: 15px;
+            max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        .modal h3 { margin: 0 0 10px 0; border-bottom: 1px solid #eee; padding-bottom: 8px; }
-        
-        .form-label { font-size: 11px; font-weight: bold; color: #64748b; margin-bottom: 4px; display: block; }
-        input, select, textarea {
-            width: 100%; padding: 10px; border: 1px solid #cbd5e1;
-            border-radius: 8px; font-family: inherit; box-sizing: border-box;
-        }
-        
-        .color-palette { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 5px; }
-        .color-swatch {
-            width: 25px; height: 25px; border-radius: 50%; cursor: pointer;
-            border: 2px solid #fff; box-shadow: 0 0 0 1px #cbd5e1;
-        }
+        .modal-header { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .modal-header h3 { margin: 0; font-size: 16px; color: #1e293b; }
 
-        /* --- پرینت --- */
+        /* --- المان‌های پرینت (مخفی در حالت عادی) --- */
+        #print-header-section, #print-extras-section, #print-footer-note { display: none; }
+
+        /* --- استایل چاپ --- */
         @media print {
             @page { size: A4 landscape; margin: 5mm; }
-            body { background: white; padding: 0; }
-            .no-print, .toolbar, .copy-day-btn { display: none !important; }
+            body { background: white; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .no-print, .toolbar, .copy-btn { display: none !important; }
             
-            #print-header-display {
-                display: block;
-                text-align: center;
-                font-size: 20px;
-                font-weight: bold;
-                margin-bottom: 10px;
-                border-bottom: 2px solid #000;
-                padding-bottom: 5px;
+            /* ساختار صفحه چاپ */
+            #print-header-section {
+                display: block; text-align: center; margin-bottom: 10px;
+                border-bottom: 2px solid #000; padding-bottom: 5px;
             }
+            #print-title-text { font-size: 22px; font-weight: 900; color: #000; }
 
-            .table-wrapper { box-shadow: none; border: none; overflow: visible; max-height: none; }
-            table { border: 2px solid #000; font-size: 10px; width: 100%; }
+            /* بخش الزامات و چک لیست در بالای جدول */
+            #print-extras-section {
+                display: flex; gap: 20px; margin-bottom: 10px; font-size: 11px;
+                justify-content: space-between; align-items: flex-start;
+                border: 1px solid #ccc; padding: 10px; border-radius: 5px;
+            }
+            .print-col { flex: 1; }
+            .print-col h4 { margin: 0 0 5px 0; border-bottom: 1px solid #000; padding-bottom: 2px; font-size: 12px; }
+            .print-list { list-style: none; padding: 0; margin: 0; }
+            .print-list li { margin-bottom: 3px; display: flex; align-items: center; gap: 5px; }
+
+            /* جدول */
+            .table-container { box-shadow: none; border: none; overflow: visible; max-height: none; }
+            table { border: 2px solid #000; width: 100%; font-size: 10px; }
             thead { display: table-header-group; }
             tr { page-break-inside: avoid; }
-            th { background-color: #ddd !important; color: black !important; border: 1px solid #000; }
-            td { border: 1px solid #666; height: 20px; }
-            td.task-cell { border: 1px solid #000 !important; color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            th { background-color: #e2e8f0 !important; color: #000 !important; border: 1px solid #000; }
+            td { border: 1px solid #666; height: 18px; } /* فشرده */
+            td.task-cell { border: 1px solid #000 !important; color: #000 !important; font-weight: bold; }
+
+            /* فوتر یادداشت */
+            #print-footer-note {
+                display: block; margin-top: 15px; padding: 10px; border: 1px dashed #666;
+                border-radius: 5px; font-size: 11px; background: #fafafa;
+                page-break-inside: avoid;
+            }
+            #print-footer-note h4 { margin: 0 0 5px 0; }
+            .landscape-warning { display: none; } /* مخفی کردن هشدار در خود چاپ */
         }
     </style>
 </head>
-<body id="mainBody">
+<body>
 
-    <!-- هدر مخصوص پرینت -->
-    <div id="print-header-display"></div>
+    <!-- بخش‌های مخصوص پرینت -->
+    <div id="print-header-section">
+        <div id="print-title-text">برنامه هفتگی</div>
+    </div>
 
+    <div id="print-extras-section">
+        <!-- ستون سمت راست: نکات/الزامات -->
+        <div class="print-col">
+            <h4>🔸 نکات و الزامات</h4>
+            <ul class="print-list" id="print-req-list"></ul>
+        </div>
+        <!-- ستون سمت چپ: چک لیست -->
+        <div class="print-col" style="border-right: 1px solid #ccc; padding-right: 20px;">
+            <h4>▫️ چک‌لیست موارد</h4>
+            <ul class="print-list" id="print-check-list"></ul>
+        </div>
+    </div>
+
+    <!-- نوار ابزار -->
     <div class="toolbar no-print">
-        <div class="toolbar-row">
-            <div style="font-weight:bold; display:flex; align-items:center; gap:5px;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                برنامه ریزی پیشرفته
+        <div class="toolbar-top">
+            <div class="app-brand">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                پلنر جامع PRO
             </div>
-            
-            <!-- دکمه مهم سوییچ حالت -->
+
             <button class="mode-switch" id="selectionModeBtn" onclick="toggleSelectionMode()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
-                <span id="modeText">حالت اسکرول</span> (برای انتخاب بزنید)
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path></svg>
+                <span id="modeText">حالت اسکرول</span> (کلیک برای انتخاب)
             </button>
         </div>
 
-        <div class="toolbar-row">
-            <input type="text" id="printHeaderInput" class="toolbar-input" placeholder="عنوان بالای صفحه برای پرینت (مثلا: برنامه هفته اول مهر)" oninput="updatePrintHeader(this.value)">
-        </div>
+        <input type="text" class="toolbar-input" id="headerInput" placeholder="عنوان سربرگ پرینت (مثلاً: برنامه هفته اول مهر ماه)" oninput="updateHeader(this.value)">
 
-        <div class="toolbar-row">
-            <button class="btn-note" onclick="openNotepad()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        <div class="toolbar-top">
+            <button class="btn-purple" onclick="openExtrasModal()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                الزامات و چک‌لیست
+            </button>
+
+            <button class="btn-accent" onclick="openNotepad()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                 یادداشت
             </button>
             
             <div style="flex:1"></div>
 
-            <button class="btn-success" onclick="exportData()">💾 دانلود بک‌آپ</button>
+            <button class="btn-success" onclick="exportData()">💾 بک‌آپ</button>
             <button class="btn-primary" onclick="document.getElementById('fileInput').click()">📂 بازگردانی</button>
             <input type="file" id="fileInput" hidden onchange="importData(this)">
-            <button class="btn-dark" onclick="window.print()">🖨 پرینت</button>
-            <button class="btn-danger" onclick="clearAll()">🗑 حذف</button>
+            
+            <button class="btn-dark" onclick="printApp()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                پرینت
+            </button>
+            <button class="btn-danger" onclick="clearAll()">🗑 حذف کل</button>
         </div>
     </div>
 
-    <div class="table-wrapper">
+    <!-- جدول -->
+    <div class="table-container">
         <table id="plannerTable">
             <thead>
-                <tr id="tableHeaderRow">
-                    <th>ساعت</th>
-                    <!-- هدرها توسط JS ساخته می‌شوند تا دکمه کپی داشته باشند -->
-                </tr>
+                <tr id="headerRow"><th>ساعت</th></tr>
             </thead>
             <tbody id="plannerBody"></tbody>
         </table>
+    </div>
+
+    <!-- فوتر یادداشت (در پرینت نمایش داده میشود) -->
+    <div id="print-footer-note">
+        <h4>📝 یادداشت‌ها:</h4>
+        <div id="print-note-content" style="white-space: pre-wrap;"></div>
+    </div>
+
+    <!-- مودال افزودنی‌ها (چک لیست و الزامات) -->
+    <div class="modal-overlay" id="extrasModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>مدیریت موارد اضافی</h3>
+                <button class="btn-danger" onclick="closeModal('extrasModal')" style="padding:4px 8px;">✕</button>
+            </div>
+            
+            <!-- تب بندی ساده -->
+            <div style="display:flex; gap:10px; border-bottom:1px solid #eee; padding-bottom:5px;">
+                <button class="btn-primary" style="flex:1" onclick="showTab('tab-req')">🔸 نکات</button>
+                <button class="btn-dark" style="flex:1" onclick="showTab('tab-chk')">▫️ چک‌لیست</button>
+            </div>
+
+            <!-- تب نکات -->
+            <div id="tab-req" style="display:block;">
+                <div style="display:flex; gap:5px; margin-top:10px;">
+                    <input type="text" id="reqInput" class="toolbar-input" placeholder="نکته جدید...">
+                    <button class="btn-success" onclick="addRequirement()">+</button>
+                </div>
+                <div style="font-size:10px; color:#666; margin-top:5px;">چشم: نمایش در پرینت</div>
+                <ul class="extras-list" id="reqListUi"></ul>
+            </div>
+
+            <!-- تب چک لیست -->
+            <div id="tab-chk" style="display:none;">
+                <div style="display:flex; gap:5px; margin-top:10px;">
+                    <input type="text" id="chkInput" class="toolbar-input" placeholder="آیتم جدید...">
+                    <button class="btn-success" onclick="addChecklist()">+</button>
+                </div>
+                <div style="font-size:10px; color:#666; margin-top:5px;">چشم: نمایش | تیک: وضعیت انجام</div>
+                <ul class="extras-list" id="chkListUi"></ul>
+            </div>
+        </div>
     </div>
 
     <!-- مودال فعالیت -->
@@ -315,32 +332,26 @@
             <input type="hidden" id="taskDay">
             <input type="hidden" id="taskStartStr">
             
+            <div style="font-size:12px; color:#666;" id="timeInfo"></div>
+            
             <div>
-                <span class="form-label">زمان:</span>
-                <div id="timeDisplay" style="font-size:12px; color:#666; margin-bottom:5px;"></div>
+                <label style="font-size:11px; font-weight:bold;">عنوان:</label>
+                <input type="text" id="inpName" class="toolbar-input" placeholder="مثلاً: ورزش" autofocus>
             </div>
 
             <div>
-                <span class="form-label">نام فعالیت:</span>
-                <input type="text" id="inpName" placeholder="مثلاً: ورزش" autofocus>
+                <label style="font-size:11px; font-weight:bold;">مدت زمان:</label>
+                <select id="inpDuration" class="toolbar-input"></select>
             </div>
 
             <div>
-                <span class="form-label">مدت زمان (تعداد خانه‌های 15 دقیقه‌ای):</span>
-                <select id="inpDuration">
-                    <!-- با JS پر میشود -->
-                </select>
-            </div>
-
-            <div>
-                <span class="form-label">رنگ:</span>
-                <div class="color-palette">
-                    <div class="color-swatch" style="background:#3b82f6" onclick="setColor('#3b82f6')"></div>
-                    <div class="color-swatch" style="background:#10b981" onclick="setColor('#10b981')"></div>
-                    <div class="color-swatch" style="background:#ef4444" onclick="setColor('#ef4444')"></div>
-                    <div class="color-swatch" style="background:#f59e0b" onclick="setColor('#f59e0b')"></div>
-                    <div class="color-swatch" style="background:#8b5cf6" onclick="setColor('#8b5cf6')"></div>
-                    <div class="color-swatch" style="background:#64748b" onclick="setColor('#64748b')"></div>
+                <label style="font-size:11px; font-weight:bold;">رنگ:</label>
+                <div style="display:flex; gap:5px; flex-wrap:wrap; margin-top:5px;">
+                    <div onclick="setColor('#3b82f6')" style="width:25px;height:25px;background:#3b82f6;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+                    <div onclick="setColor('#10b981')" style="width:25px;height:25px;background:#10b981;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+                    <div onclick="setColor('#ef4444')" style="width:25px;height:25px;background:#ef4444;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+                    <div onclick="setColor('#f59e0b')" style="width:25px;height:25px;background:#f59e0b;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
+                    <div onclick="setColor('#8b5cf6')" style="width:25px;height:25px;background:#8b5cf6;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
                     <input type="color" id="inpColor" value="#3b82f6" style="margin-right:auto">
                 </div>
             </div>
@@ -358,145 +369,105 @@
     <div class="modal-overlay" id="noteModal">
         <div class="modal">
             <h3>دفترچه یادداشت</h3>
-            <textarea id="notepadArea" rows="10" placeholder="یادداشت‌های خود را اینجا بنویسید..."></textarea>
-            <div style="display:flex; justify-content:flex-end;">
-                <button class="btn-primary" onclick="saveNoteAndClose()">ذخیره و بستن</button>
+            <textarea id="noteArea" class="toolbar-input" rows="10" placeholder="یادداشت‌ها..."></textarea>
+            <div style="display:flex; align-items:center; gap:5px;">
+                <input type="checkbox" id="showNoteInPrint">
+                <label for="showNoteInPrint" style="font-size:12px;">نمایش در انتهای صفحه پرینت</label>
+            </div>
+            <div style="display:flex; justify-content:flex-end; margin-top:10px;">
+                <button class="btn-primary" onclick="saveNote()">ذخیره و بستن</button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- تنظیمات اصلی ---
         const DAYS = [
-            { id: 'sat', label: 'شنبه' }, { id: 'sun', label: 'یکشنبه' },
-            { id: 'mon', label: 'دوشنبه' }, { id: 'tue', label: 'سه‌شنبه' },
-            { id: 'wed', label: 'چهارشنبه' }, { id: 'thu', label: 'پنج‌شنبه' },
-            { id: 'fri', label: 'جمعه' }
+            {id:'sat', l:'شنبه'}, {id:'sun', l:'یکشنبه'}, {id:'mon', l:'دوشنبه'},
+            {id:'tue', l:'سه‌شنبه'}, {id:'wed', l:'چهارشنبه'}, {id:'thu', l:'پنج‌شنبه'}, {id:'fri', l:'جمعه'}
         ];
-        
         const TIMELINE = [];
-        for(let h=0; h<24; h++) for(let m=0; m<60; m+=15) 
-            TIMELINE.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+        for(let h=0;h<24;h++) for(let m=0;m<60;m+=15) TIMELINE.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
 
-        // آبجکت اصلی دیتا
+        // ساختار داده جامع
         let appData = {
             tasks: [],
-            notes: "",
-            printHeader: ""
+            headerTitle: "",
+            notes: { text: "", showInPrint: false },
+            requirements: [
+                { id: 1, text: "بررسی اقساط وام", show: true },
+                { id: 2, text: "پرداخت قبض برق", show: true }
+            ],
+            checklists: [
+                { id: 1, text: "خرید هفتگی", show: true, checked: false },
+                { id: 2, text: "سرویس ماشین", show: true, checked: false }
+            ]
         };
 
         // متغیرهای حالت انتخاب
-        let isSelectionMode = false;
-        let isDragging = false;
-        let selectionStart = null; // { day, index }
-        let selectionCurrent = null;
+        let isSelectMode = false, isDrag = false;
+        let selStart = null, selCurr = null;
 
-        // --- شروع برنامه ---
         function init() {
-            // لود دیتا
-            const saved = localStorage.getItem('ultraPlannerV1');
-            if (saved) {
+            const saved = localStorage.getItem('proPlannerBiz');
+            if(saved) {
                 try {
                     const parsed = JSON.parse(saved);
-                    // پشتیبانی از نسخه های قدیمی (اگر آرایه بود تبدیل به آبجکت کن)
-                    if (Array.isArray(parsed)) {
-                        appData.tasks = parsed;
-                    } else {
-                        appData = parsed;
-                    }
-                } catch(e) { console.error("Data Load Error", e); }
+                    // ادغام با مقادیر پیشفرض برای سازگاری
+                    if(!Array.isArray(parsed)) appData = { ...appData, ...parsed };
+                    else appData.tasks = parsed; // پشتیبانی از نسخه قدیمی
+                } catch(e){}
             }
 
-            // مقداردهی اولیه UI
-            document.getElementById('notepadArea').value = appData.notes || "";
-            document.getElementById('printHeaderInput').value = appData.printHeader || "";
-            updatePrintHeader(appData.printHeader || "");
-
-            // پر کردن سلکت مدت زمان
+            // پر کردن UI اولیه
+            document.getElementById('headerInput').value = appData.headerTitle || "";
+            document.getElementById('print-title-text').innerText = appData.headerTitle || "برنامه هفتگی";
+            
+            // پر کردن سلکتور زمان
             const durSel = document.getElementById('inpDuration');
-            for(let i=1; i<=32; i++) {
-                let txt = "";
-                if (i*15 < 60) txt = (i*15) + " دقیقه";
-                else {
-                    const h = Math.floor((i*15)/60);
-                    const m = (i*15)%60;
-                    txt = h + " ساعت" + (m>0 ? " و " + m + " دقیقه" : "");
-                }
-                durSel.add(new Option(txt, i));
-            }
+            for(let i=1;i<=24;i++) durSel.add(new Option(`${i*15} دقیقه (${i/4} ساعت)`, i));
 
             renderHeader();
             renderTable();
-            setupPointerEvents();
+            setupTouch();
         }
 
         // --- رندرینگ ---
         function renderHeader() {
-            const tr = document.getElementById('tableHeaderRow');
-            // پاک کردن همه بجز ستون اول
-            while(tr.children.length > 1) tr.removeChild(tr.lastChild);
-
-            DAYS.forEach(day => {
+            const row = document.getElementById('headerRow');
+            while(row.children.length > 1) row.removeChild(row.lastChild);
+            DAYS.forEach(d => {
                 const th = document.createElement('th');
-                th.innerHTML = `
-                    <div style="display:flex; align-items:center; justify-content:center; gap:5px;">
-                        <button class="copy-day-btn" onclick="copyDay('${day.id}')" title="کپی کردن برنامه این روز">📋</button>
-                        ${day.label}
-                    </div>
-                `;
-                tr.appendChild(th);
+                th.innerHTML = `<div>${d.l} <span class="copy-btn" onclick="copyDay('${d.id}')">📋</span></div>`;
+                row.appendChild(th);
             });
         }
 
         function renderTable() {
             const tbody = document.getElementById('plannerBody');
             tbody.innerHTML = '';
-            
-            // نقشه اشغال بودن خانه‌ها
-            const occupied = {}; 
-            DAYS.forEach(d => occupied[d.id] = new Array(TIMELINE.length).fill(false));
+            const occupied = {}; DAYS.forEach(d=>occupied[d.id]=new Array(TIMELINE.length).fill(false));
 
-            TIMELINE.forEach((timeStr, tIndex) => {
+            TIMELINE.forEach((time, idx) => {
                 const tr = document.createElement('tr');
-                
-                // ستون ساعت
-                const tdTime = document.createElement('td');
-                tdTime.innerText = timeStr;
-                tr.appendChild(tdTime);
+                const tdTime = document.createElement('td'); tdTime.innerText = time; tr.appendChild(tdTime);
 
                 DAYS.forEach(day => {
-                    if (occupied[day.id][tIndex]) return;
+                    if(occupied[day.id][idx]) return;
+                    const task = appData.tasks.find(t => t.day===day.id && t.startStr===time);
 
-                    const task = appData.tasks.find(t => t.day === day.id && t.startStr === timeStr);
-
-                    if (task) {
+                    if(task) {
                         const td = document.createElement('td');
                         td.rowSpan = task.duration;
                         td.className = 'task-cell';
                         td.style.backgroundColor = task.color;
-                        
-                        // محتوا
-                        const endIdx = tIndex + task.duration;
-                        const endStr = endIdx < TIMELINE.length ? TIMELINE[endIdx] : "24:00";
-                        td.innerHTML = `<div class="task-inner"><b>${task.name}</b></div>`;
-                        
-                        // کلیک برای ویرایش
-                        td.onclick = (e) => {
-                            e.stopPropagation(); // جلوگیری از انتخاب سلول زیرین
-                            openTaskModal(task);
-                        };
-
+                        td.innerHTML = `<div class="task-content"><b>${task.name}</b></div>`;
+                        td.onclick = (e) => { e.stopPropagation(); openTaskModal(task); };
                         tr.appendChild(td);
-                        // پر کردن ماتریس اشغال
-                        for(let i=1; i < task.duration; i++) 
-                            if (tIndex + i < TIMELINE.length) occupied[day.id][tIndex + i] = true;
-
+                        for(let i=1; i<task.duration; i++) if(idx+i < TIMELINE.length) occupied[day.id][idx+i]=true;
                     } else {
-                        // سلول خالی
                         const td = document.createElement('td');
                         td.className = 'empty-cell';
-                        td.dataset.day = day.id;
-                        td.dataset.index = tIndex;
+                        td.dataset.d = day.id; td.dataset.i = idx;
                         tr.appendChild(td);
                     }
                 });
@@ -504,184 +475,104 @@
             });
         }
 
-        // --- سیستم انتخاب و تاچ (هسته اصلی جدید) ---
+        // --- سیستم انتخاب (Touch/Drag) ---
         function toggleSelectionMode() {
-            isSelectionMode = !isSelectionMode;
+            isSelectMode = !isSelectMode;
             const btn = document.getElementById('selectionModeBtn');
             const txt = document.getElementById('modeText');
-            const body = document.body;
-
-            if (isSelectionMode) {
-                btn.classList.add('active');
-                txt.innerText = "✍️ حالت انتخاب روشن";
-                body.classList.add('selection-mode');
+            if(isSelectMode) {
+                document.body.classList.add('selection-mode');
+                btn.classList.add('active'); txt.innerText = "حالت انتخاب فعال";
             } else {
-                btn.classList.remove('active');
-                txt.innerText = "حالت اسکرول";
-                body.classList.remove('selection-mode');
-                clearSelection();
+                document.body.classList.remove('selection-mode');
+                btn.classList.remove('active'); txt.innerText = "حالت اسکرول";
+                clearSel();
             }
         }
 
-        function setupPointerEvents() {
+        function setupTouch() {
             const table = document.getElementById('plannerTable');
             
-            // شروع لمس
-            table.addEventListener('pointerdown', (e) => {
-                if (!isSelectionMode) return;
+            const startHandler = (e) => {
+                if(!isSelectMode) return;
                 const cell = e.target.closest('td.empty-cell');
-                if (!cell) return;
-                
-                e.preventDefault(); // جلوگیری از اسکرول
-                isDragging = true;
-                const day = cell.dataset.day;
-                const idx = parseInt(cell.dataset.index);
-                
-                selectionStart = { day, index: idx };
-                selectionCurrent = { day, index: idx };
-                highlightSelection();
-                
-                // کپچر کردن پوینتر برای ادامه درگ حتی اگر از المان خارج شد
-                cell.setPointerCapture(e.pointerId);
-            });
-
-            // حرکت لمس
-            table.addEventListener('pointermove', (e) => {
-                if (!isDragging || !isSelectionMode) return;
+                if(!cell) return;
                 e.preventDefault();
+                isDrag = true;
+                selStart = { d: cell.dataset.d, i: parseInt(cell.dataset.i) };
+                selCurr = { ...selStart };
+                highlight();
+            };
 
-                // پیدا کردن المان زیر انگشت
-                const element = document.elementFromPoint(e.clientX, e.clientY);
-                if (!element) return;
-                
-                const cell = element.closest('td.empty-cell');
-                if (cell && cell.dataset.day === selectionStart.day) {
-                    const idx = parseInt(cell.dataset.index);
-                    // فقط در همان روز اجازه انتخاب داریم
-                    selectionCurrent = { day: selectionStart.day, index: idx };
-                    highlightSelection();
+            const moveHandler = (e) => {
+                if(!isDrag) return;
+                const el = document.elementFromPoint(e.clientX || e.touches[0].clientX, e.clientY || e.touches[0].clientY);
+                if(!el) return;
+                const cell = el.closest('td.empty-cell');
+                if(cell && cell.dataset.d === selStart.d) {
+                    selCurr = { d: selStart.d, i: parseInt(cell.dataset.i) };
+                    highlight();
                 }
-            });
+            };
 
-            // پایان لمس
-            table.addEventListener('pointerup', (e) => {
-                if (!isDragging) return;
-                isDragging = false;
-                if (selectionStart && selectionCurrent) {
-                    finalizeSelection();
+            const endHandler = () => {
+                if(!isDrag) return;
+                isDrag = false;
+                if(selStart && selCurr) {
+                    const s = Math.min(selStart.i, selCurr.i);
+                    const dur = Math.max(selStart.i, selCurr.i) - s + 1;
+                    openTaskModal(null, { d: selStart.d, s: TIMELINE[s], dur });
                 }
-            });
+                clearSel();
+            };
+
+            table.addEventListener('mousedown', startHandler);
+            table.addEventListener('touchstart', startHandler, {passive: false});
+            window.addEventListener('mousemove', moveHandler);
+            window.addEventListener('touchmove', moveHandler, {passive: false});
+            window.addEventListener('mouseup', endHandler);
+            window.addEventListener('touchend', endHandler);
         }
 
-        function highlightSelection() {
-            // پاک کردن قبلی ها
-            document.querySelectorAll('.selected-range').forEach(el => el.classList.remove('selected-range'));
-
-            if (!selectionStart || !selectionCurrent) return;
-
-            const start = Math.min(selectionStart.index, selectionCurrent.index);
-            const end = Math.max(selectionStart.index, selectionCurrent.index);
-            const day = selectionStart.day;
-
-            // پیدا کردن سلول‌ها و رنگ کردن
-            for (let i = start; i <= end; i++) {
-                const selector = `td.empty-cell[data-day="${day}"][data-index="${i}"]`;
-                const el = document.querySelector(selector);
-                if (el) el.classList.add('selected-range');
+        function highlight() {
+            document.querySelectorAll('.selected-range').forEach(e=>e.classList.remove('selected-range'));
+            if(!selStart || !selCurr) return;
+            const s = Math.min(selStart.i, selCurr.i), e = Math.max(selStart.i, selCurr.i);
+            for(let i=s; i<=e; i++) {
+                const td = document.querySelector(`td.empty-cell[data-d="${selStart.d}"][data-i="${i}"]`);
+                if(td) td.classList.add('selected-range');
             }
         }
-
-        function clearSelection() {
-            document.querySelectorAll('.selected-range').forEach(el => el.classList.remove('selected-range'));
-            selectionStart = null;
-            selectionCurrent = null;
+        function clearSel() { 
+            selStart = null; selCurr = null; 
+            document.querySelectorAll('.selected-range').forEach(e=>e.classList.remove('selected-range'));
         }
 
-        function finalizeSelection() {
-            const startIdx = Math.min(selectionStart.index, selectionCurrent.index);
-            const endIdx = Math.max(selectionStart.index, selectionCurrent.index);
-            const duration = endIdx - startIdx + 1;
-            const day = selectionStart.day;
-            const startStr = TIMELINE[startIdx];
-
-            // چک کردن تداخل در محدوده انتخاب شده
-            // (آیا در بین سلول‌های انتخاب شده، تسکی وجود دارد که رندر نشده باشد؟)
-            // چون ما فقط روی empty-cell ها درگ میکنیم، احتمال تداخل کم است اما برای اطمینان:
-            // اگر کاربر از روی یک تسک رد شده باشد، آن تسک selected-range نمیگیرد.
-            // پس ما فقط تعداد selected-range ها را میشماریم.
-            const selectedCount = document.querySelectorAll('.selected-range').length;
-            
-            // باز کردن مودال
-            openTaskModal(null, { day, startStr, duration: selectedCount }); // duration واقعی
-            
-            clearSelection();
-        }
-
-
-        // --- منطق کپی روز به روز ---
-        function copyDay(sourceDayId) {
-            const sourceDayLabel = DAYS.find(d => d.id === sourceDayId).label;
-            const targetLabel = prompt(`برنامه روز ${sourceDayLabel} را در کدام روز کپی کنم؟\n(نام روز را بنویسید: شنبه، یکشنبه، دوشنبه...)`);
-            
-            if (!targetLabel) return;
-            
-            const targetDayObj = DAYS.find(d => d.label === targetLabel.trim());
-            if (!targetDayObj) return alert("روز وارد شده معتبر نیست.");
-            
-            const targetDayId = targetDayObj.id;
-            if (targetDayId === sourceDayId) return alert("مبدا و مقصد یکی است.");
-
-            if(!confirm(`آیا مطمئن هستید؟ تمام برنامه های قبلی ${targetLabel} پاک شده و با ${sourceDayLabel} جایگزین می‌شود.`)) return;
-
-            // 1. حذف تمام تسک های روز مقصد
-            appData.tasks = appData.tasks.filter(t => t.day !== targetDayId);
-
-            // 2. کپی تسک های مبدا
-            const sourceTasks = appData.tasks.filter(t => t.day === sourceDayId);
-            sourceTasks.forEach(t => {
-                appData.tasks.push({
-                    ...t,
-                    id: Date.now() + Math.random(), // آیدی جدید
-                    day: targetDayId
-                });
-            });
-
-            saveData();
-            renderTable();
-        }
-
-        // --- مدیریت داده ها (CRUD) ---
-        function openTaskModal(existingTask, newSelection = null) {
+        // --- مدیریت تسک ---
+        function openTaskModal(task, newInf) {
             const modal = document.getElementById('taskModal');
-            const btnDelete = document.getElementById('btnDelete');
+            const btnDel = document.getElementById('btnDelete');
             
-            if (existingTask) {
-                document.getElementById('taskId').value = existingTask.id;
-                document.getElementById('taskDay').value = existingTask.day;
-                document.getElementById('taskStartStr').value = existingTask.startStr;
-                document.getElementById('inpName').value = existingTask.name;
-                document.getElementById('inpDuration').value = existingTask.duration;
-                document.getElementById('inpColor').value = existingTask.color;
-                
-                document.getElementById('timeDisplay').innerText = 
-                    `${getDayLabel(existingTask.day)} | شروع: ${existingTask.startStr}`;
-                
-                btnDelete.style.display = 'block';
-            } else if (newSelection) {
+            if(task) {
+                document.getElementById('taskId').value = task.id;
+                document.getElementById('taskDay').value = task.day;
+                document.getElementById('taskStartStr').value = task.startStr;
+                document.getElementById('inpName').value = task.name;
+                document.getElementById('inpDuration').value = task.duration;
+                document.getElementById('inpColor').value = task.color;
+                document.getElementById('timeInfo').innerText = `ویرایش: ${task.startStr}`;
+                btnDel.style.display = 'block';
+            } else {
                 document.getElementById('taskId').value = '';
-                document.getElementById('taskDay').value = newSelection.day;
-                document.getElementById('taskStartStr').value = newSelection.startStr;
+                document.getElementById('taskDay').value = newInf.d;
+                document.getElementById('taskStartStr').value = newInf.s;
                 document.getElementById('inpName').value = '';
-                document.getElementById('inpDuration').value = newSelection.duration;
+                document.getElementById('inpDuration').value = newInf.dur;
                 document.getElementById('inpColor').value = '#3b82f6';
-                
-                document.getElementById('timeDisplay').innerText = 
-                    `${getDayLabel(newSelection.day)} | شروع: ${newSelection.startStr}`;
-                
-                btnDelete.style.display = 'none';
+                document.getElementById('timeInfo').innerText = `جدید: ${newInf.s}`;
+                btnDel.style.display = 'none';
             }
-
-            document.getElementById('taskModal').style.display = 'flex';
+            modal.style.display = 'flex';
             document.getElementById('inpName').focus();
         }
 
@@ -689,111 +580,189 @@
             const id = document.getElementById('taskId').value;
             const day = document.getElementById('taskDay').value;
             const startStr = document.getElementById('taskStartStr').value;
-            const name = document.getElementById('inpName').value;
+            const name = document.getElementById('inpName').value.trim();
             const duration = parseInt(document.getElementById('inpDuration').value);
             const color = document.getElementById('inpColor').value;
 
-            if (!name) return alert("نام وارد نشده است");
-
-            // بررسی تداخل
-            const startIdx = TIMELINE.indexOf(startStr);
-            const endIdx = startIdx + duration;
-            
-            if (endIdx > TIMELINE.length) return alert("زمان از پایان روز بیرون می‌زند");
+            if(!name) return alert("نام الزامی است");
+            const sIdx = TIMELINE.indexOf(startStr);
+            if(sIdx + duration > TIMELINE.length) return alert("خارج از بازه روز");
 
             const conflict = appData.tasks.some(t => {
-                if (t.id == id || t.day !== day) return false;
+                if(t.id == id || t.day !== day) return false;
                 const tS = TIMELINE.indexOf(t.startStr);
-                const tE = tS + t.duration;
-                return (startIdx < tE && endIdx > tS);
+                return (sIdx < tS+t.duration && sIdx+duration > tS);
             });
+            if(conflict) return alert("تداخل زمانی!");
 
-            if (conflict) return alert("تداخل با برنامه دیگر!");
-
-            if (id) {
+            if(id) {
                 const idx = appData.tasks.findIndex(t => t.id == id);
-                if (idx !== -1) appData.tasks[idx] = { ...appData.tasks[idx], name, duration, color };
+                if(idx!==-1) appData.tasks[idx] = {...appData.tasks[idx], name, duration, color};
             } else {
-                appData.tasks.push({ id: Date.now(), day, startStr, duration, name, color });
+                appData.tasks.push({id:Date.now(), day, startStr, duration, name, color});
             }
-
-            saveData();
-            renderTable();
+            saveAndRender();
             closeModal('taskModal');
         }
 
         function deleteTask() {
             const id = document.getElementById('taskId').value;
             if(confirm("حذف شود؟")) {
-                appData.tasks = appData.tasks.filter(t => t.id != id);
-                saveData();
-                renderTable();
+                appData.tasks = appData.tasks.filter(t=>t.id!=id);
+                saveAndRender();
                 closeModal('taskModal');
             }
         }
 
-        // --- یادداشت و هدر ---
+        // --- مدیریت افزودنی‌ها (نکات و چک لیست) ---
+        function openExtrasModal() {
+            document.getElementById('extrasModal').style.display = 'flex';
+            renderExtrasList();
+        }
+        
+        function showTab(id) {
+            document.getElementById('tab-req').style.display = (id==='tab-req')?'block':'none';
+            document.getElementById('tab-chk').style.display = (id==='tab-chk')?'block':'none';
+        }
+
+        function renderExtrasList() {
+            // رندر نکات
+            const reqList = document.getElementById('reqListUi');
+            reqList.innerHTML = '';
+            appData.requirements.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = 'extra-item';
+                li.innerHTML = `
+                    <span>🔸 ${item.text}</span>
+                    <div class="extra-controls">
+                        <span class="toggle-eye ${item.show?'visible':''}" onclick="toggleExtra('req', ${index})">👁</span>
+                        <span style="cursor:pointer;color:red;font-size:16px;" onclick="deleteExtra('req', ${index})">✕</span>
+                    </div>
+                `;
+                reqList.appendChild(li);
+            });
+
+            // رندر چک لیست
+            const chkList = document.getElementById('chkListUi');
+            chkList.innerHTML = '';
+            appData.checklists.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = 'extra-item';
+                li.innerHTML = `
+                    <span>▫️ ${item.text}</span>
+                    <div class="extra-controls">
+                        <input type="checkbox" ${item.checked?'checked':''} onchange="toggleCheck(${index})">
+                        <span class="toggle-eye ${item.show?'visible':''}" onclick="toggleExtra('chk', ${index})">👁</span>
+                        <span style="cursor:pointer;color:red;font-size:16px;" onclick="deleteExtra('chk', ${index})">✕</span>
+                    </div>
+                `;
+                chkList.appendChild(li);
+            });
+        }
+
+        function addRequirement() {
+            const txt = document.getElementById('reqInput').value.trim();
+            if(txt) { appData.requirements.push({text: txt, show: true}); document.getElementById('reqInput').value=''; saveAndRender(); renderExtrasList(); }
+        }
+        function addChecklist() {
+            const txt = document.getElementById('chkInput').value.trim();
+            if(txt) { appData.checklists.push({text: txt, show: true, checked: false}); document.getElementById('chkInput').value=''; saveAndRender(); renderExtrasList(); }
+        }
+        function toggleExtra(type, index) {
+            if(type==='req') appData.requirements[index].show = !appData.requirements[index].show;
+            else appData.checklists[index].show = !appData.checklists[index].show;
+            saveAndRender(); renderExtrasList();
+        }
+        function deleteExtra(type, index) {
+            if(type==='req') appData.requirements.splice(index, 1);
+            else appData.checklists.splice(index, 1);
+            saveAndRender(); renderExtrasList();
+        }
+        function toggleCheck(index) {
+            appData.checklists[index].checked = !appData.checklists[index].checked;
+            saveAndRender();
+        }
+
+        // --- یادداشت ---
         function openNotepad() {
             document.getElementById('noteModal').style.display = 'flex';
+            document.getElementById('noteArea').value = appData.notes.text || "";
+            document.getElementById('showNoteInPrint').checked = appData.notes.showInPrint || false;
         }
-        function saveNoteAndClose() {
-            appData.notes = document.getElementById('notepadArea').value;
-            saveData();
+        function saveNote() {
+            appData.notes.text = document.getElementById('noteArea').value;
+            appData.notes.showInPrint = document.getElementById('showNoteInPrint').checked;
+            saveAndRender();
             closeModal('noteModal');
         }
-        function updatePrintHeader(val) {
-            appData.printHeader = val;
-            document.getElementById('print-header-display').innerText = val;
-            saveData();
-        }
 
-        // --- عمومی ---
-        function saveData() {
-            localStorage.setItem('ultraPlannerV1', JSON.stringify(appData));
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
-        }
-
+        // --- عمومی و پرینت ---
+        function updateHeader(val) { appData.headerTitle = val; document.getElementById('print-title-text').innerText = val; saveData(); }
         function setColor(c) { document.getElementById('inpColor').value = c; }
-        
-        function getDayLabel(id) { return DAYS.find(d => d.id === id).label; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function saveAndRender() { localStorage.setItem('proPlannerBiz', JSON.stringify(appData)); renderTable(); }
+        function clearAll() { if(confirm("حذف کامل؟")) { localStorage.removeItem('proPlannerBiz'); location.reload(); } }
 
-        function clearAll() {
-            if(confirm("همه چیز پاک شود؟")) {
-                appData = { tasks: [], notes: "", printHeader: "" };
-                saveData();
-                location.reload();
+        function copyDay(srcId) {
+            const target = prompt("نام روز مقصد (مثلاً: دوشنبه):");
+            const tDay = DAYS.find(d=>d.l===target?.trim());
+            if(!tDay) return;
+            if(confirm(`کپی ${DAYS.find(d=>d.id===srcId).l} به ${tDay.l}؟`)) {
+                appData.tasks = appData.tasks.filter(t=>t.day!==tDay.id);
+                appData.tasks.filter(t=>t.day===srcId).forEach(t => {
+                    appData.tasks.push({...t, id:Date.now()+Math.random(), day:tDay.id});
+                });
+                saveAndRender();
             }
         }
 
-        function exportData() {
-            const blob = new Blob([JSON.stringify(appData)], {type: "application/json"});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = "planner_backup.json";
-            a.click();
+        // آماده سازی پرینت
+        function printApp() {
+            // 1. پر کردن لیست نکات در پرینت
+            const pReq = document.getElementById('print-req-list');
+            pReq.innerHTML = '';
+            appData.requirements.filter(i=>i.show).forEach(i => {
+                pReq.innerHTML += `<li>🔸 ${i.text}</li>`;
+            });
+
+            // 2. پر کردن چک لیست در پرینت
+            const pChk = document.getElementById('print-check-list');
+            pChk.innerHTML = '';
+            appData.checklists.filter(i=>i.show).forEach(i => {
+                const mark = i.checked ? '☑' : '⬜';
+                pChk.innerHTML += `<li>${mark} ${i.text}</li>`;
+            });
+
+            // 3. نمایش یادداشت
+            const noteDiv = document.getElementById('print-footer-note');
+            const noteContent = document.getElementById('print-note-content');
+            if(appData.notes.showInPrint && appData.notes.text) {
+                noteDiv.style.display = 'block';
+                noteContent.innerText = appData.notes.text;
+            } else {
+                noteDiv.style.display = 'none';
+            }
+
+            // هشدار
+            alert("نکته: برای چاپ صحیح، در تنظیمات پرینت گزینه Layout را روی 'Landscape' (افقی) قرار دهید.");
+            window.print();
         }
 
-        function importData(input) {
-            const file = input.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
+        function exportData() {
+            const blob = new Blob([JSON.stringify(appData)], {type:"application/json"});
+            const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="plan_backup.json"; a.click();
+        }
+        function importData(inp) {
+            const f=inp.files[0]; if(!f)return;
+            const r=new FileReader(); r.onload=e=>{
                 try {
-                    const d = JSON.parse(e.target.result);
-                    if (d.tasks || Array.isArray(d)) {
-                         // هندل کردن ورژن های مختلف
-                         if(Array.isArray(d)) appData.tasks = d;
-                         else appData = d;
-                         
-                         saveData();
-                         location.reload();
+                    const d=JSON.parse(e.target.result);
+                    if(d.tasks || Array.isArray(d)) {
+                         if(Array.isArray(d)) appData.tasks = d; else appData = d;
+                         saveAndRender(); location.reload();
                     }
-                } catch(er){ alert("فایل خراب است"); }
-            };
-            reader.readAsText(file);
+                }catch(x){alert("فایل نامعتبر");}
+            }; r.readAsText(f);
         }
 
         init();
