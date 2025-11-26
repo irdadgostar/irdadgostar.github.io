@@ -1,26 +1,26 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>برنامه ریزی هفتگی پیشرفته</title>
+    <title>برنامه ریزی جدولی منظم</title>
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --accent-color: #3498db;
-            --light-bg: #f8f9fa;
-            --border-color: #ddd;
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --bg: #f5f6fa;
+            --border: #bdc3c7;
+            --cell-height: 25px;
         }
 
         body {
-            font-family: 'Tahoma', 'Segoe UI', Arial, sans-serif;
-            background-color: var(--light-bg);
+            font-family: 'Tahoma', 'Segoe UI', sans-serif;
+            background-color: var(--bg);
             margin: 0;
             padding: 20px;
-            color: #333;
+            font-size: 12px;
         }
 
-        /* --- کنترل پنل (ورودی ها) --- */
+        /* --- پنل تنظیمات --- */
         .controls {
             background: white;
             padding: 20px;
@@ -28,10 +28,10 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             margin-bottom: 20px;
             display: flex;
-            flex-wrap: wrap;
             gap: 15px;
-            align-items: end;
-            border-top: 5px solid var(--accent-color);
+            align-items: flex-end;
+            flex-wrap: wrap;
+            border-top: 5px solid var(--accent);
         }
 
         .input-group {
@@ -39,429 +39,426 @@
             flex-direction: column;
         }
 
-        label {
-            font-size: 12px;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
+        label { margin-bottom: 5px; font-weight: bold; color: #555; }
 
         input, select {
-            padding: 8px 12px;
-            border: 1px solid var(--border-color);
+            padding: 8px;
+            border: 1px solid #ccc;
             border-radius: 4px;
             font-family: inherit;
-            font-size: 14px;
+            min-width: 120px;
+        }
+        
+        /* استایل گزینه های غیرفعال در سلکت */
+        option:disabled {
+            background-color: #eee;
+            color: #aaa;
         }
 
         button {
-            padding: 10px 20px;
+            padding: 9px 20px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-family: inherit;
+            color: white;
             font-weight: bold;
-            transition: 0.2s;
+            font-family: inherit;
         }
 
-        .btn-add { background-color: var(--accent-color); color: white; }
-        .btn-add:hover { background-color: #2980b9; }
+        .btn-add { background: var(--accent); }
+        .btn-add:hover { background: #2980b9; }
+        .btn-print { background: var(--primary); }
+        .btn-clear { background: #c0392b; }
 
-        .btn-print { background-color: var(--primary-color); color: white; margin-right: auto; }
-        .btn-clear { background-color: #e74c3c; color: white; }
-
-        /* --- ساختار برنامه --- */
-        .planner-container {
-            display: flex;
-            flex-wrap: nowrap; /* در وب اسکرول افقی بخورد */
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 20px;
-        }
-
-        .day-column {
+        /* --- جدول برنامه --- */
+        .schedule-wrapper {
             background: white;
-            border: 1px solid var(--border-color);
             border-radius: 8px;
-            min-width: 200px;
-            flex: 0 0 200px;
-            display: flex;
-            flex-direction: column;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            overflow-x: auto;
         }
 
-        .day-header {
-            background-color: var(--primary-color);
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed; /* عرض ثابت ستون ها */
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            text-align: center;
+            padding: 0;
+            overflow: hidden;
+            word-wrap: break-word;
+        }
+
+        th {
+            background-color: var(--primary);
             color: white;
             padding: 10px;
-            text-align: center;
-            font-weight: bold;
-            border-radius: 8px 8px 0 0;
             position: sticky;
             top: 0;
             z-index: 10;
+            width: 13%; /* تقسیم بین 7 روز + ستون ساعت */
         }
-
-        .slots-container {
-            flex-grow: 1;
-        }
-
-        .time-slot {
-            display: flex;
-            border-bottom: 1px solid #eee;
-            height: 24px; /* ارتفاع هر ربع ساعت */
-            font-size: 11px;
-            position: relative;
-        }
-
-        .time-label {
-            width: 45px;
-            background-color: #f1f1f1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-left: 1px solid #ddd;
-            color: #666;
+        
+        /* ستون اول (ساعت) */
+        th:first-child, td:first-child {
+            width: 60px;
+            background-color: #ecf0f1;
+            font-weight: bold;
             font-size: 10px;
+            color: #7f8c8d;
         }
 
-        .task-area {
-            flex-grow: 1;
-            padding: 0 5px;
-            display: flex;
-            align-items: center;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            cursor: pointer;
+        td {
+            height: var(--cell-height);
             transition: background 0.2s;
-        }
-
-        .task-area:hover {
-            background-color: #fafafa;
-        }
-
-        /* استایل تسک‌های ثبت شده */
-        .filled-task {
-            background-color: #e3f2fd;
-            border-left: 3px solid var(--accent-color);
-            color: #000;
             font-size: 11px;
+            vertical-align: middle;
         }
 
-        .task-start {
-            border-top: 1px solid #bbdefb;
+        /* سلول‌های خالی قابل هاور */
+        td:not(:first-child):not(.filled-cell):hover {
+            background-color: #f0f8ff;
         }
 
-        /* --- تنظیمات پرینت (A4) --- */
+        /* سلول پر شده */
+        .filled-cell {
+            background-color: #e3f2fd;
+            color: #000;
+            cursor: pointer;
+            border-left: 4px solid var(--accent);
+            box-sizing: border-box;
+            padding: 5px;
+            font-weight: bold;
+        }
+        
+        .filled-cell:hover {
+            background-color: #bbdefb;
+        }
+
+        /* --- پرینت --- */
         @media print {
             @page {
-                size: A4;
-                margin: 10mm;
+                size: A4 landscape; /* اجبار به افقی برای جا شدن هفته */
+                margin: 1cm;
             }
 
             body {
                 background: white;
                 padding: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
 
             .controls, .no-print {
-                display: none !important;
+                display: none;
             }
 
-            .planner-container {
-                display: block; /* تغییر از فلکس به بلاک برای کنترل بهتر */
+            .schedule-wrapper {
+                box-shadow: none;
                 overflow: visible;
             }
 
-            .day-column {
-                width: 48%; /* دو روز در کنار هم */
-                float: right; 
-                margin-bottom: 15px;
-                margin-left: 1%;
-                min-width: unset;
-                border: 1px solid #000;
-                page-break-inside: avoid; /* جلوگیری از شکستن وسط روز */
-                box-shadow: none;
-                border-radius: 0;
+            table {
+                font-size: 10px;
+                border: 2px solid #000;
             }
             
-            /* تمیز کردن float ها */
-            .planner-container::after {
-                content: "";
-                clear: both;
-                display: table;
-            }
-
-            .day-header {
-                background-color: #ddd !important;
+            th {
+                background-color: #ccc !important;
                 color: black !important;
-                border-bottom: 1px solid #000;
-                border-radius: 0;
+                border: 1px solid #000;
             }
 
-            .time-slot {
-                height: 18px; /* کمی فشرده‌تر برای پرینت */
-                border-bottom: 1px solid #ccc;
+            td {
+                border: 1px solid #666;
+                height: 20px; /* کاهش ارتفاع برای جا شدن در صفحه */
             }
 
-            .time-label {
-                background-color: #fff !important;
-                border-left: 1px solid #000;
-                color: #000;
-                font-weight: bold;
-            }
-
-            .filled-task {
-                background-color: #eee !important; /* رنگ خاکستری برای پرینت */
-                border-left: 3px solid #000 !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
+            .filled-cell {
+                background-color: #eee !important;
+                border: 1px solid #000;
+                border-left: 5px solid #000 !important;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- بخش کنترل و ورودی‌ها -->
-    <div class="controls no-print">
-        <div class="input-group">
-            <label>عنوان فعالیت</label>
-            <input type="text" id="taskName" placeholder="مثلاً: مطالعه زبان">
-        </div>
-
-        <div class="input-group">
-            <label>روز هفته</label>
-            <select id="daySelect">
-                <option value="saturday">شنبه</option>
-                <option value="sunday">یکشنبه</option>
-                <option value="monday">دوشنبه</option>
-                <option value="tuesday">سه‌شنبه</option>
-                <option value="wednesday">چهارشنبه</option>
-                <option value="thursday">پنج‌شنبه</option>
-                <option value="friday">جمعه</option>
-            </select>
-        </div>
-
-        <div class="input-group">
-            <label>ساعت شروع</label>
-            <select id="startTime"></select>
-        </div>
-
-        <div class="input-group">
-            <label>ساعت پایان</label>
-            <select id="endTime"></select>
-        </div>
-
-        <div class="input-group">
-            <label>&nbsp;</label>
-            <button class="btn-add" onclick="addTask()">+ افزودن به برنامه</button>
-        </div>
-
-        <div class="input-group" style="margin-right:auto">
-             <label>&nbsp;</label>
-             <div style="display:flex; gap:5px;">
-                <button class="btn-clear" onclick="clearAllData()">پاکسازی همه</button>
-                <button class="btn-print" onclick="window.print()">دانلود / پرینت PDF</button>
-             </div>
-        </div>
+<div class="controls no-print">
+    <div class="input-group">
+        <label>عنوان فعالیت</label>
+        <input type="text" id="inpName" placeholder="مثلا: ورزش">
+    </div>
+    
+    <div class="input-group">
+        <label>روز هفته</label>
+        <select id="inpDay" onchange="updateTimeOptions()">
+            <option value="sat">شنبه</option>
+            <option value="sun">یکشنبه</option>
+            <option value="mon">دوشنبه</option>
+            <option value="tue">سه‌شنبه</option>
+            <option value="wed">چهارشنبه</option>
+            <option value="thu">پنج‌شنبه</option>
+            <option value="fri">جمعه</option>
+        </select>
     </div>
 
-    <!-- کانتینر اصلی برنامه -->
-    <div id="planner" class="planner-container">
-        <!-- روزها توسط جاوا اسکریپت اینجا ساخته می‌شوند -->
+    <div class="input-group">
+        <label>ساعت شروع</label>
+        <select id="inpStart"></select>
     </div>
 
-    <script>
-        const days = [
-            { id: 'saturday', label: 'شنبه' },
-            { id: 'sunday', label: 'یکشنبه' },
-            { id: 'monday', label: 'دوشنبه' },
-            { id: 'tuesday', label: 'سه‌شنبه' },
-            { id: 'wednesday', label: 'چهارشنبه' },
-            { id: 'thursday', label: 'پنج‌شنبه' },
-            { id: 'friday', label: 'جمعه' }
-        ];
+    <div class="input-group">
+        <label>ساعت پایان</label>
+        <select id="inpEnd"></select>
+    </div>
 
-        // تولید لیست زمان‌ها (هر ۱۵ دقیقه)
-        const timeSlots = [];
-        for (let h = 0; h < 24; h++) {
-            for (let m = 0; m < 60; m += 15) {
-                let hour = h.toString().padStart(2, '0');
-                let minute = m.toString().padStart(2, '0');
-                timeSlots.push(`${hour}:${minute}`);
-            }
+    <div class="input-group" style="flex-direction: row; gap: 10px; align-items: flex-end;">
+        <button class="btn-add" onclick="addTask()">+ ثبت در برنامه</button>
+        <button class="btn-print" onclick="window.print()">چاپ برنامه</button>
+        <button class="btn-clear" onclick="clearData()">حذف همه</button>
+    </div>
+</div>
+
+<div class="schedule-wrapper">
+    <table id="plannerTable">
+        <thead>
+            <tr>
+                <th>ساعت</th>
+                <th>شنبه</th>
+                <th>یکشنبه</th>
+                <th>دوشنبه</th>
+                <th>سه‌شنبه</th>
+                <th>چهارشنبه</th>
+                <th>پنج‌شنبه</th>
+                <th>جمعه</th>
+            </tr>
+        </thead>
+        <tbody id="plannerBody">
+            <!-- سطرها با جاوااسکریپت ساخته می‌شوند -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // تنظیمات
+    const daysOrder = ['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'];
+    const timeIntervals = []; // تمام بازه های 15 دقیقه ای
+    
+    // دیتابیس اصلی: { 'sat': { '08:00': { name: 'Gym', duration: 4 } } }
+    // duration تعداد بلاک‌های 15 دقیقه‌ای است
+    let schedule = JSON.parse(localStorage.getItem('tablePlannerDB')) || {};
+
+    // تولید بازه های زمانی 00:00 تا 23:45
+    for(let h=0; h<24; h++) {
+        for(let m=0; m<60; m+=15) {
+            let time = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+            timeIntervals.push(time);
         }
-        // اضافه کردن 24:00 برای پایان
-        timeSlots.push("24:00");
+    }
 
-        // آبجکت ذخیره اطلاعات
-        let scheduleData = JSON.parse(localStorage.getItem('mySchedule')) || {};
+    function init() {
+        populateSelects();
+        renderTable();
+        updateTimeOptions(); // آپدیت اولیه برای غیرفعال کردن تایم های پر
+    }
 
-        function init() {
-            populateTimeSelects();
-            renderPlanner();
-        }
+    function populateSelects() {
+        const startSel = document.getElementById('inpStart');
+        const endSel = document.getElementById('inpEnd');
+        
+        // پاک کردن قبلی ها
+        startSel.innerHTML = '';
+        endSel.innerHTML = '';
 
-        // پر کردن دراپ‌داون‌های ساعت
-        function populateTimeSelects() {
-            const startSelect = document.getElementById('startTime');
-            const endSelect = document.getElementById('endTime');
-            
-            // برای شروع تا 23:45
-            timeSlots.slice(0, -1).forEach(time => {
-                let opt = new Option(time, time);
-                startSelect.add(opt);
-            });
+        timeIntervals.forEach(t => {
+            startSel.add(new Option(t, t));
+        });
+        
+        // برای پایان، از 00:15 شروع میشه تا 24:00 (فرضی 00:00 روز بعد)
+        const endTimes = [...timeIntervals.slice(1), "24:00"]; // 00:00 بعدی رو دستی هندل میکنیم
+        endTimes.forEach(t => {
+            endSel.add(new Option(t, t));
+        });
+        
+        // پیشفرض
+        startSel.value = "08:00";
+        endSel.value = "09:00";
+    }
 
-            // برای پایان از 00:15 تا 24:00
-            timeSlots.slice(1).forEach(time => {
-                let opt = new Option(time, time);
-                endSelect.add(opt);
-            });
-            
-            // پیش‌فرض
-            startSelect.value = "08:00";
-            endSelect.value = "09:00";
-        }
+    // --- منطق هوشمند غیرفعال سازی ---
+    function updateTimeOptions() {
+        const day = document.getElementById('inpDay').value;
+        const startSel = document.getElementById('inpStart');
+        
+        // ریست کردن همه آپشن ها به حالت فعال
+        Array.from(startSel.options).forEach(opt => {
+            opt.disabled = false;
+            opt.text = opt.value; // برگرداندن متن اصلی
+        });
 
-        // رندر کردن ساختار HTML جدول
-        function renderPlanner() {
-            const container = document.getElementById('planner');
-            container.innerHTML = '';
-
-            days.forEach(day => {
-                const dayCol = document.createElement('div');
-                dayCol.className = 'day-column';
+        // اگر دیتایی برای این روز هست
+        if (schedule[day]) {
+            // پیمایش تمام تسک های این روز
+            Object.keys(schedule[day]).forEach(startTime => {
+                const task = schedule[day][startTime];
+                const startIndex = timeIntervals.indexOf(startTime);
                 
-                // هدر روز
-                const header = document.createElement('div');
-                header.className = 'day-header';
-                header.innerText = day.label;
-                dayCol.appendChild(header);
-
-                // کانتینر اسلات‌ها
-                const slotsDiv = document.createElement('div');
-                slotsDiv.className = 'slots-container';
-
-                // ایجاد ۹۶ اسلات ۱۵ دقیقه‌ای
-                // آخرین آیتم timeSlots (24:00) را برای شروع حلقه نیاز نداریم
-                for (let i = 0; i < timeSlots.length - 1; i++) {
-                    const time = timeSlots[i];
-                    const row = document.createElement('div');
-                    row.className = 'time-slot';
-                    
-                    // ستون ساعت
-                    const timeLabel = document.createElement('div');
-                    timeLabel.className = 'time-label';
-                    timeLabel.innerText = time;
-                    
-                    // ستون تسک
-                    const taskArea = document.createElement('div');
-                    taskArea.className = 'task-area';
-                    taskArea.id = `${day.id}-${time}`; // ID یکتا: saturday-10:15
-                    
-                    // چک کردن دیتای ذخیره شده
-                    if (scheduleData[day.id] && scheduleData[day.id][time]) {
-                        const taskInfo = scheduleData[day.id][time];
-                        taskArea.classList.add('filled-task');
-                        if (taskInfo.isStart) {
-                            taskArea.classList.add('task-start');
-                            taskArea.innerHTML = `<b>${taskInfo.name}</b>`;
-                            taskArea.title = taskInfo.name; // تولتیپ
-                        } else {
-                            // برای اسلات‌های ادامه دار متن را تکرار نمی‌کنیم تا شلوغ نشود
-                            // یا می‌توانیم کمرنگ نشان دهیم
-                        }
-                        
-                        // قابلیت حذف با کلیک
-                        taskArea.onclick = function() {
-                            if(confirm('آیا می‌خواهید این برنامه را حذف کنید؟')) {
-                                removeTask(day.id, taskInfo.groupId);
+                // غیرفعال کردن تایم هایی که اشغال شده اند
+                // از شروع تسک تا پایان تسک (duration)
+                for(let i=0; i < task.duration; i++) {
+                    const blockedIndex = startIndex + i;
+                    if(blockedIndex < timeIntervals.length) {
+                        const timeStr = timeIntervals[blockedIndex];
+                        // پیدا کردن آپشن در سلکت
+                        for (let opt of startSel.options) {
+                            if (opt.value === timeStr) {
+                                opt.disabled = true;
+                                opt.text = timeStr + " (پر است)";
                             }
-                        };
+                        }
                     }
-
-                    row.appendChild(timeLabel);
-                    row.appendChild(taskArea);
-                    slotsDiv.appendChild(row);
                 }
-
-                dayCol.appendChild(slotsDiv);
-                container.appendChild(dayCol);
             });
         }
+    }
 
-        // افزودن تسک جدید
-        function addTask() {
-            const name = document.getElementById('taskName').value;
-            const day = document.getElementById('daySelect').value;
-            const start = document.getElementById('startTime').value;
-            const end = document.getElementById('endTime').value;
+    // --- رندر جدول ---
+    function renderTable() {
+        const tbody = document.getElementById('plannerBody');
+        tbody.innerHTML = '';
 
-            if (!name) { alert('لطفا نام فعالیت را بنویسید'); return; }
-            if (start >= end) { alert('ساعت پایان باید بعد از ساعت شروع باشد'); return; }
+        // ماتریس وضعیت برای هندل کردن rowspan
+        // skipMap['sat'][5] = true یعنی در ستون شنبه، سطر پنجم رندر نشود چون سطر قبلی rowspan داشته
+        let skipMap = {}; 
+        daysOrder.forEach(d => skipMap[d] = {});
 
-            // پیدا کردن ایندکس‌ها
-            const startIndex = timeSlots.indexOf(start);
-            const endIndex = timeSlots.indexOf(end);
+        // حلقه روی تمام زمان ها (سطرها)
+        timeIntervals.forEach((time, rowIndex) => {
+            const tr = document.createElement('tr');
+            
+            // 1. ستون اول: ساعت
+            const tdTime = document.createElement('td');
+            tdTime.innerText = time;
+            tr.appendChild(tdTime);
 
-            // ایجاد شناسه گروهی برای حذف یکپارچه
-            const groupId = Date.now();
+            // 2. ستون های روزها
+            daysOrder.forEach(day => {
+                // اگر قبلا دستور داده شده که این خانه رد شود (بخاطر rowspan بالا)
+                if (skipMap[day][rowIndex]) {
+                    return; // هیچ td نمی‌سازیم (جای خالی پر شده توسط بالایی)
+                }
 
-            if (!scheduleData[day]) scheduleData[day] = {};
+                const td = document.createElement('td');
+                
+                // آیا در این روز و این ساعت تسکی شروع می‌شود؟
+                if (schedule[day] && schedule[day][time]) {
+                    const task = schedule[day][time];
+                    
+                    td.innerText = task.name;
+                    td.rowSpan = task.duration; // ادغام سلول ها به پایین
+                    td.className = 'filled-cell';
+                    td.onclick = () => deleteTask(day, time);
+                    td.title = `حذف: ${task.name}`;
 
-            // بررسی تداخل
-            for (let i = startIndex; i < endIndex; i++) {
-                const time = timeSlots[i];
-                if (scheduleData[day][time]) {
-                    if(!confirm(`در ساعت ${time} برنامه دیگری وجود دارد. جایگزین شود؟`)) {
-                        return; 
+                    // علامت گذاری سلول های بعدی برای رد شدن
+                    for(let i=1; i < task.duration; i++) {
+                        skipMap[day][rowIndex + i] = true;
                     }
+                } else {
+                    // سلول خالی
+                    td.innerHTML = '&nbsp;';
                 }
-            }
+                
+                tr.appendChild(td);
+            });
 
-            // ذخیره سازی
-            for (let i = startIndex; i < endIndex; i++) {
-                const time = timeSlots[i];
-                scheduleData[day][time] = {
-                    name: name,
-                    isStart: (i === startIndex),
-                    groupId: groupId
-                };
-            }
+            tbody.appendChild(tr);
+        });
+    }
 
+    // --- افزودن تسک ---
+    function addTask() {
+        const name = document.getElementById('inpName').value;
+        const day = document.getElementById('inpDay').value;
+        const start = document.getElementById('inpStart').value;
+        const end = document.getElementById('inpEnd').value;
+
+        if(!name) return alert("نام فعالیت را وارد کنید");
+        if(start >= end && end !== "00:00") return alert("ساعت پایان اشتباه است"); // هندل کردن ساده
+
+        const startIdx = timeIntervals.indexOf(start);
+        let endIdx = timeIntervals.indexOf(end);
+        if(end === "24:00") endIdx = timeIntervals.length;
+
+        const duration = endIdx - startIdx;
+        
+        if (duration <= 0) return alert("بازه زمانی نامعتبر");
+
+        // چک تداخل نهایی (علاوه بر UI)
+        if (checkOverlap(day, startIdx, duration)) {
+            return alert("تداخل! بخشی از این زمان قبلا پر شده است.");
+        }
+
+        // ذخیره
+        if (!schedule[day]) schedule[day] = {};
+        
+        schedule[day][start] = {
+            name: name,
+            duration: duration
+        };
+
+        saveData();
+        renderTable();
+        updateTimeOptions(); // بروزرسانی لیست ساعت‌ها
+    }
+
+    function checkOverlap(day, startIdx, duration) {
+        if (!schedule[day]) return false;
+        
+        // تبدیل همه تسک های روز به بازه های اشغال شده
+        let occupiedIndices = new Set();
+        Object.keys(schedule[day]).forEach(tTime => {
+            const tStartIdx = timeIntervals.indexOf(tTime);
+            const tDuration = schedule[day][tTime].duration;
+            for(let i=0; i<tDuration; i++) occupiedIndices.add(tStartIdx + i);
+        });
+
+        // چک کردن بازه جدید
+        for(let i=0; i<duration; i++) {
+            if (occupiedIndices.has(startIdx + i)) return true;
+        }
+        return false;
+    }
+
+    function deleteTask(day, time) {
+        if(confirm("آیا این فعالیت حذف شود؟")) {
+            delete schedule[day][time];
             saveData();
-            renderPlanner();
+            renderTable();
+            updateTimeOptions();
         }
+    }
 
-        // حذف تسک
-        function removeTask(day, groupId) {
-            const dayData = scheduleData[day];
-            for (const time in dayData) {
-                if (dayData[time].groupId === groupId) {
-                    delete dayData[time];
-                }
-            }
-            saveData();
-            renderPlanner();
+    function clearData() {
+        if(confirm("تمام برنامه پاک شود؟")) {
+            localStorage.removeItem('tablePlannerDB');
+            schedule = {};
+            renderTable();
+            updateTimeOptions();
         }
+    }
 
-        // ذخیره در لوکال استوریج
-        function saveData() {
-            localStorage.setItem('mySchedule', JSON.stringify(scheduleData));
-        }
+    function saveData() {
+        localStorage.setItem('tablePlannerDB', JSON.stringify(schedule));
+    }
 
-        function clearAllData() {
-            if(confirm("آیا مطمئن هستید که کل برنامه پاک شود؟")) {
-                localStorage.removeItem('mySchedule');
-                scheduleData = {};
-                renderPlanner();
-            }
-        }
+    init();
 
-        // اجرای اولیه
-        init();
+</script>
 
-    </script>
 </body>
 </html>
