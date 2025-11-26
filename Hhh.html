@@ -225,6 +225,11 @@
             direction: rtl; /* حل مشکل چیدمان فارسی */
         }
         
+        /* حل مشکل جدا شدن حروف در کل ناحیه اکسپورت */
+        .export-mode * {
+            letter-spacing: normal !important;
+        }
+        
         /* مخفی کردن دکمه‌های کپی در حالت اکسپورت و چاپ */
         .export-mode .copy-col-btn {
             display: none !important;
@@ -234,10 +239,9 @@
             display: flex; justify-content: space-between; align-items: flex-end;
             border-bottom: 4px solid var(--primary); padding-bottom: 20px; margin-bottom: 30px;
         }
-        /* حل مشکل جدا شدن حروف: حذف letter-spacing منفی */
         .print-title h1 { 
             margin: 0; font-size: 48px; color: var(--primary-dark); 
-            font-weight: 900; letter-spacing: normal; 
+            font-weight: 900; letter-spacing: normal !important; 
         }
         .print-meta { text-align: left; display: flex; flex-direction: column; gap: 5px; }
         .print-meta div { font-size: 18px; color: #475569; font-weight: 600; display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
@@ -263,22 +267,31 @@
         }
         .print-table-container th {
             background-color: #1e293b !important; color: white !important;
-            border: 1px solid #475569; /* رنگ ملایم‌تر */
+            border: 1px solid #475569;
             padding: 12px; font-size: 18px; text-align: center;
             -webkit-print-color-adjust: exact; print-color-adjust: exact;
+            letter-spacing: normal !important; /* اطمینان از چسبیدن حروف در هدر */
         }
-        /* اصلاح ستون زمان: عرض بیشتر برای جلوگیری از در هم رفتن */
+        
+        /* 
+           اصلاح اساسی ستون زمان برای حل مشکل در هم رفتگی و جدا شدن حروف
+        */
         .print-table-container tr td:first-child {
             background-color: #1e293b !important; color: white !important;
-            border: 1px solid #475569; /* رنگ ملایم‌تر */
+            border: 1px solid #475569;
             font-weight: bold; text-align: center; font-size: 14px;
             -webkit-print-color-adjust: exact; print-color-adjust: exact; 
-            width: 140px; /* افزایش عرض */
-            white-space: normal; /* جلوگیری از تداخل */
+            width: 180px; /* افزایش عرض برای جلوگیری از روی هم افتادن */
+            white-space: nowrap; /* جلوگیری از شکستن خط */
+            letter-spacing: normal !important; /* چسباندن حروف فارسی */
+            direction: rtl; /* جهت راست چین */
+            padding: 0 10px; /* فضای تنفس */
         }
+        
         .print-table-container td {
             border: 1px solid #64748b; /* خاکستری ملایم */
             height: 32px; padding: 0;
+            letter-spacing: normal !important;
         }
         .print-table-container td.task-cell {
             border: 1px solid #475569 !important; 
