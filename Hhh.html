@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -709,20 +709,21 @@
         else if (type === 'image') shareImage();
     }
 
-    // --- 1. Share as Image (PNG) - Fixed for Mobile ---
+    // --- 1. Share as Image (PNG) - Fixed for High Quality & File Support ---
     async function shareImage() {
-        showLoader("در حال تولید تصویر...");
+        showLoader("در حال تولید تصویر با کیفیت...");
         const element = document.getElementById('print-area');
         preparePrintDOM();
         
         element.style.display = 'block';
         element.style.position = 'absolute'; element.style.top = '0'; element.style.left = '-9999px';
         
-        // Wait for fonts to apply
+        // Ensure fonts are ready
         await document.fonts.ready;
 
         setTimeout(() => {
-            // Scale reduced to 3 to prevent crashes on mobile while keeping good quality
+            // Scale set to 3 for High Quality (Mobile Safe)
+            // windowWidth set to ensure desktop layout
             html2canvas(element, { scale: 3, useCORS: true, width: 2000, windowWidth: 2000 }).then(async canvas => {
                 canvas.toBlob(async (blob) => {
                     const file = new File([blob], `${appData.header || 'Plan'}.png`, { type: "image/png" });
@@ -730,11 +731,12 @@
                     
                     if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
                         try { 
+                            // Share as a FILE
                             await navigator.share({ files: [file], title: 'برنامه هفتگی', text: text }); 
                         }
                         catch (e) { 
                             // If share fails, fallback to download
-                            alert("اشتراک‌گذاری مستقیم پشتیبانی نشد. فایل دانلود می‌شود.");
+                            alert("اشتراک‌گذاری مستقیم فایل پشتیبانی نشد. فایل دانلود می‌شود.");
                             const link = document.createElement('a'); link.download = `${appData.header || 'Plan'}.png`;
                             link.href = canvas.toDataURL(); link.click();
                         }
@@ -743,15 +745,15 @@
                         link.href = canvas.toDataURL(); link.click();
                     }
                     element.style.display = 'none'; hideLoader();
-                });
+                }, 'image/png', 1.0);
             }).catch((err) => { 
                 alert("خطا در تولید عکس: " + err); 
                 element.style.display = 'none'; hideLoader(); 
             });
-        }, 800);
+        }, 1000); // 1 second delay to ensure full render
     }
 
-    // --- 2. Share Backup (JSON) - Robust ---
+    // --- 2. Share Backup (JSON) ---
     async function shareBackupFile() {
         showLoader("آماده‌سازی فایل...");
         if(document.getElementById('noteText')) appData.note.text = document.getElementById('noteText').value;
@@ -767,7 +769,6 @@
                     await navigator.share({ files: [file], title: 'Backup', text: text }); 
                 } 
                 catch (error) { 
-                    // Fallback
                     exportData();
                 }
             } else {
