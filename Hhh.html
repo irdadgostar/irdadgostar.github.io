@@ -1,9 +1,9 @@
-   <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>برنامه هفتگی جامع</title>
+    <title>برنامه هفتگی جامع (نسخه نهایی مدرن)</title>
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <!-- کتابخانه HTML2PDF -->
@@ -15,12 +15,12 @@
             --primary: #4f46e5;
             --primary-hover: #4338ca;
             --secondary: #64748b;
-            --bg: #f3f4f6;
+            --bg: #f8fafc;
             --surface: #ffffff;
             --border: #e2e8f0;
-            --text-main: #1e293b;
+            --text-main: #0f172a;
             --header-bg: #1e293b;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -35,7 +35,11 @@
             padding-bottom: 120px;
         }
 
-        /* --- Loading Overlays --- */
+        /* --- Icons Class --- */
+        .icon { width: 18px; height: 18px; stroke-width: 2; stroke: currentColor; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+        .icon-sm { width: 14px; height: 14px; }
+        
+        /* --- Loader --- */
         #loadingBar {
             position: fixed; top: 0; left: 0; width: 100%; height: 4px;
             background: linear-gradient(90deg, var(--primary), #8b5cf6, var(--primary));
@@ -46,42 +50,44 @@
 
         #processingMsg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.9); z-index: 10000;
+            background: rgba(255, 255, 255, 0.95); z-index: 10000;
             display: none; flex-direction: column; align-items: center; justify-content: center;
+            backdrop-filter: blur(5px);
         }
         .spinner {
-            width: 50px; height: 50px; border: 5px solid #ccc; border-top-color: var(--primary);
+            width: 50px; height: 50px; border: 4px solid #e2e8f0; border-top-color: var(--primary);
             border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px;
         }
         @keyframes spin { to {transform: rotate(360deg);} }
 
         /* --- Toolbar --- */
         .toolbar {
-            background: var(--surface); padding: 16px; border-radius: 16px;
-            box-shadow: var(--shadow); margin-bottom: 24px; border: 1px solid white;
+            background: var(--surface); padding: 20px; border-radius: 20px;
+            box-shadow: var(--shadow); margin-bottom: 24px; border: 1px solid var(--border);
             display: flex; flex-direction: column; gap: 16px;
         }
         .toolbar-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
         
         .brand { 
-            font-weight: 900; font-size: 18px; color: var(--primary); 
+            font-weight: 900; font-size: 20px; color: var(--primary); 
             display: flex; align-items: center; gap: 10px; 
         }
         
         .input-group { display: flex; gap: 10px; flex-wrap: wrap; width: 100%; }
         .input-modern {
-            padding: 12px; border: 1px solid var(--border); border-radius: 10px;
-            font-family: inherit; background: #f8fafc; transition: 0.3s; flex: 1; min-width: 200px;
+            padding: 12px 16px; border: 1px solid var(--border); border-radius: 12px;
+            font-family: inherit; background: #f1f5f9; transition: 0.3s; flex: 1; min-width: 200px;
+            font-size: 14px;
         }
-        .input-modern:focus { background: #fff; border-color: var(--primary); }
+        .input-modern:focus { background: #fff; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
 
         /* Buttons */
         .btn {
-            padding: 10px 16px; border: none; border-radius: 10px; cursor: pointer;
+            padding: 10px 18px; border: none; border-radius: 12px; cursor: pointer;
             font-family: inherit; font-weight: 600; font-size: 13px; color: white;
-            display: flex; align-items: center; gap: 8px; transition: 0.2s;
+            display: flex; align-items: center; gap: 8px; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
         .btn-primary { background: linear-gradient(135deg, #4f46e5, #4338ca); }
         .btn-success { background: linear-gradient(135deg, #10b981, #059669); }
         .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
@@ -91,49 +97,50 @@
         .btn-teal { background: linear-gradient(135deg, #14b8a6, #0d9488); }
         .btn-blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
         
-        .mode-toggle { background: #e2e8f0; color: #475569; border: 1px solid #cbd5e1; }
-        .mode-toggle.active { background: var(--primary); color: white; border-color: transparent; }
+        .mode-toggle { background: #e2e8f0; color: #475569; border: 1px solid #cbd5e1; box-shadow: none; }
+        .mode-toggle.active { background: var(--primary); color: white; border-color: transparent; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
 
-        /* --- Main Table --- */
+        /* --- Table --- */
         .planner-wrapper {
-            background: var(--surface); border-radius: 16px; box-shadow: var(--shadow);
+            background: var(--surface); border-radius: 20px; box-shadow: var(--shadow);
             overflow: auto; position: relative; border: 1px solid var(--border);
             max-height: 75vh;
         }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 900px; }
         
         thead th {
-            background: var(--header-bg); color: white; padding: 14px; position: sticky; top: 0; z-index: 20;
-            border-right: 1px solid #334155;
+            background: var(--header-bg); color: white; padding: 16px; position: sticky; top: 0; z-index: 20;
+            border-right: 1px solid #334155; font-size: 14px; letter-spacing: 0.5px;
         }
+        
         .copy-col-btn { 
-            background: rgba(255,255,255,0.15); border-radius: 6px; padding: 4px 8px; 
-            cursor: pointer; float: left; transition:0.2s; font-size: 11px;
+            background: rgba(255,255,255,0.1); border-radius: 8px; padding: 6px; 
+            cursor: pointer; float: left; transition:0.2s; display: flex; align-items: center;
         }
-        .copy-col-btn:hover { background: rgba(255,255,255,0.4); }
+        .copy-col-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
         
         th:first-child, td:first-child {
-            width: 90px; background: #f8fafc; color: #64748b; font-weight: 700; font-size: 10px;
+            width: 100px; background: #f1f5f9; color: #64748b; font-weight: 700; font-size: 11px;
             position: sticky; right: 0; z-index: 30; border-left: 2px solid #e2e8f0; text-align: center;
-            line-height: 1.4;
+            line-height: 1.5;
         }
-        td { border: 1px solid #f1f5f9; text-align: center; height: 35px; padding: 0; vertical-align: middle; }
+        td { border: 1px solid #f1f5f9; text-align: center; height: 40px; padding: 0; vertical-align: middle; }
 
         /* Task Cell */
         td.task-cell {
-            color: white; padding: 2px 4px; font-size: 11px; cursor: pointer;
-            border-bottom: 1px solid rgba(255,255,255,0.2); position: relative;
+            color: white; padding: 4px 6px; font-size: 12px; cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.3); position: relative;
             transition: filter 0.2s;
         }
         td.task-cell:hover { filter: brightness(1.1); z-index: 5; }
         
         .task-inner {
             display: flex; flex-direction: column; justify-content: center; height: 100%;
-            pointer-events: none; text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            pointer-events: none; text-shadow: 0 1px 2px rgba(0,0,0,0.15);
             white-space: normal; line-height: 1.4;
         }
-        .task-title { font-weight: 800; }
-        .task-time-range { font-size: 10px; opacity: 0.95; margin-bottom: 2px; }
+        .task-title { font-weight: 800; font-size: 12px; }
+        .task-time-range { font-size: 10px; opacity: 0.9; margin-bottom: 2px; background: rgba(0,0,0,0.1); border-radius: 4px; display: inline-block; padding: 0 4px; align-self: center;}
 
         /* Selection */
         body.selection-mode td.empty-cell { cursor: crosshair; }
@@ -143,143 +150,141 @@
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.6); z-index: 2000;
-            justify-content: center; align-items: center; backdrop-filter: blur(5px);
+            justify-content: center; align-items: center; backdrop-filter: blur(8px);
         }
         .modal {
-            background: white; padding: 24px; border-radius: 20px; width: 90%; max-width: 420px;
-            box-shadow: 0 20px 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 16px;
+            background: white; padding: 24px; border-radius: 24px; width: 90%; max-width: 450px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); display: flex; flex-direction: column; gap: 16px;
             animation: pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         @keyframes pop { from {transform: scale(0.9); opacity: 0;} to {transform: scale(1); opacity: 1;} }
         
-        .modal-header { display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; }
-        .modal-header h3 { margin: 0; font-size: 18px; color: #1e293b; }
-        .close-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #94a3b8; }
+        .modal-header { display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 16px; align-items: center; }
+        .modal-header h3 { margin: 0; font-size: 18px; color: #1e293b; font-weight: 800; }
+        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #94a3b8; transition: 0.2s; }
+        .close-btn:hover { color: #ef4444; }
         
         .copy-list { display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; }
         .copy-item {
-            display: flex; align-items: center; gap: 10px; padding: 10px;
-            background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer;
+            display: flex; align-items: center; gap: 10px; padding: 12px;
+            background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0; cursor: pointer;
         }
-        .copy-item:hover { background: #f1f5f9; }
-        .copy-item input { width: 18px; height: 18px; cursor: pointer; }
+        .copy-item:hover { background: #f1f5f9; border-color: var(--primary); }
+        .copy-item input { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary); }
 
+        /* Extras List Styles */
         .extras-list { list-style: none; padding: 0; margin: 0; max-height: 250px; overflow-y: auto; }
         .extra-row {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 8px; border-bottom: 1px solid #f1f5f9; background: #f8fafc; margin-bottom: 4px; border-radius: 8px;
+            padding: 10px; border-bottom: 1px solid #f1f5f9; background: #f8fafc; margin-bottom: 6px; border-radius: 10px;
         }
-        .extra-controls { display: flex; gap: 5px; align-items: center; }
+        .extra-controls { display: flex; gap: 6px; align-items: center; }
         .extra-btn {
-            background: none; border: none; cursor: pointer; font-size: 14px; padding: 2px; opacity: 0.6; transition: 0.2s;
+            background: white; border: 1px solid #e2e8f0; cursor: pointer; border-radius: 6px;
+            padding: 4px; color: #64748b; transition: 0.2s; display: flex; align-items: center; justify-content: center;
         }
-        .extra-btn:hover { opacity: 1; transform: scale(1.1); }
-        .extra-btn.active { color: var(--primary); opacity: 1; }
-        .extra-btn.delete { color: var(--danger); }
+        .extra-btn:hover { transform: scale(1.1); border-color: var(--primary); color: var(--primary); }
+        .extra-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .extra-btn.delete:hover { border-color: var(--danger); color: var(--danger); }
 
-        .color-options { display: flex; gap: 8px; flex-wrap: wrap; }
-        .color-dot { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 3px solid #fff; box-shadow: 0 0 0 1px #cbd5e1; }
-        .color-dot.active { box-shadow: 0 0 0 2px var(--primary); }
+        .color-options { display: flex; gap: 10px; flex-wrap: wrap; }
+        .color-dot { width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 3px solid #fff; box-shadow: 0 0 0 1px #cbd5e1; transition: 0.2s;}
+        .color-dot:hover { transform: scale(1.1); }
+        .color-dot.active { box-shadow: 0 0 0 3px var(--primary); }
 
-        .chart-container { display: flex; justify-content: center; padding: 20px; background: #f8fafc; border-radius: 12px; }
-        .chart-legend { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 10px; }
-        .legend-item { font-size: 11px; display: flex; align-items: center; gap: 4px; background: #fff; padding: 4px 8px; border-radius: 20px; border: 1px solid #e2e8f0; }
+        .chart-container { display: flex; justify-content: center; padding: 20px; background: #f8fafc; border-radius: 16px; }
+        .chart-legend { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 15px; }
+        .legend-item { font-size: 11px; display: flex; align-items: center; gap: 6px; background: #fff; padding: 6px 10px; border-radius: 20px; border: 1px solid #e2e8f0; }
 
-        /* --- PRINT & EXPORT CONTAINER --- */
+        /* --- PRINT & EXPORT STYLES --- */
         #print-area { display: none; }
 
-        /* استایل مخصوص حالت اکسپورت (PDF/Image) */
         .export-mode {
             background: white;
-            padding: 20px;
+            padding: 30px;
             font-family: 'Vazirmatn', sans-serif;
-            width: 100%;
-            /* عرض زیاد برای جا شدن کل ستون‌ها در تصویر/پی‌دی‌اف */
-            width: 2000px; 
+            width: 2000px; /* Fixed width for high-quality export */
             margin: 0 auto;
         }
 
         .print-header {
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 4px solid #1e293b; padding-bottom: 15px; margin-bottom: 20px;
+            border-bottom: 4px solid #1e293b; padding-bottom: 20px; margin-bottom: 25px;
         }
-        .print-title h1 { margin: 0; font-size: 36px; color: #1e293b; font-weight: 900; }
+        .print-title h1 { margin: 0; font-size: 42px; color: #1e293b; font-weight: 900; display: flex; align-items: center; gap: 15px; }
         .print-meta { text-align: left; }
-        .print-meta div { margin-bottom: 6px; font-size: 16px; color: #334155; font-weight: bold; }
+        .print-meta div { margin-bottom: 8px; font-size: 18px; color: #334155; font-weight: bold; }
 
         .print-grid-top {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 25px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 30px;
         }
         .print-box {
-            border: 2px solid #94a3b8; border-radius: 12px; padding: 15px;
+            border: 2px solid #cbd5e1; border-radius: 16px; padding: 20px;
             background-color: #f8fafc;
         }
         .print-box h4 {
-            margin: 0 0 10px 0; border-bottom: 2px solid #cbd5e1; padding-bottom: 5px;
-            font-size: 20px; color: #334155;
+            margin: 0 0 15px 0; border-bottom: 2px solid #cbd5e1; padding-bottom: 8px;
+            font-size: 22px; color: #1e293b; font-weight: 800;
         }
         .print-items { list-style: none; padding: 0; margin: 0; font-size: 16px; columns: 2; }
-        .print-items li { margin-bottom: 5px; break-inside: avoid; }
+        .print-items li { margin-bottom: 8px; break-inside: avoid; display: flex; align-items: center; gap: 8px; }
+        
+        /* Modern Icons in Print */
+        .print-icon { width: 18px; height: 18px; stroke-width: 2.5; }
+        .icon-check { color: var(--success); }
+        .icon-square { color: #cbd5e1; }
+        .icon-bullet { color: var(--primary); width: 12px; height: 12px; fill: var(--primary); }
 
-        /* جدول در حالت اکسپورت */
+        /* Export Table */
         .print-table-container table {
             border: 2px solid #000; font-size: 14px; width: 100%; border-collapse: collapse;
         }
         .print-table-container th {
             background-color: var(--header-bg) !important; color: white !important;
-            border: 1px solid #000; padding: 10px; font-size: 16px; text-align: center;
+            border: 1px solid #000; padding: 12px; font-size: 18px; text-align: center;
             -webkit-print-color-adjust: exact; print-color-adjust: exact;
         }
-        
-        /* ستون زمان در پرینت/اکسپورت باید همرنگ هدر باشد */
         .print-table-container tr td:first-child {
             background-color: var(--header-bg) !important; color: white !important;
-            border: 1px solid #000; font-weight: bold; text-align: center;
+            border: 1px solid #000; font-weight: bold; text-align: center; font-size: 14px;
             -webkit-print-color-adjust: exact; print-color-adjust: exact;
         }
-
-        .print-table-container td {
-            border: 1px solid #666; height: 30px; padding: 0;
-        }
+        .print-table-container td { border: 1px solid #94a3b8; height: 30px; padding: 0; }
         
-        /* سلول تسک در حالت اکسپورت (سفید ماندن متن) */
         .print-table-container td.task-cell {
-            border: 1px solid #000 !important; 
-            color: white !important; /* متن سفید */
+            border: 1px solid #000 !important; color: white !important;
             text-align: center; vertical-align: middle; padding: 4px;
             -webkit-print-color-adjust: exact; print-color-adjust: exact;
         }
         
-        /* متن‌های داخل سلول تسک */
-        .print-table-container .task-title { font-size: 14px; font-weight: 900; }
-        .print-table-container .task-time-range { font-size: 12px; border-bottom: 1px dotted rgba(255,255,255,0.5); margin-bottom: 4px; }
+        .print-table-container .task-title { font-size: 16px; font-weight: 900; }
+        .print-table-container .task-time-range { font-size: 13px; margin-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.4); display: inline-block; }
 
         .print-footer {
-            margin-top: 25px; border: 3px dashed #94a3b8; padding: 20px;
-            border-radius: 12px; background: #fff;
+            margin-top: 30px; border: 3px dashed #cbd5e1; padding: 25px;
+            border-radius: 16px; background: #fff;
         }
-        .print-note-text { font-size: 16px; white-space: pre-wrap; line-height: 1.6; }
+        .print-note-text { font-size: 16px; white-space: pre-wrap; line-height: 1.8; color: #334155; }
 
-        /* --- MEDIA PRINT (Paper Output) --- */
+        /* Print Media Query */
         @media print {
             @page { size: A4 landscape; margin: 5mm; }
             body { background: white; padding: 0; margin: 0; }
             .no-print, .toolbar, .copy-col-btn, #mainTableWrapper { display: none !important; }
             #print-area { display: block !important; width: 100%; transform: none; }
-            .export-mode { width: 100%; padding: 0; } 
+            .export-mode { width: 100%; padding: 0; }
             
             thead { display: table-header-group; }
             tr { page-break-inside: avoid; }
 
-            /* در پرینت کاغذی متن‌ها مشکی شوند (Issue 6) */
+            /* Black text for physical print */
             .print-table-container td.task-cell { color: black !important; }
-            .print-table-container .task-time-range { border-bottom: 1px dotted #000; }
+            .print-table-container .task-time-range { border-bottom: 1px solid #000; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Loading Overlays -->
     <div id="loadingBar"></div>
     <div id="processingMsg">
         <div class="spinner"></div>
@@ -287,11 +292,14 @@
         <p id="procTxt" style="color:#666;">در حال آماده‌سازی</p>
     </div>
 
-    <!-- Print / Export Container -->
+    <!-- Print / Export Layout -->
     <div id="print-area" class="export-mode">
         <div class="print-header">
             <div class="print-title" style="text-align: right;">
-                <h1 id="printTitleDisplay">برنامه هفتگی</h1>
+                <h1 id="printTitleDisplay">
+                    <svg class="icon" style="width:36px;height:36px;margin-left:10px;stroke-width:3"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    برنامه هفتگی
+                </h1>
             </div>
             <div class="print-meta" style="text-align: left;">
                 <div id="printUserDisplay"></div>
@@ -300,23 +308,23 @@
         </div>
 
         <div class="print-grid-top">
-            <!-- Right (RTL Start) -->
             <div class="print-box">
                 <h4>🔸 نکات و الزامات</h4>
                 <ul class="print-items" id="printReqList"></ul>
             </div>
-            <!-- Left (RTL End) -->
             <div class="print-box">
                 <h4>▫️ چک‌لیست</h4>
                 <ul class="print-items" id="printChkList"></ul>
             </div>
         </div>
 
-        <!-- کانتینر جدول کپی شده -->
         <div id="printTableContainer" class="print-table-container"></div>
 
         <div class="print-footer" id="printFooter" style="display:none;">
-            <h5 style="margin:0 0 5px 0; font-size:18px;">📝 یادداشت‌ها:</h5>
+            <h5 style="margin:0 0 10px 0; font-size:18px; display:flex; align-items:center; gap:8px;">
+                <svg class="icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                یادداشت‌ها:
+            </h5>
             <div class="print-note-text" id="printNoteText"></div>
         </div>
     </div>
@@ -325,11 +333,11 @@
     <div class="toolbar no-print">
         <div class="toolbar-header">
             <div class="brand" id="pageBrandTitle">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <svg class="icon" style="width:24px;height:24px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                 پلنر هوشمند
             </div>
             <button class="btn mode-toggle" id="selectModeBtn" onclick="toggleSelectMode()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                <svg class="icon"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
                 <span id="modeText">حالت اسکرول</span>
             </button>
         </div>
@@ -341,24 +349,46 @@
 
         <div class="toolbar-header">
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <button class="btn btn-purple" onclick="openModal('extrasModal'); renderExtras();">الزامات / لیست</button>
-                <button class="btn btn-orange" onclick="openModal('noteModal')">یادداشت</button>
-                <button class="btn btn-dark" onclick="openStats()">آمار 📊</button>
+                <button class="btn btn-purple" onclick="openModal('extrasModal'); renderExtras();">
+                    <svg class="icon"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                    الزامات / لیست
+                </button>
+                <button class="btn btn-orange" onclick="openModal('noteModal')">
+                    <svg class="icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    یادداشت
+                </button>
+                <button class="btn btn-dark" onclick="openStats()">
+                    <svg class="icon"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+                    آمار 📊
+                </button>
             </div>
             <div style="flex:1"></div>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <!-- دکمه اشتراک گذاری جدید -->
                 <button class="btn btn-teal" onclick="openShareModal()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                    <svg class="icon"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
                     اشتراک‌گذاری
                 </button>
-                
-                <button class="btn btn-blue" onclick="downloadAsImage()">دانلود عکس</button>
-                <button class="btn btn-success" onclick="exportData()">دانلود JSON</button>
-                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">بارگذاری</button>
+                <button class="btn btn-blue" onclick="downloadAsImage()">
+                    <svg class="icon"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    دانلود عکس
+                </button>
+                <button class="btn btn-success" onclick="exportData()">
+                    <svg class="icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    دانلود JSON
+                </button>
+                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                    <svg class="icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    بارگذاری
+                </button>
                 <input type="file" id="fileInput" hidden onchange="importData(this)">
-                <button class="btn btn-dark" onclick="printApp()">چاپ</button>
-                <button class="btn btn-danger" onclick="clearAll()">حذف کل</button>
+                <button class="btn btn-dark" onclick="printApp()">
+                    <svg class="icon"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    چاپ
+                </button>
+                <button class="btn btn-danger" onclick="clearAll()">
+                    <svg class="icon"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    حذف کل
+                </button>
             </div>
         </div>
     </div>
@@ -376,10 +406,16 @@
     <!-- Share Choice Modal -->
     <div class="modal-overlay" id="shareModal">
         <div class="modal">
-            <div class="modal-header"><h3>انتخاب روش اشتراک‌گذاری</h3><button class="close-btn" onclick="closeModal('shareModal')">&times;</button></div>
-            <p style="color:#666;">مایلید کدام نسخه ارسال شود؟</p>
-            <button class="btn btn-teal" onclick="executeShare('pdf')" style="justify-content:center; margin-bottom:10px;">ارسال فایل PDF (تصویری)</button>
-            <button class="btn btn-success" onclick="executeShare('json')" style="justify-content:center;">ارسال فایل پشتیبان (JSON)</button>
+            <div class="modal-header"><h3>اشتراک‌گذاری</h3><button class="close-btn" onclick="closeModal('shareModal')">&times;</button></div>
+            <p style="color:#666; font-size:14px;">لطفاً فرمت فایل ارسالی را انتخاب کنید:</p>
+            <button class="btn btn-teal" onclick="executeShare('pdf')" style="justify-content:center; padding:15px;">
+                <svg class="icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                ارسال PDF (تصویری)
+            </button>
+            <button class="btn btn-success" onclick="executeShare('json')" style="justify-content:center; padding:15px; margin-top:10px;">
+                <svg class="icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                ارسال فایل پشتیبان (JSON)
+            </button>
         </div>
     </div>
 
@@ -387,7 +423,7 @@
     <div class="modal-overlay" id="copyModal">
         <div class="modal">
             <div class="modal-header"><h3>کپی برنامه <span id="copySourceLabel" style="color:var(--primary)"></span></h3><button class="close-btn" onclick="closeModal('copyModal')">&times;</button></div>
-            <div style="font-size:12px; color:#666;">روزهایی که می‌خواهید برنامه در آن‌ها کپی شود را انتخاب کنید:</div>
+            <div style="font-size:12px; color:#666;">انتخاب روزهای مقصد:</div>
             <div id="copyTargetList" class="copy-list"></div>
             <button class="btn btn-primary" style="justify-content:center; margin-top:10px;" onclick="executeCopy()">تایید و کپی</button>
         </div>
@@ -396,7 +432,7 @@
     <!-- Single Copy Modal -->
     <div class="modal-overlay" id="singleCopyModal">
         <div class="modal">
-            <div class="modal-header"><h3>کپی این فعالیت به...</h3><button class="close-btn" onclick="closeModal('singleCopyModal')">&times;</button></div>
+            <div class="modal-header"><h3>کپی فعالیت</h3><button class="close-btn" onclick="closeModal('singleCopyModal')">&times;</button></div>
             <div style="font-size:12px; color:#666;">روز مقصد را انتخاب کنید:</div>
             <div id="singleCopyTargetList" class="copy-list"></div>
         </div>
@@ -429,10 +465,10 @@
             <div><label class="form-label">ساعت شروع</label><select id="inpStart" class="input-modern" onchange="updateEndOptions()"></select></div>
             <div><label class="form-label">عنوان</label><input type="text" id="inpName" class="input-modern" autofocus></div>
             <div><label class="form-label">ساعت پایان</label><select id="inpEnd" class="input-modern"></select></div>
-            <div><label class="form-label">رنگ</label><div class="color-options" id="colorPalette"></div><input type="color" id="customColor" style="margin-top:8px; width:100%; height:32px; border:none; border-radius:4px; cursor:pointer;"></div>
+            <div><label class="form-label">رنگ</label><div class="color-options" id="colorPalette"></div><input type="color" id="customColor" style="margin-top:8px; width:100%; height:36px; border:none; border-radius:8px; cursor:pointer;"></div>
             <div style="display:flex; justify-content:space-between; margin-top:10px; flex-wrap:wrap; gap:8px;">
                 <button class="btn btn-danger" id="btnDeleteTask" onclick="deleteTask()" style="display:none">حذف</button>
-                <button class="btn btn-teal" id="btnCopyTask" onclick="openSingleCopyModal()" style="display:none">کپی به روز دیگر</button>
+                <button class="btn btn-teal" id="btnCopyTask" onclick="openSingleCopyModal()" style="display:none">کپی</button>
                 <div style="flex:1"></div>
                 <button class="btn btn-dark" onclick="closeModal('taskModal')">لغو</button>
                 <button class="btn btn-primary" onclick="saveTask()">ثبت</button>
@@ -446,7 +482,7 @@
             <div class="modal-header"><h3>یادداشت‌ها</h3><button class="close-btn" onclick="closeModal('noteModal')">&times;</button></div>
             <textarea id="noteText" class="input-modern" rows="10"></textarea>
             <div style="display:flex; align-items:center; gap:8px; font-size:12px;">
-                <input type="checkbox" id="notePrintCheck"> <label for="notePrintCheck">نمایش در انتهای چاپ</label>
+                <input type="checkbox" id="notePrintCheck" style="width:16px;height:16px;"> <label for="notePrintCheck">نمایش در انتهای چاپ</label>
             </div>
             <div style="display:flex; justify-content:flex-end;"><button class="btn btn-success" onclick="saveNote()">ذخیره</button></div>
         </div>
@@ -471,6 +507,20 @@
         for(let h=0; h<24; h++) for(let m=0; m<60; m+=15) TIMELINE.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
         TIMELINE.push("24:00");
 
+        // Icons
+        const ICONS = {
+            copy: '<svg class="icon"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>',
+            eye: '<svg class="icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>',
+            eyeOff: '<svg class="icon"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>',
+            trash: '<svg class="icon"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>',
+            up: '<svg class="icon-sm"><polyline points="18 15 12 9 6 15"></polyline></svg>',
+            down: '<svg class="icon-sm"><polyline points="6 9 12 15 18 9"></polyline></svg>',
+            edit: '<svg class="icon-sm"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>',
+            bullet: '<svg class="print-icon icon-bullet"><circle cx="12" cy="12" r="10"></circle></svg>',
+            check: '<svg class="print-icon icon-check"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+            square: '<svg class="print-icon icon-square"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>'
+        };
+
         let appData = {
             tasks: [], header: "", userName: "", note: {text:"", print:false},
             reqs: [{t:"بررسی امور مالی", s:true}],
@@ -490,7 +540,7 @@
         function hideBar() { document.getElementById('loadingBar').style.display = 'none'; }
 
         function init() {
-            const saved = localStorage.getItem('finalProPlannerV9');
+            const saved = localStorage.getItem('finalProPlannerV10');
             if(saved) {
                 try {
                     const d = JSON.parse(saved);
@@ -498,13 +548,7 @@
                 } catch(e){}
             }
 
-            const initialHeader = appData.header || "پلنر هوشمند";
-            document.title = initialHeader;
-            document.getElementById('headerTitleInput').value = appData.header || "";
-            document.querySelector('.brand').innerHTML = `
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                ${initialHeader}
-            `;
+            updateHeader(appData.header || "");
             document.getElementById('userNameInput').value = appData.userName || "";
             
             const startSel = document.getElementById('inpStart');
@@ -531,7 +575,7 @@
             DAYS.forEach(d=>{
                 const th=document.createElement('th');
                 th.innerHTML=`<div style="display:flex;justify-content:center;gap:5px;align-items:center;">
-                    <span class="copy-col-btn" onclick="openCopyModal('${d.id}')" title="کپی کل روز">📋</span>
+                    <span class="copy-col-btn" onclick="openCopyModal('${d.id}')" title="کپی کل روز">${ICONS.copy}</span>
                     ${d.l}
                 </div>`;
                 tr.appendChild(th);
@@ -598,19 +642,18 @@
             }
         }
 
-        // --- Helper: Clone Table for Print/Export (Issue 7 Fix) ---
+        // --- Helper: Clone Table for Print/Export ---
         function preparePrintDOM() {
             document.getElementById('printTitleDisplay').innerText = appData.header || "برنامه هفتگی";
             document.getElementById('printUserDisplay').innerText = appData.userName ? `نام کاربر: ${appData.userName}` : "";
             document.getElementById('printDateDisplay').innerText = new Date().toLocaleDateString('fa-IR');
 
             const rL = document.getElementById('printReqList'); rL.innerHTML='';
-            appData.reqs.filter(x=>x.s).forEach(x => rL.innerHTML+=`<li>🔸 ${x.t}</li>`);
+            appData.reqs.filter(x=>x.s).forEach(x => rL.innerHTML+=`<li>${ICONS.bullet} ${x.t}</li>`);
             
             const cL = document.getElementById('printChkList'); cL.innerHTML='';
-            appData.chks.filter(x=>x.s).forEach(x => cL.innerHTML+=`<li>${x.c?'☑':'⬜'} ${x.t}</li>`);
+            appData.chks.filter(x=>x.s).forEach(x => cL.innerHTML+=`<li>${x.c?ICONS.check:ICONS.square} ${x.t}</li>`);
 
-            // CLONE the main table to preserve rowspans (Issue 7 fix)
             const tblCont = document.getElementById('printTableContainer');
             tblCont.innerHTML = '';
             const originalTable = document.getElementById('plannerTable');
@@ -626,7 +669,7 @@
             } else { ftr.style.display = 'none'; }
         }
 
-        // --- Image Download (Issue 3 & 7 Fixed) ---
+        // --- Image Download ---
         function downloadAsImage() {
             showLoader("در حال تولید عکس...");
             const element = document.getElementById('print-area');
@@ -639,14 +682,14 @@
             
             setTimeout(() => {
                 html2canvas(element, { 
-                    scale: 2, 
+                    scale: 3, // Higher quality
                     useCORS: true,
-                    width: 2000, // Issue 3 Fix: Force large width
+                    width: 2000, 
                     windowWidth: 2000
                 }).then(canvas => {
                     const link = document.createElement('a');
                     link.download = `${appData.header || 'Plan'}.jpg`;
-                    link.href = canvas.toDataURL('image/jpeg', 0.9);
+                    link.href = canvas.toDataURL('image/jpeg', 0.8); // Compress to 80%
                     link.click();
                     
                     element.style.display = 'none';
@@ -658,10 +701,10 @@
                     element.style.display = 'none';
                     hideLoader();
                 });
-            }, 800);
+            }, 1000);
         }
 
-        // --- Share Options Logic (Issue 2 Fixed) ---
+        // --- Share Options Logic ---
         function openShareModal() {
             document.getElementById('shareModal').style.display = 'flex';
         }
@@ -670,10 +713,8 @@
             closeModal('shareModal');
             
             if (type === 'json') {
-                // اشتراک JSON (Issue 1 Fixed Logic reused here)
                 shareBackupFile();
             } else {
-                // اشتراک PDF (Issue 3 Fixed)
                 sharePDF();
             }
         }
@@ -682,7 +723,10 @@
             showLoader("آماده‌سازی فایل پشتیبان...");
             setTimeout(async () => {
                 const fileName = `${appData.header || 'backup'}.json`;
-                const file = new File([JSON.stringify(appData)], fileName, {type: "application/json"});
+                // Use explicit Blob and File construction for broader support
+                const blob = new Blob([JSON.stringify(appData, null, 2)], {type: "application/json"});
+                const file = new File([blob], fileName, {type: "application/json"});
+                
                 const text = `📅 برنامه هفتگی ${appData.userName || 'کاربر'}\n📅 تاریخ: ${new Date().toLocaleDateString('fa-IR')}\n⚠️ فایل نسخه پشتیبان (JSON)`;
                 
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -692,10 +736,10 @@
                             title: appData.header || 'Backup',
                             text: text
                         });
-                    } catch (error) { console.log("Share cancelled"); }
+                    } catch (error) { console.log("Share cancelled or failed", error); }
                 } else {
                     alert('مرورگر پشتیبانی نمی‌کند. فایل دانلود می‌شود.');
-                    exportData(); // Fallback to download (Issue 1 fix)
+                    exportData(); 
                 }
                 hideLoader();
             }, 500);
@@ -707,12 +751,11 @@
             preparePrintDOM();
             element.style.display = 'block';
             
-            // Issue 3 Fix: Use fixed layout for PDF generation to avoid cuts
             const opt = {
                 margin: 0.1,
                 filename: `${appData.header || 'plan'}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, width: 2000, windowWidth: 2000 }, // Force width
+                html2canvas: { scale: 2, width: 2000, windowWidth: 2000 }, 
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
             };
 
@@ -827,11 +870,11 @@
         function renderExtras() {
             const rL=document.getElementById('reqListUi'); rL.innerHTML='';
             appData.reqs.forEach((r,i)=>{
-                rL.innerHTML+=`<li class="extra-row"><span>${r.t}</span><div class="extra-controls"><button class="extra-btn" onclick="moveExtra('req',${i},-1)">▲</button><button class="extra-btn" onclick="moveExtra('req',${i},1)">▼</button><button class="extra-btn" onclick="editExtra('req',${i})">✏️</button><button class="extra-btn ${r.s?'active':''}" onclick="toggleExtraVis('req',${i})">👁</button><button class="extra-btn delete" onclick="delEx('req',${i})">✖</button></div></li>`;
+                rL.innerHTML+=`<li class="extra-row"><span>${r.t}</span><div class="extra-controls"><button class="extra-btn" onclick="moveExtra('req',${i},-1)">${ICONS.up}</button><button class="extra-btn" onclick="moveExtra('req',${i},1)">${ICONS.down}</button><button class="extra-btn" onclick="editExtra('req',${i})">${ICONS.edit}</button><button class="extra-btn ${r.s?'active':''}" onclick="toggleExtraVis('req',${i})">${r.s?ICONS.eye:ICONS.eyeOff}</button><button class="extra-btn delete" onclick="delEx('req',${i})">${ICONS.trash}</button></div></li>`;
             });
             const cL=document.getElementById('chkListUi'); cL.innerHTML='';
             appData.chks.forEach((c,i)=>{
-                cL.innerHTML+=`<li class="extra-row"><span><input type="checkbox" ${c.c?'checked':''} onchange="togChk(${i})"> ${c.t}</span><div class="extra-controls"><button class="extra-btn" onclick="moveExtra('chk',${i},-1)">▲</button><button class="extra-btn" onclick="moveExtra('chk',${i},1)">▼</button><button class="extra-btn" onclick="editExtra('chk',${i})">✏️</button><button class="extra-btn ${c.s?'active':''}" onclick="toggleExtraVis('chk',${i})">👁</button><button class="extra-btn delete" onclick="delEx('chk',${i})">✖</button></div></li>`;
+                cL.innerHTML+=`<li class="extra-row"><span><input type="checkbox" ${c.c?'checked':''} onchange="togChk(${i})"> ${c.t}</span><div class="extra-controls"><button class="extra-btn" onclick="moveExtra('chk',${i},-1)">${ICONS.up}</button><button class="extra-btn" onclick="moveExtra('chk',${i},1)">${ICONS.down}</button><button class="extra-btn" onclick="editExtra('chk',${i})">${ICONS.edit}</button><button class="extra-btn ${c.s?'active':''}" onclick="toggleExtraVis('chk',${i})">${c.s?ICONS.eye:ICONS.eyeOff}</button><button class="extra-btn delete" onclick="delEx('chk',${i})">${ICONS.trash}</button></div></li>`;
             });
         }
         function addItem(t){const i=document.getElementById(t+'Input'); if(i.value){if(t==='req')appData.reqs.push({t:i.value,s:true}); else appData.chks.push({t:i.value,s:true,c:false}); i.value=''; saveData(); renderExtras();}}
@@ -890,7 +933,7 @@
             const list = document.getElementById('singleCopyTargetList'); list.innerHTML = '';
             DAYS.forEach(d => {
                 if (d.id !== currentEditingTask.day) {
-                    list.innerHTML += `<label class="copy-item" onclick="executeSingleCopy('${d.id}')"><span style="flex:1">${d.l}</span><span>📋</span></label>`;
+                    list.innerHTML += `<label class="copy-item" onclick="executeSingleCopy('${d.id}')"><span style="flex:1">${d.l}</span><span>${ICONS.copy}</span></label>`;
                 }
             });
             document.getElementById('singleCopyModal').style.display = 'flex';
@@ -912,23 +955,23 @@
 
         function openModal(id){document.getElementById(id).style.display='flex'; if(id==='noteModal'){document.getElementById('noteText').value=appData.note.text; document.getElementById('notePrintCheck').checked=appData.note.print;}}
         function closeModal(id){document.getElementById(id).style.display='none';}
-        function saveData(){localStorage.setItem('finalProPlannerV9', JSON.stringify(appData));}
+        function saveData(){localStorage.setItem('finalProPlannerV10', JSON.stringify(appData));}
         
         function updateHeader(v){
             appData.header=v; document.title = v || "برنامه هفتگی"; 
             document.getElementById('headerTitleInput').value = v;
-            document.querySelector('.brand').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>${v || "پلنر هوشمند"}`;
+            document.querySelector('.brand').innerHTML = `<svg class="icon" style="width:24px;height:24px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>${v || "پلنر هوشمند"}`;
             saveData();
         }
         function updateUserName(v){appData.userName=v; saveData();}
-        function clearAll(){if(confirm("حذف کامل؟")){localStorage.removeItem('finalProPlannerV9'); location.reload();}}
+        function clearAll(){if(confirm("حذف کامل؟")){localStorage.removeItem('finalProPlannerV10'); location.reload();}}
         
-        // Issue 1 Fixed: Correct JSON Export
+        // Fixed JSON Export
         function exportData(){
-            const b=new Blob([JSON.stringify(appData)],{type:'application/json'}); 
+            const b=new Blob([JSON.stringify(appData, null, 2)], {type: "application/json"}); 
             const a=document.createElement('a'); 
             a.href=URL.createObjectURL(b); 
-            a.download=`${appData.header || 'plan'}.json`; // Better filename
+            a.download=`${appData.header || 'plan'}.json`;
             a.click();
         }
         
