@@ -6,7 +6,7 @@
     <title>برنامه هفتگی</title>
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
-    <!-- کتابخانه تبدیل HTML به PDF برای اشتراک گذاری -->
+    <!-- کتابخانه تبدیل HTML به PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
@@ -99,9 +99,11 @@
         }
         .copy-col-btn:hover { background: rgba(255,255,255,0.4); }
         
+        /* تنظیم عرض ستون اول برای نمایش بازه زمانی */
         th:first-child, td:first-child {
-            width: 75px; background: #f8fafc; color: #64748b; font-weight: 700; font-size: 11px;
+            width: 90px; background: #f8fafc; color: #64748b; font-weight: 700; font-size: 10px;
             position: sticky; right: 0; z-index: 30; border-left: 2px solid #e2e8f0; text-align: center;
+            line-height: 1.4;
         }
         td { border: 1px solid #f1f5f9; text-align: center; height: 35px; padding: 0; vertical-align: middle; }
 
@@ -203,7 +205,7 @@
             tr { page-break-inside: avoid; page-break-after: auto; }
             th { background-color: #cbd5e1 !important; color: #000 !important; border: 1px solid #000; padding: 4px; font-size: 12px; }
             td { border: 1px solid #666; height: 18px; padding: 0; }
-            th:first-child, td:first-child { width: 60px; font-size: 10px; border: 1px solid #000; }
+            th:first-child, td:first-child { width: 80px; font-size: 10px; border: 1px solid #000; white-space: nowrap; }
             
             td.task-cell {
                 border: 1px solid #000 !important; color: #000 !important;
@@ -225,7 +227,7 @@
 
     <div id="loadingBar"></div>
 
-    <!-- Print Layout (Hidden until print/share) -->
+    <!-- Print Layout -->
     <div id="print-area">
         <div class="print-header">
             <div class="print-title" id="printTitleDisplay">برنامه هفتگی</div>
@@ -254,7 +256,6 @@
     <!-- Main Toolbar -->
     <div class="toolbar no-print">
         <div class="toolbar-header">
-            <!-- Title tied to document.title -->
             <div class="brand" id="pageBrandTitle">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                 پلنر هوشمند
@@ -278,7 +279,6 @@
             </div>
             <div style="flex:1"></div>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <!-- دکمه اشتراک گذاری با PDF -->
                 <button class="btn btn-teal" onclick="shareApp()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
                     ارسال PDF
@@ -300,6 +300,7 @@
         </table>
     </div>
 
+    <!-- Modals -->
     <!-- Copy Modal -->
     <div class="modal-overlay" id="copyModal">
         <div class="modal">
@@ -329,14 +330,26 @@
         </div>
     </div>
 
-    <!-- Task Modal -->
+    <!-- Task Modal (EDITED) -->
     <div class="modal-overlay" id="taskModal">
         <div class="modal">
             <div class="modal-header"><h3>مدیریت فعالیت</h3><button class="close-btn" onclick="closeModal('taskModal')">&times;</button></div>
-            <input type="hidden" id="taskId"><input type="hidden" id="taskDay"><input type="hidden" id="taskStart">
-            <div id="timeInfoDisplay" style="font-size:12px; color:#64748b;"></div>
+            <input type="hidden" id="taskId"><input type="hidden" id="taskDay">
+            
+            <!-- Edited: Start Time Selection -->
+            <div>
+                <label class="form-label">ساعت شروع</label>
+                <select id="inpStart" class="input-modern" onchange="updateEndOptions()"></select>
+            </div>
+
             <div><label class="form-label">عنوان</label><input type="text" id="inpName" class="input-modern" autofocus></div>
-            <div><label class="form-label">مدت زمان</label><select id="inpDuration" class="input-modern"></select></div>
+            
+            <!-- Edited: End Time Selection -->
+            <div>
+                <label class="form-label">ساعت پایان</label>
+                <select id="inpEnd" class="input-modern"></select>
+            </div>
+
             <div>
                 <label class="form-label">رنگ</label>
                 <div class="color-options" id="colorPalette"></div>
@@ -373,7 +386,6 @@
     </div>
 
     <script>
-        // Data & Constants
         const DAYS = [
             {id:'sat', l:'شنبه'}, {id:'sun', l:'یکشنبه'}, {id:'mon', l:'دوشنبه'},
             {id:'tue', l:'سه‌شنبه'}, {id:'wed', l:'چهارشنبه'}, {id:'thu', l:'پنج‌شنبه'}, {id:'fri', l:'جمعه'}
@@ -381,6 +393,7 @@
         const COLORS = ['#4f46e5', '#10b981', '#ef4444', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899', '#64748b'];
         const TIMELINE = [];
         for(let h=0; h<24; h++) for(let m=0; m<60; m+=15) TIMELINE.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+        TIMELINE.push("24:00"); // پایان روز
 
         let appData = {
             tasks: [], header: "", userName: "", note: {text:"", print:false},
@@ -391,12 +404,11 @@
         let isSelect=false, isDrag=false, selStart=null, selCurr=null;
         let pendingCopySource = null; 
 
-        // --- Loader ---
         function showLoading() { document.getElementById('loadingBar').style.display = 'block'; }
         function hideLoading() { document.getElementById('loadingBar').style.display = 'none'; }
 
         function init() {
-            const saved = localStorage.getItem('finalProPlannerV5');
+            const saved = localStorage.getItem('finalProPlannerV6');
             if(saved) {
                 try {
                     const d = JSON.parse(saved);
@@ -404,7 +416,6 @@
                 } catch(e){}
             }
 
-            // تنظیم عنوان صفحه و برند
             const initialHeader = appData.header || "پلنر هوشمند";
             document.title = initialHeader;
             document.getElementById('headerTitleInput').value = appData.header || "";
@@ -412,11 +423,11 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                 ${initialHeader}
             `;
-            
             document.getElementById('userNameInput').value = appData.userName || "";
             
-            const dur = document.getElementById('inpDuration');
-            for(let i=1; i<=32; i++) dur.add(new Option(`${i*15} دقیقه`, i));
+            // پر کردن سلکت ساعت شروع در مودال
+            const startSel = document.getElementById('inpStart');
+            TIMELINE.slice(0, -1).forEach(t => startSel.add(new Option(t, t)));
 
             const pal = document.getElementById('colorPalette');
             COLORS.forEach(c => {
@@ -450,9 +461,15 @@
             const b = document.getElementById('plannerBody'); b.innerHTML='';
             const occ = {}; DAYS.forEach(d=>occ[d.id]=new Array(TIMELINE.length).fill(false));
 
-            TIMELINE.forEach((time, idx) => {
+            // حلقه تا یکی مانده به آخر (چون آخرین آیتم 24:00 است که شروع بازه نیست)
+            for(let idx=0; idx < TIMELINE.length - 1; idx++) {
+                const time = TIMELINE[idx];
+                const nextTime = TIMELINE[idx+1];
+                
                 const tr = document.createElement('tr');
-                const tdTime = document.createElement('td'); tdTime.innerText=time; tr.appendChild(tdTime);
+                const tdTime = document.createElement('td'); 
+                tdTime.innerText = `${time} تا ${nextTime}`; 
+                tr.appendChild(tdTime);
 
                 DAYS.forEach(day => {
                     if(occ[day.id][idx]) return;
@@ -463,7 +480,7 @@
                         td.rowSpan = task.duration; td.className='task-cell';
                         td.style.backgroundColor=task.color;
                         const endIdx = idx + task.duration;
-                        const endStr = endIdx < TIMELINE.length ? TIMELINE[endIdx] : "24:00";
+                        const endStr = TIMELINE[endIdx];
                         td.innerHTML=`<div class="task-inner"><span class="task-time-range">${task.startStr} تا ${endStr}</span><span class="task-title">${task.name}</span></div>`;
                         td.onclick=(e)=>{e.stopPropagation(); openTaskModal(task);};
                         td.draggable=true;
@@ -479,10 +496,35 @@
                     }
                 });
                 b.appendChild(tr);
-            });
+            }
         }
 
-        // --- Logic Updates ---
+        // --- Logic Updates: Update End Options based on Start ---
+        function updateEndOptions() {
+            const startVal = document.getElementById('inpStart').value;
+            const sIdx = TIMELINE.indexOf(startVal);
+            const endSel = document.getElementById('inpEnd');
+            endSel.innerHTML = '';
+            
+            // نمایش تا انتهای روز
+            for (let i = sIdx + 1; i < TIMELINE.length; i++) {
+                const time = TIMELINE[i];
+                const duration = i - sIdx; // تعداد اسلات‌ها
+                
+                // محاسبه متن مدت زمان
+                let durationText = "";
+                const totalMin = duration * 15;
+                if(totalMin < 60) durationText = `${totalMin} دقیقه`;
+                else {
+                    const h = Math.floor(totalMin/60);
+                    const m = totalMin%60;
+                    durationText = `${h} ساعت` + (m>0 ? ` و ${m} دقیقه` : "");
+                }
+                
+                endSel.add(new Option(`${time} | ${durationText}`, duration));
+            }
+        }
+
         function toggleExtraVis(type, i) {
             if(type==='req') appData.reqs[i].s = !appData.reqs[i].s;
             else appData.chks[i].s = !appData.chks[i].s;
@@ -493,7 +535,7 @@
             e.preventDefault(); const tid=e.dataTransfer.getData('tid');
             const task=appData.tasks.find(t=>t.id==tid); if(!task)return;
             const sIdx=TIMELINE.indexOf(time);
-            if(sIdx+task.duration>TIMELINE.length) return alert("زمان ناکافی");
+            if(sIdx+task.duration >= TIMELINE.length) return alert("زمان ناکافی");
             const conf=appData.tasks.some(t=>{if(t.id==tid || t.day!==day)return false; const tS=TIMELINE.indexOf(t.startStr); return (sIdx<tS+t.duration && sIdx+task.duration>tS);});
             if(!conf) { task.day=day; task.startStr=time; saveData(); renderTable(); } else alert("تداخل!");
         }
@@ -518,33 +560,53 @@
 
         function openTaskModal(task, fresh) {
             openModal('taskModal'); const del=document.getElementById('btnDeleteTask');
+            const startEl = document.getElementById('inpStart');
+            const endEl = document.getElementById('inpEnd');
+            
             if(task) {
                 document.getElementById('taskId').value=task.id; document.getElementById('taskDay').value=task.day;
-                document.getElementById('taskStart').value=task.startStr; document.getElementById('inpName').value=task.name;
-                document.getElementById('inpDuration').value=task.duration; document.getElementById('customColor').value=task.color;
-                const endIdx = TIMELINE.indexOf(task.startStr) + task.duration;
-                const endStr = endIdx < TIMELINE.length ? TIMELINE[endIdx] : "24:00";
-                document.getElementById('timeInfoDisplay').innerText=`ویرایش: ${task.startStr} تا ${endStr}`;
+                startEl.value=task.startStr;
+                updateEndOptions(); // آپدیت گزینه‌های پایان بر اساس شروع
+                endEl.value = task.duration; // ست کردن مدت زمان (که ولیو سلکت است)
+                
+                document.getElementById('inpName').value=task.name;
+                document.getElementById('customColor').value=task.color;
                 del.style.display='block';
             } else {
                 document.getElementById('taskId').value=''; document.getElementById('taskDay').value=fresh.d;
-                document.getElementById('taskStart').value=fresh.s; document.getElementById('inpName').value='';
-                document.getElementById('inpDuration').value=fresh.dur; document.getElementById('customColor').value='#4f46e5';
-                document.getElementById('timeInfoDisplay').innerText=`جدید: شروع ${fresh.s}`;
+                startEl.value=fresh.s;
+                updateEndOptions();
+                endEl.value = fresh.dur;
+                
+                document.getElementById('inpName').value='';
+                document.getElementById('customColor').value='#4f46e5';
                 del.style.display='none';
             }
         }
+        
         function saveTask() {
             const id=document.getElementById('taskId').value, day=document.getElementById('taskDay').value;
-            const start=document.getElementById('taskStart').value, name=document.getElementById('inpName').value.trim();
-            const dur=parseInt(document.getElementById('inpDuration').value), color=document.getElementById('customColor').value;
+            const name=document.getElementById('inpName').value.trim();
+            const color=document.getElementById('customColor').value;
+            const startVal = document.getElementById('inpStart').value;
+            const durVal = parseInt(document.getElementById('inpEnd').value);
+
             if(!name) return alert("نام الزامی است");
-            const sIdx=TIMELINE.indexOf(start);
-            if(sIdx+dur>TIMELINE.length) return alert("زمان ناکافی");
-            const conf=appData.tasks.some(t=>{if(t.id==id||t.day!==day)return false; const tS=TIMELINE.indexOf(t.startStr); return (sIdx<tS+t.duration && sIdx+dur>tS);});
-            if(conf) return alert("تداخل");
-            if(id){const ix=appData.tasks.findIndex(t=>t.id==id); if(ix!==-1) appData.tasks[ix]={...appData.tasks[ix],name,duration:dur,color};}
-            else appData.tasks.push({id:Date.now(),day,startStr:start,duration:dur,name,color});
+            
+            const sIdx = TIMELINE.indexOf(startVal);
+            if(sIdx + durVal >= TIMELINE.length) return alert("زمان نامعتبر");
+
+            const conf=appData.tasks.some(t=>{
+                if(t.id==id||t.day!==day)return false; 
+                const tS=TIMELINE.indexOf(t.startStr); 
+                return (sIdx<tS+t.duration && sIdx+durVal>tS);
+            });
+            
+            if(conf) return alert("تداخل زمانی");
+
+            if(id){const ix=appData.tasks.findIndex(t=>t.id==id); if(ix!==-1) appData.tasks[ix]={...appData.tasks[ix],name,startStr:startVal,duration:durVal,color};}
+            else appData.tasks.push({id:Date.now(),day,startStr:startVal,duration:durVal,name,color});
+            
             saveData(); renderTable(); closeModal('taskModal');
         }
         function deleteTask(){const id=document.getElementById('taskId').value; if(confirm("حذف؟")){appData.tasks=appData.tasks.filter(t=>t.id!=id); saveData(); renderTable(); closeModal('taskModal');}}
@@ -571,22 +633,14 @@
             const ch=document.createElement('div'); ch.style.width='150px'; ch.style.height='150px'; ch.style.borderRadius='50%'; ch.style.background=`conic-gradient(${g.join(', ')})`; a.appendChild(ch);
         }
 
-        // --- Smart Copy with Loading ---
         function openCopyModal(sourceId) {
             pendingCopySource = sourceId;
             const sourceDay = DAYS.find(d => d.id === sourceId);
             document.getElementById('copySourceLabel').innerText = sourceDay.l;
-            
             const list = document.getElementById('copyTargetList');
             list.innerHTML = '';
-            
             DAYS.filter(d => d.id !== sourceId).forEach(d => {
-                list.innerHTML += `
-                    <label class="copy-item">
-                        <input type="checkbox" value="${d.id}" class="copy-checkbox">
-                        ${d.l}
-                    </label>
-                `;
+                list.innerHTML += `<label class="copy-item"><input type="checkbox" value="${d.id}" class="copy-checkbox">${d.l}</label>`;
             });
             openModal('copyModal');
         }
@@ -594,50 +648,38 @@
         function executeCopy() {
             const checkboxes = document.querySelectorAll('.copy-checkbox:checked');
             if(checkboxes.length === 0) { alert("لطفاً حداقل یک روز را انتخاب کنید."); return; }
-
             const targetIds = Array.from(checkboxes).map(cb => cb.value);
             if(!confirm(`آیا مطمئن هستید؟ برنامه روزهای انتخاب شده پاک شده و جایگزین می‌شود.`)) return;
 
-            // نمایش لودینگ
             closeModal('copyModal');
             showLoading();
 
-            // استفاده از setTimeout برای اجازه به مرورگر جهت نمایش لودینگ
             setTimeout(() => {
                 const sourceTasks = appData.tasks.filter(t => t.day === pendingCopySource);
                 appData.tasks = appData.tasks.filter(t => !targetIds.includes(t.day));
-
                 targetIds.forEach(targetId => {
                     sourceTasks.forEach(t => {
-                        appData.tasks.push({
-                            ...t,
-                            id: Date.now() + Math.random(),
-                            day: targetId
-                        });
+                        appData.tasks.push({ ...t, id: Date.now() + Math.random(), day: targetId });
                     });
                 });
-
                 saveData();
                 renderTable();
-                hideLoading(); // مخفی کردن لودینگ
-            }, 300); // تاخیر مصنوعی برای دیده شدن افکت
+                hideLoading();
+            }, 300);
         }
 
-        // --- Share as PDF (Actual PDF File) ---
+        // --- Share Logic ---
         async function shareApp() {
             showLoading();
-            
-            // آماده سازی ناحیه چاپ برای تولید PDF
             const element = document.getElementById('print-area');
             
-            // پر کردن اطلاعات قبل از تبدیل
+            // بروزرسانی مقادیر قبل از تولید
             document.getElementById('printTitleDisplay').innerText = appData.header || "برنامه هفتگی";
             document.getElementById('printUserDisplay').innerText = appData.userName ? `نام کاربر: ${appData.userName}` : "";
             document.getElementById('printDateDisplay').innerText = new Date().toLocaleDateString('fa-IR');
 
             const rL = document.getElementById('printReqList'); rL.innerHTML='';
             appData.reqs.filter(x=>x.s).forEach(x => rL.innerHTML+=`<li>🔸 ${x.t}</li>`);
-            
             const cL = document.getElementById('printChkList'); cL.innerHTML='';
             appData.chks.filter(x=>x.s).forEach(x => cL.innerHTML+=`<li>${x.c?'☑':'⬜'} ${x.t}</li>`);
 
@@ -651,43 +693,35 @@
                 document.getElementById('printNoteText').innerText = appData.note.text;
             } else { ftr.style.display = 'none'; }
             
-            // نمایش موقت برای html2pdf
             element.style.display = 'block';
             
-            // تنظیمات PDF
             const opt = {
-                margin:       0.2,
-                filename:     `${appData.header || 'plan'}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
+                margin: 0.2,
+                filename: `${appData.header || 'plan'}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
             };
 
             try {
-                // تولید PDF Blob
                 const pdfBlob = await html2pdf().set(opt).from(element).output('blob');
-                
-                // ساخت فایل برای اشتراک گذاری
                 const fileName = `${appData.header || 'Weekly-Plan'}.pdf`;
                 const file = new File([pdfBlob], fileName, { type: "application/pdf" });
-
                 const shareData = {
                     files: [file],
                     title: appData.header || 'برنامه هفتگی',
                     text: `برنامه هفتگی ${appData.userName || 'کاربر'} - تاریخ: ${new Date().toLocaleDateString('fa-IR')}`
                 };
 
-                // بررسی قابلیت اشتراک گذاری
                 if (navigator.canShare && navigator.canShare(shareData)) {
                     await navigator.share(shareData);
                 } else {
-                    // فال‌بک برای دسکتاپ یا مرورگرهای ناسازگار
                     const url = URL.createObjectURL(pdfBlob);
                     const a = document.createElement('a'); a.href = url; a.download = fileName; a.click();
                 }
             } catch (err) {
                 console.error(err);
-                alert("اشتراک‌گذاری انجام نشد. فایل دانلود می‌شود.");
+                alert("مشکل در تولید PDF");
             } finally {
                 element.style.display = 'none';
                 hideLoading();
@@ -697,11 +731,11 @@
         // --- Common ---
         function openModal(id){document.getElementById(id).style.display='flex'; if(id==='noteModal'){document.getElementById('noteText').value=appData.note.text; document.getElementById('notePrintCheck').checked=appData.note.print;}}
         function closeModal(id){document.getElementById(id).style.display='none';}
-        function saveData(){localStorage.setItem('finalProPlannerV5', JSON.stringify(appData));}
+        function saveData(){localStorage.setItem('finalProPlannerV6', JSON.stringify(appData));}
         
         function updateHeader(v){
             appData.header=v; 
-            document.title = v || "پلنر هوشمند"; // تغییر لحظه‌ای عنوان صفحه
+            document.title = v || "برنامه هفتگی"; 
             document.getElementById('pageBrandTitle').innerHTML = `
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                 ${v || "پلنر هوشمند"}
@@ -710,7 +744,7 @@
         }
         
         function updateUserName(v){appData.userName=v; saveData();}
-        function clearAll(){if(confirm("حذف کامل؟")){localStorage.removeItem('finalProPlannerV5'); location.reload();}}
+        function clearAll(){if(confirm("حذف کامل؟")){localStorage.removeItem('finalProPlannerV6'); location.reload();}}
         
         function exportData(){const b=new Blob([JSON.stringify(appData)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download="plan.json"; a.click();}
         function importData(i){const f=i.files[0]; const r=new FileReader(); r.onload=e=>{try{const d=JSON.parse(e.target.result); if(d.tasks||Array.isArray(d)){if(Array.isArray(d))appData.tasks=d; else appData=d; saveData(); location.reload();}}catch(x){alert("فایل نامعتبر");}}; if(f)r.readAsText(f);}
@@ -727,7 +761,6 @@
 
             const rL = document.getElementById('printReqList'); rL.innerHTML='';
             appData.reqs.filter(x=>x.s).forEach(x => rL.innerHTML+=`<li>🔸 ${x.t}</li>`);
-            
             const cL = document.getElementById('printChkList'); cL.innerHTML='';
             appData.chks.filter(x=>x.s).forEach(x => cL.innerHTML+=`<li>${x.c?'☑':'⬜'} ${x.t}</li>`);
 
