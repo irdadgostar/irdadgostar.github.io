@@ -1,11 +1,15 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>برنامه ریزی حرفه‌ای (نسخه نهایی)</title>
+    <title>پلنر جامع (با قابلیت دانلود عکس)</title>
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <!-- کتابخانه تبدیل HTML به PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- کتابخانه تبدیل HTML به عکس (جدید) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --primary: #4f46e5;
@@ -34,7 +38,8 @@
         #loadingBar {
             position: fixed; top: 0; left: 0; width: 100%; height: 4px;
             background: linear-gradient(90deg, var(--primary), #8b5cf6, var(--primary));
-            background-size: 200% 100%; z-index: 9999; display: none;
+            background-size: 200% 100%;
+            z-index: 9999; display: none;
             animation: loadingAnim 1.5s infinite linear;
         }
         @keyframes loadingAnim { 0% {background-position: 100% 0;} 100% {background-position: -100% 0;} }
@@ -50,6 +55,7 @@
         .brand { 
             font-weight: 900; font-size: 18px; color: var(--primary); 
             display: flex; align-items: center; gap: 10px; 
+            transition: color 0.3s;
         }
         
         .input-group { display: flex; gap: 10px; flex-wrap: wrap; width: 100%; }
@@ -73,6 +79,7 @@
         .btn-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
         .btn-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
         .btn-teal { background: linear-gradient(135deg, #14b8a6, #0d9488); }
+        .btn-blue { background: linear-gradient(135deg, #3b82f6, #2563eb); } /* دکمه عکس */
         
         .mode-toggle { background: #e2e8f0; color: #475569; border: 1px solid #cbd5e1; }
         .mode-toggle.active { background: var(--primary); color: white; border-color: transparent; }
@@ -266,7 +273,7 @@
 
         <div class="input-group">
             <input type="text" id="headerTitleInput" class="input-modern" placeholder="عنوان برنامه (مثلاً: برنامه هفتگی پاییز)" oninput="updateHeader(this.value)">
-            <input type="text" id="userNameInput" class="input-modern" placeholder="نام شما (جهت نمایش در چاپ و اشتراک)" oninput="updateUserName(this.value)">
+            <input type="text" id="userNameInput" class="input-modern" placeholder="نام شما (جهت نمایش در چاپ)" oninput="updateUserName(this.value)">
         </div>
 
         <div class="toolbar-header">
@@ -277,12 +284,18 @@
             </div>
             <div style="flex:1"></div>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <!-- دکمه اشتراک گذاری فایل Backup -->
-                <button class="btn btn-teal" onclick="shareBackupFile()">
+                <button class="btn btn-teal" onclick="shareApp()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-                    اشتراک‌گذاری فایل
+                    ارسال PDF
                 </button>
-                <button class="btn btn-success" onclick="exportData()">ذخیره</button>
+                <button class="btn btn-blue" onclick="downloadAsImage()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    دانلود عکس
+                </button>
+                <button class="btn btn-success" onclick="shareBackupFile()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                    اشتراک فایل
+                </button>
                 <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">بارگذاری</button>
                 <input type="file" id="fileInput" hidden onchange="importData(this)">
                 <button class="btn btn-dark" onclick="printApp()">چاپ</button>
@@ -364,10 +377,7 @@
             
             <div style="display:flex; justify-content:space-between; margin-top:10px; flex-wrap:wrap; gap:8px;">
                 <button class="btn btn-danger" id="btnDeleteTask" onclick="deleteTask()" style="display:none">حذف</button>
-                
-                <!-- دکمه جدید کپی تکی -->
                 <button class="btn btn-teal" id="btnCopyTask" onclick="openSingleCopyModal()" style="display:none">کپی به روز دیگر</button>
-                
                 <div style="flex:1"></div>
                 <button class="btn btn-dark" onclick="closeModal('taskModal')">لغو</button>
                 <button class="btn btn-primary" onclick="saveTask()">ثبت</button>
@@ -414,13 +424,13 @@
 
         let isSelect=false, isDrag=false, selStart=null, selCurr=null;
         let pendingCopySource = null; 
-        let currentEditingTask = null; // برای کپی تکی
+        let currentEditingTask = null;
 
         function showLoading() { document.getElementById('loadingBar').style.display = 'block'; }
         function hideLoading() { document.getElementById('loadingBar').style.display = 'none'; }
 
         function init() {
-            const saved = localStorage.getItem('finalProPlannerV7');
+            const saved = localStorage.getItem('finalProPlannerV8');
             if(saved) {
                 try {
                     const d = JSON.parse(saved);
@@ -431,6 +441,10 @@
             const initialHeader = appData.header || "پلنر هوشمند";
             document.title = initialHeader;
             document.getElementById('headerTitleInput').value = appData.header || "";
+            document.querySelector('.brand').innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                ${initialHeader}
+            `;
             document.getElementById('userNameInput').value = appData.userName || "";
             
             const startSel = document.getElementById('inpStart');
@@ -524,7 +538,51 @@
             }
         }
 
-        // --- Share Backup Logic ---
+        // --- Image Download Logic ---
+        function downloadAsImage() {
+            showLoading();
+            
+            const element = document.getElementById('print-area');
+            
+            document.getElementById('printTitleDisplay').innerText = appData.header || "برنامه هفتگی";
+            document.getElementById('printUserDisplay').innerText = appData.userName ? `نام کاربر: ${appData.userName}` : "";
+            document.getElementById('printDateDisplay').innerText = new Date().toLocaleDateString('fa-IR');
+
+            const rL = document.getElementById('printReqList'); rL.innerHTML='';
+            appData.reqs.filter(x=>x.s).forEach(x => rL.innerHTML+=`<li>🔸 ${x.t}</li>`);
+            
+            const cL = document.getElementById('printChkList'); cL.innerHTML='';
+            appData.chks.filter(x=>x.s).forEach(x => cL.innerHTML+=`<li>${x.c?'☑':'⬜'} ${x.t}</li>`);
+
+            const tblCont = document.getElementById('printTableContainer');
+            tblCont.innerHTML = '';
+            tblCont.appendChild(document.getElementById('plannerTable').cloneNode(true));
+
+            const ftr = document.getElementById('printFooter');
+            if(appData.note.print && appData.note.text) {
+                ftr.style.display = 'block';
+                document.getElementById('printNoteText').innerText = appData.note.text;
+            } else { ftr.style.display = 'none'; }
+            
+            element.style.display = 'block';
+            
+            html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `${appData.header || 'Plan'}.jpg`;
+                link.href = canvas.toDataURL('image/jpeg', 0.9);
+                link.click();
+                
+                element.style.display = 'none';
+                hideLoading();
+            }).catch(err => {
+                console.error(err);
+                alert("خطا در دانلود عکس");
+                element.style.display = 'none';
+                hideLoading();
+            });
+        }
+
+        // --- Backup Share Logic ---
         async function shareBackupFile() {
             showLoading();
             setTimeout(async () => {
@@ -548,6 +606,65 @@
                 }
                 hideLoading();
             }, 500);
+        }
+
+        // --- PDF Share Logic ---
+        async function shareApp() {
+            showLoading();
+            const element = document.getElementById('print-area');
+            
+            document.getElementById('printTitleDisplay').innerText = appData.header || "برنامه هفتگی";
+            document.getElementById('printUserDisplay').innerText = appData.userName ? `نام کاربر: ${appData.userName}` : "";
+            document.getElementById('printDateDisplay').innerText = new Date().toLocaleDateString('fa-IR');
+
+            const rL = document.getElementById('printReqList'); rL.innerHTML='';
+            appData.reqs.filter(x=>x.s).forEach(x => rL.innerHTML+=`<li>🔸 ${x.t}</li>`);
+            const cL = document.getElementById('printChkList'); cL.innerHTML='';
+            appData.chks.filter(x=>x.s).forEach(x => cL.innerHTML+=`<li>${x.c?'☑':'⬜'} ${x.t}</li>`);
+
+            const tblCont = document.getElementById('printTableContainer');
+            tblCont.innerHTML = '';
+            tblCont.appendChild(document.getElementById('plannerTable').cloneNode(true));
+
+            const ftr = document.getElementById('printFooter');
+            if(appData.note.print && appData.note.text) {
+                ftr.style.display = 'block';
+                document.getElementById('printNoteText').innerText = appData.note.text;
+            } else { ftr.style.display = 'none'; }
+            
+            element.style.display = 'block';
+            
+            const opt = {
+                margin: 0.2,
+                filename: `${appData.header || 'plan'}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+            };
+
+            try {
+                const pdfBlob = await html2pdf().set(opt).from(element).output('blob');
+                const fileName = `${appData.header || 'Weekly-Plan'}.pdf`;
+                const file = new File([pdfBlob], fileName, { type: "application/pdf" });
+                const shareData = {
+                    files: [file],
+                    title: appData.header || 'برنامه هفتگی',
+                    text: `برنامه هفتگی ${appData.userName || 'کاربر'} - تاریخ: ${new Date().toLocaleDateString('fa-IR')}`
+                };
+
+                if (navigator.canShare && navigator.canShare(shareData)) {
+                    await navigator.share(shareData);
+                } else {
+                    const url = URL.createObjectURL(pdfBlob);
+                    const a = document.createElement('a'); a.href = url; a.download = fileName; a.click();
+                }
+            } catch (err) {
+                console.error(err);
+                alert("مشکل در تولید PDF");
+            } finally {
+                element.style.display = 'none';
+                hideLoading();
+            }
         }
 
         // --- Extras Management (Edit/Reorder) ---
@@ -616,15 +733,13 @@
         // --- Single Task Copy Logic ---
         function openSingleCopyModal() {
             if(!currentEditingTask) return;
-            // بستن مودال تسک
             closeModal('taskModal');
             
-            // ساخت لیست روزها
             const list = document.getElementById('singleCopyTargetList');
             list.innerHTML = '';
             
             DAYS.forEach(d => {
-                if (d.id !== currentEditingTask.day) { // نمایش همه روزها غیر از روز فعلی
+                if (d.id !== currentEditingTask.day) {
                     list.innerHTML += `
                     <label class="copy-item" onclick="executeSingleCopy('${d.id}')">
                         <span style="flex:1">${d.l}</span>
@@ -639,7 +754,6 @@
         function executeSingleCopy(targetDayId) {
             if(!currentEditingTask) return;
             
-            // چک کردن تداخل در روز مقصد
             const t = currentEditingTask;
             const sIdx = TIMELINE.indexOf(t.startStr);
             
@@ -654,7 +768,6 @@
                 return;
             }
 
-            // کپی کردن
             appData.tasks.push({
                 ...t,
                 id: Date.now() + Math.random(),
@@ -673,12 +786,11 @@
             openModal('taskModal'); 
             const del = document.getElementById('btnDeleteTask');
             const copyBtn = document.getElementById('btnCopyTask');
-            
             const startEl = document.getElementById('inpStart');
             const endEl = document.getElementById('inpEnd');
             
             if(task) {
-                currentEditingTask = task; // ذخیره برای کپی
+                currentEditingTask = task;
                 document.getElementById('taskId').value=task.id; document.getElementById('taskDay').value=task.day;
                 startEl.value=task.startStr;
                 updateEndOptions();
@@ -686,7 +798,7 @@
                 document.getElementById('inpName').value=task.name;
                 document.getElementById('customColor').value=task.color;
                 del.style.display='block';
-                copyBtn.style.display='block'; // نمایش دکمه کپی
+                copyBtn.style.display='block';
             } else {
                 currentEditingTask = null;
                 document.getElementById('taskId').value=''; document.getElementById('taskDay').value=fresh.d;
@@ -798,7 +910,7 @@
 
         function openModal(id){document.getElementById(id).style.display='flex'; if(id==='noteModal'){document.getElementById('noteText').value=appData.note.text; document.getElementById('notePrintCheck').checked=appData.note.print;}}
         function closeModal(id){document.getElementById(id).style.display='none';}
-        function saveData(){localStorage.setItem('finalProPlannerV7', JSON.stringify(appData));}
+        function saveData(){localStorage.setItem('finalProPlannerV8', JSON.stringify(appData));}
         
         function updateHeader(v){
             appData.header=v; 
@@ -810,7 +922,7 @@
             saveData();
         }
         function updateUserName(v){appData.userName=v; saveData();}
-        function clearAll(){if(confirm("حذف کامل؟")){localStorage.removeItem('finalProPlannerV7'); location.reload();}}
+        function clearAll(){if(confirm("حذف کامل؟")){localStorage.removeItem('finalProPlannerV8'); location.reload();}}
         
         function exportData(){const b=new Blob([JSON.stringify(appData)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download="plan.json"; a.click();}
         function importData(i){const f=i.files[0]; const r=new FileReader(); r.onload=e=>{try{const d=JSON.parse(e.target.result); if(d.tasks||Array.isArray(d)){if(Array.isArray(d))appData.tasks=d; else appData=d; saveData(); location.reload();}}catch(x){alert("فایل نامعتبر");}}; if(f)r.readAsText(f);}
@@ -827,7 +939,6 @@
 
             const rL = document.getElementById('printReqList'); rL.innerHTML='';
             appData.reqs.filter(x=>x.s).forEach(x => rL.innerHTML+=`<li>🔸 ${x.t}</li>`);
-            
             const cL = document.getElementById('printChkList'); cL.innerHTML='';
             appData.chks.filter(x=>x.s).forEach(x => cL.innerHTML+=`<li>${x.c?'☑':'⬜'} ${x.t}</li>`);
 
@@ -845,6 +956,121 @@
                 window.print();
                 document.title = originalTitle;
             }, 100);
+        }
+
+        // --- Image Download ---
+        function downloadAsImage() {
+            showLoading();
+            const element = document.getElementById('print-area');
+            
+            document.getElementById('printTitleDisplay').innerText = appData.header || "برنامه هفتگی";
+            document.getElementById('printUserDisplay').innerText = appData.userName ? `نام کاربر: ${appData.userName}` : "";
+            document.getElementById('printDateDisplay').innerText = new Date().toLocaleDateString('fa-IR');
+
+            const rL = document.getElementById('printReqList'); rL.innerHTML='';
+            appData.reqs.filter(x=>x.s).forEach(x => rL.innerHTML+=`<li>🔸 ${x.t}</li>`);
+            const cL = document.getElementById('printChkList'); cL.innerHTML='';
+            appData.chks.filter(x=>x.s).forEach(x => cL.innerHTML+=`<li>${x.c?'☑':'⬜'} ${x.t}</li>`);
+
+            const tblCont = document.getElementById('printTableContainer');
+            tblCont.innerHTML = '';
+            tblCont.appendChild(document.getElementById('plannerTable').cloneNode(true));
+
+            const ftr = document.getElementById('printFooter');
+            if(appData.note.print && appData.note.text) {
+                ftr.style.display = 'block';
+                document.getElementById('printNoteText').innerText = appData.note.text;
+            } else { ftr.style.display = 'none'; }
+            
+            element.style.display = 'block';
+            
+            html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `${appData.header || 'Plan'}.jpg`;
+                link.href = canvas.toDataURL('image/jpeg', 0.9);
+                link.click();
+                element.style.display = 'none';
+                hideLoading();
+            });
+        }
+
+        // --- PDF Share ---
+        async function shareApp() {
+            showLoading();
+            const element = document.getElementById('print-area');
+            
+            document.getElementById('printTitleDisplay').innerText = appData.header || "برنامه هفتگی";
+            document.getElementById('printUserDisplay').innerText = appData.userName ? `نام کاربر: ${appData.userName}` : "";
+            document.getElementById('printDateDisplay').innerText = new Date().toLocaleDateString('fa-IR');
+
+            const rL = document.getElementById('printReqList'); rL.innerHTML='';
+            appData.reqs.filter(x=>x.s).forEach(x => rL.innerHTML+=`<li>🔸 ${x.t}</li>`);
+            const cL = document.getElementById('printChkList'); cL.innerHTML='';
+            appData.chks.filter(x=>x.s).forEach(x => cL.innerHTML+=`<li>${x.c?'☑':'⬜'} ${x.t}</li>`);
+
+            const tblCont = document.getElementById('printTableContainer');
+            tblCont.innerHTML = '';
+            tblCont.appendChild(document.getElementById('plannerTable').cloneNode(true));
+
+            const ftr = document.getElementById('printFooter');
+            if(appData.note.print && appData.note.text) {
+                ftr.style.display = 'block';
+                document.getElementById('printNoteText').innerText = appData.note.text;
+            } else { ftr.style.display = 'none'; }
+            
+            element.style.display = 'block';
+            
+            const opt = {
+                margin: 0.2,
+                filename: `${appData.header || 'plan'}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+            };
+
+            try {
+                const pdfBlob = await html2pdf().set(opt).from(element).output('blob');
+                const fileName = `${appData.header || 'Weekly-Plan'}.pdf`;
+                const file = new File([pdfBlob], fileName, { type: "application/pdf" });
+                const shareData = {
+                    files: [file],
+                    title: appData.header || 'برنامه هفتگی',
+                    text: `برنامه هفتگی ${appData.userName || 'کاربر'} - تاریخ: ${new Date().toLocaleDateString('fa-IR')}`
+                };
+
+                if (navigator.canShare && navigator.canShare(shareData)) {
+                    await navigator.share(shareData);
+                } else {
+                    const url = URL.createObjectURL(pdfBlob);
+                    const a = document.createElement('a'); a.href = url; a.download = fileName; a.click();
+                }
+            } catch (err) {
+                console.error(err);
+                alert("مشکل در تولید PDF");
+            } finally {
+                element.style.display = 'none';
+                hideLoading();
+            }
+        }
+
+        function updateEndOptions() {
+            const startVal = document.getElementById('inpStart').value;
+            const sIdx = TIMELINE.indexOf(startVal);
+            const endSel = document.getElementById('inpEnd');
+            endSel.innerHTML = '';
+            for (let i = sIdx + 1; i < TIMELINE.length; i++) {
+                const time = TIMELINE[i];
+                const duration = i - sIdx;
+                let durationText = "";
+                const totalMin = duration * 15;
+                if(totalMin < 60) durationText = `${totalMin} دقیقه`;
+                else {
+                    const h = Math.floor(totalMin/60);
+                    const m = totalMin%60;
+                    durationText = `${h} ساعت` + (m>0 ? ` و ${m} دقیقه` : "");
+                }
+                endSel.add(new Option(`${time} | ${durationText}`, duration));
+            }
         }
 
         init();
