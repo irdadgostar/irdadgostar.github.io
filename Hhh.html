@@ -2,27 +2,32 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>برنامه ریزی حرفه‌ای (با Drag & Drop)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>برنامه ریزی جامع (نسخه موبایل پیشرفته)</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --bg: #f8fafc;
-            --border: #e2e8f0;
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --bg: #f1f5f9;
             --surface: #ffffff;
-            --text: #1e293b;
-            --hover-cell: #f1f5f9;
-            --highlight: #e0f2fe; /* رنگ هایلایت موس */
+            --border: #cbd5e1;
+            --text: #334155;
+            --select-bg: #bfdbfe; /* رنگ انتخاب محدوده */
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, sans-serif;
             background-color: var(--bg);
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             color: var(--text);
             font-size: 13px;
-            user-select: none; /* جلوگیری از انتخاب متن موقع درگ */
+            padding-bottom: 100px;
+            -webkit-tap-highlight-color: transparent; /* حذف هایلایت آبی پیشفرض موبایل */
         }
+
+        /* --- هدر پرینت (فقط در پرینت دیده می‌شود) --- */
+        #print-header-display { display: none; }
 
         /* --- نوار ابزار --- */
         .toolbar {
@@ -30,148 +35,168 @@
             padding: 15px;
             border-radius: 12px;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toolbar-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 1px solid var(--border);
             flex-wrap: wrap;
             gap: 10px;
         }
 
-        .stats-bar {
-            font-size: 12px;
-            color: #64748b;
-            display: flex;
-            gap: 15px;
+        .toolbar-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-top: 5px;
+            font-family: inherit;
         }
 
-        .stat-item b { color: var(--primary); font-size: 14px; }
-
-        .btn-group { display: flex; gap: 8px; }
-
+        /* دکمه‌ها */
         button {
-            padding: 8px 14px;
+            padding: 8px 12px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-family: inherit;
-            font-weight: bold;
-            transition: 0.2s;
+            font-weight: 600;
+            font-size: 12px;
             color: white;
             display: flex;
             align-items: center;
             gap: 5px;
-            font-size: 12px;
+            transition: 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            white-space: nowrap;
         }
 
-        .btn-print { background-color: #475569; }
-        .btn-save { background-color: #059669; }
-        .btn-load { background-color: #0891b2; }
-        .btn-clear { background-color: #dc2626; }
-        .btn-save-modal { background-color: var(--primary); }
-        .btn-cancel { background-color: #94a3b8; }
-        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-primary { background-color: var(--primary); }
+        .btn-success { background-color: #10b981; }
+        .btn-danger { background-color: #ef4444; }
+        .btn-dark { background-color: #475569; }
+        .btn-note { background-color: #f59e0b; }
+        
+        /* دکمه سوییچ حالت انتخاب */
+        .mode-switch {
+            background-color: #e2e8f0;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+        }
+        .mode-switch.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary-dark);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
 
         /* --- جدول --- */
-        .table-container {
+        .table-wrapper {
             background: var(--surface);
             border-radius: 12px;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-            overflow-x: auto;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            overflow: auto; /* اسکرول */
             position: relative;
             border: 1px solid var(--border);
+            max-height: 80vh;
+            overscroll-behavior: contain; /* جلوگیری از رفرش صفحه در موبایل */
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
-            min-width: 800px; /* جلوگیری از بهم ریختگی در موبایل */
+            min-width: 800px; /* حداقل عرض برای خوانایی در موبایل */
         }
+
+        thead { position: sticky; top: 0; z-index: 20; }
 
         th {
             background-color: #1e293b;
             color: white;
-            padding: 12px;
-            position: sticky;
-            top: 0;
-            z-index: 20;
+            padding: 10px;
             border: 1px solid #334155;
+            font-size: 12px;
+            user-select: none;
         }
 
-        /* ستون ساعت */
+        /* دکمه کپی در هدر */
+        .copy-day-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 4px;
+            padding: 2px 6px;
+            margin-right: 5px;
+            cursor: pointer;
+            font-size: 10px;
+            color: white;
+        }
+        .copy-day-btn:hover { background: rgba(255,255,255,0.4); }
+
         th:first-child, td:first-child {
-            width: 70px;
+            width: 60px;
             background-color: #f8fafc;
             color: #64748b;
             font-weight: bold;
-            font-size: 11px;
-            z-index: 30;
+            font-size: 10px;
             position: sticky;
             right: 0;
+            z-index: 30;
             border-left: 2px solid #cbd5e1;
+            text-align: center;
         }
 
         td {
-            border: 1px solid var(--border);
+            border: 1px solid #e2e8f0;
             text-align: center;
-            height: 28px;
-            vertical-align: middle;
+            height: 25px; /* ارتفاع هر ربع ساعت */
             padding: 0;
-            transition: background 0.05s;
+            vertical-align: middle;
+            touch-action: auto; /* پیشفرض */
         }
 
-        /* --- افکت‌های تعاملی --- */
-        
-        /* هایلایت ستون و سطر (Crosshair) */
-        td.hover-highlight { background-color: #f1f5f9; }
-        th.active-head { background-color: #3b82f6; } /* رنگ هدر فعال */
-
-        /* سلول خالی */
-        td.empty-cell { cursor: pointer; }
-        td.empty-cell:hover { background-color: #e0f2fe; }
-        
-        /* کلاس برای درگ کردن */
-        td.drag-over {
-            background-color: #bbf7d0 !important; /* سبز موقع درگ */
-            border: 2px dashed #16a34a !important;
+        /* --- حالت انتخاب --- */
+        /* وقتی حالت انتخاب فعال است، اسکرول روی سلول‌ها غیرفعال می‌شود تا بتوان درگ کرد */
+        body.selection-mode td.empty-cell {
+            touch-action: none; 
+            cursor: crosshair;
         }
 
-        /* سلول تسک */
+        td.selected-range {
+            background-color: var(--select-bg) !important;
+        }
+
+        /* --- تسک‌ها --- */
         td.task-cell {
             color: white;
-            cursor: grab; /* آیکون دست */
-            box-sizing: border-box;
-            padding: 4px;
+            padding: 2px;
             font-size: 11px;
-            border: 1px solid rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            box-sizing: border-box;
             position: relative;
+            cursor: pointer;
+            overflow: hidden;
         }
         
-        td.task-cell:active { cursor: grabbing; } /* موقع گرفتن */
-
-        td.task-cell:hover {
-            filter: brightness(1.08);
-            z-index: 5;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        .task-inner {
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center;
+            pointer-events: none;
         }
 
-        .task-content {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            height: 100%;
-            pointer-events: none; /* برای اینکه درگ روی متن گیر نکند */
-        }
-
-        /* --- مودال --- */
+        /* --- مودال‌ها --- */
         .modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
             justify-content: center;
             align-items: center;
             backdrop-filter: blur(3px);
@@ -179,155 +204,257 @@
 
         .modal {
             background: white;
-            padding: 25px;
+            padding: 20px;
             border-radius: 12px;
-            width: 320px;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 350px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
             display: flex;
             flex-direction: column;
             gap: 12px;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
-        .modal input, .modal select {
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-family: inherit;
-            width: 100%;
-            box-sizing: border-box;
+        .modal h3 { margin: 0 0 10px 0; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        
+        .form-label { font-size: 11px; font-weight: bold; color: #64748b; margin-bottom: 4px; display: block; }
+        input, select, textarea {
+            width: 100%; padding: 10px; border: 1px solid #cbd5e1;
+            border-radius: 8px; font-family: inherit; box-sizing: border-box;
         }
         
-        .form-row { display: flex; gap: 10px; }
+        .color-palette { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 5px; }
+        .color-swatch {
+            width: 25px; height: 25px; border-radius: 50%; cursor: pointer;
+            border: 2px solid #fff; box-shadow: 0 0 0 1px #cbd5e1;
+        }
 
         /* --- پرینت --- */
         @media print {
             @page { size: A4 landscape; margin: 5mm; }
-            body { background: white; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .no-print, .toolbar, .modal-overlay { display: none !important; }
-            .table-container { box-shadow: none; border: none; overflow: visible; }
-            table { border: 2px solid black; font-size: 9px; }
-            th { background-color: #ddd !important; color: black !important; border: 1px solid black; }
-            td { border: 1px solid #999; height: 20px; }
-            td.task-cell { border: 1px solid #000 !important; color: black !important; }
+            body { background: white; padding: 0; }
+            .no-print, .toolbar, .copy-day-btn { display: none !important; }
+            
+            #print-header-display {
+                display: block;
+                text-align: center;
+                font-size: 20px;
+                font-weight: bold;
+                margin-bottom: 10px;
+                border-bottom: 2px solid #000;
+                padding-bottom: 5px;
+            }
+
+            .table-wrapper { box-shadow: none; border: none; overflow: visible; max-height: none; }
+            table { border: 2px solid #000; font-size: 10px; width: 100%; }
+            thead { display: table-header-group; }
+            tr { page-break-inside: avoid; }
+            th { background-color: #ddd !important; color: black !important; border: 1px solid #000; }
+            td { border: 1px solid #666; height: 20px; }
+            td.task-cell { border: 1px solid #000 !important; color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
 </head>
-<body>
+<body id="mainBody">
+
+    <!-- هدر مخصوص پرینت -->
+    <div id="print-header-display"></div>
 
     <div class="toolbar no-print">
-        <div class="stats-bar" id="statsBar">
-            <!-- آمار اینجا نمایش داده می‌شود -->
-            در حال محاسبات...
+        <div class="toolbar-row">
+            <div style="font-weight:bold; display:flex; align-items:center; gap:5px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                برنامه ریزی پیشرفته
+            </div>
+            
+            <!-- دکمه مهم سوییچ حالت -->
+            <button class="mode-switch" id="selectionModeBtn" onclick="toggleSelectionMode()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
+                <span id="modeText">حالت اسکرول</span> (برای انتخاب بزنید)
+            </button>
         </div>
-        <div class="btn-group">
-            <button class="btn-save" onclick="exportData()">💾 دانلود بک‌آپ</button>
-            <button class="btn-load" onclick="document.getElementById('fileInput').click()">📂 بازگردانی</button>
+
+        <div class="toolbar-row">
+            <input type="text" id="printHeaderInput" class="toolbar-input" placeholder="عنوان بالای صفحه برای پرینت (مثلا: برنامه هفته اول مهر)" oninput="updatePrintHeader(this.value)">
+        </div>
+
+        <div class="toolbar-row">
+            <button class="btn-note" onclick="openNotepad()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                یادداشت
+            </button>
+            
+            <div style="flex:1"></div>
+
+            <button class="btn-success" onclick="exportData()">💾 دانلود بک‌آپ</button>
+            <button class="btn-primary" onclick="document.getElementById('fileInput').click()">📂 بازگردانی</button>
             <input type="file" id="fileInput" hidden onchange="importData(this)">
-            <button class="btn-print" onclick="window.print()">🖨 پرینت</button>
-            <button class="btn-clear" onclick="clearAll()">🗑 پاکسازی</button>
+            <button class="btn-dark" onclick="window.print()">🖨 پرینت</button>
+            <button class="btn-danger" onclick="clearAll()">🗑 حذف</button>
         </div>
     </div>
 
-    <div class="table-container">
+    <div class="table-wrapper">
         <table id="plannerTable">
             <thead>
-                <tr>
+                <tr id="tableHeaderRow">
                     <th>ساعت</th>
-                    <th id="th-sat">شنبه</th>
-                    <th id="th-sun">یکشنبه</th>
-                    <th id="th-mon">دوشنبه</th>
-                    <th id="th-tue">سه‌شنبه</th>
-                    <th id="th-wed">چهارشنبه</th>
-                    <th id="th-thu">پنج‌شنبه</th>
-                    <th id="th-fri">جمعه</th>
+                    <!-- هدرها توسط JS ساخته می‌شوند تا دکمه کپی داشته باشند -->
                 </tr>
             </thead>
-            <tbody id="plannerBody">
-                <!-- جدول با JS پر می‌شود -->
-            </tbody>
+            <tbody id="plannerBody"></tbody>
         </table>
     </div>
 
-    <!-- مودال -->
-    <div class="modal-overlay" id="modal">
+    <!-- مودال فعالیت -->
+    <div class="modal-overlay" id="taskModal">
         <div class="modal">
-            <h3 style="margin:0; border-bottom:1px solid #eee; padding-bottom:10px;">مدیریت فعالیت</h3>
+            <h3>مدیریت فعالیت</h3>
             <input type="hidden" id="taskId">
+            <input type="hidden" id="taskDay">
+            <input type="hidden" id="taskStartStr">
             
             <div>
-                <label style="font-size:11px; font-weight:bold;">نام فعالیت:</label>
+                <span class="form-label">زمان:</span>
+                <div id="timeDisplay" style="font-size:12px; color:#666; margin-bottom:5px;"></div>
+            </div>
+
+            <div>
+                <span class="form-label">نام فعالیت:</span>
                 <input type="text" id="inpName" placeholder="مثلاً: ورزش" autofocus>
             </div>
 
-            <div class="form-row">
-                <div style="flex:1">
-                    <label style="font-size:11px; font-weight:bold;">روز:</label>
-                    <select id="inpDay" disabled style="background:#eee">
-                        <option value="sat">شنبه</option><option value="sun">یکشنبه</option>
-                        <option value="mon">دوشنبه</option><option value="tue">سه‌شنبه</option>
-                        <option value="wed">چهارشنبه</option><option value="thu">پنج‌شنبه</option>
-                        <option value="fri">جمعه</option>
-                    </select>
-                </div>
-                <div style="flex:1">
-                     <label style="font-size:11px; font-weight:bold;">شروع:</label>
-                     <select id="inpStart"></select>
-                </div>
-            </div>
-
             <div>
-                <label style="font-size:11px; font-weight:bold;">مدت زمان:</label>
+                <span class="form-label">مدت زمان (تعداد خانه‌های 15 دقیقه‌ای):</span>
                 <select id="inpDuration">
-                    <option value="1">15 دقیقه</option>
-                    <option value="2">30 دقیقه</option>
-                    <option value="3">45 دقیقه</option>
-                    <option value="4" selected>1 ساعت</option>
-                    <option value="5">1:15 ساعت</option>
-                    <option value="6">1:30 ساعت</option>
-                    <option value="8">2 ساعت</option>
-                    <option value="12">3 ساعت</option>
-                    <option value="16">4 ساعت</option>
+                    <!-- با JS پر میشود -->
                 </select>
             </div>
 
             <div>
-                <label style="font-size:11px; font-weight:bold;">رنگ:</label>
-                <input type="color" id="inpColor" value="#3b82f6" style="height:35px; padding:2px;">
+                <span class="form-label">رنگ:</span>
+                <div class="color-palette">
+                    <div class="color-swatch" style="background:#3b82f6" onclick="setColor('#3b82f6')"></div>
+                    <div class="color-swatch" style="background:#10b981" onclick="setColor('#10b981')"></div>
+                    <div class="color-swatch" style="background:#ef4444" onclick="setColor('#ef4444')"></div>
+                    <div class="color-swatch" style="background:#f59e0b" onclick="setColor('#f59e0b')"></div>
+                    <div class="color-swatch" style="background:#8b5cf6" onclick="setColor('#8b5cf6')"></div>
+                    <div class="color-swatch" style="background:#64748b" onclick="setColor('#64748b')"></div>
+                    <input type="color" id="inpColor" value="#3b82f6" style="margin-right:auto">
+                </div>
             </div>
 
             <div style="display:flex; justify-content:space-between; margin-top:10px;">
-                <button class="btn-clear" type="button" id="btnDelete" onclick="deleteTask()" style="display:none;">حذف</button>
+                <button class="btn-danger" id="btnDelete" onclick="deleteTask()" style="display:none">حذف</button>
                 <div style="flex:1"></div>
-                <button class="btn-cancel" onclick="closeModal()">لغو</button>
-                <button class="btn-save-modal" onclick="saveTask()">ذخیره</button>
+                <button class="btn-dark" onclick="closeModal('taskModal')" style="margin-left:5px;">لغو</button>
+                <button class="btn-primary" onclick="saveTask()">ذخیره</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال یادداشت -->
+    <div class="modal-overlay" id="noteModal">
+        <div class="modal">
+            <h3>دفترچه یادداشت</h3>
+            <textarea id="notepadArea" rows="10" placeholder="یادداشت‌های خود را اینجا بنویسید..."></textarea>
+            <div style="display:flex; justify-content:flex-end;">
+                <button class="btn-primary" onclick="saveNoteAndClose()">ذخیره و بستن</button>
             </div>
         </div>
     </div>
 
     <script>
-        const DAYS = ['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'];
+        // --- تنظیمات اصلی ---
+        const DAYS = [
+            { id: 'sat', label: 'شنبه' }, { id: 'sun', label: 'یکشنبه' },
+            { id: 'mon', label: 'دوشنبه' }, { id: 'tue', label: 'سه‌شنبه' },
+            { id: 'wed', label: 'چهارشنبه' }, { id: 'thu', label: 'پنج‌شنبه' },
+            { id: 'fri', label: 'جمعه' }
+        ];
+        
         const TIMELINE = [];
         for(let h=0; h<24; h++) for(let m=0; m<60; m+=15) 
             TIMELINE.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
 
-        let tasks = JSON.parse(localStorage.getItem('proPlannerV4')) || [];
-        let draggedTaskId = null; // برای ذخیره آیدی تسک در حال درگ
+        // آبجکت اصلی دیتا
+        let appData = {
+            tasks: [],
+            notes: "",
+            printHeader: ""
+        };
 
+        // متغیرهای حالت انتخاب
+        let isSelectionMode = false;
+        let isDragging = false;
+        let selectionStart = null; // { day, index }
+        let selectionCurrent = null;
+
+        // --- شروع برنامه ---
         function init() {
-            const startSel = document.getElementById('inpStart');
-            TIMELINE.forEach(t => startSel.add(new Option(t, t)));
-            render();
+            // لود دیتا
+            const saved = localStorage.getItem('ultraPlannerV1');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    // پشتیبانی از نسخه های قدیمی (اگر آرایه بود تبدیل به آبجکت کن)
+                    if (Array.isArray(parsed)) {
+                        appData.tasks = parsed;
+                    } else {
+                        appData = parsed;
+                    }
+                } catch(e) { console.error("Data Load Error", e); }
+            }
+
+            // مقداردهی اولیه UI
+            document.getElementById('notepadArea').value = appData.notes || "";
+            document.getElementById('printHeaderInput').value = appData.printHeader || "";
+            updatePrintHeader(appData.printHeader || "");
+
+            // پر کردن سلکت مدت زمان
+            const durSel = document.getElementById('inpDuration');
+            for(let i=1; i<=32; i++) {
+                let txt = "";
+                if (i*15 < 60) txt = (i*15) + " دقیقه";
+                else {
+                    const h = Math.floor((i*15)/60);
+                    const m = (i*15)%60;
+                    txt = h + " ساعت" + (m>0 ? " و " + m + " دقیقه" : "");
+                }
+                durSel.add(new Option(txt, i));
+            }
+
+            renderHeader();
+            renderTable();
+            setupPointerEvents();
         }
 
-        function render() {
+        // --- رندرینگ ---
+        function renderHeader() {
+            const tr = document.getElementById('tableHeaderRow');
+            // پاک کردن همه بجز ستون اول
+            while(tr.children.length > 1) tr.removeChild(tr.lastChild);
+
+            DAYS.forEach(day => {
+                const th = document.createElement('th');
+                th.innerHTML = `
+                    <div style="display:flex; align-items:center; justify-content:center; gap:5px;">
+                        <button class="copy-day-btn" onclick="copyDay('${day.id}')" title="کپی کردن برنامه این روز">📋</button>
+                        ${day.label}
+                    </div>
+                `;
+                tr.appendChild(th);
+            });
+        }
+
+        function renderTable() {
             const tbody = document.getElementById('plannerBody');
             tbody.innerHTML = '';
             
-            // محاسبه آمار
-            updateStats();
-
+            // نقشه اشغال بودن خانه‌ها
             const occupied = {}; 
-            DAYS.forEach(d => occupied[d] = new Array(TIMELINE.length).fill(false));
+            DAYS.forEach(d => occupied[d.id] = new Array(TIMELINE.length).fill(false));
 
             TIMELINE.forEach((timeStr, tIndex) => {
                 const tr = document.createElement('tr');
@@ -338,45 +465,38 @@
                 tr.appendChild(tdTime);
 
                 DAYS.forEach(day => {
-                    if (occupied[day][tIndex]) return;
+                    if (occupied[day.id][tIndex]) return;
 
-                    const task = tasks.find(t => t.day === day && t.startStr === timeStr);
+                    const task = appData.tasks.find(t => t.day === day.id && t.startStr === timeStr);
 
                     if (task) {
                         const td = document.createElement('td');
                         td.rowSpan = task.duration;
                         td.className = 'task-cell';
                         td.style.backgroundColor = task.color;
-                        td.draggable = true; // فعال سازی درگ
                         
-                        // ایونت های درگ برای تسک
-                        td.ondragstart = (e) => handleDragStart(e, task.id);
-                        td.onclick = () => openModal(day, timeStr, task);
-
+                        // محتوا
                         const endIdx = tIndex + task.duration;
                         const endStr = endIdx < TIMELINE.length ? TIMELINE[endIdx] : "24:00";
-                        td.innerHTML = `<div class="task-content"><b>${task.name}</b><br><span style="font-size:9px; opacity:0.8">${timeStr}-${endStr}</span></div>`;
+                        td.innerHTML = `<div class="task-inner"><b>${task.name}</b></div>`;
                         
+                        // کلیک برای ویرایش
+                        td.onclick = (e) => {
+                            e.stopPropagation(); // جلوگیری از انتخاب سلول زیرین
+                            openTaskModal(task);
+                        };
+
                         tr.appendChild(td);
-                        for(let i=1; i < task.duration; i++) if (tIndex + i < TIMELINE.length) occupied[day][tIndex + i] = true;
+                        // پر کردن ماتریس اشغال
+                        for(let i=1; i < task.duration; i++) 
+                            if (tIndex + i < TIMELINE.length) occupied[day.id][tIndex + i] = true;
 
                     } else {
                         // سلول خالی
                         const td = document.createElement('td');
                         td.className = 'empty-cell';
-                        td.setAttribute('data-day', day);
-                        td.setAttribute('data-time', timeStr);
-                        
-                        // ایونت های دراپ برای سلول خالی
-                        td.ondragover = (e) => handleDragOver(e);
-                        td.ondragleave = (e) => handleDragLeave(e);
-                        td.ondrop = (e) => handleDrop(e, day, timeStr);
-                        
-                        // ایونت کلیک و هاور
-                        td.onclick = () => openModal(day, timeStr, null);
-                        td.onmouseenter = () => highlightGrid(day, true);
-                        td.onmouseleave = () => highlightGrid(day, false);
-
+                        td.dataset.day = day.id;
+                        td.dataset.index = tIndex;
                         tr.appendChild(td);
                     }
                 });
@@ -384,177 +504,272 @@
             });
         }
 
-        // --- Drag & Drop Logic ---
-        function handleDragStart(e, id) {
-            draggedTaskId = id;
-            e.dataTransfer.effectAllowed = "move";
-            e.dataTransfer.setData("text/plain", id); // برای فایرفاکس الزامی است
-            // شفاف کردن المان موقع درگ
-            setTimeout(() => e.target.style.opacity = '0.5', 0);
-        }
+        // --- سیستم انتخاب و تاچ (هسته اصلی جدید) ---
+        function toggleSelectionMode() {
+            isSelectionMode = !isSelectionMode;
+            const btn = document.getElementById('selectionModeBtn');
+            const txt = document.getElementById('modeText');
+            const body = document.body;
 
-        function handleDragOver(e) {
-            e.preventDefault(); // اجازه دراپ دادن
-            e.dataTransfer.dropEffect = "move";
-            e.currentTarget.classList.add('drag-over');
-        }
-
-        function handleDragLeave(e) {
-            e.currentTarget.classList.remove('drag-over');
-        }
-
-        function handleDrop(e, targetDay, targetTimeStr) {
-            e.preventDefault();
-            e.currentTarget.classList.remove('drag-over');
-            
-            const task = tasks.find(t => t.id === draggedTaskId);
-            if (!task) return;
-
-            // تلاش برای جابجایی
-            if (tryMoveTask(task, targetDay, targetTimeStr)) {
-                // موفقیت
-                saveData();
-                render();
+            if (isSelectionMode) {
+                btn.classList.add('active');
+                txt.innerText = "✍️ حالت انتخاب روشن";
+                body.classList.add('selection-mode');
             } else {
-                alert("تداخل زمانی! امکان جابجایی به این ساعت وجود ندارد.");
-                render(); // برای برگرداندن opacity
+                btn.classList.remove('active');
+                txt.innerText = "حالت اسکرول";
+                body.classList.remove('selection-mode');
+                clearSelection();
             }
-            draggedTaskId = null;
         }
 
-        function tryMoveTask(task, newDay, newStartStr) {
-            // شبیه سازی تغییر برای چک کردن تداخل
-            const originalDay = task.day;
-            const originalStart = task.startStr;
-
-            const newStartIdx = TIMELINE.indexOf(newStartStr);
-            const newEndIdx = newStartIdx + task.duration;
-
-            // چک تداخل (به جز خودش)
-            const hasConflict = tasks.some(t => {
-                if (t.id === task.id) return false;
-                if (t.day !== newDay) return false;
+        function setupPointerEvents() {
+            const table = document.getElementById('plannerTable');
+            
+            // شروع لمس
+            table.addEventListener('pointerdown', (e) => {
+                if (!isSelectionMode) return;
+                const cell = e.target.closest('td.empty-cell');
+                if (!cell) return;
                 
-                const tStartIdx = TIMELINE.indexOf(t.startStr);
-                const tEndIdx = tStartIdx + t.duration;
-                return (newStartIdx < tEndIdx && newEndIdx > tStartIdx);
+                e.preventDefault(); // جلوگیری از اسکرول
+                isDragging = true;
+                const day = cell.dataset.day;
+                const idx = parseInt(cell.dataset.index);
+                
+                selectionStart = { day, index: idx };
+                selectionCurrent = { day, index: idx };
+                highlightSelection();
+                
+                // کپچر کردن پوینتر برای ادامه درگ حتی اگر از المان خارج شد
+                cell.setPointerCapture(e.pointerId);
             });
 
-            // چک بیرون زدن از 24 ساعت
-            if (newEndIdx > TIMELINE.length) return false;
+            // حرکت لمس
+            table.addEventListener('pointermove', (e) => {
+                if (!isDragging || !isSelectionMode) return;
+                e.preventDefault();
 
-            if (!hasConflict) {
-                task.day = newDay;
-                task.startStr = newStartStr;
-                return true;
-            }
-            return false;
+                // پیدا کردن المان زیر انگشت
+                const element = document.elementFromPoint(e.clientX, e.clientY);
+                if (!element) return;
+                
+                const cell = element.closest('td.empty-cell');
+                if (cell && cell.dataset.day === selectionStart.day) {
+                    const idx = parseInt(cell.dataset.index);
+                    // فقط در همان روز اجازه انتخاب داریم
+                    selectionCurrent = { day: selectionStart.day, index: idx };
+                    highlightSelection();
+                }
+            });
+
+            // پایان لمس
+            table.addEventListener('pointerup', (e) => {
+                if (!isDragging) return;
+                isDragging = false;
+                if (selectionStart && selectionCurrent) {
+                    finalizeSelection();
+                }
+            });
         }
 
-        // --- Visual Helpers ---
-        function highlightGrid(day, active) {
-            // روشن کردن هدر روز مربوطه
-            const th = document.getElementById(`th-${day}`);
-            if(th) {
-                if(active) th.classList.add('active-head');
-                else th.classList.remove('active-head');
+        function highlightSelection() {
+            // پاک کردن قبلی ها
+            document.querySelectorAll('.selected-range').forEach(el => el.classList.remove('selected-range'));
+
+            if (!selectionStart || !selectionCurrent) return;
+
+            const start = Math.min(selectionStart.index, selectionCurrent.index);
+            const end = Math.max(selectionStart.index, selectionCurrent.index);
+            const day = selectionStart.day;
+
+            // پیدا کردن سلول‌ها و رنگ کردن
+            for (let i = start; i <= end; i++) {
+                const selector = `td.empty-cell[data-day="${day}"][data-index="${i}"]`;
+                const el = document.querySelector(selector);
+                if (el) el.classList.add('selected-range');
             }
         }
-        
-        function updateStats() {
-            const totalTasks = tasks.length;
-            let totalSlots = 0;
-            tasks.forEach(t => totalSlots += t.duration);
-            const totalHours = (totalSlots * 15) / 60;
+
+        function clearSelection() {
+            document.querySelectorAll('.selected-range').forEach(el => el.classList.remove('selected-range'));
+            selectionStart = null;
+            selectionCurrent = null;
+        }
+
+        function finalizeSelection() {
+            const startIdx = Math.min(selectionStart.index, selectionCurrent.index);
+            const endIdx = Math.max(selectionStart.index, selectionCurrent.index);
+            const duration = endIdx - startIdx + 1;
+            const day = selectionStart.day;
+            const startStr = TIMELINE[startIdx];
+
+            // چک کردن تداخل در محدوده انتخاب شده
+            // (آیا در بین سلول‌های انتخاب شده، تسکی وجود دارد که رندر نشده باشد؟)
+            // چون ما فقط روی empty-cell ها درگ میکنیم، احتمال تداخل کم است اما برای اطمینان:
+            // اگر کاربر از روی یک تسک رد شده باشد، آن تسک selected-range نمیگیرد.
+            // پس ما فقط تعداد selected-range ها را میشماریم.
+            const selectedCount = document.querySelectorAll('.selected-range').length;
             
-            document.getElementById('statsBar').innerHTML = 
-                `<span class="stat-item">تعداد فعالیت: <b>${totalTasks}</b></span>` +
-                `<span class="stat-item"> | مجموع ساعات: <b>${totalHours}</b> ساعت</span>`;
+            // باز کردن مودال
+            openTaskModal(null, { day, startStr, duration: selectedCount }); // duration واقعی
+            
+            clearSelection();
         }
 
-        // --- Modal & CRUD ---
-        function openModal(day, startTime, task) {
-            const modal = document.getElementById('modal');
+
+        // --- منطق کپی روز به روز ---
+        function copyDay(sourceDayId) {
+            const sourceDayLabel = DAYS.find(d => d.id === sourceDayId).label;
+            const targetLabel = prompt(`برنامه روز ${sourceDayLabel} را در کدام روز کپی کنم؟\n(نام روز را بنویسید: شنبه، یکشنبه، دوشنبه...)`);
+            
+            if (!targetLabel) return;
+            
+            const targetDayObj = DAYS.find(d => d.label === targetLabel.trim());
+            if (!targetDayObj) return alert("روز وارد شده معتبر نیست.");
+            
+            const targetDayId = targetDayObj.id;
+            if (targetDayId === sourceDayId) return alert("مبدا و مقصد یکی است.");
+
+            if(!confirm(`آیا مطمئن هستید؟ تمام برنامه های قبلی ${targetLabel} پاک شده و با ${sourceDayLabel} جایگزین می‌شود.`)) return;
+
+            // 1. حذف تمام تسک های روز مقصد
+            appData.tasks = appData.tasks.filter(t => t.day !== targetDayId);
+
+            // 2. کپی تسک های مبدا
+            const sourceTasks = appData.tasks.filter(t => t.day === sourceDayId);
+            sourceTasks.forEach(t => {
+                appData.tasks.push({
+                    ...t,
+                    id: Date.now() + Math.random(), // آیدی جدید
+                    day: targetDayId
+                });
+            });
+
+            saveData();
+            renderTable();
+        }
+
+        // --- مدیریت داده ها (CRUD) ---
+        function openTaskModal(existingTask, newSelection = null) {
+            const modal = document.getElementById('taskModal');
             const btnDelete = document.getElementById('btnDelete');
             
-            document.getElementById('inpDay').value = day;
-            document.getElementById('inpStart').value = startTime;
-            
-            // ریست کردن سلکتور شروع به حالت قابل انتخاب
-            document.getElementById('inpStart').disabled = false;
-
-            if (task) {
-                document.getElementById('taskId').value = task.id;
-                document.getElementById('inpName').value = task.name;
-                document.getElementById('inpDuration').value = task.duration;
-                document.getElementById('inpColor').value = task.color;
+            if (existingTask) {
+                document.getElementById('taskId').value = existingTask.id;
+                document.getElementById('taskDay').value = existingTask.day;
+                document.getElementById('taskStartStr').value = existingTask.startStr;
+                document.getElementById('inpName').value = existingTask.name;
+                document.getElementById('inpDuration').value = existingTask.duration;
+                document.getElementById('inpColor').value = existingTask.color;
+                
+                document.getElementById('timeDisplay').innerText = 
+                    `${getDayLabel(existingTask.day)} | شروع: ${existingTask.startStr}`;
+                
                 btnDelete.style.display = 'block';
-                // در حالت ویرایش معمولا ساعت را عوض نمی‌کنیم مگر با درگ، اما اینجا باز میگذاریم
-            } else {
+            } else if (newSelection) {
                 document.getElementById('taskId').value = '';
+                document.getElementById('taskDay').value = newSelection.day;
+                document.getElementById('taskStartStr').value = newSelection.startStr;
                 document.getElementById('inpName').value = '';
-                document.getElementById('inpDuration').value = '4'; 
+                document.getElementById('inpDuration').value = newSelection.duration;
                 document.getElementById('inpColor').value = '#3b82f6';
+                
+                document.getElementById('timeDisplay').innerText = 
+                    `${getDayLabel(newSelection.day)} | شروع: ${newSelection.startStr}`;
+                
                 btnDelete.style.display = 'none';
             }
-            modal.style.display = 'flex';
+
+            document.getElementById('taskModal').style.display = 'flex';
             document.getElementById('inpName').focus();
         }
 
-        function closeModal() { document.getElementById('modal').style.display = 'none'; }
-
         function saveTask() {
             const id = document.getElementById('taskId').value;
-            const day = document.getElementById('inpDay').value;
-            const startStr = document.getElementById('inpStart').value;
+            const day = document.getElementById('taskDay').value;
+            const startStr = document.getElementById('taskStartStr').value;
+            const name = document.getElementById('inpName').value;
             const duration = parseInt(document.getElementById('inpDuration').value);
-            const name = document.getElementById('inpName').value.trim();
             const color = document.getElementById('inpColor').value;
 
-            if (!name) return alert("نام فعالیت الزامی است");
+            if (!name) return alert("نام وارد نشده است");
 
-            // بررسی تداخل (کد تکراری برای امنیت)
+            // بررسی تداخل
             const startIdx = TIMELINE.indexOf(startStr);
             const endIdx = startIdx + duration;
-            if (endIdx > TIMELINE.length) return alert("زمان از انتهای روز بیرون می‌زند!");
+            
+            if (endIdx > TIMELINE.length) return alert("زمان از پایان روز بیرون می‌زند");
 
-            const hasConflict = tasks.some(t => {
-                if (t.id == id) return false;
-                if (t.day !== day) return false;
+            const conflict = appData.tasks.some(t => {
+                if (t.id == id || t.day !== day) return false;
                 const tS = TIMELINE.indexOf(t.startStr);
                 const tE = tS + t.duration;
                 return (startIdx < tE && endIdx > tS);
             });
 
-            if (hasConflict) return alert("تداخل زمانی!");
+            if (conflict) return alert("تداخل با برنامه دیگر!");
 
             if (id) {
-                const idx = tasks.findIndex(t => t.id == id);
-                if (idx !== -1) tasks[idx] = { ...tasks[idx], day, startStr, duration, name, color };
+                const idx = appData.tasks.findIndex(t => t.id == id);
+                if (idx !== -1) appData.tasks[idx] = { ...appData.tasks[idx], name, duration, color };
             } else {
-                tasks.push({ id: Date.now(), day, startStr, duration, name, color });
+                appData.tasks.push({ id: Date.now(), day, startStr, duration, name, color });
             }
 
             saveData();
-            render();
-            closeModal();
+            renderTable();
+            closeModal('taskModal');
         }
 
         function deleteTask() {
             const id = document.getElementById('taskId').value;
             if(confirm("حذف شود؟")) {
-                tasks = tasks.filter(t => t.id != id);
+                appData.tasks = appData.tasks.filter(t => t.id != id);
                 saveData();
-                render();
-                closeModal();
+                renderTable();
+                closeModal('taskModal');
             }
         }
 
-        function saveData() { localStorage.setItem('proPlannerV4', JSON.stringify(tasks)); }
-        function clearAll() { if(confirm("همه پاک شود؟")) { tasks=[]; saveData(); render(); } }
+        // --- یادداشت و هدر ---
+        function openNotepad() {
+            document.getElementById('noteModal').style.display = 'flex';
+        }
+        function saveNoteAndClose() {
+            appData.notes = document.getElementById('notepadArea').value;
+            saveData();
+            closeModal('noteModal');
+        }
+        function updatePrintHeader(val) {
+            appData.printHeader = val;
+            document.getElementById('print-header-display').innerText = val;
+            saveData();
+        }
+
+        // --- عمومی ---
+        function saveData() {
+            localStorage.setItem('ultraPlannerV1', JSON.stringify(appData));
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function setColor(c) { document.getElementById('inpColor').value = c; }
         
+        function getDayLabel(id) { return DAYS.find(d => d.id === id).label; }
+
+        function clearAll() {
+            if(confirm("همه چیز پاک شود؟")) {
+                appData = { tasks: [], notes: "", printHeader: "" };
+                saveData();
+                location.reload();
+            }
+        }
+
         function exportData() {
-            const blob = new Blob([JSON.stringify(tasks)], {type: "application/json"});
+            const blob = new Blob([JSON.stringify(appData)], {type: "application/json"});
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
             a.download = "planner_backup.json";
@@ -568,14 +783,19 @@
             reader.onload = (e) => {
                 try {
                     const d = JSON.parse(e.target.result);
-                    if(Array.isArray(d)) { tasks=d; saveData(); render(); }
-                } catch(er){alert("فایل خراب است");}
+                    if (d.tasks || Array.isArray(d)) {
+                         // هندل کردن ورژن های مختلف
+                         if(Array.isArray(d)) appData.tasks = d;
+                         else appData = d;
+                         
+                         saveData();
+                         location.reload();
+                    }
+                } catch(er){ alert("فایل خراب است"); }
             };
             reader.readAsText(file);
-            input.value = '';
         }
-        
-        window.onclick = (e) => { if(e.target == document.getElementById('modal')) closeModal(); }
+
         init();
     </script>
 </body>
