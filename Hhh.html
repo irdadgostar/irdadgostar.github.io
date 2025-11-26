@@ -1,464 +1,541 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>برنامه ریزی جدولی منظم</title>
+    <title>برنامه ریز جامع و حرفه‌ای</title>
     <style>
         :root {
-            --primary: #2c3e50;
-            --accent: #3498db;
-            --bg: #f5f6fa;
-            --border: #bdc3c7;
-            --cell-height: 25px;
+            --primary: #2563eb;
+            --bg: #f1f5f9;
+            --border: #cbd5e1;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --hover: #e2e8f0;
         }
 
         body {
-            font-family: 'Tahoma', 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, sans-serif;
             background-color: var(--bg);
             margin: 0;
             padding: 20px;
-            font-size: 12px;
+            color: var(--text);
+            font-size: 13px;
         }
 
-        /* --- پنل تنظیمات --- */
-        .controls {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        /* --- نوار ابزار --- */
+        .toolbar {
+            background: var(--surface);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
             margin-bottom: 20px;
             display: flex;
-            gap: 15px;
-            align-items: flex-end;
-            flex-wrap: wrap;
-            border-top: 5px solid var(--accent);
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border);
         }
 
-        .input-group {
+        .btn-group {
             display: flex;
-            flex-direction: column;
-        }
-
-        label { margin-bottom: 5px; font-weight: bold; color: #555; }
-
-        input, select {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-family: inherit;
-            min-width: 120px;
-        }
-        
-        /* استایل گزینه های غیرفعال در سلکت */
-        option:disabled {
-            background-color: #eee;
-            color: #aaa;
+            gap: 10px;
         }
 
         button {
-            padding: 9px 20px;
+            padding: 8px 16px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            color: white;
-            font-weight: bold;
             font-family: inherit;
+            font-weight: bold;
+            transition: 0.2s;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
-        .btn-add { background: var(--accent); }
-        .btn-add:hover { background: #2980b9; }
-        .btn-print { background: var(--primary); }
-        .btn-clear { background: #c0392b; }
+        .btn-print { background-color: #475569; }
+        .btn-save { background-color: #059669; }
+        .btn-load { background-color: #0891b2; }
+        .btn-clear { background-color: #dc2626; }
+        .btn-save-modal { background-color: var(--primary); }
+        .btn-cancel { background-color: #94a3b8; }
 
-        /* --- جدول برنامه --- */
-        .schedule-wrapper {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* --- جدول --- */
+        .table-container {
+            background: var(--surface);
+            border-radius: 10px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
             overflow-x: auto;
+            position: relative;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: fixed; /* عرض ثابت ستون ها */
-        }
-
-        th, td {
-            border: 1px solid var(--border);
-            text-align: center;
-            padding: 0;
-            overflow: hidden;
-            word-wrap: break-word;
+            table-layout: fixed; /* عرض ثابت برای نظم */
         }
 
         th {
-            background-color: var(--primary);
+            background-color: #1e293b;
             color: white;
-            padding: 10px;
+            padding: 12px;
             position: sticky;
             top: 0;
-            z-index: 10;
-            width: 13%; /* تقسیم بین 7 روز + ستون ساعت */
+            z-index: 20;
+            border: 1px solid #334155;
         }
-        
-        /* ستون اول (ساعت) */
+
+        /* ستون ساعت */
         th:first-child, td:first-child {
-            width: 60px;
-            background-color: #ecf0f1;
+            width: 70px;
+            background-color: #f8fafc;
+            color: #64748b;
             font-weight: bold;
-            font-size: 10px;
-            color: #7f8c8d;
+            font-size: 11px;
+            z-index: 30; /* بالاتر از بقیه */
+            position: sticky;
+            right: 0; /* چسبیدن به راست در اسکرول */
         }
 
         td {
-            height: var(--cell-height);
-            transition: background 0.2s;
-            font-size: 11px;
+            border: 1px solid var(--border);
+            text-align: center;
+            height: 30px; /* ارتفاع هر ربع ساعت */
             vertical-align: middle;
+            padding: 0;
+            transition: background 0.1s;
         }
 
-        /* سلول‌های خالی قابل هاور */
-        td:not(:first-child):not(.filled-cell):hover {
-            background-color: #f0f8ff;
-        }
-
-        /* سلول پر شده */
-        .filled-cell {
-            background-color: #e3f2fd;
-            color: #000;
+        /* خانه‌های خالی */
+        td.empty-cell:hover {
+            background-color: #e0f2fe;
             cursor: pointer;
-            border-left: 4px solid var(--accent);
+        }
+
+        /* خانه‌های پر شده */
+        td.task-cell {
+            color: white;
+            cursor: pointer;
             box-sizing: border-box;
             padding: 5px;
-            font-weight: bold;
-        }
-        
-        .filled-cell:hover {
-            background-color: #bbdefb;
+            border-radius: 0; /* در جدول نباید گرد باشد تا خطوط پرینت وصل شوند */
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.1); /* مرز نازک */
+            font-size: 12px;
         }
 
-        /* --- پرینت --- */
+        td.task-cell:hover {
+            filter: brightness(1.1);
+            z-index: 5;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        .task-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .task-time { font-size: 10px; opacity: 0.9; margin-top: 2px; }
+
+        /* --- مودال (پنجره پاپ آپ) --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(2px);
+        }
+
+        .modal {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 350px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .modal h3 { margin: 0; color: var(--text); border-bottom: 1px solid #eee; padding-bottom: 10px; }
+
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 11px; font-weight: bold; color: #64748b; }
+        
+        .modal input, .modal select {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        /* --- تنظیمات پرینت --- */
         @media print {
             @page {
-                size: A4 landscape; /* اجبار به افقی برای جا شدن هفته */
-                margin: 1cm;
+                size: A4 landscape; /* افقی */
+                margin: 10mm;
             }
-
-            body {
-                background: white;
-                padding: 0;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-
-            .controls, .no-print {
-                display: none;
-            }
-
-            .schedule-wrapper {
-                box-shadow: none;
-                overflow: visible;
-            }
-
-            table {
-                font-size: 10px;
-                border: 2px solid #000;
-            }
+            body { background: white; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .no-print, .toolbar, .modal-overlay { display: none !important; }
+            .table-container { box-shadow: none; overflow: visible; }
             
-            th {
-                background-color: #ccc !important;
-                color: black !important;
-                border: 1px solid #000;
+            table { border: 2px solid black; font-size: 10px; }
+            th { background-color: #ddd !important; color: black !important; border: 1px solid black; }
+            td { border: 1px solid #666; }
+            
+            /* اجبار چاپ رنگ‌ها */
+            td.task-cell {
+                border: 1px solid #000 !important;
+                color: black !important; /* متن مشکی برای خوانایی بهتر در پرینت */
             }
-
-            td {
-                border: 1px solid #666;
-                height: 20px; /* کاهش ارتفاع برای جا شدن در صفحه */
-            }
-
-            .filled-cell {
-                background-color: #eee !important;
-                border: 1px solid #000;
-                border-left: 5px solid #000 !important;
-            }
+            /* اگر می‌خواهید متن سفید بماند، خط بالا را حذف کنید */
         }
     </style>
 </head>
 <body>
 
-<div class="controls no-print">
-    <div class="input-group">
-        <label>عنوان فعالیت</label>
-        <input type="text" id="inpName" placeholder="مثلا: ورزش">
-    </div>
-    
-    <div class="input-group">
-        <label>روز هفته</label>
-        <select id="inpDay" onchange="updateTimeOptions()">
-            <option value="sat">شنبه</option>
-            <option value="sun">یکشنبه</option>
-            <option value="mon">دوشنبه</option>
-            <option value="tue">سه‌شنبه</option>
-            <option value="wed">چهارشنبه</option>
-            <option value="thu">پنج‌شنبه</option>
-            <option value="fri">جمعه</option>
-        </select>
+    <!-- نوار ابزار بالا -->
+    <div class="toolbar no-print">
+        <div style="font-weight:bold; font-size:16px;">📅 برنامه هفتگی هوشمند</div>
+        <div class="btn-group">
+            <button class="btn-save" onclick="exportData()">💾 دانلود بک‌آپ</button>
+            <button class="btn-load" onclick="document.getElementById('fileInput').click()">📂 بازگردانی</button>
+            <input type="file" id="fileInput" hidden onchange="importData(this)">
+            <button class="btn-print" onclick="window.print()">🖨 پرینت</button>
+            <button class="btn-clear" onclick="clearAll()">🗑 حذف همه</button>
+        </div>
     </div>
 
-    <div class="input-group">
-        <label>ساعت شروع</label>
-        <select id="inpStart"></select>
+    <!-- جدول -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ساعت</th>
+                    <th>شنبه</th>
+                    <th>یکشنبه</th>
+                    <th>دوشنبه</th>
+                    <th>سه‌شنبه</th>
+                    <th>چهارشنبه</th>
+                    <th>پنج‌شنبه</th>
+                    <th>جمعه</th>
+                </tr>
+            </thead>
+            <tbody id="plannerBody">
+                <!-- توسط JS پر می‌شود -->
+            </tbody>
+        </table>
     </div>
 
-    <div class="input-group">
-        <label>ساعت پایان</label>
-        <select id="inpEnd"></select>
+    <!-- مودال افزودن/ویرایش -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <h3 id="modalTitle">افزودن فعالیت</h3>
+            <input type="hidden" id="taskId"> <!-- برای ویرایش -->
+            
+            <!-- این فیلدها فقط خواندنی هستند تا کاربر گیج نشود، یا قابل تغییر -->
+            <div class="form-group">
+                <label>روز و ساعت شروع:</label>
+                <div style="display:flex; gap:5px;">
+                    <select id="inpDay" disabled style="background:#f1f5f9; flex:1">
+                        <option value="sat">شنبه</option><option value="sun">یکشنبه</option>
+                        <option value="mon">دوشنبه</option><option value="tue">سه‌شنبه</option>
+                        <option value="wed">چهارشنبه</option><option value="thu">پنج‌شنبه</option>
+                        <option value="fri">جمعه</option>
+                    </select>
+                    <select id="inpStart" style="flex:1"></select> <!-- قابل تغییر -->
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>نام فعالیت:</label>
+                <input type="text" id="inpName" placeholder="مثلاً: کلاس زبان" autofocus>
+            </div>
+
+            <div class="form-group">
+                <label>مدت زمان:</label>
+                <select id="inpDuration">
+                    <option value="1">15 دقیقه</option>
+                    <option value="2">30 دقیقه</option>
+                    <option value="3">45 دقیقه</option>
+                    <option value="4" selected>1 ساعت</option>
+                    <option value="5">1:15 ساعت</option>
+                    <option value="6">1:30 ساعت</option>
+                    <option value="8">2 ساعت</option>
+                    <option value="12">3 ساعت</option>
+                    <option value="16">4 ساعت</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>رنگ برچسب:</label>
+                <input type="color" id="inpColor" value="#3b82f6" style="height:40px; width:100%; padding:2px;">
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-clear" type="button" id="btnDelete" onclick="deleteTask()" style="display:none;">حذف</button>
+                <div style="flex:1"></div>
+                <button class="btn-cancel" onclick="closeModal()">لغو</button>
+                <button class="btn-save-modal" onclick="saveTask()">ثبت</button>
+            </div>
+        </div>
     </div>
 
-    <div class="input-group" style="flex-direction: row; gap: 10px; align-items: flex-end;">
-        <button class="btn-add" onclick="addTask()">+ ثبت در برنامه</button>
-        <button class="btn-print" onclick="window.print()">چاپ برنامه</button>
-        <button class="btn-clear" onclick="clearData()">حذف همه</button>
-    </div>
-</div>
-
-<div class="schedule-wrapper">
-    <table id="plannerTable">
-        <thead>
-            <tr>
-                <th>ساعت</th>
-                <th>شنبه</th>
-                <th>یکشنبه</th>
-                <th>دوشنبه</th>
-                <th>سه‌شنبه</th>
-                <th>چهارشنبه</th>
-                <th>پنج‌شنبه</th>
-                <th>جمعه</th>
-            </tr>
-        </thead>
-        <tbody id="plannerBody">
-            <!-- سطرها با جاوااسکریپت ساخته می‌شوند -->
-        </tbody>
-    </table>
-</div>
-
-<script>
-    // تنظیمات
-    const daysOrder = ['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'];
-    const timeIntervals = []; // تمام بازه های 15 دقیقه ای
-    
-    // دیتابیس اصلی: { 'sat': { '08:00': { name: 'Gym', duration: 4 } } }
-    // duration تعداد بلاک‌های 15 دقیقه‌ای است
-    let schedule = JSON.parse(localStorage.getItem('tablePlannerDB')) || {};
-
-    // تولید بازه های زمانی 00:00 تا 23:45
-    for(let h=0; h<24; h++) {
-        for(let m=0; m<60; m+=15) {
-            let time = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-            timeIntervals.push(time);
+    <script>
+        // --- داده‌های پایه ---
+        const DAYS = ['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'];
+        const TIMELINE = [];
+        
+        // تولید بازه‌های ۱۵ دقیقه‌ای
+        for(let h=0; h<24; h++){
+            for(let m=0; m<60; m+=15){
+                TIMELINE.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+            }
         }
-    }
 
-    function init() {
-        populateSelects();
-        renderTable();
-        updateTimeOptions(); // آپدیت اولیه برای غیرفعال کردن تایم های پر
-    }
+        // دیتابیس: آرایه‌ای از آبجکت‌ها 
+        // { id, day, startStr, duration, name, color }
+        let tasks = JSON.parse(localStorage.getItem('masterPlanner')) || [];
 
-    function populateSelects() {
-        const startSel = document.getElementById('inpStart');
-        const endSel = document.getElementById('inpEnd');
-        
-        // پاک کردن قبلی ها
-        startSel.innerHTML = '';
-        endSel.innerHTML = '';
+        // --- توابع اجرایی ---
+        function init() {
+            // پر کردن سلکت ساعت در مودال
+            const startSel = document.getElementById('inpStart');
+            TIMELINE.forEach(t => {
+                startSel.add(new Option(t, t));
+            });
+            render();
+        }
 
-        timeIntervals.forEach(t => {
-            startSel.add(new Option(t, t));
-        });
-        
-        // برای پایان، از 00:15 شروع میشه تا 24:00 (فرضی 00:00 روز بعد)
-        const endTimes = [...timeIntervals.slice(1), "24:00"]; // 00:00 بعدی رو دستی هندل میکنیم
-        endTimes.forEach(t => {
-            endSel.add(new Option(t, t));
-        });
-        
-        // پیشفرض
-        startSel.value = "08:00";
-        endSel.value = "09:00";
-    }
+        // رندر جدول (مغز اصلی برنامه)
+        function render() {
+            const tbody = document.getElementById('plannerBody');
+            tbody.innerHTML = '';
 
-    // --- منطق هوشمند غیرفعال سازی ---
-    function updateTimeOptions() {
-        const day = document.getElementById('inpDay').value;
-        const startSel = document.getElementById('inpStart');
-        
-        // ریست کردن همه آپشن ها به حالت فعال
-        Array.from(startSel.options).forEach(opt => {
-            opt.disabled = false;
-            opt.text = opt.value; // برگرداندن متن اصلی
-        });
+            // ماتریس برای ردیابی خانه‌های پر شده (برای rowspan)
+            // occupied[dayIndex][timeIndex] = true/false
+            const occupied = {};
+            DAYS.forEach(d => occupied[d] = new Array(TIMELINE.length).fill(false));
 
-        // اگر دیتایی برای این روز هست
-        if (schedule[day]) {
-            // پیمایش تمام تسک های این روز
-            Object.keys(schedule[day]).forEach(startTime => {
-                const task = schedule[day][startTime];
-                const startIndex = timeIntervals.indexOf(startTime);
+            TIMELINE.forEach((timeStr, tIndex) => {
+                const tr = document.createElement('tr');
                 
-                // غیرفعال کردن تایم هایی که اشغال شده اند
-                // از شروع تسک تا پایان تسک (duration)
-                for(let i=0; i < task.duration; i++) {
-                    const blockedIndex = startIndex + i;
-                    if(blockedIndex < timeIntervals.length) {
-                        const timeStr = timeIntervals[blockedIndex];
-                        // پیدا کردن آپشن در سلکت
-                        for (let opt of startSel.options) {
-                            if (opt.value === timeStr) {
-                                opt.disabled = true;
-                                opt.text = timeStr + " (پر است)";
+                // 1. ستون ساعت
+                const tdTime = document.createElement('td');
+                tdTime.innerText = timeStr;
+                tr.appendChild(tdTime);
+
+                // 2. ستون روزها
+                DAYS.forEach(day => {
+                    // اگر این خانه قبلاً توسط یک تسک بالا‌دستی اشغال شده، رندر نکن (skip)
+                    if (occupied[day][tIndex]) return;
+
+                    // بررسی وجود تسک در این نقطه شروع
+                    const task = tasks.find(t => t.day === day && t.startStr === timeStr);
+
+                    if (task) {
+                        // ساخت سلول تسک
+                        const td = document.createElement('td');
+                        td.rowSpan = task.duration;
+                        td.className = 'task-cell';
+                        td.style.backgroundColor = task.color;
+                        
+                        // محتوای داخل سلول
+                        // محاسبه ساعت پایان برای نمایش
+                        const endIdx = tIndex + task.duration;
+                        const endStr = endIdx < TIMELINE.length ? TIMELINE[endIdx] : "24:00";
+
+                        td.innerHTML = `
+                            <div class="task-content">
+                                <div style="font-weight:bold">${task.name}</div>
+                                <div class="task-time">${timeStr} - ${endStr}</div>
+                            </div>
+                        `;
+                        
+                        // ایونت کلیک برای ویرایش
+                        td.onclick = () => openModal(day, timeStr, task);
+
+                        tr.appendChild(td);
+
+                        // علامت‌گذاری خانه‌های زیرین به عنوان اشغال شده
+                        for(let i=1; i < task.duration; i++) {
+                            if (tIndex + i < TIMELINE.length) {
+                                occupied[day][tIndex + i] = true;
                             }
                         }
+                    } else {
+                        // ساخت سلول خالی
+                        const td = document.createElement('td');
+                        td.className = 'empty-cell';
+                        td.onclick = () => openModal(day, timeStr, null); // کلیک برای افزودن
+                        tr.appendChild(td);
                     }
-                }
+                });
+
+                tbody.appendChild(tr);
             });
         }
-    }
 
-    // --- رندر جدول ---
-    function renderTable() {
-        const tbody = document.getElementById('plannerBody');
-        tbody.innerHTML = '';
-
-        // ماتریس وضعیت برای هندل کردن rowspan
-        // skipMap['sat'][5] = true یعنی در ستون شنبه، سطر پنجم رندر نشود چون سطر قبلی rowspan داشته
-        let skipMap = {}; 
-        daysOrder.forEach(d => skipMap[d] = {});
-
-        // حلقه روی تمام زمان ها (سطرها)
-        timeIntervals.forEach((time, rowIndex) => {
-            const tr = document.createElement('tr');
+        // --- مدیریت مودال (پنجره) ---
+        function openModal(day, startTime, task) {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modalTitle');
+            const btnDelete = document.getElementById('btnDelete');
             
-            // 1. ستون اول: ساعت
-            const tdTime = document.createElement('td');
-            tdTime.innerText = time;
-            tr.appendChild(tdTime);
+            // ریست فرم
+            document.getElementById('inpDay').value = day;
+            document.getElementById('inpStart').value = startTime;
 
-            // 2. ستون های روزها
-            daysOrder.forEach(day => {
-                // اگر قبلا دستور داده شده که این خانه رد شود (بخاطر rowspan بالا)
-                if (skipMap[day][rowIndex]) {
-                    return; // هیچ td نمی‌سازیم (جای خالی پر شده توسط بالایی)
-                }
+            if (task) {
+                // حالت ویرایش
+                title.innerText = "ویرایش فعالیت";
+                document.getElementById('taskId').value = task.id;
+                document.getElementById('inpName').value = task.name;
+                document.getElementById('inpDuration').value = task.duration;
+                document.getElementById('inpColor').value = task.color;
+                btnDelete.style.display = 'block';
+            } else {
+                // حالت افزودن
+                title.innerText = "افزودن فعالیت جدید";
+                document.getElementById('taskId').value = '';
+                document.getElementById('inpName').value = '';
+                document.getElementById('inpDuration').value = '4'; // پیشفرض 1 ساعت
+                document.getElementById('inpColor').value = '#3b82f6';
+                btnDelete.style.display = 'none';
+            }
 
-                const td = document.createElement('td');
+            modal.style.display = 'flex';
+            document.getElementById('inpName').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        function saveTask() {
+            const id = document.getElementById('taskId').value;
+            const day = document.getElementById('inpDay').value;
+            const startStr = document.getElementById('inpStart').value;
+            const duration = parseInt(document.getElementById('inpDuration').value);
+            const name = document.getElementById('inpName').value.trim();
+            const color = document.getElementById('inpColor').value;
+
+            if (!name) return alert("لطفاً نام فعالیت را بنویسید.");
+
+            // بررسی تداخل
+            // فرمول: اگر (StartA < EndB) و (EndA > StartB) تداخل است.
+            const startIdx = TIMELINE.indexOf(startStr);
+            const endIdx = startIdx + duration;
+
+            // چک کردن با همه تسک‌های دیگر (بجز خود تسک در حال ویرایش)
+            const hasConflict = tasks.some(t => {
+                if (t.id == id) return false; // خودش را نادیده بگیر
+                if (t.day !== day) return false; // روز دیگر
                 
-                // آیا در این روز و این ساعت تسکی شروع می‌شود؟
-                if (schedule[day] && schedule[day][time]) {
-                    const task = schedule[day][time];
-                    
-                    td.innerText = task.name;
-                    td.rowSpan = task.duration; // ادغام سلول ها به پایین
-                    td.className = 'filled-cell';
-                    td.onclick = () => deleteTask(day, time);
-                    td.title = `حذف: ${task.name}`;
+                const tStartIdx = TIMELINE.indexOf(t.startStr);
+                const tEndIdx = tStartIdx + t.duration;
 
-                    // علامت گذاری سلول های بعدی برای رد شدن
-                    for(let i=1; i < task.duration; i++) {
-                        skipMap[day][rowIndex + i] = true;
-                    }
-                } else {
-                    // سلول خالی
-                    td.innerHTML = '&nbsp;';
-                }
-                
-                tr.appendChild(td);
+                return (startIdx < tEndIdx && endIdx > tStartIdx);
             });
 
-            tbody.appendChild(tr);
-        });
-    }
+            if (hasConflict) {
+                alert("خطا: در این ساعت برنامه‌ی دیگری وجود دارد!");
+                return;
+            }
 
-    // --- افزودن تسک ---
-    function addTask() {
-        const name = document.getElementById('inpName').value;
-        const day = document.getElementById('inpDay').value;
-        const start = document.getElementById('inpStart').value;
-        const end = document.getElementById('inpEnd').value;
+            if (id) {
+                // آپدیت تسک موجود
+                const idx = tasks.findIndex(t => t.id == id);
+                if (idx !== -1) {
+                    tasks[idx] = { ...tasks[idx], day, startStr, duration, name, color };
+                }
+            } else {
+                // تسک جدید
+                tasks.push({
+                    id: Date.now(),
+                    day, startStr, duration, name, color
+                });
+            }
 
-        if(!name) return alert("نام فعالیت را وارد کنید");
-        if(start >= end && end !== "00:00") return alert("ساعت پایان اشتباه است"); // هندل کردن ساده
-
-        const startIdx = timeIntervals.indexOf(start);
-        let endIdx = timeIntervals.indexOf(end);
-        if(end === "24:00") endIdx = timeIntervals.length;
-
-        const duration = endIdx - startIdx;
-        
-        if (duration <= 0) return alert("بازه زمانی نامعتبر");
-
-        // چک تداخل نهایی (علاوه بر UI)
-        if (checkOverlap(day, startIdx, duration)) {
-            return alert("تداخل! بخشی از این زمان قبلا پر شده است.");
-        }
-
-        // ذخیره
-        if (!schedule[day]) schedule[day] = {};
-        
-        schedule[day][start] = {
-            name: name,
-            duration: duration
-        };
-
-        saveData();
-        renderTable();
-        updateTimeOptions(); // بروزرسانی لیست ساعت‌ها
-    }
-
-    function checkOverlap(day, startIdx, duration) {
-        if (!schedule[day]) return false;
-        
-        // تبدیل همه تسک های روز به بازه های اشغال شده
-        let occupiedIndices = new Set();
-        Object.keys(schedule[day]).forEach(tTime => {
-            const tStartIdx = timeIntervals.indexOf(tTime);
-            const tDuration = schedule[day][tTime].duration;
-            for(let i=0; i<tDuration; i++) occupiedIndices.add(tStartIdx + i);
-        });
-
-        // چک کردن بازه جدید
-        for(let i=0; i<duration; i++) {
-            if (occupiedIndices.has(startIdx + i)) return true;
-        }
-        return false;
-    }
-
-    function deleteTask(day, time) {
-        if(confirm("آیا این فعالیت حذف شود؟")) {
-            delete schedule[day][time];
             saveData();
-            renderTable();
-            updateTimeOptions();
+            render();
+            closeModal();
         }
-    }
 
-    function clearData() {
-        if(confirm("تمام برنامه پاک شود؟")) {
-            localStorage.removeItem('tablePlannerDB');
-            schedule = {};
-            renderTable();
-            updateTimeOptions();
+        function deleteTask() {
+            const id = document.getElementById('taskId').value;
+            if (id && confirm("آیا این فعالیت حذف شود؟")) {
+                tasks = tasks.filter(t => t.id != id);
+                saveData();
+                render();
+                closeModal();
+            }
         }
-    }
 
-    function saveData() {
-        localStorage.setItem('tablePlannerDB', JSON.stringify(schedule));
-    }
+        // --- ذخیره‌سازی و ابزارها ---
+        function saveData() {
+            localStorage.setItem('masterPlanner', JSON.stringify(tasks));
+        }
 
-    init();
+        function clearAll() {
+            if (confirm("تمام برنامه پاک شود؟ قابل برگشت نیست!")) {
+                tasks = [];
+                saveData();
+                render();
+            }
+        }
 
-</script>
+        function exportData() {
+            const str = JSON.stringify(tasks);
+            const blob = new Blob([str], {type: "application/json"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "planner_backup.json";
+            a.click();
+        }
 
+        function importData(input) {
+            const file = input.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if(Array.isArray(data)) {
+                        if(confirm("آیا بک‌آپ جایگزین اطلاعات فعلی شود؟")) {
+                            tasks = data;
+                            saveData();
+                            render();
+                        }
+                    } else { alert("فرمت فایل اشتباه است"); }
+                } catch(err) { alert("خطا در خواندن فایل"); }
+            };
+            reader.readAsText(file);
+            input.value = '';
+        }
+
+        // بستن مودال با کلیک بیرون
+        window.onclick = (e) => {
+            if (e.target == document.getElementById('modal')) closeModal();
+        }
+
+        init();
+    </script>
 </body>
 </html>
