@@ -1,9 +1,9 @@
-  <!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>پلنر هوشمند حرفه‌ای (نسخه نهایی اصلاح شده)</title>
+    <title>پلنر هوشمند (نسخه چاپ یک صفحه‌ای)</title>
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <style>
@@ -11,9 +11,6 @@
             --primary: #4f46e5;
             --primary-hover: #4338ca;
             --secondary: #64748b;
-            --accent: #f59e0b;
-            --success: #10b981;
-            --danger: #ef4444;
             --bg: #f3f4f6;
             --surface: #ffffff;
             --border: #e2e8f0;
@@ -96,9 +93,10 @@
         .task-inner {
             display: flex; flex-direction: column; justify-content: center; height: 100%;
             pointer-events: none; text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            white-space: normal; line-height: 1.4;
         }
-        .task-title { font-weight: 700; margin-bottom: 2px; }
-        .task-time { font-size: 9px; opacity: 0.9; font-weight: 400; background: rgba(0,0,0,0.15); border-radius: 4px; padding: 0 4px; align-self: center;}
+        .task-title { font-weight: 800; }
+        .task-time-range { font-size: 10px; opacity: 0.95; margin-bottom: 2px; }
 
         /* Selection */
         body.selection-mode td.empty-cell { cursor: crosshair; }
@@ -127,81 +125,115 @@
             display: flex; align-items: center; justify-content: space-between;
             padding: 10px; border-bottom: 1px solid #f1f5f9; background: #f8fafc; margin-bottom: 4px; border-radius: 8px;
         }
-        .icon-action { cursor: pointer; opacity: 0.3; transition: 0.2s; font-size: 16px; }
+        .icon-action { cursor: pointer; opacity: 0.3; transition: 0.2s; font-size: 16px; margin: 0 5px; }
         .icon-action:hover { opacity: 0.7; transform: scale(1.1); }
         .icon-action.active-eye { opacity: 1; color: var(--primary); }
         .delete-icon { color: var(--danger); opacity: 0.7; }
         .delete-icon:hover { opacity: 1; }
 
-        /* Color Palette */
         .color-options { display: flex; gap: 8px; flex-wrap: wrap; }
         .color-dot { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 3px solid #fff; box-shadow: 0 0 0 1px #cbd5e1; }
         .color-dot.active { box-shadow: 0 0 0 2px var(--primary); }
 
-        /* Chart */
         .chart-container { display: flex; justify-content: center; padding: 20px; background: #f8fafc; border-radius: 12px; }
         .chart-legend { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 10px; }
         .legend-item { font-size: 11px; display: flex; align-items: center; gap: 4px; background: #fff; padding: 4px 8px; border-radius: 20px; border: 1px solid #e2e8f0; }
 
-        /* --- PRINT STYLES (Fixed) --- */
+        /* --- PRINT STYLES (Single Page Optimization) --- */
         #print-area { display: none; }
 
         @media print {
-            @page { size: A4 landscape; margin: 5mm; }
-            body { background: white; padding: 0; }
+            @page { 
+                size: A4 landscape; 
+                margin: 3mm; /* حاشیه بسیار کم برای جا شدن */
+            }
+            body { background: white; padding: 0; margin: 0; overflow: hidden; }
             .no-print, .toolbar, .copy-col-btn { display: none !important; }
             
-            #print-area { display: block; width: 100%; }
+            #print-area { 
+                display: block; 
+                width: 100%; 
+                height: 100vh;
+                /* تکنیک کوچک نمایی برای جا دادن 96 ردیف در یک صفحه */
+                transform: scale(0.60); 
+                transform-origin: top center;
+                margin-top: 10px;
+            }
 
             /* Header */
             .print-header {
                 display: flex; justify-content: space-between; align-items: center;
-                border-bottom: 3px solid #1e293b; padding-bottom: 10px; margin-bottom: 10px;
+                border-bottom: 2px solid #1e293b; padding-bottom: 5px; margin-bottom: 10px;
+                width: 100%;
             }
-            .print-title { font-size: 24px; font-weight: 900; color: #1e293b; }
-            .print-date { font-size: 12px; color: #64748b; }
+            .print-title { font-size: 28px; font-weight: 900; color: #1e293b; }
+            .print-date { font-size: 14px; color: #64748b; }
 
             /* Top Boxes */
-            .print-grid-top { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px; }
+            .print-grid-top { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px; width: 100%; }
             .print-box {
-                border: 1px solid #94a3b8; border-radius: 8px; padding: 8px;
+                border: 1px solid #94a3b8; border-radius: 8px; padding: 10px;
                 background-color: #f8fafc !important; -webkit-print-color-adjust: exact;
             }
-            .print-box h4 { margin: 0 0 5px 0; border-bottom: 1px solid #cbd5e1; font-size: 12px; color: #334155; }
-            .print-items { list-style: none; padding: 0; margin: 0; font-size: 10px; columns: 2; }
-            .print-items li { margin-bottom: 2px; break-inside: avoid; }
+            .print-box h4 { margin: 0 0 5px 0; border-bottom: 1px solid #cbd5e1; font-size: 16px; color: #334155; }
+            .print-items { list-style: none; padding: 0; margin: 0; font-size: 12px; columns: 2; }
+            .print-items li { margin-bottom: 3px; break-inside: avoid; }
 
-            /* Table Fixes */
+            /* Table Optimization for Print */
             .planner-wrapper { box-shadow: none; border: none; max-height: none; overflow: visible; }
-            table { border: 2px solid #000; font-size: 9px; width: 100%; page-break-inside: auto; }
+            table { border: 2px solid #000; font-size: 10px; width: 100%; }
             
-            /* تکرار هدر در صفحات بعد */
+            /* هدر جدول */
             thead { display: table-header-group; }
-            tr { page-break-inside: avoid; page-break-after: auto; }
-            
-            th { background-color: #cbd5e1 !important; color: #000 !important; border: 1px solid #000; padding: 4px; }
-            td { border: 1px solid #666; height: 18px; }
-            
-            td.task-cell {
-                border: 1px solid #000 !important; font-weight: bold; color: #000 !important;
-                print-color-adjust: exact; -webkit-print-color-adjust: exact;
+            th { 
+                background-color: #cbd5e1 !important; color: #000 !important; 
+                border: 1px solid #000; padding: 2px; font-size: 14px;
+            }
+
+            /* سلول‌ها */
+            td { 
+                border: 1px solid #999; 
+                height: 14px; /* ارتفاع بسیار کم برای جا شدن */
+                padding: 0;
             }
             
-            /* نمایش زمان در چاپ هم باید باشد */
-            .task-time { background: transparent; border: 1px solid #000; color: #000; }
+            /* ستون ساعت */
+            th:first-child, td:first-child { 
+                width: 50px; font-size: 9px; 
+                border: 1px solid #000;
+            }
+            
+            /* سلول تسک در چاپ */
+            td.task-cell {
+                border: 1px solid #000 !important; 
+                color: #000 !important;
+                print-color-adjust: exact; -webkit-print-color-adjust: exact;
+                /* وسط چین کردن محتوا */
+                vertical-align: middle;
+            }
+            
+            .task-inner {
+                justify-content: center; align-items: center;
+            }
+            .task-time-range {
+                font-size: 11px; font-weight: bold; display: block;
+            }
+            .task-title {
+                font-size: 12px; font-weight: 900; display: block;
+            }
 
             /* Footer */
             .print-footer {
-                margin-top: 10px; border: 2px dashed #94a3b8; padding: 8px;
-                border-radius: 8px; background: #fff; page-break-inside: avoid;
+                margin-top: 15px; border: 2px dashed #94a3b8; padding: 10px;
+                border-radius: 8px; background: #fff; page-break-inside: avoid; width: 100%;
             }
-            .print-note-text { font-size: 10px; white-space: pre-wrap; }
+            .print-note-text { font-size: 14px; white-space: pre-wrap; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Print Area -->
+    <!-- ناحیه چاپ (با قابلیت Scale شدن) -->
     <div id="print-area">
         <div class="print-header">
             <div class="print-title" id="printTitleDisplay">برنامه هفتگی</div>
@@ -224,7 +256,7 @@
         </div>
     </div>
 
-    <!-- UI -->
+    <!-- UI اصلی برنامه -->
     <div class="toolbar no-print">
         <div class="toolbar-header">
             <div class="brand">
@@ -256,7 +288,7 @@
         </div>
     </div>
 
-    <!-- Table -->
+    <!-- جدول اصلی -->
     <div class="planner-wrapper" id="mainTableWrapper">
         <table id="plannerTable">
             <thead><tr id="tableHeader"><th>زمان</th></tr></thead>
@@ -264,8 +296,8 @@
         </table>
     </div>
 
-    <!-- Modals -->
-    <!-- Extras -->
+    <!-- مودال‌ها -->
+    <!-- افزودنی‌ها -->
     <div class="modal-overlay" id="extrasModal">
         <div class="modal">
             <div class="modal-header"><h3>الزامات و لیست</h3><button class="close-btn" onclick="closeModal('extrasModal')">&times;</button></div>
@@ -275,18 +307,18 @@
             </div>
             <div id="tab-req">
                 <div style="display:flex; gap:8px; margin-top:10px;"><input type="text" id="reqInput" class="input-modern" placeholder="نکته جدید..."><button class="btn btn-success" onclick="addItem('req')">+</button></div>
-                <div style="font-size:10px; color:#666; margin-top:5px;">روی آیکون چشم بزنید تا در پرینت نمایش داده شود</div>
+                <div style="font-size:10px; color:#666; margin-top:5px;">آیکون آبی = نمایش در چاپ</div>
                 <ul class="extras-list" id="reqListUi" style="margin-top:10px;"></ul>
             </div>
             <div id="tab-chk" style="display:none">
                 <div style="display:flex; gap:8px; margin-top:10px;"><input type="text" id="chkInput" class="input-modern" placeholder="مورد جدید..."><button class="btn btn-success" onclick="addItem('chk')">+</button></div>
-                <div style="font-size:10px; color:#666; margin-top:5px;">روی آیکون چشم بزنید تا در پرینت نمایش داده شود</div>
+                <div style="font-size:10px; color:#666; margin-top:5px;">آیکون آبی = نمایش در چاپ</div>
                 <ul class="extras-list" id="chkListUi" style="margin-top:10px;"></ul>
             </div>
         </div>
     </div>
 
-    <!-- Task -->
+    <!-- تسک -->
     <div class="modal-overlay" id="taskModal">
         <div class="modal">
             <div class="modal-header"><h3>مدیریت فعالیت</h3><button class="close-btn" onclick="closeModal('taskModal')">&times;</button></div>
@@ -308,7 +340,7 @@
         </div>
     </div>
 
-    <!-- Note -->
+    <!-- یادداشت -->
     <div class="modal-overlay" id="noteModal">
         <div class="modal">
             <div class="modal-header"><h3>یادداشت‌ها</h3><button class="close-btn" onclick="closeModal('noteModal')">&times;</button></div>
@@ -320,7 +352,7 @@
         </div>
     </div>
 
-    <!-- Stats -->
+    <!-- آمار -->
     <div class="modal-overlay" id="statsModal">
         <div class="modal">
             <div class="modal-header"><h3>آمار</h3><button class="close-btn" onclick="closeModal('statsModal')">&times;</button></div>
@@ -330,14 +362,13 @@
     </div>
 
     <script>
-        // Data & Constants
         const DAYS = [
             {id:'sat', l:'شنبه'}, {id:'sun', l:'یکشنبه'}, {id:'mon', l:'دوشنبه'},
             {id:'tue', l:'سه‌شنبه'}, {id:'wed', l:'چهارشنبه'}, {id:'thu', l:'پنج‌شنبه'}, {id:'fri', l:'جمعه'}
         ];
         const COLORS = ['#4f46e5', '#10b981', '#ef4444', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899', '#64748b'];
         const TIMELINE = [];
-        // ایجاد بازه زمانی 00:00 تا 23:45 (شامل خود 23:45 برای شروع)
+        // ساخت بازه زمانی 00:00 تا 23:45
         for(let h=0; h<24; h++) for(let m=0; m<60; m+=15) TIMELINE.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
 
         let appData = {
@@ -349,7 +380,7 @@
         let isSelect=false, isDrag=false, selStart=null, selCurr=null;
 
         function init() {
-            const saved = localStorage.getItem('finalProPlannerV2');
+            const saved = localStorage.getItem('finalProPlannerV3');
             if(saved) {
                 try {
                     const d = JSON.parse(saved);
@@ -403,13 +434,14 @@
                         td.rowSpan = task.duration; td.className='task-cell';
                         td.style.backgroundColor=task.color;
                         
-                        // محاسبه و نمایش زمان پایان در سلول (اصلاح مشکل شماره 4)
+                        // محاسبه پایان
                         const endIdx = idx + task.duration;
                         const endStr = endIdx < TIMELINE.length ? TIMELINE[endIdx] : "24:00";
                         
+                        // فرمت دقیق خواسته شده: 13:00 تا 14:45 نام
                         td.innerHTML=`<div class="task-inner">
+                            <span class="task-time-range">${task.startStr} تا ${endStr}</span>
                             <span class="task-title">${task.name}</span>
-                            <span class="task-time">${task.startStr} - ${endStr}</span>
                         </div>`;
                         
                         td.onclick=(e)=>{e.stopPropagation(); openTaskModal(task);};
@@ -429,15 +461,15 @@
             });
         }
 
-        // --- Logic Fixes ---
-        // 1. Eye Icon & Logic Fix
+        // --- Logic Update: Eye Icon Immediate Fix ---
         function toggleExtraVis(type, i) {
             if(type==='req') appData.reqs[i].s = !appData.reqs[i].s;
             else appData.chks[i].s = !appData.chks[i].s;
-            saveData(); renderExtras(); // Re-render to show updated state
+            saveData(); 
+            renderExtras(); // بلافاصله بازنویسی لیست برای تغییر آیکون
         }
-        
-        // --- Drag/Touch/Select Logic (Standard) ---
+
+        // --- Standard Logic ---
         function handleDrop(e, day, time) {
             e.preventDefault(); const tid=e.dataTransfer.getData('tid');
             const task=appData.tasks.find(t=>t.id==tid); if(!task)return;
@@ -470,14 +502,13 @@
         function highlight(){document.querySelectorAll('.selected-cell').forEach(e=>e.classList.remove('selected-cell')); if(!selStart||!selCurr)return; const s=Math.min(selStart.i,selCurr.i), e=Math.max(selStart.i,selCurr.i); for(let i=s;i<=e;i++) {const td=document.querySelector(`td.empty-cell[data-d="${selStart.d}"][data-i="${i}"]`); if(td)td.classList.add('selected-cell');}}
         function clearSel(){selStart=null; selCurr=null; document.querySelectorAll('.selected-cell').forEach(e=>e.classList.remove('selected-cell'));}
 
-        // --- Modals & CRUD ---
         function openTaskModal(task, fresh) {
             openModal('taskModal'); const del=document.getElementById('btnDeleteTask');
             if(task) {
                 document.getElementById('taskId').value=task.id; document.getElementById('taskDay').value=task.day;
                 document.getElementById('taskStart').value=task.startStr; document.getElementById('inpName').value=task.name;
                 document.getElementById('inpDuration').value=task.duration; document.getElementById('customColor').value=task.color;
-                // نمایش ساعت پایان در مودال
+                
                 const endIdx = TIMELINE.indexOf(task.startStr) + task.duration;
                 const endStr = endIdx < TIMELINE.length ? TIMELINE[endIdx] : "24:00";
                 document.getElementById('timeInfoDisplay').innerText=`ویرایش: ${task.startStr} تا ${endStr}`;
@@ -505,11 +536,11 @@
         }
         function deleteTask(){const id=document.getElementById('taskId').value; if(confirm("حذف؟")){appData.tasks=appData.tasks.filter(t=>t.id!=id); saveData(); renderTable(); closeModal('taskModal');}}
 
-        // --- Extras ---
         function switchTab(t){document.getElementById('tab-req').style.display=t==='req'?'block':'none'; document.getElementById('tab-chk').style.display=t==='chk'?'block':'none';}
         function renderExtras() {
             const rL=document.getElementById('reqListUi'); rL.innerHTML='';
             appData.reqs.forEach((r,i)=>{
+                // لاجیک آیکون چشم: اگر s=true است کلاس active-eye اضافه می‌شود
                 rL.innerHTML+=`<li class="extra-row"><span>${r.t}</span><div><span class="icon-action ${r.s?'active-eye':''}" onclick="toggleExtraVis('req',${i})">👁</span> <span class="icon-action delete-icon" onclick="delEx('req',${i})">✖</span></div></li>`;
             });
             const cL=document.getElementById('chkListUi'); cL.innerHTML='';
@@ -521,7 +552,6 @@
         function delEx(t,i){if(t==='req')appData.reqs.splice(i,1); else appData.chks.splice(i,1); saveData(); renderExtras();}
         function togChk(i){appData.chks[i].c=!appData.chks[i].c; saveData();}
 
-        // --- Note & Stats ---
         function saveNote(){appData.note.text=document.getElementById('noteText').value; appData.note.print=document.getElementById('notePrintCheck').checked; saveData(); closeModal('noteModal');}
         function openStats(){
             openModal('statsModal'); const a=document.getElementById('chartArea'), l=document.getElementById('chartLegend');
@@ -533,28 +563,25 @@
             const ch=document.createElement('div'); ch.style.width='150px'; ch.style.height='150px'; ch.style.borderRadius='50%'; ch.style.background=`conic-gradient(${g.join(', ')})`; a.appendChild(ch);
         }
 
-        // --- Common ---
         function openModal(id){document.getElementById(id).style.display='flex'; if(id==='noteModal'){document.getElementById('noteText').value=appData.note.text; document.getElementById('notePrintCheck').checked=appData.note.print;}}
         function closeModal(id){document.getElementById(id).style.display='none';}
-        function saveData(){localStorage.setItem('finalProPlannerV2', JSON.stringify(appData));}
+        function saveData(){localStorage.setItem('finalProPlannerV3', JSON.stringify(appData));}
         function updateHeader(v){appData.header=v; saveData();}
-        function clearAll(){if(confirm("حذف کامل؟")){localStorage.removeItem('finalProPlannerV2'); location.reload();}}
+        function clearAll(){if(confirm("حذف کامل؟")){localStorage.removeItem('finalProPlannerV3'); location.reload();}}
         function copyDay(src){const trg=prompt("به کدام روز؟ (مثلاً دوشنبه)"); const t=DAYS.find(d=>d.l===trg?.trim()); if(t && confirm("مطمئنید؟")){appData.tasks=appData.tasks.filter(x=>x.day!==t.id); appData.tasks.filter(x=>x.day===src).forEach(x=>appData.tasks.push({...x, id:Date.now()+Math.random(), day:t.id})); saveData(); renderTable();}}
         
         function exportData(){const b=new Blob([JSON.stringify(appData)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download="plan.json"; a.click();}
         function importData(i){const f=i.files[0]; const r=new FileReader(); r.onload=e=>{try{const d=JSON.parse(e.target.result); if(d.tasks||Array.isArray(d)){if(Array.isArray(d))appData.tasks=d; else appData=d; saveData(); location.reload();}}catch(x){alert("فایل نامعتبر");}}; if(f)r.readAsText(f);}
 
-        // --- PRINT Logic (Fixed 3 & 5) ---
+        // --- Logic: Print with File Name Prompt ---
         function printApp() {
-            // 5. سوال نام فایل قبل از چاپ
-            let fileName = prompt("لطفاً نام فایل خروجی (PDF) را وارد کنید:", appData.header || "برنامه هفتگی");
-            if (fileName === null) return; // لغو چاپ
+            // دریافت نام فایل از کاربر
+            const fileName = prompt("لطفاً نام فایل خروجی (PDF) را وارد کنید:", appData.header || "برنامه هفتگی");
+            if(fileName === null) return; // لغو
 
-            // تنظیم تایتل صفحه موقتاً برای نام فایل پیش‌فرض مرورگر
-            const oldTitle = document.title;
-            document.title = fileName;
+            const originalTitle = document.title;
+            document.title = fileName; // تغییر تایتل برای نام پیشفرض PDF
 
-            // آماده سازی محتوا
             document.getElementById('printTitleDisplay').innerText = appData.header || "برنامه هفتگی";
             document.getElementById('printDateDisplay').innerText = new Date().toLocaleDateString('fa-IR');
 
@@ -574,10 +601,9 @@
                 document.getElementById('printNoteText').innerText = appData.note.text;
             } else { ftr.style.display = 'none'; }
 
-            // تاخیر کوتاه برای رندر شدن DOM
             setTimeout(() => {
                 window.print();
-                document.title = oldTitle; // بازگرداندن تایتل
+                document.title = originalTitle;
             }, 100);
         }
 
