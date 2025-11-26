@@ -1,9 +1,9 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>پلنر هوشمند (نسخه چاپ یک صفحه‌ای)</title>
+    <title>پلنر هوشمند حرفه‌ای</title>
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <style>
@@ -11,6 +11,9 @@
             --primary: #4f46e5;
             --primary-hover: #4338ca;
             --secondary: #64748b;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
             --bg: #f3f4f6;
             --surface: #ffffff;
             --border: #e2e8f0;
@@ -139,25 +142,25 @@
         .chart-legend { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 10px; }
         .legend-item { font-size: 11px; display: flex; align-items: center; gap: 4px; background: #fff; padding: 4px 8px; border-radius: 20px; border: 1px solid #e2e8f0; }
 
-        /* --- PRINT STYLES (Single Page Optimization) --- */
+        /* --- PRINT STYLES (Fixed) --- */
         #print-area { display: none; }
 
         @media print {
             @page { 
                 size: A4 landscape; 
-                margin: 3mm; /* حاشیه بسیار کم برای جا شدن */
+                margin: 5mm; 
             }
-            body { background: white; padding: 0; margin: 0; overflow: hidden; }
-            .no-print, .toolbar, .copy-col-btn { display: none !important; }
+            body { background: white; padding: 0; margin: 0; }
             
+            /* مخفی کردن تمام عناصر غیر چاپی و جدول اصلی */
+            .no-print, .toolbar, .copy-col-btn, #mainTableWrapper { 
+                display: none !important; 
+            }
+            
+            /* نمایش ناحیه چاپ */
             #print-area { 
-                display: block; 
+                display: block !important; 
                 width: 100%; 
-                height: 100vh;
-                /* تکنیک کوچک نمایی برای جا دادن 96 ردیف در یک صفحه */
-                transform: scale(0.60); 
-                transform-origin: top center;
-                margin-top: 10px;
             }
 
             /* Header */
@@ -166,7 +169,7 @@
                 border-bottom: 2px solid #1e293b; padding-bottom: 5px; margin-bottom: 10px;
                 width: 100%;
             }
-            .print-title { font-size: 28px; font-weight: 900; color: #1e293b; }
+            .print-title { font-size: 24px; font-weight: 900; color: #1e293b; }
             .print-date { font-size: 14px; color: #64748b; }
 
             /* Top Boxes */
@@ -179,27 +182,28 @@
             .print-items { list-style: none; padding: 0; margin: 0; font-size: 12px; columns: 2; }
             .print-items li { margin-bottom: 3px; break-inside: avoid; }
 
-            /* Table Optimization for Print */
-            .planner-wrapper { box-shadow: none; border: none; max-height: none; overflow: visible; }
-            table { border: 2px solid #000; font-size: 10px; width: 100%; }
+            /* Table for Print (Natural Flow, No Scale) */
+            table { border: 2px solid #000; font-size: 10px; width: 100%; border-collapse: collapse; }
             
-            /* هدر جدول */
+            /* تکرار هدر در صفحات بعد */
             thead { display: table-header-group; }
+            tr { page-break-inside: avoid; page-break-after: auto; }
+            
             th { 
                 background-color: #cbd5e1 !important; color: #000 !important; 
-                border: 1px solid #000; padding: 2px; font-size: 14px;
+                border: 1px solid #000; padding: 4px; font-size: 12px;
             }
 
             /* سلول‌ها */
             td { 
-                border: 1px solid #999; 
-                height: 14px; /* ارتفاع بسیار کم برای جا شدن */
+                border: 1px solid #666; 
+                height: 18px; /* ارتفاع نرمال برای خوانایی */
                 padding: 0;
             }
             
             /* ستون ساعت */
             th:first-child, td:first-child { 
-                width: 50px; font-size: 9px; 
+                width: 60px; font-size: 10px; 
                 border: 1px solid #000;
             }
             
@@ -208,18 +212,14 @@
                 border: 1px solid #000 !important; 
                 color: #000 !important;
                 print-color-adjust: exact; -webkit-print-color-adjust: exact;
-                /* وسط چین کردن محتوا */
                 vertical-align: middle;
             }
             
-            .task-inner {
-                justify-content: center; align-items: center;
-            }
             .task-time-range {
-                font-size: 11px; font-weight: bold; display: block;
+                font-size: 10px; font-weight: bold; display: block; border-bottom: 1px dotted #000;
             }
             .task-title {
-                font-size: 12px; font-weight: 900; display: block;
+                font-size: 11px; font-weight: 900; display: block;
             }
 
             /* Footer */
@@ -227,13 +227,13 @@
                 margin-top: 15px; border: 2px dashed #94a3b8; padding: 10px;
                 border-radius: 8px; background: #fff; page-break-inside: avoid; width: 100%;
             }
-            .print-note-text { font-size: 14px; white-space: pre-wrap; }
+            .print-note-text { font-size: 12px; white-space: pre-wrap; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ناحیه چاپ (با قابلیت Scale شدن) -->
+    <!-- ناحیه چاپ -->
     <div id="print-area">
         <div class="print-header">
             <div class="print-title" id="printTitleDisplay">برنامه هفتگی</div>
@@ -362,6 +362,7 @@
     </div>
 
     <script>
+        // Data & Constants
         const DAYS = [
             {id:'sat', l:'شنبه'}, {id:'sun', l:'یکشنبه'}, {id:'mon', l:'دوشنبه'},
             {id:'tue', l:'سه‌شنبه'}, {id:'wed', l:'چهارشنبه'}, {id:'thu', l:'پنج‌شنبه'}, {id:'fri', l:'جمعه'}
