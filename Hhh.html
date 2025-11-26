@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>پلنر هوشمند حرفه‌ای</title>
+    <title>پلنر جامع نسخه نهایی (PRO MAX)</title>
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <style>
@@ -11,9 +11,6 @@
             --primary: #4f46e5;
             --primary-hover: #4338ca;
             --secondary: #64748b;
-            --accent: #f59e0b;
-            --success: #10b981;
-            --danger: #ef4444;
             --bg: #f3f4f6;
             --surface: #ffffff;
             --border: #e2e8f0;
@@ -30,7 +27,7 @@
             padding: 20px;
             color: var(--text-main);
             font-size: 13px;
-            padding-bottom: 100px;
+            padding-bottom: 120px;
         }
 
         /* --- Toolbar --- */
@@ -41,9 +38,11 @@
         }
         .toolbar-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
         .brand { font-weight: 900; font-size: 18px; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        
+        .input-group { display: flex; gap: 10px; flex-wrap: wrap; width: 100%; }
         .input-modern {
-            width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px;
-            font-family: inherit; background: #f8fafc; transition: 0.3s;
+            padding: 12px; border: 1px solid var(--border); border-radius: 10px;
+            font-family: inherit; background: #f8fafc; transition: 0.3s; flex: 1; min-width: 200px;
         }
         .input-modern:focus { background: #fff; border-color: var(--primary); }
 
@@ -60,7 +59,7 @@
         .btn-dark { background: linear-gradient(135deg, #334155, #1e293b); }
         .btn-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
         .btn-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
-        .btn-teal { background: linear-gradient(135deg, #14b8a6, #0d9488); }
+        .btn-teal { background: linear-gradient(135deg, #14b8a6, #0d9488); } /* دکمه اشتراک */
         
         .mode-toggle { background: #e2e8f0; color: #475569; border: 1px solid #cbd5e1; }
         .mode-toggle.active { background: var(--primary); color: white; border-color: transparent; }
@@ -77,7 +76,11 @@
             background: #1e293b; color: white; padding: 14px; position: sticky; top: 0; z-index: 20;
             border-right: 1px solid #334155;
         }
-        .copy-col-btn { background: rgba(255,255,255,0.1); border-radius: 6px; padding: 4px; cursor: pointer; float: left; }
+        .copy-col-btn { 
+            background: rgba(255,255,255,0.15); border-radius: 6px; padding: 4px 8px; 
+            cursor: pointer; float: left; transition:0.2s; font-size: 11px;
+        }
+        .copy-col-btn:hover { background: rgba(255,255,255,0.4); }
         
         th:first-child, td:first-child {
             width: 75px; background: #f8fafc; color: #64748b; font-weight: 700; font-size: 11px;
@@ -105,7 +108,7 @@
         body.selection-mode td.empty-cell { cursor: crosshair; }
         .selected-cell { background-color: #bfdbfe !important; }
 
-        /* --- Modal --- */
+        /* --- Modals --- */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.6); z-index: 2000;
@@ -122,6 +125,15 @@
         .modal-header h3 { margin: 0; font-size: 18px; color: #1e293b; }
         .close-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #94a3b8; }
         
+        /* Copy Checkbox List */
+        .copy-list { display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; }
+        .copy-item {
+            display: flex; align-items: center; gap: 10px; padding: 10px;
+            background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer;
+        }
+        .copy-item:hover { background: #f1f5f9; }
+        .copy-item input { width: 18px; height: 18px; cursor: pointer; }
+
         /* Extras List */
         .extras-list { list-style: none; padding: 0; margin: 0; max-height: 250px; overflow-y: auto; }
         .extra-row {
@@ -142,35 +154,23 @@
         .chart-legend { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 10px; }
         .legend-item { font-size: 11px; display: flex; align-items: center; gap: 4px; background: #fff; padding: 4px 8px; border-radius: 20px; border: 1px solid #e2e8f0; }
 
-        /* --- PRINT STYLES (Fixed) --- */
+        /* --- PRINT STYLES --- */
         #print-area { display: none; }
 
         @media print {
-            @page { 
-                size: A4 landscape; 
-                margin: 5mm; 
-            }
+            @page { size: A4 landscape; margin: 5mm; }
             body { background: white; padding: 0; margin: 0; }
             
-            /* مخفی کردن تمام عناصر غیر چاپی و جدول اصلی */
-            .no-print, .toolbar, .copy-col-btn, #mainTableWrapper { 
-                display: none !important; 
-            }
-            
-            /* نمایش ناحیه چاپ */
-            #print-area { 
-                display: block !important; 
-                width: 100%; 
-            }
+            .no-print, .toolbar, .copy-col-btn, #mainTableWrapper { display: none !important; }
+            #print-area { display: block !important; width: 100%; }
 
             /* Header */
             .print-header {
                 display: flex; justify-content: space-between; align-items: center;
-                border-bottom: 2px solid #1e293b; padding-bottom: 5px; margin-bottom: 10px;
-                width: 100%;
+                border-bottom: 2px solid #1e293b; padding-bottom: 5px; margin-bottom: 10px; width: 100%;
             }
             .print-title { font-size: 24px; font-weight: 900; color: #1e293b; }
-            .print-date { font-size: 14px; color: #64748b; }
+            .print-meta { font-size: 14px; color: #64748b; display: flex; flex-direction: column; align-items: flex-end; }
 
             /* Top Boxes */
             .print-grid-top { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px; width: 100%; }
@@ -182,45 +182,20 @@
             .print-items { list-style: none; padding: 0; margin: 0; font-size: 12px; columns: 2; }
             .print-items li { margin-bottom: 3px; break-inside: avoid; }
 
-            /* Table for Print (Natural Flow, No Scale) */
+            /* Table */
             table { border: 2px solid #000; font-size: 10px; width: 100%; border-collapse: collapse; }
-            
-            /* تکرار هدر در صفحات بعد */
             thead { display: table-header-group; }
             tr { page-break-inside: avoid; page-break-after: auto; }
+            th { background-color: #cbd5e1 !important; color: #000 !important; border: 1px solid #000; padding: 4px; font-size: 12px; }
+            td { border: 1px solid #666; height: 18px; padding: 0; }
+            th:first-child, td:first-child { width: 60px; font-size: 10px; border: 1px solid #000; }
             
-            th { 
-                background-color: #cbd5e1 !important; color: #000 !important; 
-                border: 1px solid #000; padding: 4px; font-size: 12px;
-            }
-
-            /* سلول‌ها */
-            td { 
-                border: 1px solid #666; 
-                height: 18px; /* ارتفاع نرمال برای خوانایی */
-                padding: 0;
-            }
-            
-            /* ستون ساعت */
-            th:first-child, td:first-child { 
-                width: 60px; font-size: 10px; 
-                border: 1px solid #000;
-            }
-            
-            /* سلول تسک در چاپ */
             td.task-cell {
-                border: 1px solid #000 !important; 
-                color: #000 !important;
-                print-color-adjust: exact; -webkit-print-color-adjust: exact;
-                vertical-align: middle;
+                border: 1px solid #000 !important; color: #000 !important;
+                print-color-adjust: exact; -webkit-print-color-adjust: exact; vertical-align: middle;
             }
-            
-            .task-time-range {
-                font-size: 10px; font-weight: bold; display: block; border-bottom: 1px dotted #000;
-            }
-            .task-title {
-                font-size: 11px; font-weight: 900; display: block;
-            }
+            .task-time-range { font-size: 10px; font-weight: bold; display: block; border-bottom: 1px dotted #000; }
+            .task-title { font-size: 11px; font-weight: 900; display: block; }
 
             /* Footer */
             .print-footer {
@@ -233,11 +208,14 @@
 </head>
 <body>
 
-    <!-- ناحیه چاپ -->
+    <!-- Print Layout -->
     <div id="print-area">
         <div class="print-header">
             <div class="print-title" id="printTitleDisplay">برنامه هفتگی</div>
-            <div class="print-date" id="printDateDisplay"></div>
+            <div class="print-meta">
+                <div id="printUserDisplay" style="font-weight:bold; color:#334155;"></div>
+                <div id="printDateDisplay"></div>
+            </div>
         </div>
         <div class="print-grid-top">
             <div class="print-box">
@@ -256,7 +234,7 @@
         </div>
     </div>
 
-    <!-- UI اصلی برنامه -->
+    <!-- Main Toolbar -->
     <div class="toolbar no-print">
         <div class="toolbar-header">
             <div class="brand">
@@ -269,26 +247,33 @@
             </button>
         </div>
 
-        <input type="text" id="headerTitleInput" class="input-modern" placeholder="عنوان سربرگ (مثلاً: برنامه مطالعاتی پاییز)" oninput="updateHeader(this.value)">
+        <div class="input-group">
+            <input type="text" id="headerTitleInput" class="input-modern" placeholder="عنوان برنامه (مثلاً: برنامه هفتگی پاییز)" oninput="updateHeader(this.value)">
+            <input type="text" id="userNameInput" class="input-modern" placeholder="نام شما (جهت نمایش در چاپ)" oninput="updateUserName(this.value)">
+        </div>
 
         <div class="toolbar-header">
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <button class="btn btn-purple" onclick="openModal('extrasModal'); renderExtras();">الزامات و لیست</button>
+                <button class="btn btn-purple" onclick="openModal('extrasModal'); renderExtras();">الزامات / لیست</button>
                 <button class="btn btn-orange" onclick="openModal('noteModal')">یادداشت</button>
-                <button class="btn btn-teal" onclick="openStats()">آمار 📊</button>
+                <button class="btn btn-dark" onclick="openStats()">آمار 📊</button>
             </div>
             <div style="flex:1"></div>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn btn-teal" onclick="shareApp()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                    ارسال / اشتراک
+                </button>
                 <button class="btn btn-success" onclick="exportData()">ذخیره</button>
-                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">بازگردانی</button>
+                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">بارگذاری</button>
                 <input type="file" id="fileInput" hidden onchange="importData(this)">
-                <button class="btn btn-dark" onclick="printApp()">پرینت / PDF</button>
+                <button class="btn btn-dark" onclick="printApp()">چاپ PDF</button>
                 <button class="btn btn-danger" onclick="clearAll()">حذف کل</button>
             </div>
         </div>
     </div>
 
-    <!-- جدول اصلی -->
+    <!-- Main Table -->
     <div class="planner-wrapper" id="mainTableWrapper">
         <table id="plannerTable">
             <thead><tr id="tableHeader"><th>زمان</th></tr></thead>
@@ -296,8 +281,18 @@
         </table>
     </div>
 
-    <!-- مودال‌ها -->
-    <!-- افزودنی‌ها -->
+    <!-- Modals -->
+    <!-- Copy Modal (NEW) -->
+    <div class="modal-overlay" id="copyModal">
+        <div class="modal">
+            <div class="modal-header"><h3>کپی برنامه <span id="copySourceLabel" style="color:var(--primary)"></span></h3><button class="close-btn" onclick="closeModal('copyModal')">&times;</button></div>
+            <div style="font-size:12px; color:#666;">روزهایی که می‌خواهید برنامه در آن‌ها کپی شود را انتخاب کنید:</div>
+            <div id="copyTargetList" class="copy-list"></div>
+            <button class="btn btn-primary" style="justify-content:center; margin-top:10px;" onclick="executeCopy()">تایید و کپی</button>
+        </div>
+    </div>
+
+    <!-- Extras Modal -->
     <div class="modal-overlay" id="extrasModal">
         <div class="modal">
             <div class="modal-header"><h3>الزامات و لیست</h3><button class="close-btn" onclick="closeModal('extrasModal')">&times;</button></div>
@@ -318,7 +313,7 @@
         </div>
     </div>
 
-    <!-- تسک -->
+    <!-- Task Modal -->
     <div class="modal-overlay" id="taskModal">
         <div class="modal">
             <div class="modal-header"><h3>مدیریت فعالیت</h3><button class="close-btn" onclick="closeModal('taskModal')">&times;</button></div>
@@ -340,7 +335,7 @@
         </div>
     </div>
 
-    <!-- یادداشت -->
+    <!-- Note Modal -->
     <div class="modal-overlay" id="noteModal">
         <div class="modal">
             <div class="modal-header"><h3>یادداشت‌ها</h3><button class="close-btn" onclick="closeModal('noteModal')">&times;</button></div>
@@ -352,7 +347,7 @@
         </div>
     </div>
 
-    <!-- آمار -->
+    <!-- Stats Modal -->
     <div class="modal-overlay" id="statsModal">
         <div class="modal">
             <div class="modal-header"><h3>آمار</h3><button class="close-btn" onclick="closeModal('statsModal')">&times;</button></div>
@@ -369,19 +364,19 @@
         ];
         const COLORS = ['#4f46e5', '#10b981', '#ef4444', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899', '#64748b'];
         const TIMELINE = [];
-        // ساخت بازه زمانی 00:00 تا 23:45
         for(let h=0; h<24; h++) for(let m=0; m<60; m+=15) TIMELINE.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
 
         let appData = {
-            tasks: [], header: "", note: {text:"", print:false},
+            tasks: [], header: "", userName: "", note: {text:"", print:false},
             reqs: [{t:"بررسی امور مالی", s:true}],
             chks: [{t:"خرید هفتگی", s:true, c:false}]
         };
 
         let isSelect=false, isDrag=false, selStart=null, selCurr=null;
+        let pendingCopySource = null; // برای نگهداری روز مبدا کپی
 
         function init() {
-            const saved = localStorage.getItem('finalProPlannerV3');
+            const saved = localStorage.getItem('ultraMaxPlannerV4');
             if(saved) {
                 try {
                     const d = JSON.parse(saved);
@@ -389,7 +384,9 @@
                 } catch(e){}
             }
 
-            document.getElementById('headerTitleInput').value = appData.header;
+            document.getElementById('headerTitleInput').value = appData.header || "";
+            document.getElementById('userNameInput').value = appData.userName || "";
+            
             const dur = document.getElementById('inpDuration');
             for(let i=1; i<=32; i++) dur.add(new Option(`${i*15} دقیقه`, i));
 
@@ -413,7 +410,10 @@
             while(tr.children.length>1) tr.removeChild(tr.lastChild);
             DAYS.forEach(d=>{
                 const th=document.createElement('th');
-                th.innerHTML=`<div style="display:flex;justify-content:center;gap:5px;"><span class="copy-col-btn" onclick="copyDay('${d.id}')">📋</span>${d.l}</div>`;
+                th.innerHTML=`<div style="display:flex;justify-content:center;gap:5px;align-items:center;">
+                    <span class="copy-col-btn" onclick="openCopyModal('${d.id}')" title="کپی به سایر روزها">📋</span>
+                    ${d.l}
+                </div>`;
                 tr.appendChild(th);
             });
         }
@@ -434,17 +434,9 @@
                         const td = document.createElement('td');
                         td.rowSpan = task.duration; td.className='task-cell';
                         td.style.backgroundColor=task.color;
-                        
-                        // محاسبه پایان
                         const endIdx = idx + task.duration;
                         const endStr = endIdx < TIMELINE.length ? TIMELINE[endIdx] : "24:00";
-                        
-                        // فرمت دقیق خواسته شده: 13:00 تا 14:45 نام
-                        td.innerHTML=`<div class="task-inner">
-                            <span class="task-time-range">${task.startStr} تا ${endStr}</span>
-                            <span class="task-title">${task.name}</span>
-                        </div>`;
-                        
+                        td.innerHTML=`<div class="task-inner"><span class="task-time-range">${task.startStr} تا ${endStr}</span><span class="task-title">${task.name}</span></div>`;
                         td.onclick=(e)=>{e.stopPropagation(); openTaskModal(task);};
                         td.draggable=true;
                         td.ondragstart=(e)=>{e.dataTransfer.setData('tid', task.id);};
@@ -462,32 +454,25 @@
             });
         }
 
-        // --- Logic Update: Eye Icon Immediate Fix ---
+        // --- Logic Updates ---
         function toggleExtraVis(type, i) {
             if(type==='req') appData.reqs[i].s = !appData.reqs[i].s;
             else appData.chks[i].s = !appData.chks[i].s;
-            saveData(); 
-            renderExtras(); // بلافاصله بازنویسی لیست برای تغییر آیکون
+            saveData(); renderExtras();
         }
 
-        // --- Standard Logic ---
         function handleDrop(e, day, time) {
             e.preventDefault(); const tid=e.dataTransfer.getData('tid');
             const task=appData.tasks.find(t=>t.id==tid); if(!task)return;
             const sIdx=TIMELINE.indexOf(time);
             if(sIdx+task.duration>TIMELINE.length) return alert("زمان ناکافی");
-            const conf=appData.tasks.some(t=>{
-                if(t.id==tid || t.day!==day)return false;
-                const tS=TIMELINE.indexOf(t.startStr);
-                return (sIdx<tS+t.duration && sIdx+task.duration>tS);
-            });
+            const conf=appData.tasks.some(t=>{if(t.id==tid || t.day!==day)return false; const tS=TIMELINE.indexOf(t.startStr); return (sIdx<tS+t.duration && sIdx+task.duration>tS);});
             if(!conf) { task.day=day; task.startStr=time; saveData(); renderTable(); } else alert("تداخل!");
         }
 
         function toggleSelectMode() {
             isSelect=!isSelect;
-            const btn=document.getElementById('selectModeBtn');
-            const txt=document.getElementById('modeText');
+            const btn=document.getElementById('selectModeBtn'); const txt=document.getElementById('modeText');
             if(isSelect) {document.body.classList.add('selection-mode'); btn.classList.add('active'); txt.innerText="حالت انتخاب فعال";}
             else {document.body.classList.remove('selection-mode'); btn.classList.remove('active'); txt.innerText="حالت اسکرول"; clearSel();}
         }
@@ -509,7 +494,6 @@
                 document.getElementById('taskId').value=task.id; document.getElementById('taskDay').value=task.day;
                 document.getElementById('taskStart').value=task.startStr; document.getElementById('inpName').value=task.name;
                 document.getElementById('inpDuration').value=task.duration; document.getElementById('customColor').value=task.color;
-                
                 const endIdx = TIMELINE.indexOf(task.startStr) + task.duration;
                 const endStr = endIdx < TIMELINE.length ? TIMELINE[endIdx] : "24:00";
                 document.getElementById('timeInfoDisplay').innerText=`ویرایش: ${task.startStr} تا ${endStr}`;
@@ -540,14 +524,9 @@
         function switchTab(t){document.getElementById('tab-req').style.display=t==='req'?'block':'none'; document.getElementById('tab-chk').style.display=t==='chk'?'block':'none';}
         function renderExtras() {
             const rL=document.getElementById('reqListUi'); rL.innerHTML='';
-            appData.reqs.forEach((r,i)=>{
-                // لاجیک آیکون چشم: اگر s=true است کلاس active-eye اضافه می‌شود
-                rL.innerHTML+=`<li class="extra-row"><span>${r.t}</span><div><span class="icon-action ${r.s?'active-eye':''}" onclick="toggleExtraVis('req',${i})">👁</span> <span class="icon-action delete-icon" onclick="delEx('req',${i})">✖</span></div></li>`;
-            });
+            appData.reqs.forEach((r,i)=>{rL.innerHTML+=`<li class="extra-row"><span>${r.t}</span><div><span class="icon-action ${r.s?'active-eye':''}" onclick="toggleExtraVis('req',${i})">👁</span> <span class="icon-action delete-icon" onclick="delEx('req',${i})">✖</span></div></li>`;});
             const cL=document.getElementById('chkListUi'); cL.innerHTML='';
-            appData.chks.forEach((c,i)=>{
-                cL.innerHTML+=`<li class="extra-row"><span>${c.t}</span><div><input type="checkbox" ${c.c?'checked':''} onchange="togChk(${i})"> <span class="icon-action ${c.s?'active-eye':''}" onclick="toggleExtraVis('chk',${i})">👁</span> <span class="icon-action delete-icon" onclick="delEx('chk',${i})">✖</span></div></li>`;
-            });
+            appData.chks.forEach((c,i)=>{cL.innerHTML+=`<li class="extra-row"><span>${c.t}</span><div><input type="checkbox" ${c.c?'checked':''} onchange="togChk(${i})"> <span class="icon-action ${c.s?'active-eye':''}" onclick="toggleExtraVis('chk',${i})">👁</span> <span class="icon-action delete-icon" onclick="delEx('chk',${i})">✖</span></div></li>`;});
         }
         function addItem(t){const i=document.getElementById(t+'Input'); if(i.value){if(t==='req')appData.reqs.push({t:i.value,s:true}); else appData.chks.push({t:i.value,s:true,c:false}); i.value=''; saveData(); renderExtras();}}
         function delEx(t,i){if(t==='req')appData.reqs.splice(i,1); else appData.chks.splice(i,1); saveData(); renderExtras();}
@@ -564,26 +543,101 @@
             const ch=document.createElement('div'); ch.style.width='150px'; ch.style.height='150px'; ch.style.borderRadius='50%'; ch.style.background=`conic-gradient(${g.join(', ')})`; a.appendChild(ch);
         }
 
+        // --- New Copy Logic (Smart Copy) ---
+        function openCopyModal(sourceId) {
+            pendingCopySource = sourceId;
+            const sourceDay = DAYS.find(d => d.id === sourceId);
+            document.getElementById('copySourceLabel').innerText = sourceDay.l;
+            
+            const list = document.getElementById('copyTargetList');
+            list.innerHTML = '';
+            
+            // نمایش لیست روزها بجز روز مبدا
+            DAYS.filter(d => d.id !== sourceId).forEach(d => {
+                list.innerHTML += `
+                    <label class="copy-item">
+                        <input type="checkbox" value="${d.id}" class="copy-checkbox">
+                        ${d.l}
+                    </label>
+                `;
+            });
+            openModal('copyModal');
+        }
+
+        function executeCopy() {
+            const checkboxes = document.querySelectorAll('.copy-checkbox:checked');
+            if(checkboxes.length === 0) {
+                alert("لطفاً حداقل یک روز را انتخاب کنید.");
+                return;
+            }
+
+            const targetIds = Array.from(checkboxes).map(cb => cb.value);
+            
+            if(!confirm(`آیا مطمئن هستید؟ برنامه روزهای انتخاب شده پاک شده و جایگزین می‌شود.`)) return;
+
+            // دریافت تسک‌های مبدا
+            const sourceTasks = appData.tasks.filter(t => t.day === pendingCopySource);
+
+            // حذف تسک‌های موجود در روزهای مقصد
+            appData.tasks = appData.tasks.filter(t => !targetIds.includes(t.day));
+
+            // افزودن تسک‌های جدید به هر روز مقصد
+            targetIds.forEach(targetId => {
+                sourceTasks.forEach(t => {
+                    appData.tasks.push({
+                        ...t,
+                        id: Date.now() + Math.random(), // ID جدید
+                        day: targetId
+                    });
+                });
+            });
+
+            saveData();
+            renderTable();
+            closeModal('copyModal');
+        }
+
+        // --- Share Logic ---
+        async function shareApp() {
+            const blob = new Blob([JSON.stringify(appData)], {type: 'application/json'});
+            const file = new File([blob], "plan.json", {type: 'application/json'});
+
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: 'برنامه هفتگی',
+                        text: 'فایل پشتیبان برنامه ریزی هفتگی'
+                    });
+                } catch (error) {
+                    console.log('Share failed', error);
+                }
+            } else {
+                // Fallback
+                alert('اشتراک‌گذاری مستقیم پشتیبانی نمی‌شود. فایل دانلود خواهد شد.');
+                exportData();
+            }
+        }
+
+        // --- Common ---
         function openModal(id){document.getElementById(id).style.display='flex'; if(id==='noteModal'){document.getElementById('noteText').value=appData.note.text; document.getElementById('notePrintCheck').checked=appData.note.print;}}
         function closeModal(id){document.getElementById(id).style.display='none';}
-        function saveData(){localStorage.setItem('finalProPlannerV3', JSON.stringify(appData));}
+        function saveData(){localStorage.setItem('ultraMaxPlannerV4', JSON.stringify(appData));}
         function updateHeader(v){appData.header=v; saveData();}
-        function clearAll(){if(confirm("حذف کامل؟")){localStorage.removeItem('finalProPlannerV3'); location.reload();}}
-        function copyDay(src){const trg=prompt("به کدام روز؟ (مثلاً دوشنبه)"); const t=DAYS.find(d=>d.l===trg?.trim()); if(t && confirm("مطمئنید؟")){appData.tasks=appData.tasks.filter(x=>x.day!==t.id); appData.tasks.filter(x=>x.day===src).forEach(x=>appData.tasks.push({...x, id:Date.now()+Math.random(), day:t.id})); saveData(); renderTable();}}
+        function updateUserName(v){appData.userName=v; saveData();}
+        function clearAll(){if(confirm("حذف کامل؟")){localStorage.removeItem('ultraMaxPlannerV4'); location.reload();}}
         
         function exportData(){const b=new Blob([JSON.stringify(appData)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download="plan.json"; a.click();}
         function importData(i){const f=i.files[0]; const r=new FileReader(); r.onload=e=>{try{const d=JSON.parse(e.target.result); if(d.tasks||Array.isArray(d)){if(Array.isArray(d))appData.tasks=d; else appData=d; saveData(); location.reload();}}catch(x){alert("فایل نامعتبر");}}; if(f)r.readAsText(f);}
 
-        // --- Logic: Print with File Name Prompt ---
         function printApp() {
-            // دریافت نام فایل از کاربر
-            const fileName = prompt("لطفاً نام فایل خروجی (PDF) را وارد کنید:", appData.header || "برنامه هفتگی");
-            if(fileName === null) return; // لغو
-
+            const fileName = prompt("نام فایل خروجی:", appData.header || "برنامه");
+            if(fileName === null) return;
             const originalTitle = document.title;
-            document.title = fileName; // تغییر تایتل برای نام پیشفرض PDF
+            document.title = fileName;
 
             document.getElementById('printTitleDisplay').innerText = appData.header || "برنامه هفتگی";
+            document.getElementById('printUserDisplay').innerText = appData.userName ? `نام کاربر: ${appData.userName}` : "";
             document.getElementById('printDateDisplay').innerText = new Date().toLocaleDateString('fa-IR');
 
             const rL = document.getElementById('printReqList'); rL.innerHTML='';
