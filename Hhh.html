@@ -1,11 +1,13 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>پلنر جامع نسخه نهایی (PRO MAX)</title>
+    <title>پلنر هوشمند</title>
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <!-- کتابخانه تبدیل HTML به PDF برای اشتراک گذاری -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
             --primary: #4f46e5;
@@ -29,6 +31,23 @@
             font-size: 13px;
             padding-bottom: 120px;
         }
+
+        /* --- Loading Overlay --- */
+        #loadingOverlay {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+            justify-content: center; align-items: center; flex-direction: column;
+            backdrop-filter: blur(5px);
+        }
+        .spinner {
+            width: 50px; height: 50px; border: 5px solid #e2e8f0;
+            border-top: 5px solid var(--primary); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 10px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loading-text { font-weight: bold; color: var(--primary); font-size: 16px; }
 
         /* --- Toolbar --- */
         .toolbar {
@@ -59,7 +78,7 @@
         .btn-dark { background: linear-gradient(135deg, #334155, #1e293b); }
         .btn-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
         .btn-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
-        .btn-teal { background: linear-gradient(135deg, #14b8a6, #0d9488); } /* دکمه اشتراک */
+        .btn-teal { background: linear-gradient(135deg, #14b8a6, #0d9488); }
         
         .mode-toggle { background: #e2e8f0; color: #475569; border: 1px solid #cbd5e1; }
         .mode-toggle.active { background: var(--primary); color: white; border-color: transparent; }
@@ -125,7 +144,6 @@
         .modal-header h3 { margin: 0; font-size: 18px; color: #1e293b; }
         .close-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #94a3b8; }
         
-        /* Copy Checkbox List */
         .copy-list { display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; }
         .copy-item {
             display: flex; align-items: center; gap: 10px; padding: 10px;
@@ -160,55 +178,39 @@
         @media print {
             @page { size: A4 landscape; margin: 5mm; }
             body { background: white; padding: 0; margin: 0; }
-            
             .no-print, .toolbar, .copy-col-btn, #mainTableWrapper { display: none !important; }
             #print-area { display: block !important; width: 100%; }
-
-            /* Header */
-            .print-header {
-                display: flex; justify-content: space-between; align-items: center;
-                border-bottom: 2px solid #1e293b; padding-bottom: 5px; margin-bottom: 10px; width: 100%;
-            }
+            .print-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #1e293b; padding-bottom: 5px; margin-bottom: 10px; width: 100%; }
             .print-title { font-size: 24px; font-weight: 900; color: #1e293b; }
             .print-meta { font-size: 14px; color: #64748b; display: flex; flex-direction: column; align-items: flex-end; }
-
-            /* Top Boxes */
             .print-grid-top { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px; width: 100%; }
-            .print-box {
-                border: 1px solid #94a3b8; border-radius: 8px; padding: 10px;
-                background-color: #f8fafc !important; -webkit-print-color-adjust: exact;
-            }
+            .print-box { border: 1px solid #94a3b8; border-radius: 8px; padding: 10px; background-color: #f8fafc !important; -webkit-print-color-adjust: exact; }
             .print-box h4 { margin: 0 0 5px 0; border-bottom: 1px solid #cbd5e1; font-size: 16px; color: #334155; }
             .print-items { list-style: none; padding: 0; margin: 0; font-size: 12px; columns: 2; }
             .print-items li { margin-bottom: 3px; break-inside: avoid; }
-
-            /* Table */
             table { border: 2px solid #000; font-size: 10px; width: 100%; border-collapse: collapse; }
             thead { display: table-header-group; }
             tr { page-break-inside: avoid; page-break-after: auto; }
             th { background-color: #cbd5e1 !important; color: #000 !important; border: 1px solid #000; padding: 4px; font-size: 12px; }
             td { border: 1px solid #666; height: 18px; padding: 0; }
             th:first-child, td:first-child { width: 60px; font-size: 10px; border: 1px solid #000; }
-            
-            td.task-cell {
-                border: 1px solid #000 !important; color: #000 !important;
-                print-color-adjust: exact; -webkit-print-color-adjust: exact; vertical-align: middle;
-            }
+            td.task-cell { border: 1px solid #000 !important; color: #000 !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; vertical-align: middle; }
             .task-time-range { font-size: 10px; font-weight: bold; display: block; border-bottom: 1px dotted #000; }
             .task-title { font-size: 11px; font-weight: 900; display: block; }
-
-            /* Footer */
-            .print-footer {
-                margin-top: 15px; border: 2px dashed #94a3b8; padding: 10px;
-                border-radius: 8px; background: #fff; page-break-inside: avoid; width: 100%;
-            }
+            .print-footer { margin-top: 15px; border: 2px dashed #94a3b8; padding: 10px; border-radius: 8px; background: #fff; page-break-inside: avoid; width: 100%; }
             .print-note-text { font-size: 12px; white-space: pre-wrap; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Print Layout -->
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadingText">در حال پردازش...</div>
+    </div>
+
+    <!-- Print Layout (Hidden until print/share) -->
     <div id="print-area">
         <div class="print-header">
             <div class="print-title" id="printTitleDisplay">برنامه هفتگی</div>
@@ -260,12 +262,12 @@
             </div>
             <div style="flex:1"></div>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <button class="btn btn-teal" onclick="shareApp()">
+                <button class="btn btn-teal" onclick="shareAsPDF()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-                    ارسال / اشتراک
+                    اشتراک گذاری PDF
                 </button>
-                <button class="btn btn-success" onclick="exportData()">ذخیره</button>
-                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">بارگذاری</button>
+                <button class="btn btn-success" onclick="exportData()">ذخیره فایل</button>
+                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">بازگردانی</button>
                 <input type="file" id="fileInput" hidden onchange="importData(this)">
                 <button class="btn btn-dark" onclick="printApp()">چاپ PDF</button>
                 <button class="btn btn-danger" onclick="clearAll()">حذف کل</button>
@@ -282,17 +284,15 @@
     </div>
 
     <!-- Modals -->
-    <!-- Copy Modal (NEW) -->
     <div class="modal-overlay" id="copyModal">
         <div class="modal">
             <div class="modal-header"><h3>کپی برنامه <span id="copySourceLabel" style="color:var(--primary)"></span></h3><button class="close-btn" onclick="closeModal('copyModal')">&times;</button></div>
-            <div style="font-size:12px; color:#666;">روزهایی که می‌خواهید برنامه در آن‌ها کپی شود را انتخاب کنید:</div>
+            <div style="font-size:12px; color:#666;">روزهای مقصد را انتخاب کنید:</div>
             <div id="copyTargetList" class="copy-list"></div>
             <button class="btn btn-primary" style="justify-content:center; margin-top:10px;" onclick="executeCopy()">تایید و کپی</button>
         </div>
     </div>
 
-    <!-- Extras Modal -->
     <div class="modal-overlay" id="extrasModal">
         <div class="modal">
             <div class="modal-header"><h3>الزامات و لیست</h3><button class="close-btn" onclick="closeModal('extrasModal')">&times;</button></div>
@@ -313,7 +313,6 @@
         </div>
     </div>
 
-    <!-- Task Modal -->
     <div class="modal-overlay" id="taskModal">
         <div class="modal">
             <div class="modal-header"><h3>مدیریت فعالیت</h3><button class="close-btn" onclick="closeModal('taskModal')">&times;</button></div>
@@ -335,7 +334,6 @@
         </div>
     </div>
 
-    <!-- Note Modal -->
     <div class="modal-overlay" id="noteModal">
         <div class="modal">
             <div class="modal-header"><h3>یادداشت‌ها</h3><button class="close-btn" onclick="closeModal('noteModal')">&times;</button></div>
@@ -347,7 +345,6 @@
         </div>
     </div>
 
-    <!-- Stats Modal -->
     <div class="modal-overlay" id="statsModal">
         <div class="modal">
             <div class="modal-header"><h3>آمار</h3><button class="close-btn" onclick="closeModal('statsModal')">&times;</button></div>
@@ -357,7 +354,6 @@
     </div>
 
     <script>
-        // Data & Constants
         const DAYS = [
             {id:'sat', l:'شنبه'}, {id:'sun', l:'یکشنبه'}, {id:'mon', l:'دوشنبه'},
             {id:'tue', l:'سه‌شنبه'}, {id:'wed', l:'چهارشنبه'}, {id:'thu', l:'پنج‌شنبه'}, {id:'fri', l:'جمعه'}
@@ -373,10 +369,11 @@
         };
 
         let isSelect=false, isDrag=false, selStart=null, selCurr=null;
-        let pendingCopySource = null; // برای نگهداری روز مبدا کپی
+        let pendingCopySource = null;
 
+        // --- Init ---
         function init() {
-            const saved = localStorage.getItem('ultraMaxPlannerV4');
+            const saved = localStorage.getItem('ultraMaxPlannerV5');
             if(saved) {
                 try {
                     const d = JSON.parse(saved);
@@ -386,6 +383,8 @@
 
             document.getElementById('headerTitleInput').value = appData.header || "";
             document.getElementById('userNameInput').value = appData.userName || "";
+            // Fix 1: Set Document Title on Load
+            if(appData.header) document.title = appData.header;
             
             const dur = document.getElementById('inpDuration');
             for(let i=1; i<=32; i++) dur.add(new Option(`${i*15} دقیقه`, i));
@@ -404,6 +403,9 @@
 
             renderHeader(); renderTable(); setupTouch();
         }
+
+        function showLoading() { document.getElementById('loadingOverlay').style.display = 'flex'; }
+        function hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
 
         function renderHeader() {
             const tr = document.getElementById('tableHeader');
@@ -543,99 +545,63 @@
             const ch=document.createElement('div'); ch.style.width='150px'; ch.style.height='150px'; ch.style.borderRadius='50%'; ch.style.background=`conic-gradient(${g.join(', ')})`; a.appendChild(ch);
         }
 
-        // --- New Copy Logic (Smart Copy) ---
+        // --- Copy Logic (with Loading) ---
         function openCopyModal(sourceId) {
             pendingCopySource = sourceId;
             const sourceDay = DAYS.find(d => d.id === sourceId);
             document.getElementById('copySourceLabel').innerText = sourceDay.l;
-            
             const list = document.getElementById('copyTargetList');
             list.innerHTML = '';
-            
-            // نمایش لیست روزها بجز روز مبدا
             DAYS.filter(d => d.id !== sourceId).forEach(d => {
-                list.innerHTML += `
-                    <label class="copy-item">
-                        <input type="checkbox" value="${d.id}" class="copy-checkbox">
-                        ${d.l}
-                    </label>
-                `;
+                list.innerHTML += `<label class="copy-item"><input type="checkbox" value="${d.id}" class="copy-checkbox">${d.l}</label>`;
             });
             openModal('copyModal');
         }
 
         function executeCopy() {
             const checkboxes = document.querySelectorAll('.copy-checkbox:checked');
-            if(checkboxes.length === 0) {
-                alert("لطفاً حداقل یک روز را انتخاب کنید.");
-                return;
-            }
-
+            if(checkboxes.length === 0) return alert("لطفاً حداقل یک روز را انتخاب کنید.");
             const targetIds = Array.from(checkboxes).map(cb => cb.value);
             
             if(!confirm(`آیا مطمئن هستید؟ برنامه روزهای انتخاب شده پاک شده و جایگزین می‌شود.`)) return;
+            
+            closeModal('copyModal');
+            showLoading(); // Show Loading
 
-            // دریافت تسک‌های مبدا
-            const sourceTasks = appData.tasks.filter(t => t.day === pendingCopySource);
-
-            // حذف تسک‌های موجود در روزهای مقصد
-            appData.tasks = appData.tasks.filter(t => !targetIds.includes(t.day));
-
-            // افزودن تسک‌های جدید به هر روز مقصد
-            targetIds.forEach(targetId => {
-                sourceTasks.forEach(t => {
-                    appData.tasks.push({
-                        ...t,
-                        id: Date.now() + Math.random(), // ID جدید
-                        day: targetId
+            // Simulate slight delay for visual feedback
+            setTimeout(() => {
+                const sourceTasks = appData.tasks.filter(t => t.day === pendingCopySource);
+                appData.tasks = appData.tasks.filter(t => !targetIds.includes(t.day));
+                targetIds.forEach(targetId => {
+                    sourceTasks.forEach(t => {
+                        appData.tasks.push({ ...t, id: Date.now() + Math.random(), day: targetId });
                     });
                 });
-            });
-
-            saveData();
-            renderTable();
-            closeModal('copyModal');
-        }
-
-        // --- Share Logic ---
-        async function shareApp() {
-            const blob = new Blob([JSON.stringify(appData)], {type: 'application/json'});
-            const file = new File([blob], "plan.json", {type: 'application/json'});
-
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                try {
-                    await navigator.share({
-                        files: [file],
-                        title: 'برنامه هفتگی',
-                        text: 'فایل پشتیبان برنامه ریزی هفتگی'
-                    });
-                } catch (error) {
-                    console.log('Share failed', error);
-                }
-            } else {
-                // Fallback
-                alert('اشتراک‌گذاری مستقیم پشتیبانی نمی‌شود. فایل دانلود خواهد شد.');
-                exportData();
-            }
+                saveData();
+                renderTable();
+                hideLoading(); // Hide Loading
+            }, 600);
         }
 
         // --- Common ---
         function openModal(id){document.getElementById(id).style.display='flex'; if(id==='noteModal'){document.getElementById('noteText').value=appData.note.text; document.getElementById('notePrintCheck').checked=appData.note.print;}}
         function closeModal(id){document.getElementById(id).style.display='none';}
-        function saveData(){localStorage.setItem('ultraMaxPlannerV4', JSON.stringify(appData));}
-        function updateHeader(v){appData.header=v; saveData();}
+        function saveData(){localStorage.setItem('ultraMaxPlannerV5', JSON.stringify(appData));}
+        
+        // Fix 1: Title Persistence
+        function updateHeader(v){
+            appData.header=v; 
+            document.title = v || "پلنر هوشمند"; // Update Browser Title
+            saveData();
+        }
         function updateUserName(v){appData.userName=v; saveData();}
-        function clearAll(){if(confirm("حذف کامل؟")){localStorage.removeItem('ultraMaxPlannerV4'); location.reload();}}
+        function clearAll(){if(confirm("حذف کامل؟")){localStorage.removeItem('ultraMaxPlannerV5'); location.reload();}}
         
         function exportData(){const b=new Blob([JSON.stringify(appData)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download="plan.json"; a.click();}
         function importData(i){const f=i.files[0]; const r=new FileReader(); r.onload=e=>{try{const d=JSON.parse(e.target.result); if(d.tasks||Array.isArray(d)){if(Array.isArray(d))appData.tasks=d; else appData=d; saveData(); location.reload();}}catch(x){alert("فایل نامعتبر");}}; if(f)r.readAsText(f);}
 
-        function printApp() {
-            const fileName = prompt("نام فایل خروجی:", appData.header || "برنامه");
-            if(fileName === null) return;
-            const originalTitle = document.title;
-            document.title = fileName;
-
+        // --- Prep Print Area Data ---
+        function preparePrintArea() {
             document.getElementById('printTitleDisplay').innerText = appData.header || "برنامه هفتگی";
             document.getElementById('printUserDisplay').innerText = appData.userName ? `نام کاربر: ${appData.userName}` : "";
             document.getElementById('printDateDisplay').innerText = new Date().toLocaleDateString('fa-IR');
@@ -655,11 +621,62 @@
                 ftr.style.display = 'block';
                 document.getElementById('printNoteText').innerText = appData.note.text;
             } else { ftr.style.display = 'none'; }
+        }
 
-            setTimeout(() => {
-                window.print();
-                document.title = originalTitle;
-            }, 100);
+        // --- Print Native ---
+        function printApp() {
+            const fileName = prompt("نام فایل خروجی:", appData.header || "برنامه");
+            if(fileName === null) return;
+            const originalTitle = document.title;
+            document.title = fileName;
+            preparePrintArea();
+            setTimeout(() => { window.print(); document.title = originalTitle; }, 100);
+        }
+
+        // --- Fix 2: Real PDF Sharing ---
+        async function shareAsPDF() {
+            showLoading();
+            preparePrintArea();
+            const element = document.getElementById('print-area');
+            
+            // Temporary make visible for rendering (needs block to render size)
+            // But CSS logic handles 'no-print' mostly. Here we need html2pdf to see it.
+            // We rely on html2pdf using the DOM. Since #print-area is display:none in screen CSS,
+            // we override it briefly or clone it. Best way with html2pdf is simply:
+            element.style.display = 'block'; 
+
+            const opt = {
+                margin: 5,
+                filename: (appData.header || 'plan') + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+
+            try {
+                // Generate Blob
+                const pdfBlob = await html2pdf().set(opt).from(element).output('blob');
+                const file = new File([pdfBlob], opt.filename, { type: 'application/pdf' });
+
+                // Share
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: appData.header || "برنامه هفتگی",
+                        text: `برنامه هفتگی ${appData.userName || ''} - تاریخ: ${new Date().toLocaleDateString('fa-IR')}`
+                    });
+                } else {
+                    // Fallback to download if sharing not supported on device
+                    const url = URL.createObjectURL(pdfBlob);
+                    const a = document.createElement('a'); a.href = url; a.download = opt.filename; a.click();
+                }
+            } catch (err) {
+                console.error(err);
+                alert("خطا در اشتراک گذاری. لطفاً مجدد تلاش کنید.");
+            } finally {
+                element.style.display = 'none'; // Hide again
+                hideLoading();
+            }
         }
 
         init();
