@@ -1,325 +1,398 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>پلنر جامع نسخه تجاری (PRO)</title>
+    <title>پلنر هوشمند حرفه‌ای (نسخه نهایی)</title>
+    <!-- فونت زیبای وزیرمتن (لود از گوگل فونت) -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <style>
         :root {
-            --primary: #2563eb;       /* آبی اصلی */
-            --primary-dark: #1e40af;
-            --accent: #f59e0b;        /* نارنجی برای یادداشت */
-            --success: #10b981;       /* سبز */
+            /* پالت رنگی مدرن */
+            --primary: #4f46e5;       /* نیلی مدرن */
+            --primary-hover: #4338ca;
+            --secondary: #64748b;     /* خاکستری سرد */
+            --accent: #f59e0b;        /* کهربایی */
+            --success: #10b981;       /* زمردی */
             --danger: #ef4444;        /* قرمز */
-            --bg: #f8fafc;
+            --purple: #8b5cf6;        /* بنفش */
+            --bg: #f3f4f6;
             --surface: #ffffff;
-            --border: #cbd5e1;
-            --text: #334155;
-            --select-bg: #bfdbfe;
+            --border: #e2e8f0;
+            --text-main: #1e293b;
+            --text-light: #64748b;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
-        * { box-sizing: border-box; outline: none; }
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, sans-serif;
+            font-family: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif;
             background-color: var(--bg);
             margin: 0;
-            padding: 15px;
-            color: var(--text);
+            padding: 20px;
+            color: var(--text-main);
             font-size: 13px;
-            padding-bottom: 120px;
-            -webkit-tap-highlight-color: transparent;
+            padding-bottom: 100px;
         }
 
-        /* --- نوار ابزار --- */
+        /* --- نوار ابزار (Toolbar) --- */
         .toolbar {
             background: var(--surface);
-            padding: 15px;
+            padding: 16px;
             border-radius: 16px;
-            box-shadow: 0 4px 15px -3px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            border: 1px solid white;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 16px;
+            transition: transform 0.2s;
         }
 
-        .toolbar-top {
-            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+        .toolbar-header {
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
         }
 
-        .app-brand {
-            font-weight: 800; font-size: 16px; color: var(--primary-dark);
-            display: flex; align-items: center; gap: 8px;
+        .brand {
+            font-weight: 900; font-size: 18px; color: var(--primary);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .brand svg { width: 28px; height: 28px; }
+
+        .input-modern {
+            width: 100%; padding: 12px 16px; border: 1px solid var(--border);
+            border-radius: 10px; font-family: inherit; font-size: 14px; background: #f8fafc;
+            transition: all 0.3s ease;
+        }
+        .input-modern:focus {
+            background: #fff; border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
         }
 
-        .toolbar-input {
-            width: 100%; padding: 10px; border: 1px solid var(--border);
-            border-radius: 8px; font-family: inherit; transition: 0.2s;
+        /* دکمه‌های مدرن */
+        .btn {
+            padding: 10px 16px; border: none; border-radius: 10px; cursor: pointer;
+            font-family: inherit; font-weight: 600; font-size: 13px; color: white;
+            display: flex; align-items: center; gap: 8px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative; overflow: hidden;
         }
-        .toolbar-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .btn:active { transform: translateY(0); }
+        .btn svg { width: 18px; height: 18px; stroke-width: 2px; }
 
-        /* دکمه‌ها */
-        button {
-            padding: 8px 14px; border: none; border-radius: 8px; cursor: pointer;
-            font-family: inherit; font-weight: 600; font-size: 12px; color: white;
-            display: flex; align-items: center; gap: 6px; transition: all 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        .btn-primary { background: linear-gradient(135deg, #4f46e5, #4338ca); }
+        .btn-success { background: linear-gradient(135deg, #10b981, #059669); }
+        .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .btn-dark { background: linear-gradient(135deg, #334155, #1e293b); }
+        .btn-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+        .btn-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .btn-teal { background: linear-gradient(135deg, #14b8a6, #0d9488); }
+
+        /* سوییچ حالت انتخاب */
+        .mode-toggle {
+            background: #e2e8f0; color: #475569; border: 1px solid #cbd5e1;
         }
-        button:active { transform: scale(0.98); }
-        button svg { width: 16px; height: 16px; }
-
-        .btn-primary { background: var(--primary); }
-        .btn-success { background: var(--success); }
-        .btn-danger { background: var(--danger); }
-        .btn-dark { background: #475569; }
-        .btn-accent { background: var(--accent); }
-        .btn-purple { background: #8b5cf6; }
-
-        /* دکمه حالت انتخاب */
-        .mode-switch {
-            background: #e2e8f0; color: #475569; border: 1px solid #cbd5e1; box-shadow: none;
-        }
-        .mode-switch.active {
-            background: var(--primary); color: white; border-color: var(--primary-dark);
+        .mode-toggle.active {
+            background: var(--primary); color: white; border-color: transparent;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        /* --- جدول --- */
-        .table-container {
-            background: var(--surface); border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            overflow: auto; position: relative; border: 1px solid var(--border);
-            max-height: 75vh; overscroll-behavior: contain;
+        /* --- جدول برنامه (Planner Grid) --- */
+        .planner-wrapper {
+            background: var(--surface); border-radius: 16px;
+            box-shadow: var(--shadow); overflow: auto;
+            position: relative; border: 1px solid var(--border);
+            max-height: 75vh;
         }
 
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 850px; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 900px; }
         
-        thead { position: sticky; top: 0; z-index: 20; }
-        th {
-            background: #1e293b; color: white; padding: 10px;
-            border: 1px solid #334155; user-select: none;
+        thead th {
+            background: #1e293b; color: white; padding: 14px;
+            position: sticky; top: 0; z-index: 20;
+            font-size: 14px; border-right: 1px solid #334155;
+            letter-spacing: 0.5px;
         }
 
         /* دکمه کپی در هدر */
-        .copy-btn {
-            background: rgba(255,255,255,0.15); padding: 2px 6px; border-radius: 4px;
-            font-size: 10px; margin-left: 5px; cursor: pointer; color: #fff;
+        .copy-col-btn {
+            background: rgba(255,255,255,0.1); border-radius: 6px; padding: 4px;
+            cursor: pointer; float: left; transition: 0.2s; display: flex;
         }
-        .copy-btn:hover { background: rgba(255,255,255,0.3); }
+        .copy-col-btn:hover { background: rgba(255,255,255,0.3); }
 
+        /* ستون ساعت */
         th:first-child, td:first-child {
-            width: 65px; background: #f1f5f9; color: #64748b; font-weight: bold;
-            font-size: 10px; position: sticky; right: 0; z-index: 30;
-            border-left: 2px solid #cbd5e1; text-align: center;
+            width: 70px; background: #f8fafc; color: #64748b; font-weight: 700;
+            font-size: 11px; position: sticky; right: 0; z-index: 30;
+            border-left: 2px solid #e2e8f0; text-align: center;
         }
 
         td {
-            border: 1px solid #e2e8f0; text-align: center; height: 26px;
-            padding: 0; vertical-align: middle; touch-action: auto;
+            border: 1px solid #f1f5f9; text-align: center; height: 32px; /* ارتفاع مناسب */
+            padding: 0; vertical-align: middle; transition: background 0.1s;
         }
 
         /* سلول تسک */
         td.task-cell {
-            color: white; padding: 2px; font-size: 11px; cursor: pointer;
-            box-sizing: border-box; overflow: hidden; position: relative;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
+            color: white; padding: 4px 6px; font-size: 11px; cursor: grab;
+            position: relative; border-bottom: 1px solid rgba(255,255,255,0.2);
+            box-shadow: inset 3px 0 0 rgba(0,0,0,0.2); /* نوار کناری */
+            transition: filter 0.2s;
         }
-        .task-content { pointer-events: none; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; }
+        td.task-cell:hover { filter: brightness(1.1); z-index: 5; }
+        .task-inner {
+            display: flex; flex-direction: column; justify-content: center; height: 100%;
+            pointer-events: none; text-shadow: 0 1px 2px rgba(0,0,0,0.1); font-weight: 500;
+        }
 
         /* حالت انتخاب */
-        body.selection-mode td.empty-cell { touch-action: none; cursor: crosshair; }
-        .selected-range { background-color: var(--select-bg) !important; }
+        body.selection-mode td.empty-cell { cursor: crosshair; }
+        .selected-cell { background-color: #bfdbfe !important; }
 
-        /* --- بخش مدیریت افزودنی‌ها (منو) --- */
-        .extras-list {
-            list-style: none; padding: 0; margin: 0; max-height: 200px; overflow-y: auto;
-            border: 1px solid #eee; border-radius: 8px; margin-top: 10px;
-        }
-        .extra-item {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 8px 10px; border-bottom: 1px solid #f1f5f9; background: #fff;
-        }
-        .extra-item:last-child { border-bottom: none; }
-        .extra-controls { display: flex; align-items: center; gap: 8px; }
-        
-        /* سوییچ نمایش/عدم نمایش */
-        .toggle-eye { cursor: pointer; opacity: 0.4; transition: 0.2s; }
-        .toggle-eye.visible { opacity: 1; color: var(--primary); }
-        .toggle-eye:hover { transform: scale(1.1); }
-
-        /* --- مودال‌ها --- */
+        /* --- مودال (Popup) --- */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 2000;
-            justify-content: center; align-items: center; backdrop-filter: blur(4px);
+            background: rgba(15, 23, 42, 0.6); z-index: 2000;
+            justify-content: center; align-items: center; backdrop-filter: blur(5px);
         }
+
         .modal {
-            background: white; padding: 20px; border-radius: 16px; width: 90%; max-width: 400px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); display: flex; flex-direction: column; gap: 15px;
-            max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            background: white; padding: 24px; border-radius: 20px; width: 90%; max-width: 420px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; gap: 16px;
+            animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes modalPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        .modal-header { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .modal-header h3 { margin: 0; font-size: 16px; color: #1e293b; }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #f1f5f9; padding-bottom: 12px;
+        }
+        .modal-header h3 { margin: 0; font-size: 18px; color: #1e293b; display: flex; align-items: center; gap: 8px; }
+        .close-btn { background: none; border: none; cursor: pointer; color: #94a3b8; font-size: 20px; }
+        .close-btn:hover { color: #ef4444; }
 
-        /* --- المان‌های پرینت (مخفی در حالت عادی) --- */
-        #print-header-section, #print-extras-section, #print-footer-note { display: none; }
+        .form-label { font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 6px; display: block; }
 
-        /* --- استایل چاپ --- */
+        /* پالت رنگ */
+        .color-options { display: flex; gap: 8px; flex-wrap: wrap; }
+        .color-dot {
+            width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+            border: 3px solid #fff; box-shadow: 0 0 0 1px #cbd5e1; transition: transform 0.2s;
+        }
+        .color-dot:hover { transform: scale(1.15); }
+        .color-dot.active { box-shadow: 0 0 0 2px var(--primary); }
+
+        /* لیست افزودنی‌ها */
+        .extras-list { list-style: none; padding: 0; margin: 0; max-height: 250px; overflow-y: auto; }
+        .extra-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px; border-bottom: 1px solid #f1f5f9; background: #f8fafc; margin-bottom: 4px; border-radius: 8px;
+        }
+        .extra-row:last-child { margin-bottom: 0; }
+        .icon-action { cursor: pointer; opacity: 0.6; transition: 0.2s; }
+        .icon-action:hover { opacity: 1; transform: scale(1.2); }
+        .visible-icon { color: var(--primary); }
+        .delete-icon { color: var(--danger); }
+
+        /* --- نمودار (Chart) --- */
+        .chart-container {
+            display: flex; justify-content: center; align-items: center; padding: 20px;
+            background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;
+        }
+        .chart-legend {
+            display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; justify-content: center;
+        }
+        .legend-item { font-size: 11px; display: flex; align-items: center; gap: 4px; background: #fff; padding: 4px 8px; border-radius: 20px; border: 1px solid #e2e8f0; }
+
+        /* --- پرینت (Print Styling) --- */
+        #print-area { display: none; }
+
         @media print {
             @page { size: A4 landscape; margin: 5mm; }
-            body { background: white; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .no-print, .toolbar, .copy-btn { display: none !important; }
+            body { background: white; padding: 0; }
+            .no-print, .toolbar, .copy-col-btn { display: none !important; }
             
-            /* ساختار صفحه چاپ */
-            #print-header-section {
-                display: block; text-align: center; margin-bottom: 10px;
-                border-bottom: 2px solid #000; padding-bottom: 5px;
-            }
-            #print-title-text { font-size: 22px; font-weight: 900; color: #000; }
+            #print-area { display: block; width: 100%; height: 100%; }
 
-            /* بخش الزامات و چک لیست در بالای جدول */
-            #print-extras-section {
-                display: flex; gap: 20px; margin-bottom: 10px; font-size: 11px;
-                justify-content: space-between; align-items: flex-start;
-                border: 1px solid #ccc; padding: 10px; border-radius: 5px;
+            /* سربرگ مدرن پرینت */
+            .print-header {
+                display: flex; justify-content: space-between; align-items: center;
+                border-bottom: 3px solid #1e293b; padding-bottom: 10px; margin-bottom: 15px;
             }
-            .print-col { flex: 1; }
-            .print-col h4 { margin: 0 0 5px 0; border-bottom: 1px solid #000; padding-bottom: 2px; font-size: 12px; }
-            .print-list { list-style: none; padding: 0; margin: 0; }
-            .print-list li { margin-bottom: 3px; display: flex; align-items: center; gap: 5px; }
+            .print-title { font-size: 24px; font-weight: 900; color: #1e293b; }
+            .print-date { font-size: 12px; color: #64748b; }
 
-            /* جدول */
-            .table-container { box-shadow: none; border: none; overflow: visible; max-height: none; }
-            table { border: 2px solid #000; width: 100%; font-size: 10px; }
+            /* باکس‌های نکات و چک لیست */
+            .print-grid-top {
+                display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;
+            }
+            .print-box {
+                border: 1px solid #94a3b8; border-radius: 8px; padding: 10px;
+                background-color: #f8fafc !important; -webkit-print-color-adjust: exact;
+            }
+            .print-box h4 {
+                margin: 0 0 8px 0; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px;
+                font-size: 12px; color: #334155; text-transform: uppercase;
+            }
+            .print-items { list-style: none; padding: 0; margin: 0; font-size: 10px; columns: 2; }
+            .print-items li { margin-bottom: 4px; break-inside: avoid; }
+
+            /* جدول پرینت */
+            .planner-wrapper { box-shadow: none; border: none; max-height: none; overflow: visible; }
+            table { border: 2px solid #000; font-size: 9px; width: 100%; }
             thead { display: table-header-group; }
             tr { page-break-inside: avoid; }
-            th { background-color: #e2e8f0 !important; color: #000 !important; border: 1px solid #000; }
-            td { border: 1px solid #666; height: 18px; } /* فشرده */
-            td.task-cell { border: 1px solid #000 !important; color: #000 !important; font-weight: bold; }
+            th { background-color: #cbd5e1 !important; color: #000 !important; border: 1px solid #000; padding: 5px; }
+            td { border: 1px solid #666; height: 18px; }
+            
+            td.task-cell {
+                border: 1px solid #000 !important; font-weight: bold; color: #000 !important;
+                print-color-adjust: exact; -webkit-print-color-adjust: exact;
+            }
 
             /* فوتر یادداشت */
-            #print-footer-note {
-                display: block; margin-top: 15px; padding: 10px; border: 1px dashed #666;
-                border-radius: 5px; font-size: 11px; background: #fafafa;
-                page-break-inside: avoid;
+            .print-footer {
+                margin-top: 15px; border: 2px dashed #94a3b8; padding: 10px;
+                border-radius: 8px; background: #fff; page-break-inside: avoid;
             }
-            #print-footer-note h4 { margin: 0 0 5px 0; }
-            .landscape-warning { display: none; } /* مخفی کردن هشدار در خود چاپ */
+            .print-footer h5 { margin: 0 0 5px 0; font-size: 11px; }
+            .print-note-text { font-size: 10px; white-space: pre-wrap; }
         }
     </style>
 </head>
 <body>
 
-    <!-- بخش‌های مخصوص پرینت -->
-    <div id="print-header-section">
-        <div id="print-title-text">برنامه هفتگی</div>
-    </div>
-
-    <div id="print-extras-section">
-        <!-- ستون سمت راست: نکات/الزامات -->
-        <div class="print-col">
-            <h4>🔸 نکات و الزامات</h4>
-            <ul class="print-list" id="print-req-list"></ul>
+    <!-- 1. بخش مخصوص پرینت (در حالت عادی مخفی) -->
+    <div id="print-area">
+        <div class="print-header">
+            <div class="print-title" id="printTitleDisplay">برنامه هفتگی</div>
+            <div class="print-date" id="printDateDisplay">تهیه شده با پلنر هوشمند</div>
         </div>
-        <!-- ستون سمت چپ: چک لیست -->
-        <div class="print-col" style="border-right: 1px solid #ccc; padding-right: 20px;">
-            <h4>▫️ چک‌لیست موارد</h4>
-            <ul class="print-list" id="print-check-list"></ul>
-        </div>
-    </div>
 
-    <!-- نوار ابزار -->
-    <div class="toolbar no-print">
-        <div class="toolbar-top">
-            <div class="app-brand">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                پلنر جامع PRO
+        <div class="print-grid-top">
+            <!-- سمت راست: نکات -->
+            <div class="print-box">
+                <h4>🔸 نکات و الزامات</h4>
+                <ul class="print-items" id="printReqList"></ul>
             </div>
+            <!-- سمت چپ: چک لیست -->
+            <div class="print-box">
+                <h4>▫️ چک‌لیست موارد</h4>
+                <ul class="print-items" id="printChkList"></ul>
+            </div>
+        </div>
+        
+        <!-- جدول در اینجا کلون می‌شود موقع پرینت -->
+        <div id="printTableContainer"></div>
 
-            <button class="mode-switch" id="selectionModeBtn" onclick="toggleSelectionMode()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path></svg>
+        <div class="print-footer" id="printFooter" style="display:none;">
+            <h5>📝 یادداشت‌ها:</h5>
+            <div class="print-note-text" id="printNoteText"></div>
+        </div>
+    </div>
+
+    <!-- 2. رابط کاربری اصلی -->
+    <div class="toolbar no-print">
+        <div class="toolbar-header">
+            <div class="brand">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                پلنر هوشمند PRO
+            </div>
+            
+            <button class="btn mode-toggle" id="selectModeBtn" onclick="toggleSelectMode()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
                 <span id="modeText">حالت اسکرول</span> (کلیک برای انتخاب)
             </button>
         </div>
 
-        <input type="text" class="toolbar-input" id="headerInput" placeholder="عنوان سربرگ پرینت (مثلاً: برنامه هفته اول مهر ماه)" oninput="updateHeader(this.value)">
+        <input type="text" id="headerTitleInput" class="input-modern" placeholder="عنوان سربرگ برای پرینت (مثلاً: برنامه مطالعاتی پاییز)" oninput="updateHeader(this.value)">
 
-        <div class="toolbar-top">
-            <button class="btn-purple" onclick="openExtrasModal()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                الزامات و چک‌لیست
-            </button>
+        <div class="toolbar-header">
+            <!-- گروه مدیریت محتوا -->
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn btn-purple" onclick="openModal('extrasModal'); renderExtras();">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                    الزامات و لیست
+                </button>
+                <button class="btn btn-orange" onclick="openModal('noteModal')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    یادداشت
+                </button>
+                <button class="btn btn-teal" onclick="openStats()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+                    آمار
+                </button>
+            </div>
 
-            <button class="btn-accent" onclick="openNotepad()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                یادداشت
-            </button>
-            
             <div style="flex:1"></div>
 
-            <button class="btn-success" onclick="exportData()">💾 بک‌آپ</button>
-            <button class="btn-primary" onclick="document.getElementById('fileInput').click()">📂 بازگردانی</button>
-            <input type="file" id="fileInput" hidden onchange="importData(this)">
-            
-            <button class="btn-dark" onclick="printApp()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                پرینت
-            </button>
-            <button class="btn-danger" onclick="clearAll()">🗑 حذف کل</button>
+            <!-- گروه عملیات -->
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn btn-success" onclick="exportData()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                    ذخیره
+                </button>
+                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    بازگردانی
+                </button>
+                <input type="file" id="fileInput" hidden onchange="importData(this)">
+                
+                <button class="btn btn-dark" onclick="printApp()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    پرینت
+                </button>
+                <button class="btn btn-danger" onclick="clearAll()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- جدول -->
-    <div class="table-container">
+    <div class="planner-wrapper" id="mainTableWrapper">
         <table id="plannerTable">
             <thead>
-                <tr id="headerRow"><th>ساعت</th></tr>
+                <tr id="tableHeader"><th>زمان</th></tr>
             </thead>
             <tbody id="plannerBody"></tbody>
         </table>
     </div>
 
-    <!-- فوتر یادداشت (در پرینت نمایش داده میشود) -->
-    <div id="print-footer-note">
-        <h4>📝 یادداشت‌ها:</h4>
-        <div id="print-note-content" style="white-space: pre-wrap;"></div>
-    </div>
-
-    <!-- مودال افزودنی‌ها (چک لیست و الزامات) -->
+    <!-- مودال افزودنی‌ها (الزامات و چک لیست) -->
     <div class="modal-overlay" id="extrasModal">
         <div class="modal">
             <div class="modal-header">
-                <h3>مدیریت موارد اضافی</h3>
-                <button class="btn-danger" onclick="closeModal('extrasModal')" style="padding:4px 8px;">✕</button>
+                <h3><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg> الزامات و لیست</h3>
+                <button class="close-btn" onclick="closeModal('extrasModal')">&times;</button>
             </div>
             
-            <!-- تب بندی ساده -->
-            <div style="display:flex; gap:10px; border-bottom:1px solid #eee; padding-bottom:5px;">
-                <button class="btn-primary" style="flex:1" onclick="showTab('tab-req')">🔸 نکات</button>
-                <button class="btn-dark" style="flex:1" onclick="showTab('tab-chk')">▫️ چک‌لیست</button>
+            <!-- تب بندی -->
+            <div style="display:flex; gap:10px; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">
+                <button class="btn btn-purple" style="flex:1; justify-content:center;" onclick="switchTab('req')">🔸 نکات</button>
+                <button class="btn btn-dark" style="flex:1; justify-content:center;" onclick="switchTab('chk')">▫️ چک‌لیست</button>
             </div>
 
             <!-- تب نکات -->
-            <div id="tab-req" style="display:block;">
-                <div style="display:flex; gap:5px; margin-top:10px;">
-                    <input type="text" id="reqInput" class="toolbar-input" placeholder="نکته جدید...">
-                    <button class="btn-success" onclick="addRequirement()">+</button>
+            <div id="tab-req" style="display:block">
+                <div style="display:flex; gap:8px;">
+                    <input type="text" id="reqInput" class="input-modern" placeholder="نکته جدید...">
+                    <button class="btn btn-success" onclick="addItem('req')">+</button>
                 </div>
-                <div style="font-size:10px; color:#666; margin-top:5px;">چشم: نمایش در پرینت</div>
-                <ul class="extras-list" id="reqListUi"></ul>
+                <ul class="extras-list" id="reqListUi" style="margin-top:10px;"></ul>
             </div>
 
             <!-- تب چک لیست -->
-            <div id="tab-chk" style="display:none;">
-                <div style="display:flex; gap:5px; margin-top:10px;">
-                    <input type="text" id="chkInput" class="toolbar-input" placeholder="آیتم جدید...">
-                    <button class="btn-success" onclick="addChecklist()">+</button>
+            <div id="tab-chk" style="display:none">
+                <div style="display:flex; gap:8px;">
+                    <input type="text" id="chkInput" class="input-modern" placeholder="مورد جدید...">
+                    <button class="btn btn-success" onclick="addItem('chk')">+</button>
                 </div>
-                <div style="font-size:10px; color:#666; margin-top:5px;">چشم: نمایش | تیک: وضعیت انجام</div>
-                <ul class="extras-list" id="chkListUi"></ul>
+                <ul class="extras-list" id="chkListUi" style="margin-top:10px;"></ul>
             </div>
         </div>
     </div>
@@ -327,40 +400,39 @@
     <!-- مودال فعالیت -->
     <div class="modal-overlay" id="taskModal">
         <div class="modal">
-            <h3>مدیریت فعالیت</h3>
+            <div class="modal-header">
+                <h3><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> مدیریت فعالیت</h3>
+                <button class="close-btn" onclick="closeModal('taskModal')">&times;</button>
+            </div>
+            
             <input type="hidden" id="taskId">
             <input type="hidden" id="taskDay">
-            <input type="hidden" id="taskStartStr">
-            
-            <div style="font-size:12px; color:#666;" id="timeInfo"></div>
-            
+            <input type="hidden" id="taskStart">
+            <div style="font-size:12px; color:#64748b;" id="timeInfoDisplay"></div>
+
             <div>
-                <label style="font-size:11px; font-weight:bold;">عنوان:</label>
-                <input type="text" id="inpName" class="toolbar-input" placeholder="مثلاً: ورزش" autofocus>
+                <label class="form-label">عنوان فعالیت</label>
+                <input type="text" id="inpName" class="input-modern" placeholder="مثلاً: جلسه کاری" autofocus>
             </div>
 
             <div>
-                <label style="font-size:11px; font-weight:bold;">مدت زمان:</label>
-                <select id="inpDuration" class="toolbar-input"></select>
+                <label class="form-label">مدت زمان</label>
+                <select id="inpDuration" class="input-modern"></select>
             </div>
 
             <div>
-                <label style="font-size:11px; font-weight:bold;">رنگ:</label>
-                <div style="display:flex; gap:5px; flex-wrap:wrap; margin-top:5px;">
-                    <div onclick="setColor('#3b82f6')" style="width:25px;height:25px;background:#3b82f6;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
-                    <div onclick="setColor('#10b981')" style="width:25px;height:25px;background:#10b981;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
-                    <div onclick="setColor('#ef4444')" style="width:25px;height:25px;background:#ef4444;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
-                    <div onclick="setColor('#f59e0b')" style="width:25px;height:25px;background:#f59e0b;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
-                    <div onclick="setColor('#8b5cf6')" style="width:25px;height:25px;background:#8b5cf6;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #ccc"></div>
-                    <input type="color" id="inpColor" value="#3b82f6" style="margin-right:auto">
+                <label class="form-label">رنگ برچسب</label>
+                <div class="color-options" id="colorPalette">
+                    <!-- رنگ‌ها با JS تولید می‌شوند -->
                 </div>
+                <input type="color" id="customColor" style="margin-top:8px; width:100%; height:32px; border:none; border-radius:4px; cursor:pointer;">
             </div>
 
             <div style="display:flex; justify-content:space-between; margin-top:10px;">
-                <button class="btn-danger" id="btnDelete" onclick="deleteTask()" style="display:none">حذف</button>
+                <button class="btn btn-danger" id="btnDeleteTask" onclick="deleteTask()" style="display:none">حذف</button>
                 <div style="flex:1"></div>
-                <button class="btn-dark" onclick="closeModal('taskModal')" style="margin-left:5px;">لغو</button>
-                <button class="btn-primary" onclick="saveTask()">ذخیره</button>
+                <button class="btn btn-dark" onclick="closeModal('taskModal')" style="margin-left:8px;">لغو</button>
+                <button class="btn btn-primary" onclick="saveTask()">ثبت</button>
             </div>
         </div>
     </div>
@@ -368,84 +440,117 @@
     <!-- مودال یادداشت -->
     <div class="modal-overlay" id="noteModal">
         <div class="modal">
-            <h3>دفترچه یادداشت</h3>
-            <textarea id="noteArea" class="toolbar-input" rows="10" placeholder="یادداشت‌ها..."></textarea>
-            <div style="display:flex; align-items:center; gap:5px;">
-                <input type="checkbox" id="showNoteInPrint">
-                <label for="showNoteInPrint" style="font-size:12px;">نمایش در انتهای صفحه پرینت</label>
+            <div class="modal-header">
+                <h3><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> یادداشت‌ها</h3>
+                <button class="close-btn" onclick="closeModal('noteModal')">&times;</button>
             </div>
-            <div style="display:flex; justify-content:flex-end; margin-top:10px;">
-                <button class="btn-primary" onclick="saveNote()">ذخیره و بستن</button>
+            <textarea id="noteText" class="input-modern" rows="10" placeholder="هر چیزی که می‌خواهید بنویسید..."></textarea>
+            
+            <div style="display:flex; align-items:center; gap:8px; font-size:12px;">
+                <input type="checkbox" id="notePrintCheck" style="width:16px; height:16px;">
+                <label for="notePrintCheck">نمایش در انتهای صفحه چاپ</label>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end;">
+                <button class="btn btn-success" onclick="saveNote()">ذخیره</button>
             </div>
         </div>
     </div>
 
+    <!-- مودال آمار -->
+    <div class="modal-overlay" id="statsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg> آمار فعالیت‌ها</h3>
+                <button class="close-btn" onclick="closeModal('statsModal')">&times;</button>
+            </div>
+            
+            <div class="chart-container" id="chartArea">
+                <!-- نمودار اینجا رسم می‌شود -->
+            </div>
+            <div class="chart-legend" id="chartLegend"></div>
+        </div>
+    </div>
+
     <script>
+        // --- داده‌ها و تنظیمات ---
         const DAYS = [
             {id:'sat', l:'شنبه'}, {id:'sun', l:'یکشنبه'}, {id:'mon', l:'دوشنبه'},
             {id:'tue', l:'سه‌شنبه'}, {id:'wed', l:'چهارشنبه'}, {id:'thu', l:'پنج‌شنبه'}, {id:'fri', l:'جمعه'}
         ];
+        const COLORS = ['#4f46e5', '#10b981', '#ef4444', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899', '#64748b'];
         const TIMELINE = [];
-        for(let h=0;h<24;h++) for(let m=0;m<60;m+=15) TIMELINE.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+        for(let h=0; h<24; h++) for(let m=0; m<60; m+=15) TIMELINE.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
 
-        // ساختار داده جامع
         let appData = {
             tasks: [],
-            headerTitle: "",
-            notes: { text: "", showInPrint: false },
-            requirements: [
-                { id: 1, text: "بررسی اقساط وام", show: true },
-                { id: 2, text: "پرداخت قبض برق", show: true }
-            ],
-            checklists: [
-                { id: 1, text: "خرید هفتگی", show: true, checked: false },
-                { id: 2, text: "سرویس ماشین", show: true, checked: false }
-            ]
+            header: "",
+            note: { text: "", print: false },
+            reqs: [ {t:"بررسی صورت حساب‌ها", s:true}, {t:"تماس با مشتریان", s:true} ],
+            chks: [ {t:"خرید اقلام ضروری", s:true, c:false}, {t:"ورزش روزانه", s:true, c:false} ]
         };
 
-        // متغیرهای حالت انتخاب
-        let isSelectMode = false, isDrag = false;
+        let isSelect = false, isDrag = false;
         let selStart = null, selCurr = null;
 
+        // --- شروع برنامه ---
         function init() {
-            const saved = localStorage.getItem('proPlannerBiz');
+            // بارگذاری داده
+            const saved = localStorage.getItem('ultraProPlanner');
             if(saved) {
                 try {
-                    const parsed = JSON.parse(saved);
-                    // ادغام با مقادیر پیشفرض برای سازگاری
-                    if(!Array.isArray(parsed)) appData = { ...appData, ...parsed };
-                    else appData.tasks = parsed; // پشتیبانی از نسخه قدیمی
-                } catch(e){}
+                    const d = JSON.parse(saved);
+                    // سازگاری با نسخه‌های قبلی
+                    if(Array.isArray(d)) appData.tasks = d;
+                    else appData = { ...appData, ...d };
+                } catch(e) {}
             }
 
-            // پر کردن UI اولیه
-            document.getElementById('headerInput').value = appData.headerTitle || "";
-            document.getElementById('print-title-text').innerText = appData.headerTitle || "برنامه هفتگی";
+            // UI Init
+            document.getElementById('headerTitleInput').value = appData.header;
             
-            // پر کردن سلکتور زمان
-            const durSel = document.getElementById('inpDuration');
-            for(let i=1;i<=24;i++) durSel.add(new Option(`${i*15} دقیقه (${i/4} ساعت)`, i));
+            // پر کردن سلکت زمان
+            const dur = document.getElementById('inpDuration');
+            for(let i=1; i<=32; i++) dur.add(new Option(`${i*15} دقیقه (${i/4} ساعت)`, i));
+
+            // پر کردن رنگ‌ها
+            const pal = document.getElementById('colorPalette');
+            COLORS.forEach(c => {
+                const dot = document.createElement('div');
+                dot.className = 'color-dot'; dot.style.background = c;
+                dot.onclick = () => { 
+                    document.getElementById('customColor').value = c;
+                    document.querySelectorAll('.color-dot').forEach(el=>el.classList.remove('active'));
+                    dot.classList.add('active');
+                };
+                pal.appendChild(dot);
+            });
 
             renderHeader();
             renderTable();
-            setupTouch();
+            setupTouchEvents();
         }
 
-        // --- رندرینگ ---
+        // --- رندر جدول ---
         function renderHeader() {
-            const row = document.getElementById('headerRow');
-            while(row.children.length > 1) row.removeChild(row.lastChild);
+            const tr = document.getElementById('tableHeader');
+            while(tr.children.length > 1) tr.removeChild(tr.lastChild);
             DAYS.forEach(d => {
                 const th = document.createElement('th');
-                th.innerHTML = `<div>${d.l} <span class="copy-btn" onclick="copyDay('${d.id}')">📋</span></div>`;
-                row.appendChild(th);
+                th.innerHTML = `
+                    <div style="display:flex; justify-content:center; align-items:center; gap:5px;">
+                        <span class="copy-col-btn" title="کپی به..." onclick="copyDay('${d.id}')">📋</span>
+                        ${d.l}
+                    </div>
+                `;
+                tr.appendChild(th);
             });
         }
 
         function renderTable() {
-            const tbody = document.getElementById('plannerBody');
-            tbody.innerHTML = '';
-            const occupied = {}; DAYS.forEach(d=>occupied[d.id]=new Array(TIMELINE.length).fill(false));
+            const body = document.getElementById('plannerBody');
+            body.innerHTML = '';
+            const occupied = {}; DAYS.forEach(d => occupied[d.id] = new Array(TIMELINE.length).fill(false));
 
             TIMELINE.forEach((time, idx) => {
                 const tr = document.createElement('tr');
@@ -460,27 +565,57 @@
                         td.rowSpan = task.duration;
                         td.className = 'task-cell';
                         td.style.backgroundColor = task.color;
-                        td.innerHTML = `<div class="task-content"><b>${task.name}</b></div>`;
+                        td.innerHTML = `<div class="task-inner">${task.name}</div>`;
                         td.onclick = (e) => { e.stopPropagation(); openTaskModal(task); };
+                        
+                        // Drag logic start
+                        td.draggable = true;
+                        td.ondragstart = (e) => { e.dataTransfer.setData('tid', task.id); };
+                        
                         tr.appendChild(td);
                         for(let i=1; i<task.duration; i++) if(idx+i < TIMELINE.length) occupied[day.id][idx+i]=true;
                     } else {
                         const td = document.createElement('td');
                         td.className = 'empty-cell';
                         td.dataset.d = day.id; td.dataset.i = idx;
+                        
+                        // Drag logic drop
+                        td.ondragover = (e) => e.preventDefault();
+                        td.ondrop = (e) => handleDrop(e, day.id, time);
+
                         tr.appendChild(td);
                     }
                 });
-                tbody.appendChild(tr);
+                body.appendChild(tr);
             });
         }
 
-        // --- سیستم انتخاب (Touch/Drag) ---
-        function toggleSelectionMode() {
-            isSelectMode = !isSelectMode;
-            const btn = document.getElementById('selectionModeBtn');
+        // --- Drag & Drop ---
+        function handleDrop(e, day, time) {
+            e.preventDefault();
+            const tid = e.dataTransfer.getData('tid');
+            const task = appData.tasks.find(t=>t.id == tid);
+            if(!task) return;
+            
+            // Check conflict
+            const sIdx = TIMELINE.indexOf(time);
+            if(sIdx + task.duration > TIMELINE.length) return alert("زمان کافی نیست");
+            const conflict = appData.tasks.some(t => {
+                if(t.id == tid || t.day !== day) return false;
+                const tS = TIMELINE.indexOf(t.startStr);
+                return (sIdx < tS+t.duration && sIdx+task.duration > tS);
+            });
+
+            if(!conflict) { task.day = day; task.startStr = time; saveData(); renderTable(); }
+            else alert("تداخل با فعالیت دیگر!");
+        }
+
+        // --- Touch & Multi Select ---
+        function toggleSelectMode() {
+            isSelect = !isSelect;
+            const btn = document.getElementById('selectModeBtn');
             const txt = document.getElementById('modeText');
-            if(isSelectMode) {
+            if(isSelect) {
                 document.body.classList.add('selection-mode');
                 btn.classList.add('active'); txt.innerText = "حالت انتخاب فعال";
             } else {
@@ -490,279 +625,263 @@
             }
         }
 
-        function setupTouch() {
-            const table = document.getElementById('plannerTable');
+        function setupTouchEvents() {
+            const tbl = document.getElementById('plannerTable');
             
-            const startHandler = (e) => {
-                if(!isSelectMode) return;
+            const start = (e) => {
+                if(!isSelect) return;
                 const cell = e.target.closest('td.empty-cell');
                 if(!cell) return;
-                e.preventDefault();
-                isDrag = true;
-                selStart = { d: cell.dataset.d, i: parseInt(cell.dataset.i) };
-                selCurr = { ...selStart };
-                highlight();
+                e.preventDefault(); isDrag=true;
+                selStart = { d:cell.dataset.d, i:parseInt(cell.dataset.i) };
+                selCurr = {...selStart}; highlight();
             };
-
-            const moveHandler = (e) => {
+            const move = (e) => {
                 if(!isDrag) return;
-                const el = document.elementFromPoint(e.clientX || e.touches[0].clientX, e.clientY || e.touches[0].clientY);
+                const el = document.elementFromPoint(e.clientX||e.touches[0].clientX, e.clientY||e.touches[0].clientY);
                 if(!el) return;
                 const cell = el.closest('td.empty-cell');
                 if(cell && cell.dataset.d === selStart.d) {
-                    selCurr = { d: selStart.d, i: parseInt(cell.dataset.i) };
-                    highlight();
+                    selCurr = { d:selStart.d, i:parseInt(cell.dataset.i) }; highlight();
                 }
             };
-
-            const endHandler = () => {
-                if(!isDrag) return;
-                isDrag = false;
+            const end = () => {
+                if(!isDrag) return; isDrag=false;
                 if(selStart && selCurr) {
                     const s = Math.min(selStart.i, selCurr.i);
                     const dur = Math.max(selStart.i, selCurr.i) - s + 1;
-                    openTaskModal(null, { d: selStart.d, s: TIMELINE[s], dur });
+                    openTaskModal(null, { d:selStart.d, s:TIMELINE[s], dur });
                 }
                 clearSel();
             };
 
-            table.addEventListener('mousedown', startHandler);
-            table.addEventListener('touchstart', startHandler, {passive: false});
-            window.addEventListener('mousemove', moveHandler);
-            window.addEventListener('touchmove', moveHandler, {passive: false});
-            window.addEventListener('mouseup', endHandler);
-            window.addEventListener('touchend', endHandler);
+            tbl.addEventListener('mousedown', start); tbl.addEventListener('touchstart', start, {passive:false});
+            window.addEventListener('mousemove', move); window.addEventListener('touchmove', move, {passive:false});
+            window.addEventListener('mouseup', end); window.addEventListener('touchend', end);
         }
 
         function highlight() {
-            document.querySelectorAll('.selected-range').forEach(e=>e.classList.remove('selected-range'));
+            document.querySelectorAll('.selected-cell').forEach(e=>e.classList.remove('selected-cell'));
             if(!selStart || !selCurr) return;
             const s = Math.min(selStart.i, selCurr.i), e = Math.max(selStart.i, selCurr.i);
             for(let i=s; i<=e; i++) {
                 const td = document.querySelector(`td.empty-cell[data-d="${selStart.d}"][data-i="${i}"]`);
-                if(td) td.classList.add('selected-range');
+                if(td) td.classList.add('selected-cell');
             }
         }
-        function clearSel() { 
-            selStart = null; selCurr = null; 
-            document.querySelectorAll('.selected-range').forEach(e=>e.classList.remove('selected-range'));
-        }
+        function clearSel() { selStart=null; selCurr=null; document.querySelectorAll('.selected-cell').forEach(e=>e.classList.remove('selected-cell')); }
 
-        // --- مدیریت تسک ---
-        function openTaskModal(task, newInf) {
-            const modal = document.getElementById('taskModal');
-            const btnDel = document.getElementById('btnDelete');
+        // --- تسک‌ها ---
+        function openTaskModal(task, fresh) {
+            openModal('taskModal');
+            const delBtn = document.getElementById('btnDeleteTask');
             
             if(task) {
                 document.getElementById('taskId').value = task.id;
                 document.getElementById('taskDay').value = task.day;
-                document.getElementById('taskStartStr').value = task.startStr;
+                document.getElementById('taskStart').value = task.startStr;
                 document.getElementById('inpName').value = task.name;
                 document.getElementById('inpDuration').value = task.duration;
-                document.getElementById('inpColor').value = task.color;
-                document.getElementById('timeInfo').innerText = `ویرایش: ${task.startStr}`;
-                btnDel.style.display = 'block';
+                document.getElementById('customColor').value = task.color;
+                document.getElementById('timeInfoDisplay').innerText = `ویرایش: ${task.startStr}`;
+                delBtn.style.display = 'block';
             } else {
                 document.getElementById('taskId').value = '';
-                document.getElementById('taskDay').value = newInf.d;
-                document.getElementById('taskStartStr').value = newInf.s;
+                document.getElementById('taskDay').value = fresh.d;
+                document.getElementById('taskStart').value = fresh.s;
                 document.getElementById('inpName').value = '';
-                document.getElementById('inpDuration').value = newInf.dur;
-                document.getElementById('inpColor').value = '#3b82f6';
-                document.getElementById('timeInfo').innerText = `جدید: ${newInf.s}`;
-                btnDel.style.display = 'none';
+                document.getElementById('inpDuration').value = fresh.dur;
+                document.getElementById('customColor').value = '#4f46e5';
+                document.getElementById('timeInfoDisplay').innerText = `جدید: ${fresh.s}`;
+                delBtn.style.display = 'none';
             }
-            modal.style.display = 'flex';
-            document.getElementById('inpName').focus();
         }
 
         function saveTask() {
             const id = document.getElementById('taskId').value;
             const day = document.getElementById('taskDay').value;
-            const startStr = document.getElementById('taskStartStr').value;
+            const start = document.getElementById('taskStart').value;
             const name = document.getElementById('inpName').value.trim();
-            const duration = parseInt(document.getElementById('inpDuration').value);
-            const color = document.getElementById('inpColor').value;
+            const dur = parseInt(document.getElementById('inpDuration').value);
+            const color = document.getElementById('customColor').value;
 
             if(!name) return alert("نام الزامی است");
-            const sIdx = TIMELINE.indexOf(startStr);
-            if(sIdx + duration > TIMELINE.length) return alert("خارج از بازه روز");
-
+            
+            // Conflict Check
+            const sIdx = TIMELINE.indexOf(start);
+            if(sIdx + dur > TIMELINE.length) return alert("زمان کافی نیست");
+            
             const conflict = appData.tasks.some(t => {
                 if(t.id == id || t.day !== day) return false;
                 const tS = TIMELINE.indexOf(t.startStr);
-                return (sIdx < tS+t.duration && sIdx+duration > tS);
+                return (sIdx < tS+t.duration && sIdx+dur > tS);
             });
-            if(conflict) return alert("تداخل زمانی!");
+            if(conflict) return alert("تداخل زمانی");
 
             if(id) {
-                const idx = appData.tasks.findIndex(t => t.id == id);
-                if(idx!==-1) appData.tasks[idx] = {...appData.tasks[idx], name, duration, color};
+                const idx = appData.tasks.findIndex(t=>t.id==id);
+                if(idx!==-1) appData.tasks[idx] = {...appData.tasks[idx], name, duration:dur, color};
             } else {
-                appData.tasks.push({id:Date.now(), day, startStr, duration, name, color});
+                appData.tasks.push({id:Date.now(), day, startStr:start, duration:dur, name, color});
             }
-            saveAndRender();
-            closeModal('taskModal');
+            saveData(); renderTable(); closeModal('taskModal');
         }
 
         function deleteTask() {
             const id = document.getElementById('taskId').value;
-            if(confirm("حذف شود؟")) {
-                appData.tasks = appData.tasks.filter(t=>t.id!=id);
-                saveAndRender();
-                closeModal('taskModal');
+            if(confirm("حذف شود؟")) { appData.tasks = appData.tasks.filter(t=>t.id!=id); saveData(); renderTable(); closeModal('taskModal'); }
+        }
+
+        // --- مدیریت افزودنی‌ها (الزامات/چک لیست) ---
+        function switchTab(t) {
+            document.getElementById('tab-req').style.display = t==='req'?'block':'none';
+            document.getElementById('tab-chk').style.display = t==='chk'?'block':'none';
+        }
+        function renderExtras() {
+            const rL = document.getElementById('reqListUi'); rL.innerHTML='';
+            appData.reqs.forEach((r,i) => {
+                rL.innerHTML += `<li class="extra-row"><span>${r.t}</span><div><span class="icon-action ${r.s?'visible-icon':''}" onclick="togEx('req',${i})">👁</span> <span class="icon-action delete-icon" onclick="delEx('req',${i})">✖</span></div></li>`;
+            });
+            const cL = document.getElementById('chkListUi'); cL.innerHTML='';
+            appData.chks.forEach((c,i) => {
+                cL.innerHTML += `<li class="extra-row"><span>${c.t}</span><div><input type="checkbox" ${c.c?'checked':''} onchange="togChk(${i})"> <span class="icon-action ${c.s?'visible-icon':''}" onclick="togEx('chk',${i})">👁</span> <span class="icon-action delete-icon" onclick="delEx('chk',${i})">✖</span></div></li>`;
+            });
+        }
+        function addItem(type) {
+            const inp = document.getElementById(type+'Input');
+            const v = inp.value.trim();
+            if(v) {
+                if(type==='req') appData.reqs.push({t:v, s:true});
+                else appData.chks.push({t:v, s:true, c:false});
+                inp.value=''; saveData(); renderExtras();
             }
         }
-
-        // --- مدیریت افزودنی‌ها (نکات و چک لیست) ---
-        function openExtrasModal() {
-            document.getElementById('extrasModal').style.display = 'flex';
-            renderExtrasList();
+        function togEx(type, i) { 
+            if(type==='req') appData.reqs[i].s = !appData.reqs[i].s; 
+            else appData.chks[i].s = !appData.chks[i].s;
+            saveData(); renderExtras();
         }
-        
-        function showTab(id) {
-            document.getElementById('tab-req').style.display = (id==='tab-req')?'block':'none';
-            document.getElementById('tab-chk').style.display = (id==='tab-chk')?'block':'none';
+        function delEx(type, i) {
+            if(type==='req') appData.reqs.splice(i,1);
+            else appData.chks.splice(i,1);
+            saveData(); renderExtras();
         }
+        function togChk(i) { appData.chks[i].c = !appData.chks[i].c; saveData(); }
 
-        function renderExtrasList() {
-            // رندر نکات
-            const reqList = document.getElementById('reqListUi');
-            reqList.innerHTML = '';
-            appData.requirements.forEach((item, index) => {
-                const li = document.createElement('li');
-                li.className = 'extra-item';
-                li.innerHTML = `
-                    <span>🔸 ${item.text}</span>
-                    <div class="extra-controls">
-                        <span class="toggle-eye ${item.show?'visible':''}" onclick="toggleExtra('req', ${index})">👁</span>
-                        <span style="cursor:pointer;color:red;font-size:16px;" onclick="deleteExtra('req', ${index})">✕</span>
-                    </div>
-                `;
-                reqList.appendChild(li);
+        // --- آمار (Chart) ---
+        function openStats() {
+            openModal('statsModal');
+            const area = document.getElementById('chartArea');
+            const legend = document.getElementById('chartLegend');
+            area.innerHTML = ''; legend.innerHTML = '';
+
+            // محاسبه زمان هر رنگ
+            const stats = {};
+            let total = 0;
+            appData.tasks.forEach(t => {
+                stats[t.color] = (stats[t.color] || 0) + t.duration;
+                total += t.duration;
             });
 
-            // رندر چک لیست
-            const chkList = document.getElementById('chkListUi');
-            chkList.innerHTML = '';
-            appData.checklists.forEach((item, index) => {
-                const li = document.createElement('li');
-                li.className = 'extra-item';
-                li.innerHTML = `
-                    <span>▫️ ${item.text}</span>
-                    <div class="extra-controls">
-                        <input type="checkbox" ${item.checked?'checked':''} onchange="toggleCheck(${index})">
-                        <span class="toggle-eye ${item.show?'visible':''}" onclick="toggleExtra('chk', ${index})">👁</span>
-                        <span style="cursor:pointer;color:red;font-size:16px;" onclick="deleteExtra('chk', ${index})">✕</span>
-                    </div>
-                `;
-                chkList.appendChild(li);
-            });
-        }
+            if(total === 0) { area.innerHTML = 'داده‌ای وجود ندارد'; return; }
 
-        function addRequirement() {
-            const txt = document.getElementById('reqInput').value.trim();
-            if(txt) { appData.requirements.push({text: txt, show: true}); document.getElementById('reqInput').value=''; saveAndRender(); renderExtrasList(); }
-        }
-        function addChecklist() {
-            const txt = document.getElementById('chkInput').value.trim();
-            if(txt) { appData.checklists.push({text: txt, show: true, checked: false}); document.getElementById('chkInput').value=''; saveAndRender(); renderExtrasList(); }
-        }
-        function toggleExtra(type, index) {
-            if(type==='req') appData.requirements[index].show = !appData.requirements[index].show;
-            else appData.checklists[index].show = !appData.checklists[index].show;
-            saveAndRender(); renderExtrasList();
-        }
-        function deleteExtra(type, index) {
-            if(type==='req') appData.requirements.splice(index, 1);
-            else appData.checklists.splice(index, 1);
-            saveAndRender(); renderExtrasList();
-        }
-        function toggleCheck(index) {
-            appData.checklists[index].checked = !appData.checklists[index].checked;
-            saveAndRender();
+            // ساخت Pie Chart با Conic Gradient
+            let gradientStr = [];
+            let currentDeg = 0;
+            Object.keys(stats).forEach(color => {
+                const deg = (stats[color] / total) * 360;
+                gradientStr.push(`${color} ${currentDeg}deg ${currentDeg + deg}deg`);
+                currentDeg += deg;
+                
+                // افزودن به راهنما
+                const hours = (stats[color] * 15) / 60;
+                legend.innerHTML += `<div class="legend-item"><div style="width:10px;height:10px;border-radius:50%;background:${color}"></div> ${hours} ساعت</div>`;
+            });
+
+            const chart = document.createElement('div');
+            chart.style.width = '150px'; chart.style.height = '150px';
+            chart.style.borderRadius = '50%';
+            chart.style.background = `conic-gradient(${gradientStr.join(', ')})`;
+            area.appendChild(chart);
         }
 
         // --- یادداشت ---
-        function openNotepad() {
-            document.getElementById('noteModal').style.display = 'flex';
-            document.getElementById('noteArea').value = appData.notes.text || "";
-            document.getElementById('showNoteInPrint').checked = appData.notes.showInPrint || false;
-        }
         function saveNote() {
-            appData.notes.text = document.getElementById('noteArea').value;
-            appData.notes.showInPrint = document.getElementById('showNoteInPrint').checked;
-            saveAndRender();
-            closeModal('noteModal');
+            appData.note.text = document.getElementById('noteText').value;
+            appData.note.print = document.getElementById('notePrintCheck').checked;
+            saveData(); closeModal('noteModal');
         }
 
-        // --- عمومی و پرینت ---
-        function updateHeader(val) { appData.headerTitle = val; document.getElementById('print-title-text').innerText = val; saveData(); }
-        function setColor(c) { document.getElementById('inpColor').value = c; }
+        // --- عمومی ---
+        function openModal(id) { 
+            document.getElementById(id).style.display = 'flex';
+            if(id==='noteModal') {
+                document.getElementById('noteText').value = appData.note.text;
+                document.getElementById('notePrintCheck').checked = appData.note.print;
+            }
+        }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function saveAndRender() { localStorage.setItem('proPlannerBiz', JSON.stringify(appData)); renderTable(); }
-        function clearAll() { if(confirm("حذف کامل؟")) { localStorage.removeItem('proPlannerBiz'); location.reload(); } }
-
-        function copyDay(srcId) {
-            const target = prompt("نام روز مقصد (مثلاً: دوشنبه):");
-            const tDay = DAYS.find(d=>d.l===target?.trim());
-            if(!tDay) return;
-            if(confirm(`کپی ${DAYS.find(d=>d.id===srcId).l} به ${tDay.l}؟`)) {
-                appData.tasks = appData.tasks.filter(t=>t.day!==tDay.id);
-                appData.tasks.filter(t=>t.day===srcId).forEach(t => {
-                    appData.tasks.push({...t, id:Date.now()+Math.random(), day:tDay.id});
-                });
-                saveAndRender();
+        function saveData() { localStorage.setItem('ultraProPlanner', JSON.stringify(appData)); }
+        function updateHeader(v) { appData.header = v; saveData(); }
+        
+        function copyDay(src) {
+            const destName = prompt("کپی به کدام روز؟ (مثلاً: دوشنبه)");
+            const target = DAYS.find(d=>d.l === destName?.trim());
+            if(target) {
+                if(confirm(`آیا مطمئنید؟ برنامه ${target.l} جایگزین می‌شود.`)) {
+                    appData.tasks = appData.tasks.filter(t=>t.day !== target.id);
+                    appData.tasks.filter(t=>t.day === src).forEach(t => {
+                        appData.tasks.push({...t, id:Date.now()+Math.random(), day:target.id});
+                    });
+                    saveData(); renderTable();
+                }
             }
         }
 
-        // آماده سازی پرینت
-        function printApp() {
-            // 1. پر کردن لیست نکات در پرینت
-            const pReq = document.getElementById('print-req-list');
-            pReq.innerHTML = '';
-            appData.requirements.filter(i=>i.show).forEach(i => {
-                pReq.innerHTML += `<li>🔸 ${i.text}</li>`;
-            });
-
-            // 2. پر کردن چک لیست در پرینت
-            const pChk = document.getElementById('print-check-list');
-            pChk.innerHTML = '';
-            appData.checklists.filter(i=>i.show).forEach(i => {
-                const mark = i.checked ? '☑' : '⬜';
-                pChk.innerHTML += `<li>${mark} ${i.text}</li>`;
-            });
-
-            // 3. نمایش یادداشت
-            const noteDiv = document.getElementById('print-footer-note');
-            const noteContent = document.getElementById('print-note-content');
-            if(appData.notes.showInPrint && appData.notes.text) {
-                noteDiv.style.display = 'block';
-                noteContent.innerText = appData.notes.text;
-            } else {
-                noteDiv.style.display = 'none';
-            }
-
-            // هشدار
-            alert("نکته: برای چاپ صحیح، در تنظیمات پرینت گزینه Layout را روی 'Landscape' (افقی) قرار دهید.");
-            window.print();
-        }
-
+        function clearAll() { if(confirm("پاکسازی کل برنامه؟")) { localStorage.removeItem('ultraProPlanner'); location.reload(); } }
+        
         function exportData() {
-            const blob = new Blob([JSON.stringify(appData)], {type:"application/json"});
-            const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="plan_backup.json"; a.click();
+            const b = new Blob([JSON.stringify(appData)], {type:'application/json'});
+            const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download="plan.json"; a.click();
         }
         function importData(inp) {
-            const f=inp.files[0]; if(!f)return;
+            const f=inp.files[0]; if(!f) return;
             const r=new FileReader(); r.onload=e=>{
                 try {
                     const d=JSON.parse(e.target.result);
                     if(d.tasks || Array.isArray(d)) {
                          if(Array.isArray(d)) appData.tasks = d; else appData = d;
-                         saveAndRender(); location.reload();
+                         saveData(); location.reload();
                     }
                 }catch(x){alert("فایل نامعتبر");}
             }; r.readAsText(f);
+        }
+
+        function printApp() {
+            // آماده‌سازی DOM پرینت
+            document.getElementById('printTitleDisplay').innerText = appData.header || "برنامه هفتگی";
+            document.getElementById('printDateDisplay').innerText = new Date().toLocaleDateString('fa-IR');
+            
+            const rL = document.getElementById('printReqList'); rL.innerHTML='';
+            appData.reqs.filter(x=>x.s).forEach(x => rL.innerHTML+=`<li>🔸 ${x.t}</li>`);
+            
+            const cL = document.getElementById('printChkList'); cL.innerHTML='';
+            appData.chks.filter(x=>x.s).forEach(x => cL.innerHTML+=`<li>${x.c?'☑':'⬜'} ${x.t}</li>`);
+
+            // کلون جدول
+            const tblCont = document.getElementById('printTableContainer');
+            tblCont.innerHTML = '';
+            tblCont.appendChild(document.getElementById('plannerTable').cloneNode(true));
+
+            // یادداشت
+            const ftr = document.getElementById('printFooter');
+            if(appData.note.print && appData.note.text) {
+                ftr.style.display = 'block';
+                document.getElementById('printNoteText').innerText = appData.note.text;
+            } else { ftr.style.display = 'none'; }
+
+            alert("لطفاً جهت چاپ صحیح، کاغذ را در حالت افقی (Landscape) قرار دهید.");
+            window.print();
         }
 
         init();
