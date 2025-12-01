@@ -1,458 +1,689 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سیستم محاسبه نفس | نسخه پیشرفته</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>سامانه پایش اخلاق | نسخه حرفه‌ای</title>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         :root {
-            --bg-color: #f0f2f5;
-            --card-bg: #ffffff;
-            --primary: #2c3e50;
-            --accent: #3498db;
-            --success: #27ae60;
-            --danger: #c0392b;
-            --text-main: #2c3e50;
-            --text-muted: #95a5a6;
+            --bg-body: #f3f4f6;
+            --surface: #ffffff;
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-main: #1f2937;
+            --text-light: #6b7280;
             --border-radius: 16px;
-            --shadow: 0 8px 30px rgba(0,0,0,0.05);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
-        * { box-sizing: border-box; font-family: 'Vazirmatn', sans-serif; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        body { background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; padding-bottom: 80px; }
-        
-        .container { max-width: 700px; margin: 0 auto; }
-
-        /* Header & Score */
-        header {
-            background: var(--primary);
-            color: white;
-            padding: 30px 20px;
-            border-radius: var(--border-radius);
-            text-align: center;
-            box-shadow: var(--shadow);
-            margin-bottom: 30px;
-            position: relative;
-            overflow: hidden;
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Vazirmatn', sans-serif;
+            margin: 0;
+            padding: 0;
+            padding-bottom: 80px; /* Space for bottom nav */
+            overflow-x: hidden;
         }
 
-        .date-badge {
-            background: rgba(255,255,255,0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            display: inline-block;
-            margin-bottom: 10px;
+        /* --- Layout --- */
+        .app-container {
+            max-width: 600px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--bg-body);
         }
 
-        .total-score { font-size: 4rem; font-weight: 900; line-height: 1; margin: 10px 0; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .score-label { font-size: 1rem; opacity: 0.9; }
-
-        /* Menu Button */
-        .settings-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        /* Cards */
-        .card {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
+        /* --- Header Section --- */
+        .header {
+            background: var(--surface);
             padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: var(--shadow);
-            display: flex;
-            flex-direction: column;
-            border-right: 5px solid transparent;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 50;
         }
 
-        .card.virtue { border-right-color: var(--success); }
-        .card.vice { border-right-color: var(--danger); }
-
-        .card-top {
+        .date-navigator {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
-        }
-
-        .item-info h3 { margin: 0; font-size: 1.1rem; }
-        .item-info p { margin: 5px 0 0; font-size: 0.8rem; color: var(--text-muted); }
-
-        /* Counter Controls */
-        .counter-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #f8f9fa;
-            padding: 5px;
+            background: #f8fafc;
+            padding: 8px;
             border-radius: 12px;
         }
 
-        .btn-count {
-            width: 35px;
-            height: 35px;
+        .date-btn {
+            background: none;
             border: none;
-            border-radius: 10px;
+            color: var(--primary);
             font-size: 1.2rem;
-            font-weight: bold;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.1s;
-        }
-        
-        .btn-count:active { transform: scale(0.9); }
-        .btn-minus { background: #e0e0e0; color: #555; }
-        .btn-plus-v { background: var(--success); color: white; }
-        .btn-plus-x { background: var(--danger); color: white; }
-
-        .count-display {
-            font-size: 1.3rem;
-            font-weight: bold;
-            min-width: 30px;
-            text-align: center;
+            padding: 5px 10px;
         }
 
-        .note-input {
-            width: 100%;
-            border: 1px solid #eee;
-            background: #fafafa;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.9rem;
+        .current-date {
+            font-weight: 700;
+            color: var(--text-main);
+            font-size: 0.95rem;
         }
 
-        /* Result Box */
-        .result-box {
-            background: var(--card-bg);
+        .score-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
             padding: 20px;
-            border-radius: var(--border-radius);
-            margin-top: 30px;
-            text-align: center;
-            border: 2px dashed #ddd;
-            display: none;
+            border-radius: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
         }
-        
-        .result-title { font-weight: bold; margin-bottom: 10px; display: block; }
 
-        /* Settings Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
+        .score-info h2 { margin: 0; font-size: 0.9rem; opacity: 0.9; font-weight: normal; }
+        .score-value { font-size: 2.8rem; font-weight: 800; line-height: 1.1; }
+        .score-status { font-size: 0.8rem; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; }
+        
+        .score-chart-mini {
+            width: 60px; height: 60px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 1.5rem;
         }
 
-        .modal-content {
-            background: white;
-            width: 90%;
-            max-width: 500px;
-            max-height: 80vh;
-            overflow-y: auto;
-            border-radius: var(--border-radius);
-            padding: 25px;
-        }
+        /* --- Content Tabs --- */
+        .tab-content { display: none; padding: 20px; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
 
-        .modal-header {
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Lists --- */
+        .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
+            margin: 25px 0 15px 0;
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .list-editor { margin-bottom: 20px; }
-        .list-item-row {
+        .section-title.virtue { color: var(--success); }
+        .section-title.vice { color: var(--danger); }
+
+        .behavior-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .behavior-card:active { transform: scale(0.98); }
+
+        .behavior-header {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .behavior-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-left: 12px;
+        }
+
+        .bg-virtue { background: #ecfdf5; color: var(--success); }
+        .bg-vice { background: #fef2f2; color: var(--danger); }
+
+        .behavior-details { flex: 1; }
+        .behavior-name { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+        .behavior-desc { font-size: 0.75rem; color: var(--text-light); }
+
+        /* Stepper */
+        .stepper {
+            display: flex;
+            align-items: center;
+            background: #f3f4f6;
+            border-radius: 12px;
+            padding: 4px;
+        }
+
+        .step-btn {
+            width: 32px; height: 32px;
+            border: none;
+            background: white;
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: background 0.2s;
+        }
+
+        .step-btn.add-v { color: var(--success); }
+        .step-btn.add-x { color: var(--danger); }
+        .step-val { width: 30px; text-align: center; font-weight: bold; font-size: 1rem; }
+
+        .note-area {
+            width: 100%;
+            border: none;
+            border-top: 1px solid #f0f0f0;
+            padding: 10px 0 0 0;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            outline: none;
+            background: transparent;
+            color: var(--text-main);
+        }
+
+        /* --- Analytics --- */
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 20px;
+            height: 250px;
+        }
+
+        /* --- Bottom Nav --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--surface);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+            z-index: 100;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-light);
+            font-size: 0.75rem;
+            gap: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .nav-item i { font-size: 1.4rem; transition: color 0.3s; }
+        .nav-item.active { color: var(--primary); font-weight: bold; }
+        .nav-item.active i { transform: translateY(-2px); }
+
+        /* --- Settings / Modal --- */
+        .settings-group {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .settings-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
             border-bottom: 1px solid #f0f0f0;
         }
-        
-        .input-group { display: flex; gap: 10px; margin-top: 10px; }
-        .input-group input { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 6px; }
-        .btn-add { background: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; }
-        .btn-del { background: transparent; color: var(--danger); border: none; cursor: pointer; font-size: 1.2rem; }
-        
-        .btn-close { background: var(--primary); color: white; width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; margin-top: 10px; }
+        .settings-row:last-child { border-bottom: none; }
 
-        /* Floating Reset Button */
-        .fab-reset {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: var(--text-muted);
+        .btn-primary {
+            background: var(--primary);
             color: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
             border: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            font-size: 1.5rem;
+            padding: 12px 20px;
+            border-radius: 12px;
+            width: 100%;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-top: 10px;
             cursor: pointer;
+        }
+
+        .fab {
+            position: fixed;
+            bottom: 90px;
+            left: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: var(--shadow-lg);
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
             z-index: 90;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <button class="settings-btn" onclick="openSettings()">⚙️ تنظیمات پاداش/جریمه</button>
-        <div class="date-badge" id="dateDisplay"></div>
-        <div class="score-label">تراز اخلاقی امروز</div>
-        <div class="total-score" id="totalScore">0</div>
-        <div id="scoreMessage">روزت را بساز...</div>
-    </header>
+<div class="app-container">
+    
+    <!-- Tab 1: Tracker (Home) -->
+    <div id="tab-home" class="tab-content active">
+        <header class="header">
+            <div class="date-navigator">
+                <button class="date-btn" onclick="changeDate(-1)"><i class="fas fa-chevron-right"></i></button>
+                <div class="current-date" id="dateDisplay"></div>
+                <button class="date-btn" onclick="changeDate(1)"><i class="fas fa-chevron-left"></i></button>
+            </div>
 
-    <!-- Result Box -->
-    <div id="resultBox" class="result-box">
-        <span class="result-title">نتیجه عملکرد امروز:</span>
-        <div id="resultText"></div>
+            <div class="score-card">
+                <div class="score-info">
+                    <h2>تراز اخلاقی</h2>
+                    <div class="score-value" id="dailyScore">0</div>
+                    <div class="score-status" id="scoreStatus">خنثی</div>
+                </div>
+                <div class="score-chart-mini">
+                    <i class="fas fa-balance-scale"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Virtues -->
+        <div class="section-header">
+            <span class="section-title virtue"><i class="fas fa-dove"></i> فضایل (خوبی‌ها)</span>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">تقویت روح</span>
+        </div>
+        <div id="virtuesContainer"></div>
+
+        <!-- Vices -->
+        <div class="section-header">
+            <span class="section-title vice"><i class="fas fa-skull-crossbones"></i> رذایل (بدی‌ها)</span>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">آفات نفس</span>
+        </div>
+        <div id="vicesContainer"></div>
+        
+        <div style="height: 20px;"></div>
     </div>
 
-    <!-- Virtues List -->
-    <h3 style="color: var(--success); margin-right: 10px;">فضایل (تقویت‌کننده‌ها)</h3>
-    <div id="virtuesList"></div>
-
-    <!-- Vices List -->
-    <h3 style="color: var(--danger); margin-right: 10px;">رذایل (آسیب‌زننده‌ها)</h3>
-    <div id="vicesList"></div>
-</div>
-
-<button class="fab-reset" onclick="resetDay()" title="شروع روز جدید">↺</button>
-
-<!-- Settings Modal -->
-<div id="settingsModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>مدیریت پاداش و جریمه</h2>
-            <span style="cursor:pointer; font-size:1.5rem;" onclick="closeSettings()">×</span>
+    <!-- Tab 2: Analytics -->
+    <div id="tab-stats" class="tab-content">
+        <h2 style="margin-bottom: 20px;">تحلیل روند</h2>
+        <div class="chart-container">
+            <canvas id="progressChart"></canvas>
         </div>
-
-        <div class="list-editor">
-            <h4>🎁 لیست پاداش‌ها (برای امتیاز مثبت)</h4>
-            <div id="rewardsContainer"></div>
-            <div class="input-group">
-                <input type="text" id="newRewardInput" placeholder="پاداش جدید...">
-                <button class="btn-add" onclick="addSettingItem('reward')">+</button>
+        
+        <div class="settings-group">
+            <h3>خلاصه عملکرد</h3>
+            <div class="settings-row">
+                <span>مجموع امتیاز کل</span>
+                <strong id="totalLifetimeScore">0</strong>
+            </div>
+            <div class="settings-row">
+                <span>بهترین روز</span>
+                <strong style="color: var(--success)" id="bestDayScore">-</strong>
             </div>
         </div>
-
-        <div class="list-editor">
-            <h4>⚠️ لیست جریمه‌ها (برای امتیاز منفی)</h4>
-            <div id="penaltiesContainer"></div>
-            <div class="input-group">
-                <input type="text" id="newPenaltyInput" placeholder="جریمه جدید...">
-                <button class="btn-add" onclick="addSettingItem('penalty')">+</button>
-            </div>
-        </div>
-
-        <button class="btn-close" onclick="closeSettings()">ذخیره و بستن</button>
     </div>
+
+    <!-- Tab 3: Manage (Settings) -->
+    <div id="tab-settings" class="tab-content">
+        <h2 style="margin-bottom: 20px;">مدیریت سیستم</h2>
+        
+        <div class="settings-group">
+            <h3>مدیریت رفتارها</h3>
+            <p style="font-size:0.85rem; color:var(--text-light);">در اینجا رفتارهای جدید تعریف کن یا قبلی‌ها را حذف کن.</p>
+            <button class="btn-primary" onclick="promptAddBehavior()">+ افزودن رفتار جدید</button>
+            <button class="btn-primary" style="background:white; color:var(--danger); border:1px solid var(--danger); margin-top:10px;" onclick="resetBehaviors()">بازنشانی به پیش‌فرض</button>
+        </div>
+
+        <div class="settings-group">
+            <h3>پشتیبان‌گیری</h3>
+            <button class="btn-primary" style="background: var(--secondary);" onclick="exportData()">📥 خروجی گرفتن (Backup)</button>
+            <input type="file" id="importFile" style="display:none" onchange="importData(this)">
+            <button class="btn-primary" style="background: white; color: var(--text-main); border:1px solid #ddd; margin-top:10px;" onclick="document.getElementById('importFile').click()">📤 بازگردانی اطلاعات</button>
+        </div>
+    </div>
+
 </div>
+
+<!-- Bottom Navigation -->
+<nav class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('home')">
+        <i class="fas fa-clipboard-check"></i>
+        <span>امروز</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('stats')">
+        <i class="fas fa-chart-line"></i>
+        <span>روند</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('settings')">
+        <i class="fas fa-sliders-h"></i>
+        <span>تنظیمات</span>
+    </button>
+</nav>
 
 <script>
-    // --- Initial Data Config ---
-    const defaultData = {
-        virtues: [
-            { id: 'v1', title: 'خردورزی', desc: 'تصمیم بر اساس عقل و دلیل' },
-            { id: 'v2', title: 'انضباط شخصی', desc: 'پایبندی به برنامه (ورزش/درس)' },
-            { id: 'v3', title: 'صداقت', desc: 'راستگویی و شفافیت' },
-            { id: 'v4', title: 'همدلی و کمک', desc: 'درک دیگران و مهربانی' },
-            { id: 'v5', title: 'سکوت و کنترل', desc: 'کنترل خشم و زبان' }
-        ],
-        vices: [
-            { id: 'x1', title: 'دروغ و فریب', desc: 'تحریف واقعیت' },
-            { id: 'x2', title: 'تنبلی', desc: 'وقت‌کشی و اهمال' },
-            { id: 'x3', title: 'آسیب زدن', desc: 'آزار کلامی یا رفتاری' },
-            { id: 'x4', title: 'قضاوت و غیبت', desc: 'بدگویی پشت سر دیگران' },
-            { id: 'x5', title: 'توجیه', desc: 'بهانه‌تراشی برای اشتباه' }
-        ]
+    // --- Default Data Configuration ---
+    const defaultBehaviors = [
+        // Virtues
+        { id: 'v1', title: 'کمک به والدین', desc: 'احترام و خدمت', type: 'virtue', weight: 2 },
+        { id: 'v2', title: 'کمک به همنوع', desc: 'گره گشایی از کار دیگران', type: 'virtue', weight: 2 },
+        { id: 'v3', title: 'مطالعه/یادگیری', desc: 'رشد شخصی', type: 'virtue', weight: 1 },
+        { id: 'v4', title: 'ورزش/باشگاه', desc: 'سلامت جسم', type: 'virtue', weight: 2 },
+        { id: 'v5', title: 'صداقت', desc: 'راستگویی حتی به ضرر', type: 'virtue', weight: 3 },
+        { id: 'v6', title: 'سکوت و کنترل خشم', desc: 'مدیریت هیجان', type: 'virtue', weight: 2 },
+        
+        // Vices
+        { id: 'x1', title: 'دروغ', desc: 'تحریف واقعیت', type: 'vice', weight: 3 },
+        { id: 'x2', title: 'غیبت', desc: 'بدگویی پشت سر', type: 'vice', weight: 2 },
+        { id: 'x3', title: 'توهین/فحاشی', desc: 'خشونت کلامی', type: 'vice', weight: 2 },
+        { id: 'x4', title: 'سخن‌چینی', desc: 'برهم زدن رابطه دو نفر', type: 'vice', weight: 3 },
+        { id: 'x5', title: 'نگاه آلوده/پورن', desc: 'آسیب به روان', type: 'vice', weight: 3 },
+        { id: 'x6', title: 'اتلاف وقت', desc: 'تنبلی و اهمال', type: 'vice', weight: 1 }
+    ];
+
+    // --- State ---
+    let currentDate = new Date();
+    let db = JSON.parse(localStorage.getItem('amirProDB')) || {
+        behaviors: defaultBehaviors,
+        logs: {} // Structure: { "2023-12-01": { "v1": {count: 1, note: "..."} } }
     };
 
-    const defaultSettings = {
-        rewards: ['خرید یک کتاب', 'دیدن یک فیلم خوب', 'خوردن غذای مورد علاقه', 'یک ساعت استراحت مطلق'],
-        penalties: ['۲۰ تا شنا سوئدی اضافه', '۱۰ هزار تومان صدقه', 'حذف شام امشب', 'محرومیت از اینترنت']
-    };
-
-    // --- State Management ---
-    let appState = JSON.parse(localStorage.getItem('amirAppState')) || {};
-    let userSettings = JSON.parse(localStorage.getItem('amirAppSettings')) || defaultSettings;
-
-    // --- Date Setup ---
-    document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString('fa-IR', { weekday: 'long', day: 'numeric', month: 'long' });
+    let myChart = null;
 
     // --- Core Functions ---
 
-    function renderApp() {
-        renderList('virtue', defaultData.virtues);
-        renderList('vice', defaultData.vices);
-        updateScoreBoard();
+    function getFormattedDate(date) {
+        return date.toLocaleDateString('en-CA'); // YYYY-MM-DD
     }
 
-    function renderList(type, items) {
-        const container = document.getElementById(type === 'virtue' ? 'virtuesList' : 'vicesList');
-        container.innerHTML = items.map(item => {
-            const count = appState[item.id]?.count || 0;
-            const note = appState[item.id]?.note || '';
+    function getPersianDate(date) {
+        return date.toLocaleDateString('fa-IR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    }
+
+    function saveData() {
+        localStorage.setItem('amirProDB', JSON.stringify(db));
+        updateUI();
+    }
+
+    function changeDate(offset) {
+        currentDate.setDate(currentDate.getDate() + offset);
+        updateUI();
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById('tab-' + tabId).classList.add('active');
+        
+        // Find index based on tab name to highlight nav
+        const navIndex = ['home', 'stats', 'settings'].indexOf(tabId);
+        document.querySelectorAll('.nav-item')[navIndex].classList.add('active');
+
+        if (tabId === 'stats') renderChart();
+    }
+
+    function updateUI() {
+        const dateKey = getFormattedDate(currentDate);
+        document.getElementById('dateDisplay').innerText = getPersianDate(currentDate);
+        
+        // Ensure log entry exists for date
+        if (!db.logs[dateKey]) db.logs[dateKey] = {};
+
+        // Render Lists
+        const vContainer = document.getElementById('virtuesContainer');
+        const xContainer = document.getElementById('vicesContainer');
+        vContainer.innerHTML = '';
+        xContainer.innerHTML = '';
+
+        let dailyScore = 0;
+
+        db.behaviors.forEach(b => {
+            const log = db.logs[dateKey][b.id] || { count: 0, note: '' };
             
-            return `
-            <div class="card ${type}">
-                <div class="card-top">
-                    <div class="item-info">
-                        <h3>${item.title}</h3>
-                        <p>${item.desc}</p>
+            // Calculate Score
+            if (b.type === 'virtue') dailyScore += (log.count * b.weight);
+            else dailyScore -= (log.count * b.weight);
+
+            const cardHtml = `
+                <div class="behavior-card">
+                    <div class="behavior-header">
+                        <div style="display:flex; align-items:center;">
+                            <div class="behavior-icon ${b.type === 'virtue' ? 'bg-virtue' : 'bg-vice'}">
+                                <i class="fas ${b.type === 'virtue' ? 'fa-check' : 'fa-times'}"></i>
+                            </div>
+                            <div class="behavior-details" style="margin-right:10px;">
+                                <div class="behavior-name">${b.title} <span style="font-size:0.7rem; opacity:0.6;">(ضریب ${b.weight})</span></div>
+                                <div class="behavior-desc">${b.desc}</div>
+                            </div>
+                        </div>
+                        <div class="stepper">
+                            <button class="step-btn" onclick="updateCount('${b.id}', -1)">-</button>
+                            <div class="step-val">${log.count}</div>
+                            <button class="step-btn ${b.type === 'virtue' ? 'add-v' : 'add-x'}" onclick="updateCount('${b.id}', 1)">+</button>
+                        </div>
                     </div>
-                    <div class="counter-controls">
-                        <button class="btn-count btn-minus" onclick="updateCount('${item.id}', -1)">-</button>
-                        <span class="count-display">${count}</span>
-                        <button class="btn-count ${type === 'virtue' ? 'btn-plus-v' : 'btn-plus-x'}" onclick="updateCount('${item.id}', 1)">+</button>
-                    </div>
+                    <input type="text" class="note-area" placeholder="یادداشت مصداق..." value="${log.note}" onchange="updateNote('${b.id}', this.value)">
                 </div>
-                <input type="text" class="note-input" placeholder="توضیح یا مصداق..." value="${note}" oninput="saveNote('${item.id}', this.value)">
-            </div>
             `;
-        }).join('');
+
+            if (b.type === 'virtue') vContainer.innerHTML += cardHtml;
+            else xContainer.innerHTML += cardHtml;
+        });
+
+        // Update Header
+        const scoreEl = document.getElementById('dailyScore');
+        scoreEl.innerText = dailyScore > 0 ? `+${dailyScore}` : dailyScore;
+        scoreEl.style.color = dailyScore >= 0 ? 'white' : '#ffadad';
+        
+        let statusText = "خنثی";
+        if (dailyScore > 5) statusText = "عالی - در مسیر رشد";
+        else if (dailyScore > 0) statusText = "خوب - ادامه بده";
+        else if (dailyScore < 0) statusText = "هشدار - نیاز به جبران";
+        else if (dailyScore < -5) statusText = "بحرانی - توقف کن";
+        document.getElementById('scoreStatus').innerText = statusText;
     }
 
     function updateCount(id, change) {
-        if (!appState[id]) appState[id] = { count: 0, note: '' };
+        const dateKey = getFormattedDate(currentDate);
+        if (!db.logs[dateKey][id]) db.logs[dateKey][id] = { count: 0, note: '' };
         
-        let newCount = appState[id].count + change;
-        if (newCount < 0) newCount = 0; // No negative counts
+        let newCount = db.logs[dateKey][id].count + change;
+        if (newCount < 0) newCount = 0;
         
-        appState[id].count = newCount;
-        saveState();
-        renderApp(); // Re-render to update numbers and score
+        db.logs[dateKey][id].count = newCount;
+        saveData();
     }
 
-    function saveNote(id, text) {
-        if (!appState[id]) appState[id] = { count: 0, note: '' };
-        appState[id].note = text;
-        saveState();
-    }
-
-    function calculateTotalScore() {
-        let score = 0;
-        defaultData.virtues.forEach(v => score += (appState[v.id]?.count || 0));
-        defaultData.vices.forEach(v => score -= (appState[v.id]?.count || 0));
-        return score;
-    }
-
-    function updateScoreBoard() {
-        const score = calculateTotalScore();
-        const scoreEl = document.getElementById('totalScore');
-        const msgEl = document.getElementById('scoreMessage');
-        const resBox = document.getElementById('resultBox');
-        const resText = document.getElementById('resultText');
-
-        scoreEl.innerText = score > 0 ? `+${score}` : score;
+    function updateNote(id, text) {
+        const dateKey = getFormattedDate(currentDate);
+        if (!db.logs[dateKey][id]) db.logs[dateKey][id] = { count: 0, note: '' };
         
-        if (score > 0) {
-            scoreEl.style.color = '#2ecc71';
-            msgEl.innerText = "مسیر درست همین است.";
-            resBox.style.display = 'block';
-            resBox.style.borderColor = '#2ecc71';
-            resText.innerHTML = `<span style="color:#27ae60">پیشنهاد پاداش:</span> ${getRandomItem(userSettings.rewards)}`;
-        } else if (score < 0) {
-            scoreEl.style.color = '#e74c3c';
-            msgEl.innerText = "نیاز به اصلاح مسیر.";
-            resBox.style.display = 'block';
-            resBox.style.borderColor = '#e74c3c';
-            resText.innerHTML = `<span style="color:#c0392b">پیشنهاد جریمه:</span> ${getRandomItem(userSettings.penalties)}`;
-        } else {
-            scoreEl.style.color = 'white';
-            msgEl.innerText = "خنثی. حرکت کن.";
-            resBox.style.display = 'none';
+        db.logs[dateKey][id].note = text;
+        saveData();
+    }
+
+    // --- Settings Functions ---
+
+    function promptAddBehavior() {
+        const title = prompt("عنوان رفتار جدید:");
+        if (!title) return;
+        
+        const type = confirm("آیا این رفتار مثبت (فضیلت) است؟\nتایید = بله (مثبت)\nلغو = خیر (رذیلت)") ? 'virtue' : 'vice';
+        const weight = prompt("ضریب اهمیت (۱ تا ۵):", "1");
+        const desc = prompt("توضیح کوتاه:");
+
+        const newB = {
+            id: Date.now().toString(),
+            title: title,
+            desc: desc || '',
+            type: type,
+            weight: parseInt(weight) || 1
+        };
+
+        db.behaviors.push(newB);
+        saveData();
+        alert("رفتار جدید اضافه شد.");
+    }
+
+    function resetBehaviors() {
+        if(confirm("آیا لیست رفتارها به حالت اولیه برگردد؟ اطلاعات آماری پاک نمی‌شوند.")) {
+            db.behaviors = defaultBehaviors;
+            saveData();
         }
     }
 
-    function getRandomItem(array) {
-        if (!array || array.length === 0) return "لیست خالی است!";
-        return array[Math.floor(Math.random() * array.length)];
+    function exportData() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "Amir_Ethics_Backup_" + getFormattedDate(new Date()) + ".json");
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
     }
 
-    function saveState() {
-        localStorage.setItem('amirAppState', JSON.stringify(appState));
+    function importData(input) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const importedDb = JSON.parse(e.target.result);
+                if(importedDb.behaviors && importedDb.logs) {
+                    db = importedDb;
+                    saveData();
+                    alert("اطلاعات با موفقیت بازیابی شد.");
+                } else {
+                    alert("فایل نامعتبر است.");
+                }
+            } catch(err) {
+                alert("خطا در خواندن فایل.");
+            }
+        };
+        reader.readAsText(file);
     }
 
-    function resetDay() {
-        if(confirm("روز جدید شروع شود؟ تمام شمارنده‌ها صفر می‌شوند.")) {
-            appState = {};
-            saveState();
-            renderApp();
-        }
-    }
-
-    // --- Settings Logic ---
-
-    function openSettings() {
-        renderSettingsList('reward');
-        renderSettingsList('penalty');
-        document.getElementById('settingsModal').style.display = 'flex';
-    }
-
-    function closeSettings() {
-        document.getElementById('settingsModal').style.display = 'none';
-        updateScoreBoard(); // Update result suggestion if list changed
-    }
-
-    function renderSettingsList(type) {
-        const list = type === 'reward' ? userSettings.rewards : userSettings.penalties;
-        const container = document.getElementById(type === 'reward' ? 'rewardsContainer' : 'penaltiesContainer');
+    // --- Chart Logic ---
+    function renderChart() {
+        const ctx = document.getElementById('progressChart').getContext('2d');
         
-        container.innerHTML = list.map((item, index) => `
-            <div class="list-item-row">
-                <span>${item}</span>
-                <button class="btn-del" onclick="removeItem('${type}', ${index})">×</button>
-            </div>
-        `).join('');
-    }
+        // Get last 7 days data
+        const labels = [];
+        const dataPoints = [];
+        let totalScore = 0;
+        let maxScore = -9999;
 
-    function addSettingItem(type) {
-        const input = document.getElementById(type === 'reward' ? 'newRewardInput' : 'newPenaltyInput');
-        const val = input.value.trim();
-        if (val) {
-            if (type === 'reward') userSettings.rewards.push(val);
-            else userSettings.penalties.push(val);
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const key = getFormattedDate(d);
             
-            localStorage.setItem('amirAppSettings', JSON.stringify(userSettings));
-            input.value = '';
-            renderSettingsList(type);
+            // Calculate score for that day
+            let dayScore = 0;
+            if (db.logs[key]) {
+                db.behaviors.forEach(b => {
+                    if (db.logs[key][b.id]) {
+                        const count = db.logs[key][b.id].count;
+                        if (b.type === 'virtue') dayScore += (count * b.weight);
+                        else dayScore -= (count * b.weight);
+                    }
+                });
+            }
+            
+            labels.push(d.toLocaleDateString('fa-IR', {weekday: 'short'}));
+            dataPoints.push(dayScore);
+            totalScore += dayScore;
+            if(dayScore > maxScore) maxScore = dayScore;
         }
-    }
 
-    function removeItem(type, index) {
-        if (type === 'reward') userSettings.rewards.splice(index, 1);
-        else userSettings.penalties.splice(index, 1);
-        
-        localStorage.setItem('amirAppSettings', JSON.stringify(userSettings));
-        renderSettingsList(type);
+        document.getElementById('totalLifetimeScore').innerText = totalScore;
+        document.getElementById('bestDayScore').innerText = maxScore > -9999 ? `+${maxScore}` : '0';
+
+        if (myChart) myChart.destroy();
+
+        myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'تراز اخلاقی',
+                    data: dataPoints,
+                    borderColor: '#4f46e5',
+                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#4f46e5',
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#f3f4f6' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
     }
 
     // Init
-    renderApp();
+    updateUI();
 
 </script>
 </body>
-  </html>
+</html>
