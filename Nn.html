@@ -1,9 +1,9 @@
-  <!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>سامانه جامع پایش اخلاق | نسخه نهایی اصلاح شده</title>
+    <title>سامانه جامع پایش اخلاق | نسخه نهایی و کامل</title>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -35,78 +35,63 @@
         }
 
         .container { max-width: 600px; margin: 0 auto; padding: 15px; }
-        .btn {
-            border: none; border-radius: 12px; padding: 12px 20px;
-            font-size: 1rem; font-weight: bold; cursor: pointer;
-            transition: transform 0.1s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .btn:active { transform: scale(0.96); }
-        .btn-primary { background: var(--primary); color: white; width: 100%; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
-        .btn-success { background: var(--success); color: white; }
-        .btn-danger { background: var(--danger); color: white; }
-        .btn-outline { background: transparent; border: 2px solid #e2e8f0; color: var(--text-light); }
-        .btn-accept { background: var(--primary); color: white; flex: 1; }
-        .btn-change { background: white; border: 1px solid #cbd5e1; color: var(--text-light); }
 
-        /* --- Header & Score --- */
-        .header-card {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 24px;
-            text-align: center;
-            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
-            margin-bottom: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        /* UI Fix: Separated Manifesto Button from Date Nav */
-        .top-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
+        /* --- Header Area --- */
+        .top-bar {
+            display: flex; flex-direction: column; gap: 10px;
+            margin-bottom: 15px; 
         }
 
         .manifesto-btn {
-            background: rgba(255,255,255,0.2); color: white;
-            border: 1px solid rgba(255,255,255,0.3); padding: 6px 12px;
-            border-radius: 12px; font-size: 0.8rem; font-weight: bold;
-            display: flex; align-items: center; gap: 6px; cursor: pointer;
-            transition: 0.2s; white-space: nowrap;
+            background: var(--surface); color: var(--primary);
+            border: 1px solid var(--primary); padding: 10px;
+            border-radius: 12px; font-size: 0.9rem; font-weight: bold;
+            display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+            box-shadow: var(--shadow); transition: 0.2s; width: 100%;
         }
-        .manifesto-btn.read { background: var(--success); border-color: var(--success); }
+        .manifesto-btn.read { background: var(--success); color: white; border-color: var(--success); }
 
-        .date-nav {
-            display: flex; align-items: center; gap: 10px;
-            background: rgba(0,0,0,0.2); padding: 5px 10px;
-            border-radius: 12px; font-size: 0.85rem;
+        .date-navigator {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--surface); padding: 8px 15px;
+            border-radius: 12px; box-shadow: var(--shadow);
         }
-        .date-nav i { cursor: pointer; padding: 5px; }
-        .date-nav i.disabled { opacity: 0.3; cursor: default; }
+        .date-btn { background: none; border: none; color: var(--text-main); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; padding: 5px; }
+        .date-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .date-text { font-weight: bold; font-size: 0.85rem; text-align: center; }
 
-        /* Dynamic Score Card Colors */
+        /* --- Dynamic Score Card --- */
+        .score-card {
+            color: white; padding: 25px; border-radius: 24px;
+            text-align: center; box-shadow: var(--shadow);
+            margin-bottom: 25px; transition: background 0.5s ease;
+            position: relative; overflow: hidden;
+        }
+        
+        /* Dynamic Background Classes */
         .score-card.neutral { background: linear-gradient(135deg, #64748b 0%, #475569 100%); }
         .score-card.positive { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
         .score-card.negative { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); }
 
-        .score-display { font-size: 3.5rem; font-weight: 900; line-height: 1; margin: 10px 0; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .score-label { font-size: 0.9rem; opacity: 0.9; letter-spacing: 1px; }
+        .main-score { font-size: 4rem; font-weight: 900; line-height: 1; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .score-label { font-size: 0.9rem; opacity: 0.9; letter-spacing: 1px; margin-bottom: 5px; }
         
         .sub-scores {
-            display: flex; justify-content: space-around; margin-top: 15px;
-            background: rgba(0,0,0,0.15); padding: 8px; border-radius: 12px;
+            display: flex; justify-content: space-around; margin-top: 20px;
+            background: rgba(0,0,0,0.15); padding: 10px; border-radius: 16px;
         }
         .sub-score-item { display: flex; flex-direction: column; }
-        .sub-val { font-weight: 800; font-size: 1.1rem; }
-        .sub-lbl { font-size: 0.7rem; opacity: 0.8; }
+        .sub-val { font-weight: 800; font-size: 1.2rem; }
+        .sub-lbl { font-size: 0.75rem; opacity: 0.8; }
 
-        /* --- Behavior Cards --- */
-        .section-header { margin: 25px 0 10px 0; padding: 0 5px; }
+        /* --- Lists --- */
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin: 25px 0 10px 0; padding: 0 5px;
+        }
         .section-title { font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
-        .section-title.virtue { color: var(--success-dark); }
-        .section-title.vice { color: var(--danger-dark); }
+        .virtue-text { color: var(--success-dark); }
+        .vice-text { color: var(--danger-dark); }
 
         .card {
             background: var(--surface); border-radius: var(--border-radius);
@@ -120,6 +105,14 @@
         .item-name { font-weight: 700; font-size: 1rem; color: var(--text-main); }
         .item-weight { font-size: 0.7rem; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: var(--text-light); }
         
+        /* Specific Rule Indicator */
+        .specific-badge {
+            font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-right: 5px; display: inline-block;
+        }
+        .spec-reward { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+        .spec-penalty { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+        /* Stepper */
         .stepper { display: flex; align-items: center; background: #f8fafc; border-radius: 10px; padding: 3px; border: 1px solid #e2e8f0; }
         .step-btn {
             width: 30px; height: 30px; border: none; background: white; border-radius: 8px;
@@ -158,6 +151,11 @@
         }
         .trigger-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-weight: bold; }
         .trigger-actions { display: flex; gap: 10px; }
+        .btn { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
+        .btn-accept { background: var(--primary); color: white; flex: 1; }
+        .btn-change { background: white; border: 1px solid #cbd5e1; color: var(--text-light); }
+        .btn-success { background: var(--success); color: white; flex: 1; }
+
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- Bottom Nav --- */
@@ -201,12 +199,6 @@
             max-height: 60vh; overflow-y: auto; border: 1px solid #e2e8f0;
             margin: 15px 0;
         }
-        
-        .type-indicator {
-            display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px;
-        }
-        .ind-virtue { background-color: var(--success); }
-        .ind-vice { background-color: var(--danger); }
 
         /* Tab Visibility */
         .tab-content { display: none; }
@@ -222,18 +214,18 @@
     <div id="tab-home" class="tab-content active">
         <div class="container">
             
-            <div class="score-card neutral" id="scoreCard">
-                <div class="top-controls">
-                    <button class="manifesto-btn" onclick="openManifestoModal()">
-                        <i class="fas fa-book-open"></i> <span id="manifestoBtnText">منشور اخلاقی</span>
-                    </button>
-                    <div class="date-nav">
-                        <i class="fas fa-chevron-right" onclick="navigateDate(-1)"></i>
-                        <span id="headerDateDisplay">...</span>
-                        <i class="fas fa-chevron-left" id="nextDayBtn" onclick="navigateDate(1)"></i>
-                    </div>
+            <div class="top-bar">
+                <button class="manifesto-btn" onclick="openManifestoModal()">
+                    <i class="fas fa-book-open"></i> <span id="manifestoBtnText">منشور اخلاقی</span>
+                </button>
+                <div class="date-navigator">
+                    <button class="date-btn" onclick="navigateDate(-1)"><i class="fas fa-chevron-right"></i></button>
+                    <div class="date-text" id="headerDateDisplay">...</div>
+                    <button class="date-btn" id="nextDayBtn" onclick="navigateDate(1)" disabled><i class="fas fa-chevron-left"></i></button>
                 </div>
+            </div>
 
+            <div class="score-card neutral" id="scoreCard">
                 <div class="score-label">تراز امروز</div>
                 <div class="main-score" id="totalScoreDisplay">0</div>
                 <div class="sub-scores">
@@ -387,8 +379,7 @@
                 
                 <div class="form-group" id="specificBehDiv" style="display:none;">
                     <label class="form-label">انتخاب رفتار:</label>
-                    <select id="ruleTargetId" class="form-select" onchange="autoSetResultType()"></select>
-                    <small style="color:var(--text-light); font-size:0.75rem; display:block; margin-top:5px;">نوع پاداش/جریمه بر اساس نوع رفتار خودکار تنظیم می‌شود.</small>
+                    <select id="ruleTargetId" class="form-select" onchange="autoSetRuleResult()"></select>
                 </div>
 
                 <div class="form-group">
@@ -397,14 +388,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">نتیجه:</label>
+                    <label class="form-label">نتیجه (خودکار تنظیم می‌شود):</label>
                     <div style="display:flex; gap:5px;">
-                         <!-- Auto-set select, disabled for specific rules -->
-                         <select id="ruleResultType" class="form-select" style="width:100px;" disabled>
+                         <select id="ruleResultType" class="form-select" style="width:80px;" disabled>
                             <option value="reward">پاداش</option>
                             <option value="penalty">جریمه</option>
                         </select>
-                        <input type="text" id="ruleResultText" class="form-input" placeholder="عنوان پاداش/جریمه">
+                        <input type="text" id="ruleResultText" class="form-input" placeholder="مثلا: دیدن فیلم">
                     </div>
                 </div>
                 <div class="form-group">
@@ -435,64 +425,92 @@
             { id: 'b6', title: 'اتلاف وقت', type: 'vice', weight: 3 }
         ],
         rules: [
-            // Sample Rules
             { id: 'r1', type: 'specific', targetId: 'b1', threshold: 10, resultType: 'penalty', resultText: 'جریمه دروغگویی (10 امتیاز)', isSpecific: true },
             { id: 'r2', type: 'specific', targetId: 'b3', threshold: 25, resultType: 'reward', resultText: 'جایزه کمک به فقیر', isSpecific: true },
             { id: 'r3', type: 'total_pos', targetId: null, threshold: 50, resultType: 'reward', resultText: 'تشویق عمومی (امتیاز بالا)', isSpecific: false },
             { id: 'r4', type: 'total_neg', targetId: null, threshold: 70, resultType: 'penalty', resultText: 'جریمه عمومی (وضعیت قرمز)', isSpecific: false }
         ],
-        logs: {} // Date keyed logs
+        logs: {} 
     };
 
-    let db = JSON.parse(localStorage.getItem('EthicsDB_Final_V2')) || JSON.parse(JSON.stringify(DEFAULT_DB));
+    let db = JSON.parse(localStorage.getItem('EthicsDB_Final')) || JSON.parse(JSON.stringify(DEFAULT_DB));
     let viewingDate = new Date();
-    let currentEditorMode = null; // 'behavior' or 'rule'
+    let currentEditorMode = null; 
 
-    // Helper: Generate key
-    function getKey(date) { return date.toLocaleDateString('en-CA'); }
+    // --- Helper: Full Persian Date Converter ---
+    function getVerbalDate(date) {
+        const weekDays = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه'];
+        const months = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+        
+        const options = { year: 'numeric', month: 'numeric', day: 'numeric', weekday: 'long' };
+        const parts = new Intl.DateTimeFormat('fa-IR', options).formatToParts(date);
+        
+        let y, m, d, wd;
+        parts.forEach(p => {
+            if(p.type === 'year') y = p.value;
+            if(p.type === 'month') m = p.value;
+            if(p.type === 'day') d = p.value;
+            if(p.type === 'weekday') wd = p.value;
+        });
 
-    function saveDB() { localStorage.setItem('EthicsDB_Final_V2', JSON.stringify(db)); }
+        // Parse numbers
+        const yearNum = parseInt(y.replace(/[۰-۹]/g, d => d.charCodeAt(0) - 1776));
+        const dayNum = parseInt(d.replace(/[۰-۹]/g, d => d.charCodeAt(0) - 1776));
+        const monthIndex = parseInt(m.replace(/[۰-۹]/g, d => d.charCodeAt(0) - 1776)) - 1;
 
-    // Helper: Number to Words (Robust Persian)
-    function numToWord(numStr) {
-        const n = parseInt(numStr);
-        if (n === 0) return 'صفر';
-        
-        const ones = ['','یک','دو','سه','چهار','پنج','شش','هفت','هشت','نه'];
-        const teens = ['ده','یازده','دوازده','سیزده','چهارده','پانزده','شانزده','هفده','هجده','نوزده'];
-        const tens = ['','','بیست','سی','چهل','پنجاه','شصت','هفتاد','هشتاد','نود'];
-        const hundreds = ['','صد','دویست','سیصد','چهارصد','پانصد','ششصد','هفتصد','هشتصد','نهصد'];
-
-        let str = '';
-        
-        // Handle Year (Assumption: 4 digits)
-        if (n >= 1000) {
-            const th = Math.floor(n / 1000);
-            const rem = n % 1000;
-            str += (th === 1 ? 'هزار' : ones[th] + ' هزار');
-            if (rem > 0) str += ' و ' + numToWord(rem);
-            return str;
-        }
-        
-        const h = Math.floor(n / 100);
-        const remH = n % 100;
-        if (h > 0) { str += hundreds[h]; if (remH > 0) str += ' و '; }
-        
-        if (remH > 0) {
-            if (remH < 10) str += ones[remH];
-            else if (remH >= 10 && remH < 20) str += teens[remH - 10];
-            else {
-                const t = Math.floor(remH / 10);
-                const o = remH % 10;
-                str += tens[t];
-                if (o > 0) str += ' و ' + ones[o];
+        // Number to Words Helper
+        const numToWord = (n) => {
+            const ones = ['','یک','دو','سه','چهار','پنج','شش','هفت','هشت','نه'];
+            const teens = ['ده','یازده','دوازده','سیزده','چهارده','پانزده','شانزده','هفده','هجده','نوزده'];
+            const tens = ['','','بیست','سی','چهل','پنجاه','شصت','هفتاد','هشتاد','نود'];
+            const hundreds = ['','صد','دویست','سیصد','چهارصد','پانصد','ششصد','هفتصد','هشتصد','نهصد'];
+            
+            if (n === 0) return 'صفر';
+            
+            let str = '';
+            
+            if (n >= 1000) {
+                const th = Math.floor(n / 1000);
+                const rem = n % 1000;
+                str += (th === 1 ? 'هزار' : ones[th] + ' هزار');
+                if (rem > 0) str += ' و ' + numToWord(rem);
+                return str;
             }
-        }
-        return str;
+            
+            const h = Math.floor(n / 100);
+            const remH = n % 100;
+            if (h > 0) { str += hundreds[h]; if(remH > 0) str += ' و '; }
+            
+            if (remH > 0) {
+                if (remH < 10) str += ones[remH];
+                else if (remH < 20) str += teens[remH - 10];
+                else {
+                    const t = Math.floor(remH / 10);
+                    const o = remH % 10;
+                    str += tens[t];
+                    if (o > 0) str += ' و ' + ones[o];
+                }
+            }
+            return str;
+        };
+        
+        // Ordinal for Day
+        const ordinals = ["", "یکم", "دوم", "سوم", "چهارم", "پنجم", "ششم", "هفتم", "هشتم", "نهم", "دهم", 
+                   "یازدهم", "دوازدهم", "سیزدهم", "چهاردهم", "پانزدهم", "شانزدهم", "هفدهم", "هجدهم", "نوزدهم", "بیستم",
+                   "بیست و یکم", "بیست و دوم", "بیست و سوم", "بیست و چهارم", "بیست و پنجم", "بیست و ششم", "بیست و هفتم", "بیست و هشتم", "بیست و نهم", "سی ام", "سی و یکم"];
+        
+        const dayWord = ordinals[dayNum];
+        const yearWord = numToWord(yearNum);
+        
+        return `${wd}، ${dayWord} ${months[monthIndex]} ${yearWord}`;
     }
 
+    function getKey(date) { return date.toLocaleDateString('en-CA'); }
+
+    function saveDB() { localStorage.setItem('EthicsDB_Final', JSON.stringify(db)); }
+
     // ==========================================
-    // 2. INITIALIZATION
+    // 2. INITIALIZATION & ROUTING
     // ==========================================
     
     window.onload = () => {
@@ -523,7 +541,6 @@
         
         document.getElementById('tab-' + tabId).classList.add('active');
         
-        // Highlight nav
         const indices = { 'home': 0, 'actions': 1, 'settings': 2 };
         document.querySelectorAll('.nav-item')[indices[tabId]].classList.add('active');
 
@@ -541,9 +558,10 @@
         
         const today = new Date();
         today.setHours(0,0,0,0);
-        newDate.setHours(0,0,0,0);
         
-        if (newDate.getTime() > today.getTime()) return; 
+        // FIX: Allow going back to today if we are in past
+        // But prevent going future than today
+        if (delta > 0 && newDate > today) return; 
         
         viewingDate = newDate;
         renderHome();
@@ -554,18 +572,18 @@
         const todayKey = getKey(new Date());
         const isToday = (key === todayKey);
         
-        // Date Navigation UI Logic
-        const dateStr = viewingDate.toLocaleDateString('fa-IR', {weekday: 'long', month: 'long', day: 'numeric'});
-        document.getElementById('headerDateDisplay').innerText = dateStr;
+        // Date Display
+        const dateStr = viewingDate.toLocaleDateString('fa-IR', {weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'});
+        document.getElementById('headerDateDisplay').innerText = isToday ? "امروز، " + dateStr : dateStr;
         
-        // Fix 4: Next Day Button Logic
+        // Enable/Disable Next Button
         const nextBtn = document.getElementById('nextDayBtn');
         if (isToday) {
-            nextBtn.classList.add('disabled');
-            nextBtn.style.opacity = "0.3";
+            nextBtn.disabled = true;
+            nextBtn.style.opacity = 0.3;
         } else {
-            nextBtn.classList.remove('disabled');
-            nextBtn.style.opacity = "1";
+            nextBtn.disabled = false;
+            nextBtn.style.opacity = 1;
         }
 
         // Ensure Log Exists
@@ -580,7 +598,7 @@
             manText.innerText = "منشور خوانده شد";
         } else {
             manBtn.classList.remove('read');
-            manText.innerText = "منشور اخلاقی";
+            manText.innerText = "خواندن منشور";
         }
 
         // Render Behaviors & Calc Scores
@@ -602,14 +620,18 @@
                 posScore += itemScore;
             } else {
                 totalScore -= itemScore;
-                negScore += itemScore; 
+                negScore += itemScore; // Tracking absolute value of negative actions
             }
+
+            // Check if there is a specific rule for this behavior
+            const hasRule = db.rules.some(r => r.type === 'specific' && r.targetId === b.id);
+            const badgeHtml = hasRule ? `<span class="specific-badge ${b.type==='virtue'?'spec-reward':'spec-penalty'}">${b.type==='virtue'?'پاداش‌دار':'جریمه‌دار'}</span>` : '';
 
             const html = `
                 <div class="card ${b.type}">
                     <div class="card-top">
                         <div>
-                            <div class="item-name">${b.title}</div>
+                            <div class="item-name">${badgeHtml} ${b.title}</div>
                             <div class="item-weight">ضریب: ${b.weight} | امتیاز: ${itemScore}</div>
                         </div>
                         <div class="stepper">
@@ -652,9 +674,7 @@
         }
 
         // Check Triggers (Logic 4)
-        if (isToday) {
-            checkTriggers(key, totalScore, posScore, negScore);
-        }
+        if(isToday) checkTriggers(key, totalScore, posScore, negScore);
     }
 
     function updateCount(behId, delta) {
@@ -671,59 +691,47 @@
     }
 
     // ==========================================
-    // 4. TRIGGER LOGIC (CONSUMED POINTS)
+    // 4. TRIGGER LOGIC (ADVANCED)
     // ==========================================
     
     function checkTriggers(dateKey, total, posTotal, negTotal) {
         const log = db.logs[dateKey];
-        // Initialize consumed if not exists
-        if (!log.consumed) log.consumed = {};
-        
+        const consumed = log.consumed || {};
         const triggerArea = document.getElementById('triggerArea');
-        triggerArea.innerHTML = ''; // Clear previous
+        triggerArea.innerHTML = ''; 
         
         for (let rule of db.rules) {
             let currentValue = 0;
-            let consumedValue = log.consumed[rule.id] || 0;
+            let consumedValue = consumed[rule.id] || 0;
 
-            // Determine current value based on rule type
-            if (rule.type === 'total_net') currentValue = total; 
+            if (rule.type === 'total_net') currentValue = total;
             else if (rule.type === 'total_pos') currentValue = posTotal;
             else if (rule.type === 'total_neg') currentValue = negTotal;
             else if (rule.type === 'specific') {
                 const bId = rule.targetId;
                 const b = db.behaviors.find(x => x.id === bId);
-                if (!b) continue;
                 const count = log.behaviors[bId] || 0;
-                currentValue = count * b.weight; // We calculate based on points, as per instruction
+                if (!b) continue;
+                currentValue = count * b.weight;
             }
 
-            // Fix 4: Consumed Logic implementation
-            // We compare (Current - Consumed) >= Threshold
-            // For Net Total, threshold can be negative.
-            
             let triggered = false;
 
             if (rule.type === 'total_net') {
-                 // If threshold > 0 (Reward) -> we need positive points
-                 if (rule.threshold > 0) {
+                 if (rule.threshold > 0) { // Reward Logic
                      if (currentValue - consumedValue >= rule.threshold) triggered = true;
-                 } 
-                 // If threshold < 0 (Penalty) -> we need negative points
-                 else {
+                 } else { // Penalty Logic
                      // e.g. Current -80, Threshold -70. Consumed -0.
-                     // Available negative points: -80 - (-0) = -80.
-                     // is -80 <= -70 ? Yes. Trigger.
-                     if (currentValue - consumedValue <= rule.threshold) triggered = true;
+                     if (currentValue <= (consumedValue + rule.threshold)) triggered = true;
                  }
             } else {
-                // Pos/Neg/Specific are always positive magnitudes
+                // Simple accumulation logic
                 if (currentValue - consumedValue >= rule.threshold) triggered = true;
             }
 
             if (triggered) {
                 showTriggerAlert(rule);
-                break; // Show one at a time
+                break; 
             }
         }
     }
@@ -732,7 +740,6 @@
         const area = document.getElementById('triggerArea');
         area.style.display = 'block';
         
-        let actionText = rule.resultText;
         const typeLabel = rule.resultType === 'reward' ? '🎉 پاداش:' : '⚠️ جریمه:';
         const color = rule.resultType === 'reward' ? 'var(--success)' : 'var(--danger)';
 
@@ -741,10 +748,9 @@
                 <div class="trigger-header" style="color:${color}">
                     ${typeLabel} حد نصاب "${getRuleDescription(rule)}" پر شد.
                 </div>
-                <div style="margin-bottom:10px;">${actionText}</div>
+                <div style="margin-bottom:10px;">${rule.resultText}</div>
                 <div class="trigger-actions">
-                    <button class="btn btn-accept" onclick="acceptTrigger('${rule.id}')">ثبت در اقدامات</button>
-                    <button class="btn btn-change" onclick="ignoreTrigger()">نادیده گرفتن</button>
+                    <button class="btn btn-success" onclick="acceptTrigger('${rule.id}')">ثبت در اقدامات</button>
                 </div>
             </div>
         `;
@@ -757,7 +763,7 @@
         }
         if(rule.type === 'total_pos') return 'مجموع مثبت';
         if(rule.type === 'total_neg') return 'مجموع منفی';
-        return 'امتیاز خالص';
+        return 'امتیاز کل';
     }
 
     function acceptTrigger(ruleId) {
@@ -765,7 +771,6 @@
         const rule = db.rules.find(r => r.id === ruleId);
         const log = db.logs[key];
 
-        // Add Action
         log.actions.push({
             id: Date.now(),
             text: rule.resultText,
@@ -773,68 +778,55 @@
             done: false
         });
 
-        // Update Consumed
         if (!log.consumed[ruleId]) log.consumed[ruleId] = 0;
         log.consumed[ruleId] += rule.threshold;
 
         saveDB();
         document.getElementById('triggerArea').style.display = 'none';
-        renderHome(); // Re-check for more triggers
-    }
-
-    function ignoreTrigger() {
-        document.getElementById('triggerArea').style.display = 'none';
+        renderHome(); 
     }
 
     // ==========================================
-    // 5. MANIFESTO LOGIC (FIX 3: Exact Text)
+    // 5. MANIFESTO LOGIC
     // ==========================================
     
     function openManifestoModal() {
         const name = db.user.name;
         const now = new Date();
         
-        // Fix 3: Exact Date Format: سه‌شنبه، ۱۱ آذر ۱۴۰۳
-        // But user asked for full text: سه‌شنبه، یازدهم آذر هزار و چهارصد و چهار
-        
-        const dayName = now.toLocaleDateString('fa-IR', {weekday:'long'});
-        const dayNum = numToWord(now.toLocaleDateString('fa-IR', {day:'numeric'}));
-        const monthName = now.toLocaleDateString('fa-IR', {month:'long'});
-        // Year logic for 1403/1404 - using dynamic but converting to words
-        const yearVal = now.toLocaleDateString('fa-IR', {year:'numeric'});
-        const yearWord = numToWord(yearVal);
-        
-        const dateStr = `${dayName}، ${dayNum} ${monthName} ${yearWord}`;
-        
-        // Time: ۹:۱۸ دقیقه
-        const h = now.getHours().toLocaleString('fa-IR');
-        const m = now.getMinutes().toLocaleString('fa-IR').padStart(2, '۰');
-        const timeStr = `${h}:${m} دقیقه`;
+        // FIX: Date string construction using new helper
+        const dateStr = getVerbalDate(now);
+        const timeStr = now.toLocaleTimeString('fa-IR', {hour:'numeric', minute:'numeric'});
 
         const text = `
-            من <strong>${name}</strong> در تاریخ <strong>${dateStr}</strong> و ساعت <strong>${timeStr}</strong> منشور اخلاقی‌ام را مرور می‌کنم.<br><br>
+            من <strong>${name}</strong> در تاریخ <strong>${dateStr}</strong> و ساعت <strong>${timeStr} دقیقه</strong> منشور اخلاقی‌ام را مرور می‌کنم.<br><br>
             
-            <div style="text-align:center; color:var(--primary); font-weight:bold; margin-bottom:10px;">منشور اخلاق</div>
+            <strong>منشور اخلاق</strong><br>
             من به این زندگی و فرصت یگانه‌ی آن احترام می‌گذارم.<br>
             اصلِ بنیادینِ من، کاهشِ رنج و ساختنِ دنیایی بهتر است.<br>
-            من خرد و عقلانیت را راهنمای خود قرار می‌دهم، نه ترس و خرافه را.<br> 
+            من خرد و عقلانیت را راهنمای خود قرار می‌دهم، نه ترس و خرافه را.<br>
             من مسئولِ احساسات، انتخاب‌ها و آینده‌ی خود هستم.<br>
-            بسیار خوشحالم برای نفسی که می‌کشم و توانی که برای تغییر دارم.<br> 
+            بسیار خوشحالم برای نفسی که می‌کشم و توانی که برای تغییر دارم.<br><br>
+
             من متعهد می‌شوم که صادق باشم و با خود و دیگران صادقانه رفتار کنم.<br>
             من متعهد می‌شوم که به حریم خصوصی دیگران و تفاوت‌های انسان‌ها احترام بگذارم.<br>
             من متعهد می‌شوم که از خط قرمزهای آسیب به دیگران عبور نکنم.<br>
-            من متعهد میشوم تا تلاش کنم امروز، نسخه‌ای قوی‌تر و مهربان‌تر از دیروزِ خود باشم.<br>
+            من متعهد می‌شوم تا تلاش کنم امروز، نسخه‌ای قوی‌تر و مهربان‌تر از دیروزِ خود باشم.<br><br>
+
             من در برابرِ قوانینِ طبیعت و واقعیت‌های جهان سر فرود می‌آورم.<br>
             من آن‌چه را که در کنترلم نیست، می‌پذیرم.<br>
             من انعطاف‌پذیرم، مثل درخت در برابر باد.<br>
             تعصب را رها می‌کنم تا نشکنم.<br>
-            من طبیعت را دوست دارم و با آن درست رفتار می‌کنم.<br> 
-            در این لحظه تمامِ خشم‌ها، شهوت‌ها و غم‌هایم را به خاک می‌سپارم. من در این لحظه دوباره شکوفا شدم و جان تازهَای گرفتم. من خودم را دوست دارم و به خودم احترام میگذارم......من در امنیـتم... من آرامـم...<br>
-            من برای خودم و دیگران ارزش بسیاری قائل هستم و برای همگی  قدرت، سلامتی، زیبایی، انصاف و عدالت آرزو می‌کنم. باشد که هیچ انسانی مورد ظلم واقع نشود و من نیز ابزارِ ظلم نباشم.<br>
+            من طبیعت را دوست دارم و با آن درست رفتار می‌کنم.<br><br>
+
+            در این لحظه تمامِ خشم‌ها، شهوت‌ها و غم‌هایم را به خاک می‌سپارم. من در این لحظه دوباره شکوفا شدم و جان تازه‌ای گرفتم. من خودم را دوست دارم و به خودم احترام میگذارم... من در امنیـتم... من آرامـم...<br><br>
+
+            من برای خودم و دیگران ارزش بسیاری قائل هستم و برای همگی قدرت، سلامتی، زیبایی، انصاف و عدالت آرزو می‌کنم. باشد که هیچ انسانی مورد ظلم واقع نشود و من نیز ابزارِ ظلم نباشم.<br><br>
             من گواهی می‌دهم که انسان هستم و کرامت دارم.<br>
-            من گواهی می‌دهم که از عقل و خردم بهره ببرم و استفاده کنم.<br> 
-            من گواهی میدهم، فارق از هر دیدگاهی که دارم اخلاق مدار باشم و رفتاری انسان دوستانه داشته باشم.<br> 
-             گواهی می‌دهم ظلم نکنم، ستم نکنم و برای برپایی عدالت تلاش کنم.<br> 
+            من گواهی می‌دهم که از عقل و خردم بهره ببرم و استفاده کنم.<br>
+            من گواهی می‌دهم، فارغ از هر دیدگاهی که دارم اخلاق مدار باشم و رفتاری انسان دوستانه داشته باشم.<br>
+            گواهی می‌دهم ظلم نکنم، ستم نکنم و برای برپایی عدالت تلاش کنم.<br><br>
+
             سلام بر من که ارزشمندم.<br>
             سلام بر تمام انسان‌های نیک‌اندیش.<br>
             و سلام بر صلح و آگاهی و عقلانیت.<br>
@@ -850,7 +842,7 @@
         
         container.scrollTop = 0;
         container.onscroll = function() {
-            if(Math.ceil(container.offsetHeight + container.scrollTop) >= container.scrollHeight - 5) {
+            if(Math.ceil(container.offsetHeight + container.scrollTop) >= container.scrollHeight) {
                 btn.disabled = false;
                 btn.style.opacity = 1;
             }
@@ -865,7 +857,7 @@
         db.logs[key].manifestoRead = true;
         saveDB();
         document.getElementById('manifestoModal').style.display = 'none';
-        renderHome();
+        renderHome(); 
     }
 
     // ==========================================
@@ -918,7 +910,7 @@
     }
 
     // ==========================================
-    // 7. SETTINGS & EDITORS (Fix 1: Auto logic)
+    // 7. SETTINGS & EDITORS
     // ==========================================
 
     function openEditor(type) {
@@ -932,7 +924,7 @@
         
         if(type === 'rule') {
             populateTargetSelect();
-            toggleRuleInputs();
+            toggleRuleInputs(); // trigger default state
         }
     }
 
@@ -940,39 +932,37 @@
         const sel = document.getElementById('ruleTargetId');
         sel.innerHTML = '';
         db.behaviors.forEach(b => {
-            // Add visual cue in text
-            const indicator = b.type === 'virtue' ? '🟢' : '🔴';
-            sel.innerHTML += `<option value="${b.id}">${indicator} ${b.title}</option>`;
+            sel.innerHTML += `<option value="${b.id}">${b.title} (${b.type==='virtue'?'فضیلت':'رذیلت'})</option>`;
         });
-    }
-
-    // Fix 1: Auto select Reward/Penalty for Specific behaviors
-    function autoSetResultType() {
-        const type = document.getElementById('ruleType').value;
-        const resTypeSelect = document.getElementById('ruleResultType');
-        
-        if (type === 'specific') {
-            const targetId = document.getElementById('ruleTargetId').value;
-            const behavior = db.behaviors.find(b => b.id === targetId);
-            
-            resTypeSelect.disabled = true; // Lock it
-            if (behavior) {
-                resTypeSelect.value = behavior.type === 'virtue' ? 'reward' : 'penalty';
-            }
-        } else {
-            resTypeSelect.disabled = false; // Enable for general rules
-        }
+        autoSetRuleResult();
     }
 
     function toggleRuleInputs() {
         const type = document.getElementById('ruleType').value;
         document.getElementById('specificBehDiv').style.display = type === 'specific' ? 'block' : 'none';
-        autoSetResultType();
+        
+        if (type === 'specific') autoSetRuleResult();
+    }
+
+    function autoSetRuleResult() {
+        const type = document.getElementById('ruleType').value;
+        const resSelect = document.getElementById('ruleResultType');
+        
+        if (type === 'specific') {
+            const bId = document.getElementById('ruleTargetId').value;
+            const b = db.behaviors.find(x => x.id === bId);
+            if (b) {
+                // FIX: If virtue -> reward, If vice -> penalty. Auto selected.
+                resSelect.value = b.type === 'virtue' ? 'reward' : 'penalty';
+            }
+        }
+        // For total types, user can choose, but default logic might apply
+        // Keep as is for totals
     }
 
     function closeEditor() {
         document.getElementById('editorModal').style.display = 'none';
-        renderHome();
+        renderHome(); 
     }
 
     function renderEditorList() {
@@ -981,13 +971,9 @@
 
         if (currentEditorMode === 'behavior') {
             db.behaviors.forEach((b, idx) => {
-                const indicatorClass = b.type === 'virtue' ? 'ind-virtue' : 'ind-vice';
                 container.innerHTML += `
                     <div class="list-row">
-                        <div style="display:flex; align-items:center;">
-                            <span class="type-indicator ${indicatorClass}"></span>
-                            <span>${b.title} (ضریب ${b.weight})</span>
-                        </div>
+                        <span>${b.title} (${b.type==='virtue'?'مثبت':'منفی'} - ضریب ${b.weight})</span>
                         <div>
                             <i class="fas fa-trash btn-icon delete" onclick="deleteItem('behavior', ${idx})"></i>
                         </div>
@@ -997,12 +983,11 @@
         } else {
             db.rules.forEach((r, idx) => {
                 let desc = getRuleDescription(r);
-                const color = r.resultType === 'reward' ? 'var(--success)' : 'var(--danger)';
                 container.innerHTML += `
                     <div class="list-row">
                         <div style="font-size:0.8rem;">
                             <strong>${desc}</strong> > ${r.threshold}<br>
-                            <span style="color:${color}">${r.resultType==='reward'?'پاداش':'جریمه'}:</span> ${r.resultText}
+                            ${r.resultType==='reward'?'پاداش':'جریمه'}: ${r.resultText}
                         </div>
                         <div>
                             <i class="fas fa-trash btn-icon delete" onclick="deleteItem('rule', ${idx})"></i>
@@ -1049,10 +1034,7 @@
         
         saveDB();
         renderEditorList();
-        // Clear fields
-        document.getElementById('behTitle').value = '';
-        document.getElementById('ruleResultText').value = '';
-        document.getElementById('ruleThreshold').value = '';
+        document.querySelectorAll('#editorModal input').forEach(i => i.value = '');
     }
 
     function deleteItem(type, index) {
@@ -1083,7 +1065,7 @@
         reader.onload = function(e) {
             try {
                 const imported = JSON.parse(e.target.result);
-                if(imported.user && imported.behaviors) {
+                if(imported.behaviors && imported.rules) {
                     db = imported;
                     saveDB();
                     alert('بازگردانی موفقیت‌آمیز بود.');
