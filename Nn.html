@@ -1,587 +1,765 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>سامانه پایش اخلاق | نسخه حرفه‌ای</title>
+    <title>سامانه جامع پایش اخلاق | نسخه نهایی</title>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
-    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <style>
         :root {
-            --bg-body: #f3f4f6;
+            --bg-body: #f0f4f8;
             --surface: #ffffff;
-            --primary: #4f46e5;
-            --primary-dark: #4338ca;
-            --secondary: #64748b;
+            --primary: #3b82f6;
+            --primary-dark: #1d4ed8;
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
-            --text-main: #1f2937;
-            --text-light: #6b7280;
+            --text-main: #1e293b;
+            --text-light: #64748b;
             --border-radius: 16px;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body {
             background-color: var(--bg-body);
             color: var(--text-main);
             font-family: 'Vazirmatn', sans-serif;
-            margin: 0;
-            padding: 0;
-            padding-bottom: 80px; /* Space for bottom nav */
+            margin: 0; padding: 0; padding-bottom: 90px;
             overflow-x: hidden;
         }
 
-        /* --- Layout --- */
-        .app-container {
-            max-width: 600px;
-            margin: 0 auto;
-            min-height: 100vh;
-            background: var(--bg-body);
+        /* --- Components --- */
+        .container { max-width: 600px; margin: 0 auto; padding: 15px; }
+        .btn {
+            border: none; border-radius: 12px; padding: 12px 20px;
+            font-size: 1rem; font-weight: bold; cursor: pointer;
+            transition: transform 0.1s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
         }
+        .btn:active { transform: scale(0.96); }
+        .btn-primary { background: var(--primary); color: white; width: 100%; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-outline { background: transparent; border: 2px solid #e2e8f0; color: var(--text-light); }
 
-        /* --- Header Section --- */
-        .header {
-            background: var(--surface);
-            padding: 20px;
-            border-bottom-left-radius: 24px;
-            border-bottom-right-radius: 24px;
-            box-shadow: var(--shadow-md);
-            position: sticky;
-            top: 0;
-            z-index: 50;
-        }
-
-        .date-navigator {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            background: #f8fafc;
-            padding: 8px;
-            border-radius: 12px;
-        }
-
-        .date-btn {
-            background: none;
-            border: none;
-            color: var(--primary);
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 5px 10px;
-        }
-
-        .current-date {
-            font-weight: 700;
-            color: var(--text-main);
-            font-size: 0.95rem;
-        }
-
-        .score-card {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        /* --- Header & Score --- */
+        .header-card {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white;
-            padding: 20px;
-            border-radius: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
-        }
-
-        .score-info h2 { margin: 0; font-size: 0.9rem; opacity: 0.9; font-weight: normal; }
-        .score-value { font-size: 2.8rem; font-weight: 800; line-height: 1.1; }
-        .score-status { font-size: 0.8rem; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; }
-        
-        .score-chart-mini {
-            width: 60px; height: 60px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-
-        /* --- Content Tabs --- */
-        .tab-content { display: none; padding: 20px; animation: fadeIn 0.3s ease; }
-        .tab-content.active { display: block; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- Lists --- */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 25px 0 15px 0;
-        }
-        
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .section-title.virtue { color: var(--success); }
-        .section-title.vice { color: var(--danger); }
-
-        .behavior-card {
-            background: var(--surface);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: var(--shadow-sm);
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.2s;
-            border: 1px solid transparent;
-        }
-
-        .behavior-card:active { transform: scale(0.98); }
-
-        .behavior-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .behavior-icon {
-            width: 40px; height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            margin-left: 12px;
-        }
-
-        .bg-virtue { background: #ecfdf5; color: var(--success); }
-        .bg-vice { background: #fef2f2; color: var(--danger); }
-
-        .behavior-details { flex: 1; }
-        .behavior-name { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
-        .behavior-desc { font-size: 0.75rem; color: var(--text-light); }
-
-        /* Stepper */
-        .stepper {
-            display: flex;
-            align-items: center;
-            background: #f3f4f6;
-            border-radius: 12px;
-            padding: 4px;
-        }
-
-        .step-btn {
-            width: 32px; height: 32px;
-            border: none;
-            background: white;
-            border-radius: 8px;
-            color: var(--text-main);
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: var(--shadow-sm);
-            transition: background 0.2s;
-        }
-
-        .step-btn.add-v { color: var(--success); }
-        .step-btn.add-x { color: var(--danger); }
-        .step-val { width: 30px; text-align: center; font-weight: bold; font-size: 1rem; }
-
-        .note-area {
-            width: 100%;
-            border: none;
-            border-top: 1px solid #f0f0f0;
-            padding: 10px 0 0 0;
-            margin-top: 10px;
-            font-size: 0.85rem;
-            outline: none;
-            background: transparent;
-            color: var(--text-main);
-        }
-
-        /* --- Analytics --- */
-        .chart-container {
-            background: white;
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: var(--shadow-md);
+            padding: 25px;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
             margin-bottom: 20px;
-            height: 250px;
+            position: relative;
         }
-
-        /* --- Bottom Nav --- */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: var(--surface);
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 0;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
-            z-index: 100;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
+        .date-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 0.9rem; opacity: 0.9; }
+        .score-display { font-size: 3.5rem; font-weight: 900; line-height: 1; margin: 10px 0; }
+        .manifesto-badge {
+            position: absolute; top: 20px; left: 20px;
+            background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px;
+            font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 5px;
         }
+        .manifesto-badge.done { background: var(--success); }
 
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: var(--text-light);
-            font-size: 0.75rem;
-            gap: 4px;
-            background: none;
-            border: none;
-            cursor: pointer;
+        /* --- Behavior Cards --- */
+        .section-title { font-size: 1.1rem; font-weight: 800; margin: 25px 0 10px 0; display: flex; align-items: center; gap: 8px; }
+        .card {
+            background: var(--surface); border-radius: var(--border-radius); padding: 15px;
+            margin-bottom: 12px; box-shadow: var(--shadow); display: flex; flex-direction: column;
+            border-right: 4px solid transparent;
         }
+        .card.virtue { border-right-color: var(--success); }
+        .card.vice { border-right-color: var(--danger); }
+        
+        .card-row { display: flex; justify-content: space-between; align-items: center; }
+        .item-title { font-weight: 700; font-size: 1rem; }
+        .item-desc { font-size: 0.75rem; color: var(--text-light); margin-top: 2px; }
+        
+        .stepper { background: #f1f5f9; border-radius: 10px; display: flex; align-items: center; padding: 2px; }
+        .step-btn { width: 32px; height: 32px; border: none; background: white; border-radius: 8px; font-size: 1.2rem; cursor: pointer; color: var(--text-main); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .step-val { width: 30px; text-align: center; font-weight: bold; }
 
-        .nav-item i { font-size: 1.4rem; transition: color 0.3s; }
-        .nav-item.active { color: var(--primary); font-weight: bold; }
-        .nav-item.active i { transform: translateY(-2px); }
-
-        /* --- Settings / Modal --- */
-        .settings-group {
-            background: white;
-            padding: 20px;
-            border-radius: 16px;
-            margin-bottom: 15px;
-            box-shadow: var(--shadow-sm);
+        /* --- Action (Reward/Penalty) List --- */
+        .action-item {
+            background: var(--surface); border-radius: 12px; padding: 15px; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow); transition: opacity 0.3s;
         }
-
-        .settings-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #f0f0f0;
+        .action-item.done { opacity: 0.6; text-decoration: line-through; }
+        .action-checkbox {
+            width: 24px; height: 24px; border-radius: 6px; border: 2px solid var(--text-light);
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
         }
-        .settings-row:last-child { border-bottom: none; }
+        .action-checkbox.checked { background: var(--success); border-color: var(--success); color: white; }
+        .action-type { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-right: auto; }
+        .type-reward { background: #d1fae5; color: #065f46; }
+        .type-penalty { background: #fee2e2; color: #991b1b; }
 
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 12px;
-            width: 100%;
-            font-size: 1rem;
-            font-weight: bold;
-            margin-top: 10px;
-            cursor: pointer;
+        /* --- Modals --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+            z-index: 1000; display: none; align-items: center; justify-content: center;
         }
+        .modal-content {
+            background: white; width: 90%; max-width: 500px; border-radius: 24px;
+            padding: 25px; max-height: 85vh; overflow-y: auto; position: relative;
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        .fab {
-            position: fixed;
-            bottom: 90px;
-            left: 20px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: var(--shadow-lg);
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            z-index: 90;
+        /* Manifesto Specific */
+        .manifesto-text {
+            line-height: 1.8; text-align: justify; font-size: 0.95rem;
+            border: 1px solid #e2e8f0; padding: 15px; border-radius: 12px;
+            margin: 15px 0; max-height: 300px; overflow-y: auto;
+            background: #f8fafc;
         }
+        .manifesto-header { text-align: center; font-weight: bold; color: var(--primary); margin-bottom: 10px; }
+
+        /* Bottom Nav */
+        .nav-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%; background: white;
+            display: flex; justify-content: space-around; padding: 10px 0;
+            border-top-left-radius: 20px; border-top-right-radius: 20px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.05); z-index: 900;
+        }
+        .nav-btn {
+            background: none; border: none; display: flex; flex-direction: column;
+            align-items: center; color: var(--text-light); gap: 4px; font-size: 0.7rem; cursor: pointer;
+        }
+        .nav-btn i { font-size: 1.4rem; margin-bottom: 2px; }
+        .nav-btn.active { color: var(--primary); }
+
+        /* Settings Inputs */
+        .input-group { display: flex; gap: 10px; margin-bottom: 10px; }
+        .input-box { flex: 1; padding: 10px; border: 1px solid #e2e8f0; border-radius: 10px; }
+
     </style>
 </head>
 <body>
 
-<div class="app-container">
+<!-- Main App -->
+<div id="app" style="display:none;">
     
-    <!-- Tab 1: Tracker (Home) -->
-    <div id="tab-home" class="tab-content active">
-        <header class="header">
-            <div class="date-navigator">
-                <button class="date-btn" onclick="changeDate(-1)"><i class="fas fa-chevron-right"></i></button>
-                <div class="current-date" id="dateDisplay"></div>
-                <button class="date-btn" onclick="changeDate(1)"><i class="fas fa-chevron-left"></i></button>
-            </div>
-
-            <div class="score-card">
-                <div class="score-info">
-                    <h2>تراز اخلاقی</h2>
-                    <div class="score-value" id="dailyScore">0</div>
-                    <div class="score-status" id="scoreStatus">خنثی</div>
+    <!-- Tab: Tracker -->
+    <div id="tab-home" class="tab-view">
+        <div class="container">
+            <div class="header-card">
+                <div class="manifesto-badge" onclick="openManifesto()">
+                    <i class="fas fa-book-open"></i> <span id="manifestoStatusText">خواندن منشور</span>
                 </div>
-                <div class="score-chart-mini">
-                    <i class="fas fa-balance-scale"></i>
+                <div class="date-nav">
+                    <i class="fas fa-chevron-right" onclick="changeDate(-1)"></i>
+                    <span id="dateDisplay">...</span>
+                    <i class="fas fa-chevron-left" onclick="changeDate(1)"></i>
                 </div>
+                <div style="font-size: 0.9rem; opacity: 0.8;">امتیاز امروز</div>
+                <div class="score-display" id="dailyScore">0</div>
             </div>
-        </header>
 
-        <!-- Virtues -->
-        <div class="section-header">
-            <span class="section-title virtue"><i class="fas fa-dove"></i> فضایل (خوبی‌ها)</span>
-            <span style="font-size: 0.8rem; color: var(--text-muted);">تقویت روح</span>
-        </div>
-        <div id="virtuesContainer"></div>
-
-        <!-- Vices -->
-        <div class="section-header">
-            <span class="section-title vice"><i class="fas fa-skull-crossbones"></i> رذایل (بدی‌ها)</span>
-            <span style="font-size: 0.8rem; color: var(--text-muted);">آفات نفس</span>
-        </div>
-        <div id="vicesContainer"></div>
-        
-        <div style="height: 20px;"></div>
-    </div>
-
-    <!-- Tab 2: Analytics -->
-    <div id="tab-stats" class="tab-content">
-        <h2 style="margin-bottom: 20px;">تحلیل روند</h2>
-        <div class="chart-container">
-            <canvas id="progressChart"></canvas>
-        </div>
-        
-        <div class="settings-group">
-            <h3>خلاصه عملکرد</h3>
-            <div class="settings-row">
-                <span>مجموع امتیاز کل</span>
-                <strong id="totalLifetimeScore">0</strong>
+            <!-- Action List Preview (Only showing pending) -->
+            <div id="pendingActionsArea" style="display:none;">
+                <div class="section-title" style="color: var(--warning);">
+                    <i class="fas fa-clipboard-list"></i> اقدامات باقی‌مانده
+                </div>
+                <div id="pendingList"></div>
             </div>
-            <div class="settings-row">
-                <span>بهترین روز</span>
-                <strong style="color: var(--success)" id="bestDayScore">-</strong>
+
+            <div class="section-title virtue">
+                <i class="fas fa-seedling"></i> فضایل (رشد دهنده)
             </div>
+            <div id="virtuesList"></div>
+
+            <div class="section-title vice">
+                <i class="fas fa-ban"></i> رذایل (آسیب زننده)
+            </div>
+            <div id="vicesList"></div>
         </div>
     </div>
 
-    <!-- Tab 3: Manage (Settings) -->
-    <div id="tab-settings" class="tab-content">
-        <h2 style="margin-bottom: 20px;">مدیریت سیستم</h2>
-        
-        <div class="settings-group">
-            <h3>مدیریت رفتارها</h3>
-            <p style="font-size:0.85rem; color:var(--text-light);">در اینجا رفتارهای جدید تعریف کن یا قبلی‌ها را حذف کن.</p>
-            <button class="btn-primary" onclick="promptAddBehavior()">+ افزودن رفتار جدید</button>
-            <button class="btn-primary" style="background:white; color:var(--danger); border:1px solid var(--danger); margin-top:10px;" onclick="resetBehaviors()">بازنشانی به پیش‌فرض</button>
-        </div>
+    <!-- Tab: Actions (Rewards/Penalties) -->
+    <div id="tab-actions" class="tab-view" style="display:none;">
+        <div class="container">
+            <h2 style="margin-top:0;">مدیریت پیامدها</h2>
+            <p style="color:var(--text-light); font-size:0.9rem;">لیست پاداش‌ها و جریمه‌های امروز شما. تیک بزنید تا در تاریخچه ثبت شود.</p>
+            
+            <div id="todayActionsList"></div>
 
-        <div class="settings-group">
-            <h3>پشتیبان‌گیری</h3>
-            <button class="btn-primary" style="background: var(--secondary);" onclick="exportData()">📥 خروجی گرفتن (Backup)</button>
-            <input type="file" id="importFile" style="display:none" onchange="importData(this)">
-            <button class="btn-primary" style="background: white; color: var(--text-main); border:1px solid #ddd; margin-top:10px;" onclick="document.getElementById('importFile').click()">📤 بازگردانی اطلاعات</button>
+            <div style="margin-top:30px; padding-top:20px; border-top:1px solid #e2e8f0;">
+                <h3>پیشنهاد سیستم</h3>
+                <div class="card">
+                    <p id="suggestionText" style="text-align:center; color:var(--text-light);">امتیاز شما هنوز به حد نصاب نرسیده است.</p>
+                    <div id="suggestionButtons" style="display:none; gap:10px; margin-top:10px;">
+                        <button class="btn btn-primary" onclick="acceptSuggestion()">ثبت در لیست امروز</button>
+                        <button class="btn btn-outline" onclick="generateSuggestion()">پیشنهاد دیگر 🎲</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab: Settings -->
+    <div id="tab-settings" class="tab-view" style="display:none;">
+        <div class="container">
+            <h2>تنظیمات سیستم</h2>
+            
+            <div class="card">
+                <h3>مدیریت رفتارها</h3>
+                <button class="btn btn-outline" onclick="openBehaviorEditor()">ویرایش لیست فضایل/رذایل</button>
+            </div>
+
+            <div class="card">
+                <h3>بانک پاداش و جریمه</h3>
+                <button class="btn btn-outline" onclick="openRewardPenaltyEditor()">ویرایش لیست پاداش/جریمه</button>
+            </div>
+
+            <div class="card">
+                <h3>پشتیبان‌گیری</h3>
+                <button class="btn btn-success" onclick="exportData()">دانلود نسخه پشتیبان (JSON)</button>
+                <input type="file" id="importFile" style="display:none" onchange="importData(this)">
+                <button class="btn btn-outline" style="margin-top:10px;" onclick="document.getElementById('importFile').click()">بازگردانی اطلاعات</button>
+            </div>
+            
+            <br><br><br>
         </div>
     </div>
 
 </div>
 
-<!-- Bottom Navigation -->
-<nav class="bottom-nav">
-    <button class="nav-item active" onclick="switchTab('home')">
-        <i class="fas fa-clipboard-check"></i>
-        <span>امروز</span>
+<!-- Bottom Nav -->
+<div class="nav-bar" id="navBar" style="display:none;">
+    <button class="nav-btn active" onclick="switchTab('home')">
+        <i class="fas fa-home"></i> خانه
     </button>
-    <button class="nav-item" onclick="switchTab('stats')">
-        <i class="fas fa-chart-line"></i>
-        <span>روند</span>
+    <button class="nav-btn" onclick="switchTab('actions')">
+        <i class="fas fa-tasks"></i> اقدامات
     </button>
-    <button class="nav-item" onclick="switchTab('settings')">
-        <i class="fas fa-sliders-h"></i>
-        <span>تنظیمات</span>
+    <button class="nav-btn" onclick="switchTab('settings')">
+        <i class="fas fa-cog"></i> تنظیمات
     </button>
-</nav>
+</div>
+
+<!-- Modal: Onboarding (Name) -->
+<div id="onboardingModal" class="modal-overlay">
+    <div class="modal-content" style="text-align:center;">
+        <h2>خوش آمدید</h2>
+        <p>برای شروع، لطفاً نام خود را وارد کنید تا در منشور اخلاقی ثبت شود.</p>
+        <input type="text" id="userNameInput" class="input-box" placeholder="نام شما..." style="width:100%; text-align:center; font-size:1.2rem;">
+        <br><br>
+        <button class="btn btn-primary" onclick="saveUserName()">شروع سفر</button>
+    </div>
+</div>
+
+<!-- Modal: Manifesto -->
+<div id="manifestoModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="manifesto-header">
+            <h3>تجدید میثاق روزانه</h3>
+            <div style="font-size:0.8rem; color:var(--text-light);" id="manifestoDate"></div>
+        </div>
+        <div class="manifesto-text" id="manifestoTextContent">
+            <!-- Content injected via JS -->
+        </div>
+        <button id="manifestoBtn" class="btn btn-primary" disabled onclick="confirmManifesto()">خواندم و متعهد می‌شوم</button>
+        <p style="font-size:0.7rem; color:red; text-align:center; margin-top:5px;">(لطفاً تا انتها اسکرول کنید)</p>
+    </div>
+</div>
+
+<!-- Modal: Editors -->
+<div id="editorModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3 id="editorTitle">ویرایش</h3>
+        <div id="editorList" style="max-height:300px; overflow-y:auto; margin-bottom:15px;"></div>
+        <div class="input-group">
+            <input type="text" id="editorInput" class="input-box" placeholder="عنوان جدید...">
+            <!-- Extra inputs depending on type -->
+            <input type="number" id="editorWeight" class="input-box" placeholder="ضریب" style="width:70px; display:none;">
+            <select id="editorType" class="input-box" style="display:none;">
+                <option value="virtue">فضیلت</option>
+                <option value="vice">رذیلت</option>
+            </select>
+            <button class="btn btn-success" onclick="editorAddItem()">+</button>
+        </div>
+        <button class="btn btn-outline" onclick="document.getElementById('editorModal').style.display='none'">بستن</button>
+    </div>
+</div>
 
 <script>
-    // --- Default Data Configuration ---
-    const defaultBehaviors = [
-        // Virtues
-        { id: 'v1', title: 'کمک به والدین', desc: 'احترام و خدمت', type: 'virtue', weight: 2 },
-        { id: 'v2', title: 'کمک به همنوع', desc: 'گره گشایی از کار دیگران', type: 'virtue', weight: 2 },
-        { id: 'v3', title: 'مطالعه/یادگیری', desc: 'رشد شخصی', type: 'virtue', weight: 1 },
-        { id: 'v4', title: 'ورزش/باشگاه', desc: 'سلامت جسم', type: 'virtue', weight: 2 },
-        { id: 'v5', title: 'صداقت', desc: 'راستگویی حتی به ضرر', type: 'virtue', weight: 3 },
-        { id: 'v6', title: 'سکوت و کنترل خشم', desc: 'مدیریت هیجان', type: 'virtue', weight: 2 },
-        
-        // Vices
-        { id: 'x1', title: 'دروغ', desc: 'تحریف واقعیت', type: 'vice', weight: 3 },
-        { id: 'x2', title: 'غیبت', desc: 'بدگویی پشت سر', type: 'vice', weight: 2 },
-        { id: 'x3', title: 'توهین/فحاشی', desc: 'خشونت کلامی', type: 'vice', weight: 2 },
-        { id: 'x4', title: 'سخن‌چینی', desc: 'برهم زدن رابطه دو نفر', type: 'vice', weight: 3 },
-        { id: 'x5', title: 'نگاه آلوده/پورن', desc: 'آسیب به روان', type: 'vice', weight: 3 },
-        { id: 'x6', title: 'اتلاف وقت', desc: 'تنبلی و اهمال', type: 'vice', weight: 1 }
-    ];
-
-    // --- State ---
-    let currentDate = new Date();
-    let db = JSON.parse(localStorage.getItem('amirProDB')) || {
-        behaviors: defaultBehaviors,
-        logs: {} // Structure: { "2023-12-01": { "v1": {count: 1, note: "..."} } }
+    // --- CONFIGURATION ---
+    const DEFAULT_DATA = {
+        user: { name: "" },
+        behaviors: [
+            { id: 'v1', title: 'خردورزی و مطالعه', type: 'virtue', weight: 2 },
+            { id: 'v2', title: 'انضباط شخصی (ورزش/سحرخیزی)', type: 'virtue', weight: 2 },
+            { id: 'v3', title: 'صداقت و راستی', type: 'virtue', weight: 3 },
+            { id: 'v4', title: 'کمک به دیگران', type: 'virtue', weight: 2 },
+            { id: 'v5', title: 'کنترل خشم و سکوت', type: 'virtue', weight: 2 },
+            { id: 'x1', title: 'دروغ', type: 'vice', weight: 3 },
+            { id: 'x2', title: 'تنبلی و اهمال', type: 'vice', weight: 1 },
+            { id: 'x3', title: 'آسیب کلامی/فیزیکی', type: 'vice', weight: 3 },
+            { id: 'x4', title: 'قضاوت و غیبت', type: 'vice', weight: 2 },
+            { id: 'x5', title: 'توجیه اشتباه', type: 'vice', weight: 1 }
+        ],
+        rewardsList: [
+            { text: 'دیدن یک فیلم خوب', threshold: 5 },
+            { text: 'خرید یک کتاب', threshold: 10 },
+            { text: 'خوردن غذای محبوب', threshold: 5 },
+            { text: 'یک ساعت استراحت مطلق', threshold: 3 }
+        ],
+        penaltiesList: [
+            { text: '۲۰ شنا سوئدی', threshold: -3 },
+            { text: '۱۰ هزار تومان صدقه', threshold: -5 },
+            { text: 'حذف شام', threshold: -5 },
+            { text: 'محرومیت از اینترنت (۱ ساعت)', threshold: -3 }
+        ],
+        logs: {} 
     };
 
-    let myChart = null;
+    // --- STATE ---
+    let db = JSON.parse(localStorage.getItem('AMIR_ETHICS_DB')) || JSON.parse(JSON.stringify(DEFAULT_DATA));
+    let viewingDate = new Date();
+    let currentEditorType = ''; // 'behavior' or 'reward_penalty'
 
-    // --- Core Functions ---
+    // --- INIT ---
+    window.onload = function() {
+        if (!db.user.name) {
+            document.getElementById('onboardingModal').style.display = 'flex';
+        } else {
+            initApp();
+        }
+    };
 
-    function getFormattedDate(date) {
-        return date.toLocaleDateString('en-CA'); // YYYY-MM-DD
+    function initApp() {
+        document.getElementById('app').style.display = 'block';
+        document.getElementById('navBar').style.display = 'flex';
+        renderUI();
     }
 
-    function getPersianDate(date) {
-        return date.toLocaleDateString('fa-IR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-    }
-
-    function saveData() {
-        localStorage.setItem('amirProDB', JSON.stringify(db));
-        updateUI();
-    }
-
-    function changeDate(offset) {
-        currentDate.setDate(currentDate.getDate() + offset);
-        updateUI();
-    }
-
-    function switchTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        
-        document.getElementById('tab-' + tabId).classList.add('active');
-        
-        // Find index based on tab name to highlight nav
-        const navIndex = ['home', 'stats', 'settings'].indexOf(tabId);
-        document.querySelectorAll('.nav-item')[navIndex].classList.add('active');
-
-        if (tabId === 'stats') renderChart();
-    }
-
-    function updateUI() {
-        const dateKey = getFormattedDate(currentDate);
-        document.getElementById('dateDisplay').innerText = getPersianDate(currentDate);
-        
-        // Ensure log entry exists for date
-        if (!db.logs[dateKey]) db.logs[dateKey] = {};
-
-        // Render Lists
-        const vContainer = document.getElementById('virtuesContainer');
-        const xContainer = document.getElementById('vicesContainer');
-        vContainer.innerHTML = '';
-        xContainer.innerHTML = '';
-
-        let dailyScore = 0;
-
-        db.behaviors.forEach(b => {
-            const log = db.logs[dateKey][b.id] || { count: 0, note: '' };
-            
-            // Calculate Score
-            if (b.type === 'virtue') dailyScore += (log.count * b.weight);
-            else dailyScore -= (log.count * b.weight);
-
-            const cardHtml = `
-                <div class="behavior-card">
-                    <div class="behavior-header">
-                        <div style="display:flex; align-items:center;">
-                            <div class="behavior-icon ${b.type === 'virtue' ? 'bg-virtue' : 'bg-vice'}">
-                                <i class="fas ${b.type === 'virtue' ? 'fa-check' : 'fa-times'}"></i>
-                            </div>
-                            <div class="behavior-details" style="margin-right:10px;">
-                                <div class="behavior-name">${b.title} <span style="font-size:0.7rem; opacity:0.6;">(ضریب ${b.weight})</span></div>
-                                <div class="behavior-desc">${b.desc}</div>
-                            </div>
-                        </div>
-                        <div class="stepper">
-                            <button class="step-btn" onclick="updateCount('${b.id}', -1)">-</button>
-                            <div class="step-val">${log.count}</div>
-                            <button class="step-btn ${b.type === 'virtue' ? 'add-v' : 'add-x'}" onclick="updateCount('${b.id}', 1)">+</button>
-                        </div>
-                    </div>
-                    <input type="text" class="note-area" placeholder="یادداشت مصداق..." value="${log.note}" onchange="updateNote('${b.id}', this.value)">
-                </div>
-            `;
-
-            if (b.type === 'virtue') vContainer.innerHTML += cardHtml;
-            else xContainer.innerHTML += cardHtml;
-        });
-
-        // Update Header
-        const scoreEl = document.getElementById('dailyScore');
-        scoreEl.innerText = dailyScore > 0 ? `+${dailyScore}` : dailyScore;
-        scoreEl.style.color = dailyScore >= 0 ? 'white' : '#ffadad';
-        
-        let statusText = "خنثی";
-        if (dailyScore > 5) statusText = "عالی - در مسیر رشد";
-        else if (dailyScore > 0) statusText = "خوب - ادامه بده";
-        else if (dailyScore < 0) statusText = "هشدار - نیاز به جبران";
-        else if (dailyScore < -5) statusText = "بحرانی - توقف کن";
-        document.getElementById('scoreStatus').innerText = statusText;
-    }
-
-    function updateCount(id, change) {
-        const dateKey = getFormattedDate(currentDate);
-        if (!db.logs[dateKey][id]) db.logs[dateKey][id] = { count: 0, note: '' };
-        
-        let newCount = db.logs[dateKey][id].count + change;
-        if (newCount < 0) newCount = 0;
-        
-        db.logs[dateKey][id].count = newCount;
-        saveData();
-    }
-
-    function updateNote(id, text) {
-        const dateKey = getFormattedDate(currentDate);
-        if (!db.logs[dateKey][id]) db.logs[dateKey][id] = { count: 0, note: '' };
-        
-        db.logs[dateKey][id].note = text;
-        saveData();
-    }
-
-    // --- Settings Functions ---
-
-    function promptAddBehavior() {
-        const title = prompt("عنوان رفتار جدید:");
-        if (!title) return;
-        
-        const type = confirm("آیا این رفتار مثبت (فضیلت) است؟\nتایید = بله (مثبت)\nلغو = خیر (رذیلت)") ? 'virtue' : 'vice';
-        const weight = prompt("ضریب اهمیت (۱ تا ۵):", "1");
-        const desc = prompt("توضیح کوتاه:");
-
-        const newB = {
-            id: Date.now().toString(),
-            title: title,
-            desc: desc || '',
-            type: type,
-            weight: parseInt(weight) || 1
-        };
-
-        db.behaviors.push(newB);
-        saveData();
-        alert("رفتار جدید اضافه شد.");
-    }
-
-    function resetBehaviors() {
-        if(confirm("آیا لیست رفتارها به حالت اولیه برگردد؟ اطلاعات آماری پاک نمی‌شوند.")) {
-            db.behaviors = defaultBehaviors;
-            saveData();
+    function saveUserName() {
+        const name = document.getElementById('userNameInput').value.trim();
+        if(name) {
+            db.user.name = name;
+            saveDB();
+            document.getElementById('onboardingModal').style.display = 'none';
+            initApp();
         }
     }
 
+    function saveDB() {
+        localStorage.setItem('AMIR_ETHICS_DB', JSON.stringify(db));
+    }
+
+    // --- DATE HELPERS ---
+    function getDateKey(date) {
+        return date.toLocaleDateString('en-CA'); // YYYY-MM-DD
+    }
+
+    function getPersianDateStr(date) {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        return date.toLocaleDateString('fa-IR', options);
+    }
+
+    function numToPersian(n) {
+        const farsiDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+        return n.toString().replace(/\d/g, x => farsiDigits[x]);
+    }
+
+    // --- MANIFESTO ---
+    function openManifesto() {
+        const todayKey = getDateKey(new Date());
+        // Check if already read today? (Optional logic, currently allows re-reading)
+        
+        const now = new Date();
+        const dateStr = getPersianDateStr(now);
+        const timeStr = now.toLocaleTimeString('fa-IR', {hour: '2-digit', minute:'2-digit'});
+        const name = db.user.name;
+
+        document.getElementById('manifestoDate').innerText = dateStr;
+        
+        const text = `
+من <strong>${name}</strong> در تاریخ <strong>${dateStr}</strong> و ساعت <strong>${timeStr}</strong> منشور اخلاقی‌ام را مرور می‌کنم.<br><br>
+<span style="color:var(--primary); font-weight:bold;">منشور اخلاق</span><br>
+من به این زندگی و فرصت یگانه‌ی آن احترام می‌گذارم.<br>
+اصلِ بنیادینِ من، کاهشِ رنج و ساختنِ دنیایی بهتر است.<br>
+من خرد و عقلانیت را راهنمای خود قرار می‌دهم، نه ترس و خرافه را.<br>
+من مسئولِ احساسات، انتخاب‌ها و آینده‌ی خود هستم.<br>
+بسیار خوشحالم برای نفسی که می‌کشم و توانی که برای تغییر دارم.<br><br>
+من متعهد می‌شوم که صادق باشم و با خود و دیگران صادقانه رفتار کنم.<br>
+من متعهد می‌شوم که به حریم خصوصی دیگران و تفاوت‌های انسان‌ها احترام بگذارم.<br>
+من متعهد می‌شوم که از خط قرمزهای آسیب به دیگران عبور نکنم.<br>
+من متعهد می‌شوم تا تلاش کنم امروز، نسخه‌ای قوی‌تر و مهربان‌تر از دیروزِ خود باشم.<br><br>
+من در برابرِ قوانینِ طبیعت و واقعیت‌های جهان سر فرود می‌آورم.<br>
+من آن‌چه را که در کنترلم نیست، می‌پذیرم.<br>
+من انعطاف‌پذیرم، مثل درخت در برابر باد.<br>
+تعصب را رها می‌کنم تا نشکنم.<br>
+من طبیعت را دوست دارم و با آن درست رفتار می‌کنم.<br><br>
+در این لحظه تمامِ خشم‌ها، شهوت‌ها و غم‌هایم را به خاک می‌سپارم. من در این لحظه دوباره شکوفا شدم و جان تازه‌ای گرفتم. من خودم را دوست دارم و به خودم احترام می‌گذارم... من در امنیـتم... من آرامـم...<br><br>
+من برای خودم و دیگران ارزش بسیاری قائل هستم و برای همگی قدرت، سلامتی، زیبایی، انصاف و عدالت آرزو می‌کنم. باشد که هیچ انسانی مورد ظلم واقع نشود و من نیز ابزارِ ظلم نباشم.<br><br>
+من گواهی می‌دهم که انسان هستم و کرامت دارم.<br>
+من گواهی می‌دهم که از عقل و خردم بهره ببرم و استفاده کنم.<br>
+من گواهی می‌دهم، فارغ از هر دیدگاهی که دارم اخلاق‌مدار باشم و رفتاری انسان‌دوستانه داشته باشم.<br>
+گواهی می‌دهم ظلم نکنم، ستم نکنم و برای برپایی عدالت تلاش کنم.<br><br>
+سلام بر من که ارزشمندم.<br>
+سلام بر تمام انسان‌های نیک‌اندیش.<br>
+و سلام بر صلح و آگاهی و عقلانیت.<br>
+<strong>پایان.</strong>
+        `;
+        
+        const container = document.getElementById('manifestoTextContent');
+        container.innerHTML = text;
+        
+        // Scroll Logic
+        const btn = document.getElementById('manifestoBtn');
+        btn.disabled = true;
+        btn.innerText = "مطالعه کنید...";
+        
+        container.onscroll = function() {
+            if (container.offsetHeight + container.scrollTop >= container.scrollHeight - 10) {
+                btn.disabled = false;
+                btn.innerText = "متعهد می‌شوم";
+            }
+        };
+
+        document.getElementById('manifestoModal').style.display = 'flex';
+    }
+
+    function confirmManifesto() {
+        const key = getDateKey(new Date()); // Always marks today
+        if (!db.logs[key]) db.logs[key] = { behaviors: {}, actions: [], manifestoRead: false };
+        
+        db.logs[key].manifestoRead = true;
+        saveDB();
+        document.getElementById('manifestoModal').style.display = 'none';
+        renderUI();
+    }
+
+    // --- CORE LOGIC ---
+
+    function changeDate(offset) {
+        viewingDate.setDate(viewingDate.getDate() + offset);
+        renderUI();
+    }
+
+    function renderUI() {
+        const key = getDateKey(viewingDate);
+        const todayKey = getDateKey(new Date());
+        const isToday = key === todayKey;
+
+        document.getElementById('dateDisplay').innerText = isToday ? "امروز" : getPersianDateStr(viewingDate);
+
+        // Ensure log structure
+        if (!db.logs[key]) db.logs[key] = { behaviors: {}, actions: [], manifestoRead: false };
+        const dayLog = db.logs[key];
+
+        // Manifesto Badge
+        const manBadge = document.querySelector('.manifesto-badge');
+        if (dayLog.manifestoRead) {
+            manBadge.classList.add('done');
+            document.getElementById('manifestoStatusText').innerText = "منشور خوانده شد";
+        } else {
+            manBadge.classList.remove('done');
+            document.getElementById('manifestoStatusText').innerText = "خواندن منشور";
+        }
+
+        // Render Behaviors & Score
+        let score = 0;
+        const vContainer = document.getElementById('virtuesList');
+        const xContainer = document.getElementById('vicesList');
+        vContainer.innerHTML = '';
+        xContainer.innerHTML = '';
+
+        db.behaviors.forEach(b => {
+            const count = dayLog.behaviors[b.id] || 0;
+            
+            if (b.type === 'virtue') score += (count * b.weight);
+            else score -= (count * b.weight);
+
+            const html = `
+                <div class="card ${b.type}">
+                    <div class="card-row">
+                        <div>
+                            <div class="item-title">${b.title}</div>
+                            <div class="item-desc">ضریب اثر: ${b.weight}</div>
+                        </div>
+                        <div class="stepper">
+                            <button class="step-btn" onclick="updateCount('${b.id}', -1)">-</button>
+                            <div class="step-val">${count}</div>
+                            <button class="step-btn" onclick="updateCount('${b.id}', 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            if(b.type === 'virtue') vContainer.innerHTML += html;
+            else xContainer.innerHTML += html;
+        });
+
+        document.getElementById('dailyScore').innerText = score;
+        
+        // Check Thresholds for Suggestions (Only if Today)
+        if (isToday) {
+            checkSuggestions(score);
+        }
+
+        // Render Actions (Pending & Done)
+        renderActions(dayLog.actions, isToday);
+    }
+
+    function updateCount(id, delta) {
+        const key = getDateKey(viewingDate);
+        if (!db.logs[key]) db.logs[key] = { behaviors: {}, actions: [], manifestoRead: false };
+        
+        const current = db.logs[key].behaviors[id] || 0;
+        const newVal = current + delta;
+        
+        if (newVal >= 0) {
+            db.logs[key].behaviors[id] = newVal;
+            saveDB();
+            renderUI();
+        }
+    }
+
+    // --- ACTIONS (Rewards/Penalties) ---
+
+    let currentSuggestion = null;
+
+    function checkSuggestions(score) {
+        const suggestionText = document.getElementById('suggestionText');
+        const buttons = document.getElementById('suggestionButtons');
+        
+        // Simple logic: Suggest something based on score polarity
+        let pool = [];
+        let type = '';
+
+        if (score >= 5) {
+            type = 'reward';
+            pool = db.rewardsList.filter(r => r.threshold <= score);
+            if(pool.length === 0) pool = db.rewardsList; // fallback
+        } else if (score <= -3) {
+            type = 'penalty';
+            pool = db.penaltiesList.filter(p => p.threshold >= score); // logic: -5 <= -3
+            if(pool.length === 0) pool = db.penaltiesList;
+        }
+
+        if (type) {
+            // Pick random
+            if (!currentSuggestion || currentSuggestion.type !== type) {
+                const item = pool[Math.floor(Math.random() * pool.length)];
+                currentSuggestion = { ...item, type: type };
+            }
+            
+            const color = type === 'reward' ? 'var(--success)' : 'var(--danger)';
+            suggestionText.innerHTML = `<strong style="color:${color}">${type === 'reward' ? 'پاداش پیشنهادی:' : 'جریمه پیشنهادی:'}</strong> <br> ${currentSuggestion.text}`;
+            buttons.style.display = 'flex';
+        } else {
+            currentSuggestion = null;
+            suggestionText.innerText = "امتیاز فعلی در محدوده خنثی است. ادامه دهید...";
+            buttons.style.display = 'none';
+        }
+    }
+
+    function generateSuggestion() {
+        currentSuggestion = null; // Force reset
+        renderUI(); // Will trigger checkSuggestions
+    }
+
+    function acceptSuggestion() {
+        if (!currentSuggestion) return;
+        const key = getDateKey(viewingDate);
+        const action = {
+            id: Date.now(),
+            text: currentSuggestion.text,
+            type: currentSuggestion.type,
+            done: false
+        };
+        db.logs[key].actions.push(action);
+        saveDB();
+        renderUI();
+        alert("در لیست اقدامات ثبت شد.");
+    }
+
+    function renderActions(actions, isToday) {
+        // Two places to render: 
+        // 1. Pending list in Home Tab (only pending)
+        // 2. Full list in Actions Tab (all)
+
+        const pendingContainer = document.getElementById('pendingList');
+        const fullContainer = document.getElementById('todayActionsList');
+        const pendingArea = document.getElementById('pendingActionsArea');
+
+        pendingContainer.innerHTML = '';
+        fullContainer.innerHTML = '';
+
+        let pendingCount = 0;
+
+        if (actions.length === 0) {
+            fullContainer.innerHTML = '<p style="text-align:center; color:#ccc;">هیچ اقدامی ثبت نشده است.</p>';
+        }
+
+        actions.forEach(action => {
+            const html = `
+                <div class="action-item ${action.done ? 'done' : ''}">
+                    <div class="action-checkbox ${action.done ? 'checked' : ''}" onclick="toggleAction(${action.id})">
+                        <i class="fas fa-check" style="${action.done ? '' : 'display:none'}"></i>
+                    </div>
+                    <div style="flex:1;">
+                        <span class="action-type ${action.type === 'reward' ? 'type-reward' : 'type-penalty'}">
+                            ${action.type === 'reward' ? 'پاداش' : 'جریمه'}
+                        </span>
+                        <span style="font-weight:bold;">${action.text}</span>
+                    </div>
+                    ${!action.done ? `<i class="fas fa-trash" style="color:#ccc; cursor:pointer;" onclick="deleteAction(${action.id})"></i>` : ''}
+                </div>
+            `;
+            
+            fullContainer.innerHTML += html;
+            
+            if (!action.done) {
+                pendingContainer.innerHTML += html;
+                pendingCount++;
+            }
+        });
+
+        if (pendingCount > 0) pendingArea.style.display = 'block';
+        else pendingArea.style.display = 'none';
+    }
+
+    function toggleAction(id) {
+        const key = getDateKey(viewingDate);
+        const action = db.logs[key].actions.find(a => a.id === id);
+        if (action) {
+            action.done = !action.done;
+            saveDB();
+            renderUI();
+        }
+    }
+
+    function deleteAction(id) {
+        if(!confirm('حذف شود؟')) return;
+        const key = getDateKey(viewingDate);
+        db.logs[key].actions = db.logs[key].actions.filter(a => a.id !== id);
+        saveDB();
+        renderUI();
+    }
+
+    // --- EDITORS ---
+
+    function openBehaviorEditor() {
+        currentEditorType = 'behavior';
+        document.getElementById('editorTitle').innerText = "ویرایش رفتارها";
+        document.getElementById('editorWeight').style.display = 'block';
+        document.getElementById('editorType').style.display = 'block';
+        renderEditorList();
+        document.getElementById('editorModal').style.display = 'flex';
+    }
+
+    function openRewardPenaltyEditor() {
+        currentEditorType = 'rp';
+        document.getElementById('editorTitle').innerText = "ویرایش پاداش و جریمه";
+        document.getElementById('editorWeight').style.display = 'block'; // reusing for threshold
+        document.getElementById('editorWeight').placeholder = "حدنصاب";
+        document.getElementById('editorType').style.display = 'block';
+        // Change options
+        const select = document.getElementById('editorType');
+        select.innerHTML = '<option value="reward">پاداش</option><option value="penalty">جریمه</option>';
+        
+        renderEditorList();
+        document.getElementById('editorModal').style.display = 'flex';
+    }
+
+    function renderEditorList() {
+        const container = document.getElementById('editorList');
+        container.innerHTML = '';
+
+        if (currentEditorType === 'behavior') {
+            db.behaviors.forEach((b, idx) => {
+                container.innerHTML += `
+                    <div class="action-item">
+                        <span style="font-size:0.8rem; width:50px;">${b.type==='virtue'?'خوب':'بد'} (${b.weight})</span>
+                        <span style="flex:1">${b.title}</span>
+                        <i class="fas fa-trash" style="color:var(--danger); cursor:pointer;" onclick="removeEditorItem('behavior', ${idx})"></i>
+                    </div>
+                `;
+            });
+        } else {
+            // Rewards
+            container.innerHTML += '<h4>پاداش‌ها</h4>';
+            db.rewardsList.forEach((r, idx) => {
+                container.innerHTML += `
+                    <div class="action-item">
+                        <span style="font-size:0.8rem; width:30px;">>${r.threshold}</span>
+                        <span style="flex:1">${r.text}</span>
+                        <i class="fas fa-trash" style="color:var(--danger); cursor:pointer;" onclick="removeEditorItem('reward', ${idx})"></i>
+                    </div>
+                `;
+            });
+            // Penalties
+            container.innerHTML += '<h4>جریمه‌ها</h4>';
+            db.penaltiesList.forEach((p, idx) => {
+                container.innerHTML += `
+                    <div class="action-item">
+                        <span style="font-size:0.8rem; width:30px;"><${p.threshold}</span>
+                        <span style="flex:1">${p.text}</span>
+                        <i class="fas fa-trash" style="color:var(--danger); cursor:pointer;" onclick="removeEditorItem('penalty', ${idx})"></i>
+                    </div>
+                `;
+            });
+        }
+    }
+
+    function editorAddItem() {
+        const title = document.getElementById('editorInput').value;
+        const weight = parseInt(document.getElementById('editorWeight').value);
+        const type = document.getElementById('editorType').value;
+
+        if (!title || isNaN(weight)) { alert('لطفا عنوان و عدد را وارد کنید'); return; }
+
+        if (currentEditorType === 'behavior') {
+            db.behaviors.push({
+                id: Date.now().toString(),
+                title: title,
+                type: type,
+                weight: weight
+            });
+        } else {
+            if (type === 'reward') db.rewardsList.push({ text: title, threshold: weight });
+            else db.penaltiesList.push({ text: title, threshold: weight }); // Users usually input negative for penalty threshold e.g -5
+        }
+        saveDB();
+        renderEditorList();
+        document.getElementById('editorInput').value = '';
+    }
+
+    function removeEditorItem(type, index) {
+        if(!confirm('حذف شود؟')) return;
+        if (type === 'behavior') db.behaviors.splice(index, 1);
+        else if (type === 'reward') db.rewardsList.splice(index, 1);
+        else db.penaltiesList.splice(index, 1);
+        saveDB();
+        renderEditorList();
+    }
+
+    // --- TAB SWITCHING ---
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-view').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById('tab-' + tabId).style.display = 'block';
+        
+        // Find button index based on id to highlight
+        const map = { 'home': 0, 'actions': 1, 'settings': 2 };
+        document.querySelectorAll('.nav-btn')[map[tabId]].classList.add('active');
+    }
+
+    // --- EXPORT/IMPORT ---
     function exportData() {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
         const downloadAnchorNode = document.createElement('a');
         downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", "Amir_Ethics_Backup_" + getFormattedDate(new Date()) + ".json");
+        downloadAnchorNode.setAttribute("download", "Ethics_Backup_" + getDateKey(new Date()) + ".json");
         document.body.appendChild(downloadAnchorNode);
         downloadAnchorNode.click();
         downloadAnchorNode.remove();
@@ -592,97 +770,19 @@
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
-                const importedDb = JSON.parse(e.target.result);
-                if(importedDb.behaviors && importedDb.logs) {
-                    db = importedDb;
-                    saveData();
-                    alert("اطلاعات با موفقیت بازیابی شد.");
+                const imported = JSON.parse(e.target.result);
+                if (imported.user && imported.logs) {
+                    db = imported;
+                    saveDB();
+                    alert("بازگردانی موفقیت‌آمیز بود.");
+                    location.reload();
                 } else {
                     alert("فایل نامعتبر است.");
                 }
-            } catch(err) {
-                alert("خطا در خواندن فایل.");
-            }
+            } catch(err) { alert("خطا در خواندن فایل"); }
         };
         reader.readAsText(file);
     }
-
-    // --- Chart Logic ---
-    function renderChart() {
-        const ctx = document.getElementById('progressChart').getContext('2d');
-        
-        // Get last 7 days data
-        const labels = [];
-        const dataPoints = [];
-        let totalScore = 0;
-        let maxScore = -9999;
-
-        for (let i = 6; i >= 0; i--) {
-            const d = new Date();
-            d.setDate(d.getDate() - i);
-            const key = getFormattedDate(d);
-            
-            // Calculate score for that day
-            let dayScore = 0;
-            if (db.logs[key]) {
-                db.behaviors.forEach(b => {
-                    if (db.logs[key][b.id]) {
-                        const count = db.logs[key][b.id].count;
-                        if (b.type === 'virtue') dayScore += (count * b.weight);
-                        else dayScore -= (count * b.weight);
-                    }
-                });
-            }
-            
-            labels.push(d.toLocaleDateString('fa-IR', {weekday: 'short'}));
-            dataPoints.push(dayScore);
-            totalScore += dayScore;
-            if(dayScore > maxScore) maxScore = dayScore;
-        }
-
-        document.getElementById('totalLifetimeScore').innerText = totalScore;
-        document.getElementById('bestDayScore').innerText = maxScore > -9999 ? `+${maxScore}` : '0';
-
-        if (myChart) myChart.destroy();
-
-        myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'تراز اخلاقی',
-                    data: dataPoints,
-                    borderColor: '#4f46e5',
-                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                    borderWidth: 3,
-                    tension: 0.4,
-                    fill: true,
-                    pointBackgroundColor: '#fff',
-                    pointBorderColor: '#4f46e5',
-                    pointRadius: 5
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: '#f3f4f6' }
-                    },
-                    x: {
-                        grid: { display: false }
-                    }
-                }
-            }
-        });
-    }
-
-    // Init
-    updateUI();
 
 </script>
 </body>
