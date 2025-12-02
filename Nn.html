@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+   <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -149,6 +149,7 @@
         .btn { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
         .btn-accept { background: var(--primary); color: white; flex: 1; }
         .btn-change { background: white; border: 1px solid #cbd5e1; color: var(--text-light); }
+        .btn-danger-outline { background: white; border: 1px solid var(--danger); color: var(--danger); }
 
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -334,6 +335,12 @@
                 <input type="file" id="restoreFile" style="display:none" onchange="restoreData(this)">
                 <button class="btn btn-change" style="width:100%; margin-top:10px;" onclick="document.getElementById('restoreFile').click()">بازگردانی اطلاعات</button>
             </div>
+
+            <div class="card" style="border-right-color: var(--danger);">
+                <h3 style="color:var(--danger);">پاکسازی داده‌ها</h3>
+                <button class="btn btn-danger-outline" style="width:100%" onclick="openClearDataModal()">حذف اطلاعات</button>
+            </div>
+            
             <br><br><br>
         </div>
     </div>
@@ -382,6 +389,30 @@
     </div>
 </div>
 
+<!-- MODAL: CLEAR DATA -->
+<div id="clearDataModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3 style="color:var(--danger)">حذف اطلاعات</h3>
+        <p>لطفاً بازه زمانی را انتخاب کنید:</p>
+        
+        <div class="form-group">
+            <label>
+                <input type="radio" name="clearOption" value="today" checked> امروز
+            </label>
+        </div>
+        <div class="form-group">
+            <label>
+                <input type="radio" name="clearOption" value="all"> تمام اطلاعات (بازگشت به تنظیمات کارخانه)
+            </label>
+        </div>
+        
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button class="btn btn-danger" style="flex:1" onclick="performClearData()">حذف کن</button>
+            <button class="btn btn-change" style="flex:1" onclick="document.getElementById('clearDataModal').style.display='none'">انصراف</button>
+        </div>
+    </div>
+</div>
+
 <!-- MODAL: EDITOR (GENERIC) -->
 <div id="editorModal" class="modal-overlay">
     <div class="modal-content">
@@ -404,8 +435,8 @@
         <div id="editorListContainer" style="max-height:300px; overflow-y:auto; margin-bottom:20px;"></div>
 
         <div style="border-top:1px solid #eee; padding-top:15px;">
-            <h4 style="margin-top:0">افزودن / ویرایش مورد</h4>
-            <input type="hidden" id="editId">
+            <h4 style="margin-top:0" id="formTitle">افزودن جدید</h4>
+            <input type="hidden" id="editId" value="">
             
             <!-- Fields for Behavior -->
             <div id="behaviorFields" style="display:none;">
@@ -460,7 +491,10 @@
                 </div>
             </div>
 
-            <button class="btn btn-accept" style="width:100%" onclick="saveEditorItem()">ذخیره</button>
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-accept" style="flex:1" onclick="saveEditorItem()">ذخیره</button>
+                <button class="btn btn-change" style="display:none; flex:1" id="cancelEditBtn" onclick="resetEditorForm()">انصراف</button>
+            </div>
         </div>
     </div>
 </div>
@@ -473,64 +507,87 @@
     const DEFAULT_DATA = {
         user: { name: "" },
         behaviors: [
-            // Virtues (10+)
-            { id: 'v1', title: 'مطالعه کتاب', type: 'virtue', weight: 5 },
-            { id: 'v2', title: 'کمک به فقیر', type: 'virtue', weight: 10 },
-            { id: 'v3', title: 'ورزش روزانه', type: 'virtue', weight: 3 },
-            { id: 'v4', title: 'سحرخیزی', type: 'virtue', weight: 4 },
-            { id: 'v5', title: 'کنترل خشم', type: 'virtue', weight: 8 },
-            { id: 'v6', title: 'صله‌ی رحم', type: 'virtue', weight: 3 },
-            { id: 'v7', title: 'نظافت شخصی', type: 'virtue', weight: 2 },
-            { id: 'v8', title: 'یادگیری مهارت جدید', type: 'virtue', weight: 5 },
+            // Virtues
+            { id: 'v1', title: 'خردورزی', type: 'virtue', weight: 5 },
+            { id: 'v2', title: 'انضباط شخصی', type: 'virtue', weight: 4 },
+            { id: 'v3', title: 'صداقت', type: 'virtue', weight: 5 },
+            { id: 'v4', title: 'مسئولیت‌پذیری', type: 'virtue', weight: 4 },
+            { id: 'v5', title: 'همدلی', type: 'virtue', weight: 3 },
+            { id: 'v6', title: 'کمک به همنوع', type: 'virtue', weight: 5 },
+            { id: 'v7', title: 'کنترل خشم', type: 'virtue', weight: 6 },
+            { id: 'v8', title: 'احترام به حریم‌ها', type: 'virtue', weight: 3 },
             { id: 'v9', title: 'شکرگزاری', type: 'virtue', weight: 2 },
-            { id: 'v10', title: 'راستگویی در شرایط سخت', type: 'virtue', weight: 10 },
-            // Vices (10+)
+            { id: 'v10', title: 'یادگیری مستمر', type: 'virtue', weight: 4 },
+            { id: 'v11', title: 'نظافت و آراستگی', type: 'virtue', weight: 2 },
+            { id: 'v12', title: 'وفای به عهد', type: 'virtue', weight: 5 },
+            { id: 'v13', title: 'عدالت و انصاف', type: 'virtue', weight: 5 },
+            { id: 'v14', title: 'شجاعت', type: 'virtue', weight: 4 },
+            { id: 'v15', title: 'تاب‌آوری', type: 'virtue', weight: 3 },
+            { id: 'v16', title: 'رازداری', type: 'virtue', weight: 4 },
+            { id: 'v17', title: 'سحرخیزی', type: 'virtue', weight: 3 },
+            { id: 'v18', title: 'سکوتِ آگاهانه', type: 'virtue', weight: 2 },
+            { id: 'v19', title: 'حفظ محیط زیست', type: 'virtue', weight: 2 },
+            { id: 'v20', title: 'عزت نفس', type: 'virtue', weight: 4 },
+            // Vices
             { id: 'x1', title: 'دروغ', type: 'vice', weight: 5 },
-            { id: 'x2', title: 'غیبت', type: 'vice', weight: 5 },
-            { id: 'x3', title: 'تهمت', type: 'vice', weight: 10 },
-            { id: 'x4', title: 'سخن‌چینی', type: 'vice', weight: 5 },
-            { id: 'x5', title: 'فحاشی و بددهنی', type: 'vice', weight: 4 },
-            { id: 'x6', title: 'اتلاف وقت در فضای مجازی', type: 'vice', weight: 2 },
-            { id: 'x7', title: 'پرخوری', type: 'vice', weight: 2 },
+            { id: 'x2', title: 'غیبت', type: 'vice', weight: 4 },
+            { id: 'x3', title: 'توهین و فحاشی', type: 'vice', weight: 4 },
+            { id: 'x4', title: 'تهمت', type: 'vice', weight: 6 },
+            { id: 'x5', title: 'سخن‌چینی', type: 'vice', weight: 4 },
+            { id: 'x6', title: 'تنبلی و اهمال', type: 'vice', weight: 3 },
+            { id: 'x7', title: 'حسادت', type: 'vice', weight: 3 },
             { id: 'x8', title: 'قضاوت عجولانه', type: 'vice', weight: 3 },
-            { id: 'x9', title: 'بدقولی', type: 'vice', weight: 4 },
-            { id: 'x10', title: 'اسراف', type: 'vice', weight: 3 }
+            { id: 'x9', title: 'پرخوری یا پرخوابی', type: 'vice', weight: 2 },
+            { id: 'x10', title: 'اسراف', type: 'vice', weight: 2 },
+            { id: 'x11', title: 'تکبر و خودبرتربینی', type: 'vice', weight: 4 },
+            { id: 'x12', title: 'بدقولی', type: 'vice', weight: 4 },
+            { id: 'x13', title: 'کنترل‌گری', type: 'vice', weight: 3 },
+            { id: 'x14', title: 'قربانی‌نمایی', type: 'vice', weight: 3 },
+            { id: 'x15', title: 'نگاه آلوده یا پورنوگرافی', type: 'vice', weight: 5 },
+            { id: 'x16', title: 'کینه و انتقام‌جویی', type: 'vice', weight: 4 },
+            { id: 'x17', title: 'خیانت', type: 'vice', weight: 6 },
+            { id: 'x18', title: 'چاپلوسی', type: 'vice', weight: 3 },
+            { id: 'x19', title: 'ناامیدی و پوچ‌گرایی', type: 'vice', weight: 4 },
+            { id: 'x20', title: 'بی‌تفاوتی', type: 'vice', weight: 3 }
         ],
         rules: [
-            { id: 'r1', type: 'total_pos', targetId: null, threshold: 50, resultType: 'reward', resultText: 'تماشای یک فیلم سینمایی', isSpecific: false },
-            { id: 'r2', type: 'total_neg', targetId: null, threshold: 20, resultType: 'penalty', resultText: '۲۰ دقیقه پیاده‌روی تنبیهی', isSpecific: false },
-            { id: 'r3', type: 'specific', targetId: 'v1', threshold: 30, resultType: 'reward', resultText: 'خرید یک کتاب جدید', isSpecific: true },
-            { id: 'r4', type: 'specific', targetId: 'x1', threshold: 10, resultType: 'penalty', resultText: '۱۰ هزار تومان صدقه جریمه', isSpecific: true }
+            // General Rules
+            { id: 'r1', type: 'total_pos', targetId: null, threshold: 50, resultType: 'reward', resultText: 'تماشای فیلم یا سریال', isSpecific: false },
+            { id: 'r2', type: 'total_neg', targetId: null, threshold: 20, resultType: 'penalty', resultText: '۲۰ شنا سوئدی اضافه', isSpecific: false },
+            
+            // Specific Rules Examples (Can be edited)
+            { id: 'r3', type: 'specific', targetId: 'v1', threshold: 30, resultType: 'reward', resultText: 'خرید کتاب', isSpecific: true },
+            { id: 'r4', type: 'specific', targetId: 'x1', threshold: 10, resultType: 'penalty', resultText: '۱۰ هزار تومان صدقه', isSpecific: true }
         ],
         logs: {} 
     };
 
     let db = JSON.parse(localStorage.getItem('EthicsDB_Final')) || JSON.parse(JSON.stringify(DEFAULT_DATA));
     let viewingDate = new Date();
-    let currentEditorMode = null; // 'behavior' or 'rule'
-    let currentRuleFilter = 'virtue'; // for filtering rules in editor
+    let currentEditorMode = null; 
+    let currentRuleFilter = 'virtue';
+    let editingItemId = null; // For tracking what we are editing
 
-    // --- Helper: Persian Date Converter ---
+    // --- Helper: Persian Date Converter (Updated) ---
     function getVerbalDate(date) {
         const weekDays = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه'];
         const months = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
         
-        const options = { year: 'numeric', month: 'numeric', day: 'numeric', weekday: 'long' };
-        // We use en-US-u-ca-persian to get numeric parts first then convert
+        // Convert to Persian Calendar first
+        const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
         const parts = new Intl.DateTimeFormat('fa-IR', options).formatToParts(date);
         
-        let y, m, d, wd;
+        let y, m, d;
         parts.forEach(p => {
             if(p.type === 'year') y = p.value;
-            if(p.type === 'month') m = p.value; // name
+            if(p.type === 'month') m = p.value;
             if(p.type === 'day') d = p.value;
-            if(p.type === 'weekday') wd = p.value;
         });
 
-        // Fix numeric string from fa to integer for conversion
         const parseFa = (s) => parseInt(s.replace(/[۰-۹]/g, c => c.charCodeAt(0) - 1776));
         const dayInt = parseFa(d);
         const yearInt = parseFa(y);
+        const monthInt = parseFa(m);
 
         const numToWord = (n) => {
             if (n === 0) return 'صفر';
@@ -565,22 +622,17 @@
             return str;
         };
 
-        // Special case for 1404 as requested exact wording if possible, but dynamic is better. 
-        // Using the dynamic function above will output "هزار و چهارصد و چهار".
-        
-        // Day names logic for 1-31 (Ordinal-ish)
         const dayOrdinals = ["", "یکم", "دوم", "سوم", "چهارم", "پنجم", "ششم", "هفتم", "هشتم", "نهم", "دهم", 
                    "یازدهم", "دوازدهم", "سیزدهم", "چهاردهم", "پانزدهم", "شانزدهم", "هفدهم", "هجدهم", "نوزدهم", "بیستم",
                    "بیست و یکم", "بیست و دوم", "بیست و سوم", "بیست و چهارم", "بیست و پنجم", "بیست و ششم", "بیست و هفتم", "بیست و هشتم", "بیست و نهم", "سی‌ام", "سی و یکم"];
         
         const dayWord = dayOrdinals[dayInt];
         const yearWord = numToWord(yearInt);
-        
-        // Re-obtaining month name to be sure
-        const monthName = new Intl.DateTimeFormat('fa-IR', {month: 'long'}).format(date);
+        const monthNameStr = months[monthInt - 1];
         const weekDayName = new Intl.DateTimeFormat('fa-IR', {weekday: 'long'}).format(date);
 
-        return `${weekDayName}، ${dayWord} ${monthName} ${yearWord}`;
+        // Output Format: سه‌شنبه، یازدهم آذر هزار و چهارصد و چهار
+        return `${weekDayName}، ${dayWord} ${monthNameStr} ${yearWord}`;
     }
 
     function getKey(date) { return date.toLocaleDateString('en-CA'); }
@@ -648,7 +700,6 @@
         const todayKey = getKey(new Date());
         
         // Header Date
-        // Format: ۱۴۰۳/۰۹/۱۱
         const dateNum = new Intl.DateTimeFormat('fa-IR').format(viewingDate);
         const weekDay = new Intl.DateTimeFormat('fa-IR', {weekday:'long'}).format(viewingDate);
         document.getElementById('headerDateDisplay').innerText = (key === todayKey ? "امروز، " : "") + `${weekDay} ${dateNum}`;
@@ -774,20 +825,12 @@
 
             if (rule.type === 'total_net') {
                 currentValue = total;
-                 // Net score logic:
-                 // Reward (Positive Threshold): If score >= 50, AND last consumed was < 50 (or 0).
-                 // We check if current > consumed.
-                 // Example: Thr=50. Score=55. Consumed=0. -> Trigger. New Consumed=50.
-                 // Next Score=110. Consumed=50. 110-50 >= 50 -> Trigger. New Consumed=100.
                  if (rule.resultType === 'reward') {
                      if (currentValue - consumedValue >= rule.threshold) {
                          showTriggerAlert(rule);
                          break; 
                      }
                  } else {
-                     // Penalty (Negative Threshold e.g. -50). Score -60. Consumed 0.
-                     // If Score <= (Consumed - |Threshold|)
-                     // e.g. -60 <= (0 - 50) -> True. Trigger. New Consumed = -50.
                      if (currentValue <= (consumedValue - Math.abs(rule.threshold))) {
                          showTriggerAlert(rule);
                          break;
@@ -813,7 +856,7 @@
                 const b = db.behaviors.find(x => x.id === bId);
                 if (!b) continue;
                 const count = log.behaviors[bId] || 0;
-                currentValue = count * b.weight; // Based on prompt: "اگر دروغ ۱۰ امتیاز شد"
+                currentValue = count * b.weight; 
                 
                 if (currentValue - consumedValue >= rule.threshold) {
                      showTriggerAlert(rule);
@@ -869,7 +912,6 @@
 
         if (!log.consumed[ruleId]) log.consumed[ruleId] = 0;
         
-        // Logic for updating consumed to prevent re-trigger
         if (rule.type === 'total_net' && rule.resultType === 'penalty') {
              log.consumed[ruleId] -= Math.abs(rule.threshold);
         } else {
@@ -893,11 +935,11 @@
         const name = db.user.name;
         
         const now = new Date();
-        const dateStr = getVerbalDate(now); // e.g. سه‌شنبه، یازدهم آذر...
-        const timeStr = now.toLocaleTimeString('fa-IR', {hour:'numeric', minute:'numeric'});
-        // Fix minute text format: ۹:۱۸ دقیقه
-        const timeParts = timeStr.split(':');
-        const formattedTime = `${timeParts[0]}:${timeParts[1]} دقیقه`;
+        const dateStr = getVerbalDate(now);
+        // Custom Time Format: ۹:۱۸ دقیقه
+        const h = now.getHours().toLocaleString('fa-IR');
+        const m = now.getMinutes().toLocaleString('fa-IR').padStart(2,'۰');
+        const formattedTime = `${h}:${m} دقیقه`;
 
         const text = `
             من <strong>${name}</strong> در تاریخ <strong>${dateStr}</strong> و ساعت <strong>${formattedTime}</strong> منشور اخلاقی‌ام را مرور می‌کنم.<br><br>
@@ -1012,23 +1054,24 @@
     }
 
     // ==========================================
-    // 7. EDITORS
+    // 7. EDITORS (Full CRUD)
     // ==========================================
 
     function openEditor(type) {
         currentEditorMode = type;
         document.getElementById('editorTitle').innerText = type === 'behavior' ? 'مدیریت رفتارها' : 'مدیریت قوانین';
         
-        // Show/Hide toggle based on type
         document.getElementById('ruleListToggle').style.display = type === 'rule' ? 'flex' : 'none';
-        document.getElementById('editorSearch').style.display = type === 'behavior' ? 'block' : 'none'; // only behavior has search
+        document.getElementById('editorSearch').style.display = type === 'behavior' ? 'block' : 'none';
 
         document.getElementById('behaviorFields').style.display = type === 'behavior' ? 'block' : 'none';
         document.getElementById('ruleFields').style.display = type === 'rule' ? 'block' : 'none';
         
+        resetEditorForm(); // Clear form state
+
         if(type === 'rule') {
             populateTargetSelect();
-            toggleRuleInputs(); // Reset UI state
+            toggleRuleInputs();
         }
         
         renderEditorList();
@@ -1055,7 +1098,6 @@
         const type = document.getElementById('ruleType').value;
         document.getElementById('specificBehDiv').style.display = type === 'specific' ? 'block' : 'none';
         
-        // Auto logic for general types
         const resTypeInput = document.getElementById('ruleResultType');
         const resTypeDisp = document.getElementById('ruleResultTypeDisplay');
         const autoInd = document.getElementById('ruleAutoTypeIndicator');
@@ -1067,10 +1109,9 @@
         } else if (type === 'specific') {
             updateRuleResultTypeBasedOnTarget();
         }
-        // total_net is manual choice in dropdown? No, logic says net > threshold = reward.
-        // Let's allow user to choose type for net, but typically + is reward.
+        
         if (type === 'total_net') {
-            // User can choose
+            // Reset to neutral, user will likely set threshold sign
         }
     }
 
@@ -1108,17 +1149,13 @@
                     <div class="list-row">
                         <span>${b.title} <span style="font-size:0.8rem; color:#999;">(${b.type==='virtue'?'مثبت':'منفی'} - ${b.weight})</span></span>
                         <div>
+                            <i class="fas fa-edit btn-icon edit" onclick="editItem('behavior', ${idx})"></i>
                             <i class="fas fa-trash btn-icon delete" onclick="deleteItem('behavior', ${idx})"></i>
                         </div>
                     </div>
                 `;
             });
         } else {
-            // Filter Rules based on toggle (Virtue rules / Vice rules)
-            // Virtue Rules: total_pos, or specific-virtue
-            // Vice Rules: total_neg, or specific-vice
-            // Total_net -> ? let's show in both or separate? Show in Virtue if reward, Vice if penalty
-            
             const filteredRules = db.rules.filter(r => {
                 let isVirtue = false;
                 if (r.type === 'total_pos') isVirtue = true;
@@ -1130,14 +1167,12 @@
                 else if (r.type === 'total_net') {
                     isVirtue = r.resultType === 'reward';
                 }
-                
                 return (currentRuleFilter === 'virtue' && isVirtue) || (currentRuleFilter === 'vice' && !isVirtue);
             });
 
             if(filteredRules.length === 0) container.innerHTML = '<p style="text-align:center; color:#999">موردی یافت نشد.</p>';
 
             filteredRules.forEach((r) => {
-                // Find original index
                 const originalIdx = db.rules.indexOf(r);
                 let desc = getRuleDescription(r);
                 container.innerHTML += `
@@ -1147,6 +1182,7 @@
                             <div style="color:var(--text-light); margin-top:2px;">${r.resultText}</div>
                         </div>
                         <div>
+                            <i class="fas fa-edit btn-icon edit" onclick="editItem('rule', ${originalIdx})"></i>
                             <i class="fas fa-trash btn-icon delete" onclick="deleteItem('rule', ${originalIdx})"></i>
                         </div>
                     </div>
@@ -1157,6 +1193,38 @@
     
     function filterEditorList() { renderEditorList(); }
 
+    function editItem(type, index) {
+        editingItemId = index; // Storing index for splice
+        document.getElementById('formTitle').innerText = "ویرایش مورد";
+        document.getElementById('cancelEditBtn').style.display = 'inline-block';
+        
+        if (type === 'behavior') {
+            const item = db.behaviors[index];
+            document.getElementById('behTitle').value = item.title;
+            document.getElementById('behType').value = item.type;
+            document.getElementById('behWeight').value = item.weight;
+        } else {
+            const item = db.rules[index];
+            document.getElementById('ruleType').value = item.type;
+            toggleRuleInputs();
+            if(item.targetId) document.getElementById('ruleTargetId').value = item.targetId;
+            document.getElementById('ruleThreshold').value = Math.abs(item.threshold);
+            document.getElementById('ruleResultText').value = item.resultText;
+            document.getElementById('ruleIsSpecific').checked = item.isSpecific;
+        }
+    }
+
+    function resetEditorForm() {
+        editingItemId = null;
+        document.getElementById('formTitle').innerText = "افزودن جدید";
+        document.getElementById('cancelEditBtn').style.display = 'none';
+        
+        // Clear Inputs
+        document.getElementById('behTitle').value = '';
+        document.getElementById('ruleResultText').value = '';
+        document.getElementById('ruleThreshold').value = '';
+    }
+
     function saveEditorItem() {
         if (currentEditorMode === 'behavior') {
             const title = document.getElementById('behTitle').value.trim();
@@ -1165,10 +1233,18 @@
             
             if(!title) return alert('عنوان الزامی است');
             
-            db.behaviors.push({
-                id: 'b' + Date.now(),
-                title, type, weight
-            });
+            if (editingItemId !== null) {
+                // Edit
+                db.behaviors[editingItemId].title = title;
+                db.behaviors[editingItemId].type = type;
+                db.behaviors[editingItemId].weight = weight;
+            } else {
+                // Add
+                db.behaviors.push({
+                    id: 'b' + Date.now(),
+                    title, type, weight
+                });
+            }
 
         } else {
             const rType = document.getElementById('ruleType').value;
@@ -1180,26 +1256,26 @@
 
             if(!resText || isNaN(threshold)) return alert('اطلاعات ناقص است');
 
-            // Ensure Penalty Threshold is treated as absolute value for logic, but if net_total, sign matters?
-            // Logic 4 handles Absolute. So we just save positive number here.
-            
-            db.rules.push({
-                id: 'r' + Date.now(),
+            const newRule = {
+                id: editingItemId !== null ? db.rules[editingItemId].id : 'r' + Date.now(),
                 type: rType,
                 targetId: rType === 'specific' ? target : null,
-                threshold: Math.abs(threshold), // Store as positive magnitude
+                threshold: Math.abs(threshold),
                 resultType: resType,
                 resultText: resText,
                 isSpecific: isSpec
-            });
+            };
+
+            if (editingItemId !== null) {
+                db.rules[editingItemId] = newRule;
+            } else {
+                db.rules.push(newRule);
+            }
         }
         
         saveDB();
+        resetEditorForm();
         renderEditorList();
-        // Reset inputs
-        document.getElementById('behTitle').value = '';
-        document.getElementById('ruleResultText').value = '';
-        document.getElementById('ruleThreshold').value = '';
     }
 
     function deleteItem(type, index) {
@@ -1207,6 +1283,7 @@
         if(type === 'behavior') db.behaviors.splice(index, 1);
         else db.rules.splice(index, 1);
         saveDB();
+        resetEditorForm();
         renderEditorList();
     }
 
@@ -1216,7 +1293,7 @@
     }
 
     // ==========================================
-    // 8. BACKUP & RESTORE
+    // 8. DATA MANAGEMENT
     // ==========================================
     
     function backupData() {
@@ -1248,6 +1325,31 @@
             }
         };
         reader.readAsText(file);
+    }
+    
+    function openClearDataModal() {
+        document.getElementById('clearDataModal').style.display = 'flex';
+    }
+    
+    function performClearData() {
+        const option = document.querySelector('input[name="clearOption"]:checked').value;
+        
+        if (option === 'all') {
+            if(confirm("آیا مطمئنید؟ تمام اطلاعات شما پاک خواهد شد.")) {
+                localStorage.removeItem('EthicsDB_Final');
+                location.reload();
+            }
+        } else {
+            // Clear Today
+            const key = getKey(new Date());
+            if (db.logs[key]) {
+                delete db.logs[key];
+                saveDB();
+                renderHome();
+                document.getElementById('clearDataModal').style.display = 'none';
+                alert('اطلاعات امروز پاک شد.');
+            }
+        }
     }
 
 </script>
