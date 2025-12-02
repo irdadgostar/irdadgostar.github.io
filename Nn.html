@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -25,7 +25,7 @@
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        
+    
         body {
             background-color: var(--bg-body);
             color: var(--text-main);
@@ -48,6 +48,8 @@
             border-radius: 50px; font-size: 0.85rem; font-weight: bold;
             display: flex; align-items: center; gap: 6px; cursor: pointer;
             box-shadow: var(--shadow); transition: 0.2s;
+            /* Fixed width to prevent resizing */
+            min-width: 140px; justify-content: center;
         }
         .manifesto-btn.read { background: var(--success); color: white; border-color: var(--success); }
 
@@ -182,11 +184,25 @@
         .nav-item.active { color: var(--primary); }
 
         /* --- Modal --- */
+        /* LAYER MANAGEMENT (FIXED) */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); backdrop-filter: blur(3px);
             z-index: 2000; display: none; align-items: center; justify-content: center;
         }
+        
+        /* Specific Z-Indices to ensure correct layering */
+        #manifestoModal { z-index: 2000; }
+        #nameModal { z-index: 2000; }
+        #clearDataModal { z-index: 2000; }
+        #editorModal { z-index: 2000; }
+        #dateRangeModal { z-index: 2000; }
+        
+        /* These must be higher as they can open ON TOP of others */
+        #actionListPopupModal { z-index: 2100; } /* On top of home or range stats */
+        #editFormModal { z-index: 2100; } /* On top of editor */
+        #actionDetailModal { z-index: 2200; } /* On top of action list popup */
+
         .modal-content {
             background: white; width: 90%; max-width: 500px; border-radius: 20px;
             padding: 20px; max-height: 90vh; overflow-y: auto;
@@ -271,150 +287,150 @@
 
 <div id="app">
 
-    <!-- TAB: HOME -->
-    <div id="tab-home" class="tab-content active">
-        <div class="container">
-            
-            <div class="top-bar">
-                <button class="manifesto-btn" onclick="openManifestoModal()">
-                    <i class="fas fa-book-open"></i> <span id="manifestoBtnText">منشور اخلاقی</span>
-                </button>
-                <div class="date-navigator">
-                    <button class="date-btn" onclick="navigateDate(-1)"><i class="fas fa-chevron-right"></i></button>
-                    <div class="date-text" id="headerDateDisplay">...</div>
-                    <button class="date-btn" id="nextDayBtn" onclick="navigateDate(1)" disabled><i class="fas fa-chevron-left"></i></button>
-                </div>
+<!-- TAB: HOME -->
+<div id="tab-home" class="tab-content active">
+    <div class="container">
+        
+        <div class="top-bar">
+            <button class="manifesto-btn" onclick="openManifestoModal()">
+                <i class="fas fa-book-open" id="manifestoIcon"></i> <span id="manifestoBtnText">منشور اخلاقی</span>
+            </button>
+            <div class="date-navigator">
+                <button class="date-btn" onclick="navigateDate(-1)"><i class="fas fa-chevron-right"></i></button>
+                <div class="date-text" id="headerDateDisplay">...</div>
+                <button class="date-btn" id="nextDayBtn" onclick="navigateDate(1)" disabled><i class="fas fa-chevron-left"></i></button>
             </div>
-
-            <div class="score-card neutral" id="scoreCard">
-                <div class="score-label">تراز امروز</div>
-                <div class="main-score" id="totalScoreDisplay">0</div>
-                <div class="sub-scores">
-                    <div class="sub-score-item">
-                        <span class="sub-val" id="posScoreDisplay">0</span>
-                        <span class="sub-lbl">مثبت</span>
-                    </div>
-                    <div class="sub-score-item">
-                        <span class="sub-val" id="negScoreDisplay">0</span>
-                        <span class="sub-lbl">منفی</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Trigger Notification Area -->
-            <div id="triggerArea"></div>
-
-            <!-- Pending Actions Summary (New Design) -->
-            <div id="homePendingSummary" class="stats-summary-card" style="margin-bottom: 20px; display:none;">
-                <div class="stat-box stat-reward" onclick="openActionListModal('reward', false)">
-                    <span class="stat-num" id="pendingRewardCount">0</span>
-                    <span class="stat-label">پاداش مانده</span>
-                </div>
-                <div class="stat-box stat-penalty" onclick="openActionListModal('penalty', false)">
-                    <span class="stat-num" id="pendingPenaltyCount">0</span>
-                    <span class="stat-label">جریمه مانده</span>
-                </div>
-            </div>
-
-            <!-- Search -->
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="homeSearch" placeholder="جستجو در رفتارها..." oninput="filterHomeList()">
-            </div>
-
-            <!-- Virtues -->
-            <div class="section-header">
-                <span class="section-title virtue"><i class="fas fa-check-circle"></i> فضایل</span>
-            </div>
-            <div id="virtuesList"></div>
-
-            <!-- Vices -->
-            <div class="section-header">
-                <span class="section-title vice"><i class="fas fa-times-circle"></i> رذایل</span>
-            </div>
-            <div id="vicesList"></div>
-
         </div>
-    </div>
 
-    <!-- TAB: ACTIONS (KARNAMEH) -->
-    <div id="tab-actions" class="tab-content">
-        <div class="container">
-            <h2 style="margin-top:0;">کارنامه عملی</h2>
-            
-            <!-- Stats / Filter Buttons -->
-            <div class="stats-summary-card">
-                <div class="stat-box stat-reward" onclick="filterActionsTab('reward')">
-                    <span class="stat-num" id="totalRewardCount">0</span>
-                    <span class="stat-label">کل پاداش‌ها</span>
+        <div class="score-card neutral" id="scoreCard">
+            <div class="score-label">تراز امروز</div>
+            <div class="main-score" id="totalScoreDisplay">0</div>
+            <div class="sub-scores">
+                <div class="sub-score-item">
+                    <span class="sub-val" id="posScoreDisplay">0</span>
+                    <span class="sub-lbl">مثبت</span>
                 </div>
-                <div class="stat-box stat-penalty" onclick="filterActionsTab('penalty')">
-                    <span class="stat-num" id="totalPenaltyCount">0</span>
-                    <span class="stat-label">کل جریمه‌ها</span>
+                <div class="sub-score-item">
+                    <span class="sub-val" id="negScoreDisplay">0</span>
+                    <span class="sub-lbl">منفی</span>
                 </div>
             </div>
-
-             <!-- Search Actions -->
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="actionsSearch" placeholder="جستجو در کارنامه..." oninput="renderActionsTab()">
-            </div>
-
-            <!-- Stats Detail (Completed/Pending) Instruction 9 -->
-            <div style="margin-bottom: 15px; display:flex; gap:10px; overflow-x:auto; padding-bottom:5px;">
-                 <div class="stat-box" style="min-width:100px; background:#f0f9ff;" onclick="openActionListModal(null, true)">
-                    <span class="stat-num" id="totalDoneCount">0</span>
-                    <span class="stat-label">انجام شده</span>
-                </div>
-                <div class="stat-box" style="min-width:100px; background:#fff1f2;" onclick="openActionListModal(null, false)">
-                    <span class="stat-num" id="totalPendingCount">0</span>
-                    <span class="stat-label">انجام نشده</span>
-                </div>
-                 <div class="stat-box" style="min-width:120px; background:#fef3c7;" onclick="openDateRangeStats()">
-                    <span class="stat-num"><i class="fas fa-calendar-alt"></i></span>
-                    <span class="stat-label">آمار بازه زمانی</span>
-                </div>
-            </div>
-
-            <div id="actionsListFull"></div>
         </div>
-    </div>
 
-    <!-- TAB: SETTINGS -->
-    <div id="tab-settings" class="tab-content">
-        <div class="container">
-            <h2>تنظیمات</h2>
-            
-            <div class="card">
-                <h3>رفتارها (فضایل و رذایل)</h3>
-                <button class="btn btn-accept" style="width:100%" onclick="openEditor('behavior')">مدیریت لیست رفتارها</button>
-            </div>
+        <!-- Trigger Notification Area -->
+        <div id="triggerArea"></div>
 
-            <div class="card">
-                <h3>قوانین پاداش و جریمه</h3>
-                <p style="font-size:0.8rem; color:var(--text-light);">تعیین کنید در چه امتیازی چه اتفاقی بیفتد.</p>
-                <button class="btn btn-accept" style="width:100%" onclick="openEditor('rule')">مدیریت قوانین</button>
+        <!-- Pending Actions Summary (New Design) -->
+        <div id="homePendingSummary" class="stats-summary-card" style="margin-bottom: 20px; display:none;">
+            <div class="stat-box stat-reward" onclick="openActionListModal('reward', false)">
+                <span class="stat-num" id="pendingRewardCount">0</span>
+                <span class="stat-label">پاداش مانده</span>
             </div>
-
-            <div class="card">
-                <h3>پشتیبان‌گیری</h3>
-                <button class="btn btn-accept" style="background:var(--success); width:100%" onclick="backupData()">دانلود فایل پشتیبان</button>
-                <input type="file" id="restoreFile" style="display:none" onchange="restoreData(this)">
-                <button class="btn btn-change" style="width:100%; margin-top:10px;" onclick="document.getElementById('restoreFile').click()">بازگردانی اطلاعات</button>
+            <div class="stat-box stat-penalty" onclick="openActionListModal('penalty', false)">
+                <span class="stat-num" id="pendingPenaltyCount">0</span>
+                <span class="stat-label">جریمه مانده</span>
             </div>
-
-            <div class="card" style="border-right-color: var(--danger);">
-                <h3 style="color:var(--danger);">پاکسازی داده‌ها</h3>
-                <button class="btn btn-danger-outline" style="width:100%" onclick="openClearDataModal()">حذف اطلاعات</button>
-            </div>
-            
-            <br><br><br>
         </div>
-    </div>
 
+        <!-- Search -->
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="homeSearch" placeholder="جستجو در رفتارها..." oninput="filterHomeList()">
+        </div>
+
+        <!-- Virtues -->
+        <div class="section-header">
+            <span class="section-title virtue"><i class="fas fa-check-circle"></i> فضایل</span>
+        </div>
+        <div id="virtuesList"></div>
+
+        <!-- Vices -->
+        <div class="section-header">
+            <span class="section-title vice"><i class="fas fa-times-circle"></i> رذایل</span>
+        </div>
+        <div id="vicesList"></div>
+
+    </div>
+</div>
+
+<!-- TAB: ACTIONS (KARNAMEH) -->
+<div id="tab-actions" class="tab-content">
+    <div class="container">
+        <h2 style="margin-top:0;">کارنامه عملی</h2>
+        
+        <!-- Stats / Filter Buttons -->
+        <div class="stats-summary-card">
+            <div class="stat-box stat-reward" onclick="filterActionsTab('reward')">
+                <span class="stat-num" id="totalRewardCount">0</span>
+                <span class="stat-label">کل پاداش‌ها</span>
+            </div>
+            <div class="stat-box stat-penalty" onclick="filterActionsTab('penalty')">
+                <span class="stat-num" id="totalPenaltyCount">0</span>
+                <span class="stat-label">کل جریمه‌ها</span>
+            </div>
+        </div>
+
+         <!-- Search Actions -->
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="actionsSearch" placeholder="جستجو در کارنامه..." oninput="renderActionsTab()">
+        </div>
+
+        <!-- Stats Detail (Completed/Pending) Instruction 9 -->
+        <div style="margin-bottom: 15px; display:flex; gap:10px; overflow-x:auto; padding-bottom:5px;">
+             <div class="stat-box" style="min-width:100px; background:#f0f9ff;" onclick="openActionListModal(null, true)">
+                <span class="stat-num" id="totalDoneCount">0</span>
+                <span class="stat-label">انجام شده</span>
+            </div>
+            <div class="stat-box" style="min-width:100px; background:#fff1f2;" onclick="openActionListModal(null, false)">
+                <span class="stat-num" id="totalPendingCount">0</span>
+                <span class="stat-label">انجام نشده</span>
+            </div>
+             <div class="stat-box" style="min-width:120px; background:#fef3c7;" onclick="openDateRangeStats()">
+                <span class="stat-num"><i class="fas fa-calendar-alt"></i></span>
+                <span class="stat-label">آمار بازه زمانی</span>
+            </div>
+        </div>
+
+        <div id="actionsListFull"></div>
+    </div>
+</div>
+
+<!-- TAB: SETTINGS -->
+<div id="tab-settings" class="tab-content">
+    <div class="container">
+        <h2>تنظیمات</h2>
+        
+        <div class="card">
+            <h3>رفتارها (فضایل و رذایل)</h3>
+            <button class="btn btn-accept" style="width:100%" onclick="openEditor('behavior')">مدیریت لیست رفتارها</button>
+        </div>
+
+        <div class="card">
+            <h3>قوانین پاداش و جریمه</h3>
+            <p style="font-size:0.8rem; color:var(--text-light);">تعیین کنید در چه امتیازی چه اتفاقی بیفتد.</p>
+            <button class="btn btn-accept" style="width:100%" onclick="openEditor('rule')">مدیریت قوانین</button>
+        </div>
+
+        <div class="card">
+            <h3>پشتیبان‌گیری</h3>
+            <button class="btn btn-accept" style="background:var(--success); width:100%" onclick="backupData()">دانلود فایل پشتیبان</button>
+            <input type="file" id="restoreFile" style="display:none" onchange="restoreData(this)">
+            <button class="btn btn-change" style="width:100%; margin-top:10px;" onclick="document.getElementById('restoreFile').click()">بازگردانی اطلاعات</button>
+        </div>
+
+        <div class="card" style="border-right-color: var(--danger);">
+            <h3 style="color:var(--danger);">پاکسازی داده‌ها</h3>
+            <button class="btn btn-danger-outline" style="width:100%" onclick="openClearDataModal()">حذف اطلاعات</button>
+        </div>
+        
+        <br><br><br>
+    </div>
+</div>
 </div>
 
 <!-- NAVIGATION -->
+
 <div class="nav-bar">
     <button class="nav-item active" onclick="switchTab('home')">
         <i class="fas fa-home"></i>
@@ -431,6 +447,7 @@
 </div>
 
 <!-- MODAL: MANIFESTO -->
+
 <div id="manifestoModal" class="modal-overlay">
     <div class="modal-content" style="position:relative; max-height:85vh; display:flex; flex-direction:column;">
         <div style="position:absolute; top:15px; left:15px; z-index:10; cursor:pointer;" onclick="document.getElementById('manifestoModal').style.display='none'">
@@ -446,6 +463,7 @@
 </div>
 
 <!-- MODAL: ONBOARDING (NAME) -->
+
 <div id="nameModal" class="modal-overlay">
     <div class="modal-content" style="text-align:center;">
         <h3>خوش آمدید</h3>
@@ -457,11 +475,14 @@
 </div>
 
 <!-- MODAL: CLEAR DATA -->
+
 <div id="clearDataModal" class="modal-overlay">
-    <div class="modal-content">
+    <div class="modal-content" style="position:relative;">
+        <div style="position:absolute; top:15px; left:15px; cursor:pointer;" onclick="document.getElementById('clearDataModal').style.display='none'">
+            <i class="fas fa-times" style="font-size:1.2rem; color:var(--text-light);"></i>
+        </div>
         <h3 style="color:var(--danger)">حذف اطلاعات</h3>
         <p>لطفاً بازه زمانی را انتخاب کنید:</p>
-        
         <div class="form-group">
             <label>
                 <input type="radio" name="clearOption" value="today" checked> امروز
@@ -481,135 +502,139 @@
 </div>
 
 <!-- MODAL: EDITOR (GENERIC POPUP) - Instruction 4 -->
+
 <div id="editorModal" class="modal-overlay">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <h3 id="editorTitle" style="margin:0">ویرایش</h3>
             <i class="fas fa-times" style="cursor:pointer; font-size:1.2rem;" onclick="closeEditor()"></i>
         </div>
-        
-        <!-- Toggle for Lists in Rule Mode -->
-        <div id="ruleListToggle" class="list-toggle" style="display:none;">
-            <button class="toggle-btn active" onclick="toggleRuleList('virtue')" id="toggleVirtueBtn">فضایل/پاداش</button>
-            <button class="toggle-btn" onclick="toggleRuleList('vice')" id="toggleViceBtn">رذایل/جریمه</button>
-        </div>
-        
-        <div class="search-box" style="margin-bottom:10px;">
-             <i class="fas fa-search"></i>
-             <input type="text" id="editorSearch" placeholder="جستجو..." oninput="filterEditorList()">
-        </div>
 
-        <div id="editorListContainer" style="max-height:300px; overflow-y:auto; margin-bottom:20px;"></div>
-
-        <!-- Floating Button for Add New -->
-        <button class="btn btn-accept" onclick="openEditForm(null)" style="width:100%">+ افزودن مورد جدید</button>
+    <!-- Toggle for Lists in Rule Mode -->
+    <div id="ruleListToggle" class="list-toggle" style="display:none;">
+        <button class="toggle-btn active" onclick="toggleRuleList('virtue')" id="toggleVirtueBtn">فضایل/پاداش</button>
+        <button class="toggle-btn" onclick="toggleRuleList('vice')" id="toggleViceBtn">رذایل/جریمه</button>
     </div>
+    
+    <div class="search-box" style="margin-bottom:10px;">
+         <i class="fas fa-search"></i>
+         <input type="text" id="editorSearch" placeholder="جستجو..." oninput="filterEditorList()">
+    </div>
+
+    <div id="editorListContainer" style="max-height:300px; overflow-y:auto; margin-bottom:20px;"></div>
+
+    <!-- Floating Button for Add New -->
+    <button class="btn btn-accept" onclick="openEditForm(null)" style="width:100%">+ افزودن مورد جدید</button>
+</div>
 </div>
 
 <!-- MODAL: EDIT FORM POPUP (New Popup for Editing/Adding) - Instruction 4 -->
+
 <div id="editFormModal" class="modal-overlay">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <h3 id="formTitle" style="margin:0">افزودن/ویرایش</h3>
             <i class="fas fa-times" style="cursor:pointer; font-size:1.2rem;" onclick="closeEditForm()"></i>
         </div>
-        
-        <input type="hidden" id="editId" value="">
-        
-        <!-- Fields for Behavior -->
-        <div id="behaviorFields" style="display:none;">
-            <div class="form-group">
-                <input type="text" id="behTitle" class="form-input" placeholder="عنوان رفتار">
-            </div>
-            <div class="form-group" style="display:flex; gap:10px;">
-                <select id="behType" class="form-select">
-                    <option value="virtue">فضیلت (مثبت)</option>
-                    <option value="vice">رذیلت (منفی)</option>
-                </select>
-                <input type="number" id="behWeight" class="form-input" placeholder="امتیاز" value="1">
-            </div>
+
+    <input type="hidden" id="editId" value="">
+    
+    <!-- Fields for Behavior -->
+    <div id="behaviorFields" style="display:none;">
+        <div class="form-group">
+            <input type="text" id="behTitle" class="form-input" placeholder="عنوان رفتار">
         </div>
-
-        <!-- Fields for Rules -->
-        <div id="ruleFields" style="display:none;">
-            <div class="form-group">
-                <label class="form-label">نوع شرط:</label>
-                <select id="ruleType" class="form-select" onchange="toggleRuleInputs()">
-                    <option value="total_pos">مجموع امتیاز مثبت روزانه</option>
-                    <option value="total_neg">مجموع امتیاز منفی روزانه</option>
-                    <option value="total_net">امتیاز خالص (برآیند)</option>
-                    <option value="specific">رفتار خاص</option>
-                </select>
-            </div>
-            
-            <div class="form-group" id="specificBehDiv" style="display:none;">
-                <label class="form-label">انتخاب رفتار:</label>
-                <select id="ruleTargetId" class="form-select" onchange="updateRuleResultTypeBasedOnTarget()"></select>
-                <!-- Instruction 1: Automatic Type Indicator -->
-                <div id="ruleAutoTypeIndicator" style="font-size:0.8rem; margin-top:5px; padding:5px; border-radius:4px; display:inline-block;"></div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">حد نصاب (تعداد/امتیاز):</label>
-                <input type="number" id="ruleThreshold" class="form-input" placeholder="مثلا 20">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">نتیجه (خودکار تعیین می‌شود):</label>
-                <div style="display:flex; gap:5px;">
-                     <input type="text" id="ruleResultTypeDisplay" class="form-input" style="width:80px; background:#eee; color:#555;" disabled>
-                     <input type="hidden" id="ruleResultType">
-                    <input type="text" id="ruleResultText" class="form-input" placeholder="مثلا: دیدن فیلم">
-                </div>
-            </div>
-            
-            <!-- Instruction 8: Time Range -->
-            <div class="form-group">
-                <label class="form-label">محدوده زمانی (اختیاری):</label>
-                <div style="display:flex; gap:5px; align-items:center;">
-                    <span>از</span>
-                    <input type="time" id="ruleStartTime" class="form-input">
-                    <span>تا</span>
-                    <input type="time" id="ruleEndTime" class="form-input">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label style="font-size:0.8rem; display:flex; align-items:center; gap:5px;">
-                    <input type="checkbox" id="ruleIsSpecific"> این پاداش/جریمه اختصاصی است (تصادفی انتخاب نشود)
-                </label>
-            </div>
+        <div class="form-group" style="display:flex; gap:10px;">
+            <select id="behType" class="form-select">
+                <option value="virtue">فضیلت (مثبت)</option>
+                <option value="vice">رذیلت (منفی)</option>
+            </select>
+            <input type="number" id="behWeight" class="form-input" placeholder="امتیاز" value="1">
         </div>
-
-        <button class="btn btn-accept" style="width:100%; margin-top:15px;" onclick="saveEditorItem()">ذخیره</button>
     </div>
+
+    <!-- Fields for Rules -->
+    <div id="ruleFields" style="display:none;">
+        <div class="form-group">
+            <label class="form-label">نوع شرط:</label>
+            <select id="ruleType" class="form-select" onchange="toggleRuleInputs()">
+                <option value="total_pos">مجموع امتیاز مثبت روزانه</option>
+                <option value="total_neg">مجموع امتیاز منفی روزانه</option>
+                <option value="total_net">امتیاز خالص (برآیند)</option>
+                <option value="specific">رفتار خاص</option>
+            </select>
+        </div>
+        
+        <div class="form-group" id="specificBehDiv" style="display:none;">
+            <label class="form-label">انتخاب رفتار:</label>
+            <select id="ruleTargetId" class="form-select" onchange="updateRuleResultTypeBasedOnTarget()"></select>
+            <!-- Instruction 1: Automatic Type Indicator -->
+            <div id="ruleAutoTypeIndicator" style="font-size:0.8rem; margin-top:5px; padding:5px; border-radius:4px; display:inline-block;"></div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">حد نصاب (تعداد/امتیاز):</label>
+            <input type="number" id="ruleThreshold" class="form-input" placeholder="مثلا 20">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">نتیجه (خودکار تعیین می‌شود):</label>
+            <div style="display:flex; gap:5px;">
+                 <input type="text" id="ruleResultTypeDisplay" class="form-input" style="width:80px; background:#eee; color:#555;" disabled>
+                 <input type="hidden" id="ruleResultType">
+                <input type="text" id="ruleResultText" class="form-input" placeholder="مثلا: دیدن فیلم">
+            </div>
+        </div>
+        
+        <!-- Instruction 8: Time Range -->
+        <div class="form-group">
+            <label class="form-label">محدوده زمانی (اختیاری):</label>
+            <div style="display:flex; gap:5px; align-items:center;">
+                <span>از</span>
+                <input type="time" id="ruleStartTime" class="form-input">
+                <span>تا</span>
+                <input type="time" id="ruleEndTime" class="form-input">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label style="font-size:0.8rem; display:flex; align-items:center; gap:5px;">
+                <input type="checkbox" id="ruleIsSpecific"> این پاداش/جریمه اختصاصی است (تصادفی انتخاب نشود)
+            </label>
+        </div>
+    </div>
+
+    <button class="btn btn-accept" style="width:100%; margin-top:15px;" onclick="saveEditorItem()">ذخیره</button>
+</div>
 </div>
 
 <!-- MODAL: ACTION DETAILS -->
+
 <div id="actionDetailModal" class="modal-overlay">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <h3 id="actionDetailTitle" style="margin:0">جزئیات اقدام</h3>
             <i class="fas fa-times" style="cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('actionDetailModal').style.display='none'"></i>
         </div>
-        
-        <div id="actionDetailContent">
-            <!-- Details Injected Here -->
-        </div>
 
-        <div id="actionEditControls" style="margin-top:20px; border-top:1px solid #eee; padding-top:15px; display:none;">
-            <h4>تغییر اقدام (دستور اول)</h4>
-            <input type="text" id="actionEditText" class="form-input" placeholder="عنوان جدید پاداش/جریمه">
-            <button class="btn btn-accept" style="margin-top:10px; width:100%;" onclick="saveActionEdit()">ثبت تغییر</button>
-        </div>
-        
-        <div style="margin-top:20px; text-align:right;">
-             <button class="btn btn-outline" onclick="document.getElementById('actionDetailModal').style.display='none'">بستن</button>
-        </div>
+    <div id="actionDetailContent">
+        <!-- Details Injected Here -->
     </div>
+
+    <div id="actionEditControls" style="margin-top:20px; border-top:1px solid #eee; padding-top:15px; display:none;">
+        <h4>تغییر اقدام (دستور اول)</h4>
+        <input type="text" id="actionEditText" class="form-input" placeholder="عنوان جدید پاداش/جریمه">
+        <button class="btn btn-accept" style="margin-top:10px; width:100%;" onclick="saveActionEdit()">ثبت تغییر</button>
+    </div>
+    
+    <div style="margin-top:20px; text-align:right;">
+         <button class="btn btn-outline" onclick="document.getElementById('actionDetailModal').style.display='none'">بستن</button>
+    </div>
+</div>
 </div>
 
 <!-- MODAL: ACTION LIST POPUP (From Home Summary) -->
+
 <div id="actionListPopupModal" class="modal-overlay">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
@@ -621,9 +646,13 @@
 </div>
 
 <!-- MODAL: DATE RANGE STATS - Instruction 9 -->
+
 <div id="dateRangeModal" class="modal-overlay">
     <div class="modal-content">
-        <h3>آمار بازه زمانی</h3>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h3 style="margin:0;">آمار بازه زمانی</h3>
+            <i class="fas fa-times" style="cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('dateRangeModal').style.display='none'"></i>
+        </div>
         <div class="form-group">
             <label>تاریخ شروع:</label>
             <input type="date" id="statStartDate" class="form-input">
@@ -633,23 +662,23 @@
             <input type="date" id="statEndDate" class="form-input">
         </div>
         <button class="btn btn-accept" onclick="calcDateRangeStats()">محاسبه</button>
-        
-        <div id="rangeStatsResult" style="margin-top:20px; display:none;">
-            <div class="sub-scores" style="background:#f8fafc; padding:15px;">
-                <div class="sub-score-item"><span>مثبت:</span> <strong id="rsPos" style="color:var(--success)"></strong></div>
-                <div class="sub-score-item"><span>منفی:</span> <strong id="rsNeg" style="color:var(--danger)"></strong></div>
-                <div class="sub-score-item"><span>کل:</span> <strong id="rsTotal"></strong></div>
-            </div>
-            <div class="list-row"><span>تعداد پاداش‌ها:</span> <strong id="rsRewards"></strong></div>
-            <div class="list-row"><span>تعداد جریمه‌ها:</span> <strong id="rsPenalties"></strong></div>
-            <div class="list-row" onclick="showRangeActionDetails(true)" style="cursor:pointer; color:var(--primary);">
-                <span>انجام شده (کلیک کنید):</span> <strong id="rsDone"></strong>
-            </div>
-            <div class="list-row" onclick="showRangeActionDetails(false)" style="cursor:pointer; color:var(--danger);">
-                <span>انجام نشده (کلیک کنید):</span> <strong id="rsPending"></strong>
-            </div>
+
+    <div id="rangeStatsResult" style="margin-top:20px; display:none;">
+        <div class="sub-scores" style="background:#f8fafc; padding:15px;">
+            <div class="sub-score-item"><span>مثبت:</span> <strong id="rsPos" style="color:var(--success)"></strong></div>
+            <div class="sub-score-item"><span>منفی:</span> <strong id="rsNeg" style="color:var(--danger)"></strong></div>
+            <div class="sub-score-item"><span>کل:</span> <strong id="rsTotal"></strong></div>
+        </div>
+        <div class="list-row"><span>تعداد پاداش‌ها:</span> <strong id="rsRewards"></strong></div>
+        <div class="list-row"><span>تعداد جریمه‌ها:</span> <strong id="rsPenalties"></strong></div>
+        <div class="list-row" onclick="showRangeActionDetails(true)" style="cursor:pointer; color:var(--primary);">
+            <span>انجام شده (کلیک کنید):</span> <strong id="rsDone"></strong>
+        </div>
+        <div class="list-row" onclick="showRangeActionDetails(false)" style="cursor:pointer; color:var(--danger);">
+            <span>انجام نشده (کلیک کنید):</span> <strong id="rsPending"></strong>
         </div>
     </div>
+</div>
 </div>
 
 <script>
@@ -704,14 +733,53 @@
             { id: 'x20', title: 'بی‌تفاوتی', type: 'vice', weight: 3 }
         ],
         rules: [
-            // General Rules (Instruction 5: thresholds adjusted)
-            { id: 'r1', type: 'total_pos', targetId: null, threshold: 200, resultType: 'reward', resultText: 'تماشای فیلم یا سریال', isSpecific: false },
-            { id: 'r2', type: 'total_neg', targetId: null, threshold: 300, resultType: 'penalty', resultText: '۲۰ شنا سوئدی اضافه', isSpecific: false },
+            // General Rules (Instruction 5 & New Instruction: Totals)
+            { id: 'r_total_pos', type: 'total_pos', targetId: null, threshold: 200, resultType: 'reward', resultText: 'تماشای فیلم یا سریال', isSpecific: false },
+            { id: 'r_total_neg', type: 'total_neg', targetId: null, threshold: 300, resultType: 'penalty', resultText: '۲۰ شنا سوئدی اضافه', isSpecific: false },
             
-            // Specific Rules Examples (Instruction 5: all behaviors covered is impractical in default, user can add. 
-            // Added logic in code to auto-assign if no rule exists, based on instruction 5 implication or keeping defaults robust)
-            { id: 'r3', type: 'specific', targetId: 'v1', threshold: 30, resultType: 'reward', resultText: 'خرید کتاب', isSpecific: true },
-            { id: 'r4', type: 'specific', targetId: 'x1', threshold: 10, resultType: 'penalty', resultText: '۱۰ هزار تومان صدقه', isSpecific: true }
+            // Specific Rules for EVERY Virtue (20 items - as requested "don't miss one")
+            { id: 'rv1', type: 'specific', targetId: 'v1', threshold: 25, resultType: 'reward', resultText: 'پاداش خردورزی', isSpecific: true },
+            { id: 'rv2', type: 'specific', targetId: 'v2', threshold: 20, resultType: 'reward', resultText: 'پاداش انضباط', isSpecific: true },
+            { id: 'rv3', type: 'specific', targetId: 'v3', threshold: 25, resultType: 'reward', resultText: 'پاداش صداقت', isSpecific: true },
+            { id: 'rv4', type: 'specific', targetId: 'v4', threshold: 20, resultType: 'reward', resultText: 'پاداش مسئولیت', isSpecific: true },
+            { id: 'rv5', type: 'specific', targetId: 'v5', threshold: 15, resultType: 'reward', resultText: 'پاداش همدلی', isSpecific: true },
+            { id: 'rv6', type: 'specific', targetId: 'v6', threshold: 25, resultType: 'reward', resultText: 'پاداش کمک', isSpecific: true },
+            { id: 'rv7', type: 'specific', targetId: 'v7', threshold: 30, resultType: 'reward', resultText: 'پاداش کنترل خشم', isSpecific: true },
+            { id: 'rv8', type: 'specific', targetId: 'v8', threshold: 15, resultType: 'reward', resultText: 'پاداش احترام', isSpecific: true },
+            { id: 'rv9', type: 'specific', targetId: 'v9', threshold: 10, resultType: 'reward', resultText: 'پاداش شکرگزاری', isSpecific: true },
+            { id: 'rv10', type: 'specific', targetId: 'v10', threshold: 20, resultType: 'reward', resultText: 'پاداش یادگیری', isSpecific: true },
+            { id: 'rv11', type: 'specific', targetId: 'v11', threshold: 10, resultType: 'reward', resultText: 'پاداش نظافت', isSpecific: true },
+            { id: 'rv12', type: 'specific', targetId: 'v12', threshold: 25, resultType: 'reward', resultText: 'پاداش وفای عهد', isSpecific: true },
+            { id: 'rv13', type: 'specific', targetId: 'v13', threshold: 25, resultType: 'reward', resultText: 'پاداش عدالت', isSpecific: true },
+            { id: 'rv14', type: 'specific', targetId: 'v14', threshold: 20, resultType: 'reward', resultText: 'پاداش شجاعت', isSpecific: true },
+            { id: 'rv15', type: 'specific', targetId: 'v15', threshold: 15, resultType: 'reward', resultText: 'پاداش تاب‌آوری', isSpecific: true },
+            { id: 'rv16', type: 'specific', targetId: 'v16', threshold: 20, resultType: 'reward', resultText: 'پاداش رازداری', isSpecific: true },
+            { id: 'rv17', type: 'specific', targetId: 'v17', threshold: 15, resultType: 'reward', resultText: 'پاداش سحرخیزی', isSpecific: true },
+            { id: 'rv18', type: 'specific', targetId: 'v18', threshold: 10, resultType: 'reward', resultText: 'پاداش سکوت', isSpecific: true },
+            { id: 'rv19', type: 'specific', targetId: 'v19', threshold: 10, resultType: 'reward', resultText: 'پاداش محیط زیست', isSpecific: true },
+            { id: 'rv20', type: 'specific', targetId: 'v20', threshold: 20, resultType: 'reward', resultText: 'پاداش عزت نفس', isSpecific: true },
+
+            // Specific Rules for EVERY Vice (20 items - as requested "don't miss one")
+            { id: 'rx1', type: 'specific', targetId: 'x1', threshold: 10, resultType: 'penalty', resultText: 'جریمه دروغ', isSpecific: true },
+            { id: 'rx2', type: 'specific', targetId: 'x2', threshold: 8, resultType: 'penalty', resultText: 'جریمه غیبت', isSpecific: true },
+            { id: 'rx3', type: 'specific', targetId: 'x3', threshold: 8, resultType: 'penalty', resultText: 'جریمه توهین', isSpecific: true },
+            { id: 'rx4', type: 'specific', targetId: 'x4', threshold: 12, resultType: 'penalty', resultText: 'جریمه تهمت', isSpecific: true },
+            { id: 'rx5', type: 'specific', targetId: 'x5', threshold: 8, resultType: 'penalty', resultText: 'جریمه سخن‌چینی', isSpecific: true },
+            { id: 'rx6', type: 'specific', targetId: 'x6', threshold: 9, resultType: 'penalty', resultText: 'جریمه تنبلی', isSpecific: true },
+            { id: 'rx7', type: 'specific', targetId: 'x7', threshold: 9, resultType: 'penalty', resultText: 'جریمه حسادت', isSpecific: true },
+            { id: 'rx8', type: 'specific', targetId: 'x8', threshold: 9, resultType: 'penalty', resultText: 'جریمه قضاوت', isSpecific: true },
+            { id: 'rx9', type: 'specific', targetId: 'x9', threshold: 6, resultType: 'penalty', resultText: 'جریمه پرخوری/خواب', isSpecific: true },
+            { id: 'rx10', type: 'specific', targetId: 'x10', threshold: 6, resultType: 'penalty', resultText: 'جریمه اسراف', isSpecific: true },
+            { id: 'rx11', type: 'specific', targetId: 'x11', threshold: 12, resultType: 'penalty', resultText: 'جریمه تکبر', isSpecific: true },
+            { id: 'rx12', type: 'specific', targetId: 'x12', threshold: 12, resultType: 'penalty', resultText: 'جریمه بدقولی', isSpecific: true },
+            { id: 'rx13', type: 'specific', targetId: 'x13', threshold: 9, resultType: 'penalty', resultText: 'جریمه کنترل‌گری', isSpecific: true },
+            { id: 'rx14', type: 'specific', targetId: 'x14', threshold: 9, resultType: 'penalty', resultText: 'جریمه قربانی‌نمایی', isSpecific: true },
+            { id: 'rx15', type: 'specific', targetId: 'x15', threshold: 10, resultType: 'penalty', resultText: 'جریمه نگاه آلوده', isSpecific: true },
+            { id: 'rx16', type: 'specific', targetId: 'x16', threshold: 12, resultType: 'penalty', resultText: 'جریمه کینه', isSpecific: true },
+            { id: 'rx17', type: 'specific', targetId: 'x17', threshold: 15, resultType: 'penalty', resultText: 'جریمه خیانت', isSpecific: true },
+            { id: 'rx18', type: 'specific', targetId: 'x18', threshold: 9, resultType: 'penalty', resultText: 'جریمه چاپلوسی', isSpecific: true },
+            { id: 'rx19', type: 'specific', targetId: 'x19', threshold: 12, resultType: 'penalty', resultText: 'جریمه ناامیدی', isSpecific: true },
+            { id: 'rx20', type: 'specific', targetId: 'x20', threshold: 9, resultType: 'penalty', resultText: 'جریمه بی‌تفاوتی', isSpecific: true }
         ],
         logs: {} 
     };
@@ -722,8 +790,8 @@
     let currentRuleFilter = 'virtue';
     let editingItemId = null;
     let currentActionFilter = null; 
-    let currentActionEditId = null; // For Instruction 1
-    let tempDateRangeResults = null; // For Instruction 9
+    let currentActionEditId = null; 
+    let tempDateRangeResults = null; 
 
     // --- Helper: Persian Date Converter (Instruction 3: Precise Text Format) ---
     function getVerbalDate(date) {
@@ -744,7 +812,7 @@
         const parseFa = (s) => parseInt(s.replace(/[۰-۹]/g, c => c.charCodeAt(0) - 1776));
         const dayInt = parseFa(d);
         const yearInt = parseFa(y);
-        const monthInt = parseFa(m); // Numeric month
+        const monthInt = parseFa(m); 
 
         const numToWord = (n) => {
             if (n === 0) return 'صفر';
@@ -785,18 +853,15 @@
         
         const dayWord = dayOrdinals[dayInt];
         const yearWord = numToWord(yearInt);
-        
-        // Month Name from array to ensure correctness
         const monthNameStr = months[monthInt - 1];
         
-        // Instruction 3 Format: سه‌شنبه، یازدهم آذر هزار و چهارصد و چهار
         return `${wd}، ${dayWord} ${monthNameStr} ${yearWord}`;
     }
     
     function getHeaderDate(date) {
         const weekDayName = new Intl.DateTimeFormat('fa-IR', {weekday: 'long'}).format(date);
         const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
-        const dateStr = new Intl.DateTimeFormat('fa-IR', options).format(date); // e.g. ۱۴۰۳/۰۹/۱۱
+        const dateStr = new Intl.DateTimeFormat('fa-IR', options).format(date); 
         return `${weekDayName}، ${dateStr}`;
     }
 
@@ -869,8 +934,8 @@
         const key = getKey(viewingDate);
         const todayKey = getKey(new Date());
         
-        // Header Date (Instruction 3)
-        document.getElementById('headerDateDisplay').innerText = (key === todayKey ? "امروز، " : "") + getHeaderDate(viewingDate);
+        // Header Date (Corrected: No "امروز" prefix)
+        document.getElementById('headerDateDisplay').innerText = getHeaderDate(viewingDate);
         document.getElementById('nextDayBtn').disabled = (key === todayKey);
 
         if(!db.logs[key]) db.logs[key] = { behaviors: {}, actions: [], manifestoRead: false, consumed: {} };
@@ -878,12 +943,16 @@
 
         const manBtn = document.querySelector('.manifesto-btn');
         const manText = document.getElementById('manifestoBtnText');
+        const manIcon = document.getElementById('manifestoIcon');
+
+        // Manifesto Button Logic (Corrected)
         if (log.manifestoRead) {
             manBtn.classList.add('read');
-            manText.innerText = "منشور خوانده شد";
+            // Text DOES NOT change, Icon becomes tick, color is handled by CSS class 'read'
+            manIcon.className = 'fas fa-check';
         } else {
             manBtn.classList.remove('read');
-            manText.innerText = "خواندن منشور";
+            manIcon.className = 'fas fa-book-open';
         }
 
         let totalScore = 0;
@@ -938,7 +1007,7 @@
         const scoreCard = document.getElementById('scoreCard');
         scoreCard.className = 'score-card ' + (totalScore > 0 ? 'positive' : (totalScore < 0 ? 'negative' : 'neutral'));
 
-        // Pending Actions Summary (Instruction 1: Clickable counts)
+        // Pending Actions Summary
         const pendingActions = log.actions.filter(a => !a.done);
         const pendingRewards = pendingActions.filter(a => a.type === 'reward').length;
         const pendingPenalties = pendingActions.filter(a => a.type === 'penalty').length;
@@ -1071,28 +1140,25 @@
         const dateStr = getVerbalDate(now);
 
         // Instruction 8: Time Range Logic
-        // We check previous actions of same rule to find last time
         const prevActions = log.actions.filter(a => a.ruleId === ruleId);
         let timeRangeStr = "";
         
         if (prevActions.length === 0) {
-            // First time
             timeRangeStr = `از ۰۰:۰۰ تا ${timeStr}`;
         } else {
-            // Subsequent times
             const lastAction = prevActions[prevActions.length - 1];
-            const lastTime = lastAction.rawTime || "۰۰:۰۰"; // Fallback
+            const lastTime = lastAction.rawTime || "۰۰:۰۰"; 
             timeRangeStr = `مابین ${lastTime} تا ${timeStr}`;
         }
 
         log.actions.push({
             id: Date.now(),
-            ruleId: ruleId, // Track rule for time range logic
+            ruleId: ruleId, 
             text: rule.resultText,
             type: rule.resultType,
             reason: getRuleDescription(rule), 
             dateStr: dateStr,
-            timeRange: timeRangeStr, // Instruction 8
+            timeRange: timeRangeStr, 
             rawTime: timeStr,
             done: false
         });
@@ -1253,13 +1319,32 @@
         renderActionsTab();
     }
 
-    function toggleAction(id) {
-        const key = getKey(viewingDate);
-        const action = db.logs[key].actions.find(a => a.id === id);
+    // Updated toggleAction to handle range stats (by optional key)
+    function toggleAction(id, forcedKey = null) {
+        const key = forcedKey || getKey(viewingDate);
+        const action = db.logs[key]?.actions.find(a => a.id === id);
         if(action) {
             action.done = !action.done;
             saveDB();
-            renderActionsTab();
+            
+            // Refresh views
+            if (document.getElementById('dateRangeModal').style.display === 'flex') {
+                // If in range mode, refresh the list
+                 const isDoneList = document.getElementById('actionListPopupTitle').innerText.includes('انجام شده');
+                 // Refresh calc is complex, so simpler is to refresh the popup list
+                 // To fully refresh, we re-calc range stats to get updated objects
+                 calcDateRangeStats();
+                 showRangeActionDetails(isDoneList); // Keeps the list open
+            } else {
+                renderActionsTab();
+                renderHome(); // For pending counts
+                // If popup list is open (from Home)
+                if(document.getElementById('actionListPopupModal').style.display === 'flex') {
+                    const type = document.getElementById('actionListPopupTitle').innerText.includes('پاداش') ? 'reward' : (document.getElementById('actionListPopupTitle').innerText.includes('جریمه') ? 'penalty' : null);
+                    const isDone = document.getElementById('actionListPopupTitle').innerText.includes('انجام شده');
+                    openActionListModal(type, isDone);
+                }
+            }
         }
     }
 
@@ -1272,6 +1357,7 @@
     }
 
     // Instruction 1: Popup List for Pending Actions from Home
+    // Instruction Update: Add Checkbox here too
     function openActionListModal(type, doneStatus) {
         const key = getKey(viewingDate);
         const actions = db.logs[key]?.actions || [];
@@ -1294,6 +1380,9 @@
             filtered.forEach(a => {
                 container.innerHTML += `
                     <div class="action-item" onclick="openActionDetail(${a.id})">
+                        <div class="action-checkbox ${a.done ? 'checked' : ''}" onclick="event.stopPropagation(); toggleAction(${a.id})">
+                             <i class="fas fa-check" style="${a.done ? '' : 'display:none'}"></i>
+                        </div>
                         <div class="action-content">
                             <span style="font-weight:bold;">${a.text}</span>
                             <div style="font-size:0.75rem; color:var(--text-light);">دلیل: ${a.reason}</div>
@@ -1309,8 +1398,26 @@
     // Instruction 1: Change Action Reward/Penalty & Detail Modal
     function openActionDetail(id) {
         currentActionEditId = id;
-        const key = getKey(viewingDate);
-        const action = db.logs[key].actions.find(a => a.id === id);
+        
+        // Find action: could be today OR from range stats
+        // We look in current view date first
+        let key = getKey(viewingDate);
+        let action = db.logs[key]?.actions.find(a => a.id === id);
+        
+        // If not found, check temp range results if available
+        if(!action && tempDateRangeResults) {
+             const tempObj = tempDateRangeResults.find(a => a.id === id);
+             if(tempObj) {
+                 // We need to find the real record in DB to get updated properties
+                 // tempObj should have stored dateKey, but we need to ensure it.
+                 // In calcDateRangeStats, we will attach dateKey to temp objects
+                 if(tempObj._dateKey) {
+                     key = tempObj._dateKey;
+                     action = db.logs[key].actions.find(a => a.id === id);
+                 }
+             }
+        }
+
         if(!action) return;
 
         const content = `
@@ -1350,8 +1457,18 @@
         const newText = document.getElementById('actionEditText').value.trim();
         if (!newText) return alert('متن خالی است');
         
-        const key = getKey(viewingDate);
-        const action = db.logs[key].actions.find(a => a.id === currentActionEditId);
+        // Same logic to find action
+        let key = getKey(viewingDate);
+        let action = db.logs[key]?.actions.find(a => a.id === currentActionEditId);
+        
+         if(!action && tempDateRangeResults) {
+             const tempObj = tempDateRangeResults.find(a => a.id === currentActionEditId);
+             if(tempObj && tempObj._dateKey) {
+                 key = tempObj._dateKey;
+                 action = db.logs[key].actions.find(a => a.id === currentActionEditId);
+             }
+        }
+        
         if (action) {
             action.text = newText;
             saveDB();
@@ -1359,6 +1476,12 @@
             document.getElementById('actionDetailModal').style.display = 'none';
             renderActionsTab();
             renderHome(); // Update summary if changed there
+            
+            if(document.getElementById('dateRangeModal').style.display === 'flex') {
+                calcDateRangeStats();
+                const isDone = document.getElementById('actionListPopupTitle').innerText.includes('انجام شده');
+                showRangeActionDetails(isDone);
+            }
         }
     }
 
@@ -1373,8 +1496,6 @@
         document.getElementById('ruleListToggle').style.display = type === 'rule' ? 'flex' : 'none';
         document.getElementById('editorSearch').style.display = type === 'behavior' ? 'block' : 'none';
         
-        // Instruction 3: Separation of Virtues and Vices in Behavior Mode is handled by list rendering (no separate tabs requested for behavior list, but search handles it. Rule list has tabs).
-        // Let's add tabs for behavior too as implied by "جدا شوند" in instruction 3.
         if (type === 'behavior') {
             document.getElementById('ruleListToggle').style.display = 'flex'; // Reuse toggle UI
         }
@@ -1687,6 +1808,9 @@
         const end = new Date(document.getElementById('statEndDate').value);
         
         if(isNaN(start) || isNaN(end)) return alert("تاریخ نامعتبر");
+        
+        // Corrected: End Date cannot be before Start Date
+        if (end < start) return alert("تاریخ پایان نمی‌تواند قبل از تاریخ شروع باشد.");
 
         let pos = 0, neg = 0, total = 0;
         let rCount = 0, pCount = 0;
@@ -1708,6 +1832,8 @@
                 log.actions.forEach(a => {
                     if(a.type === 'reward') rCount++; else pCount++;
                     if(a.done) doneCount++; else pendingCount++;
+                    // Attach the dateKey so we can toggle it later
+                    a._dateKey = key;
                     filteredActions.push(a);
                 });
             }
@@ -1726,6 +1852,7 @@
         tempDateRangeResults = filteredActions;
     }
 
+    // Instruction: Checkable List inside Range Stats
     function showRangeActionDetails(doneStatus) {
         const filtered = tempDateRangeResults.filter(a => a.done === doneStatus);
         const container = document.getElementById('actionListPopupContent');
@@ -1738,6 +1865,9 @@
             filtered.forEach(a => {
                 container.innerHTML += `
                     <div class="action-item" onclick="openActionDetail(${a.id})">
+                        <div class="action-checkbox ${a.done ? 'checked' : ''}" onclick="event.stopPropagation(); toggleAction(${a.id}, '${a._dateKey}')">
+                             <i class="fas fa-check" style="${a.done ? '' : 'display:none'}"></i>
+                        </div>
                         <div class="action-content">
                             <span style="font-weight:bold;">${a.text}</span>
                             <div style="font-size:0.75rem; color:var(--text-light);">${a.dateStr}</div>
@@ -1750,5 +1880,6 @@
     }
 
 </script>
+
 </body>
 </html>
