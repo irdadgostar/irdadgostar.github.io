@@ -1,13 +1,4 @@
-در کد های زیر می‌خواهم ویرایشی انجام بدهم
-در کدهای زیر می‌خواهم این دستورات را کامل اجرا کنی بدون اینکه ذره ای خللی به کدهای من وارد شود... حتی اگر هزاران خط بشوند کدهای من را باید ریز به ریز   بنویسی و بفرستی(هم کد اچ تی ام ال را باید کامل و با تمام جزئیات بنویسی و بفرستی و هم کد اسکریپت گوگل را) ... کد را باید دقیق و با تمام جزئیات بنویسی و بفرستی. باید تمام ویرایش های درخواستی را بدون اینکه مشکلی در کد ایجاد بشود با کمال دقت و صحت بنویسی و ارسال کنی و نباید حتی ذره ای اشتباه در کدها پیش بیاید... نباید حتی ذره ای از کدها را حذف کنی یا ننویسی...
-
-دستور اول: در قسمت اقدامات انجام نشده میخواهم که اقدامات را نمایش ندهد بلکه اور اقدامی باشد تعداد را که الان مینویسه اما ابنجوری بنویسه مثلا پاداش 6 جریمه 9 و با کلبک روی هرکدام در پنجره لازشویی باز شوند 
-دستور دوم: در قسمت کارنامه باید جستجو وجود داشته باشه و همچنین باید اینجا هم تفکیک بشه بین جریمه و پاداش و با کلیک روی هرکدام بالا بیایند 
-دستور سوم: من میخواهم در قسمت اقدامات انجام نشده دلیل نوشته بشه و در قسمت اقدامات و کارنامه بیان بشه که  جریمه یا پاداش بخاطر چه بوده و اطلاعاتش هم بنویسه مثلا چندمرتبه انجام شده و از چه تاریخی و تا چه تاریخی بوده
-دستور چهارم: در قسمت هایی که رفتارها و پاداش و جریمه اضافه یا ویرایش می‌شود. باید چند عمل رخ بدهد. یکی اینکه افزوده جدید در ته لیست که اضافه میشه خودکار روی همون مورو اخر اسکرول بشه. دوم اینکه ویرایش ها در پنجره پاپ آپی نمایش داده شود. 
-
-کد
-   <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -249,6 +240,43 @@
             background: var(--primary);
             color: white;
         }
+        
+        /* Actions Summary Buttons */
+        .action-summary {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .summary-btn {
+            flex: 1;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: transform 0.1s;
+        }
+        .summary-btn:active { transform: scale(0.98); }
+        .summary-count { font-size: 1.5rem; font-weight: 900; display: block; }
+        .summary-label { font-size: 0.85rem; opacity: 0.8; }
+        .text-reward { color: var(--success); }
+        .text-penalty { color: var(--danger); }
+
+        /* Action Details Modal Specifics */
+        .action-detail-item {
+            background: #f8fafc;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+        .action-detail-meta {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
 
     </style>
 </head>
@@ -289,8 +317,17 @@
             <!-- Trigger Notification Area -->
             <div id="triggerArea"></div>
 
-            <!-- Pending Actions Preview -->
-            <div id="homePendingActions" style="margin-bottom: 20px;"></div>
+            <!-- Pending Actions Summary (Modified per Instruction 1) -->
+            <div id="homePendingSummary" class="action-summary" style="display:none;">
+                <div class="summary-btn" onclick="openActionDetails('reward')">
+                    <span class="summary-count text-reward" id="pendingRewardCount">0</span>
+                    <span class="summary-label text-reward">پاداش فعال</span>
+                </div>
+                <div class="summary-btn" onclick="openActionDetails('penalty')">
+                    <span class="summary-count text-penalty" id="pendingPenaltyCount">0</span>
+                    <span class="summary-label text-penalty">جریمه فعال</span>
+                </div>
+            </div>
 
             <!-- Search -->
             <div class="search-box">
@@ -317,7 +354,21 @@
     <div id="tab-actions" class="tab-content">
         <div class="container">
             <h2 style="margin-top:0;">کارنامه عملی</h2>
-            <p style="color:var(--text-light); font-size:0.9rem;">لیست پاداش‌ها و جریمه‌های فعال برای این روز.</p>
+            <p style="color:var(--text-light); font-size:0.9rem;">لیست پاداش‌ها و جریمه‌های این روز.</p>
+            
+            <!-- Search for Actions (Instruction 2) -->
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="actionSearch" placeholder="جستجو در اقدامات..." oninput="filterActionList()">
+            </div>
+
+            <!-- Filter Toggles (Instruction 2) -->
+            <div class="list-toggle" style="margin-bottom:20px;">
+                <button class="toggle-btn active" onclick="filterActionType('all')" id="filterAllBtn">همه</button>
+                <button class="toggle-btn" onclick="filterActionType('reward')" id="filterRewardBtn" style="color:var(--success)">پاداش‌ها</button>
+                <button class="toggle-btn" onclick="filterActionType('penalty')" id="filterPenaltyBtn" style="color:var(--danger)">جریمه‌ها</button>
+            </div>
+
             <div id="actionsListFull"></div>
         </div>
     </div>
@@ -384,6 +435,17 @@
         </div>
         <button id="manifestoConfirmBtn" class="btn btn-accept" style="width:100%; opacity:0.5;" disabled onclick="confirmManifestoRead()">تایید و تعهد</button>
         <p style="text-align:center; font-size:0.75rem; color:red; margin-top:5px;">(لطفاً تا انتها مطالعه کنید)</p>
+    </div>
+</div>
+
+<!-- MODAL: ACTION DETAILS (HOME POPUP) -->
+<div id="actionDetailsModal" class="modal-overlay">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h3 id="actionDetailTitle" style="margin:0">جزئیات</h3>
+            <i class="fas fa-times" style="cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('actionDetailsModal').style.display='none'"></i>
+        </div>
+        <div id="actionDetailList" style="max-height:400px; overflow-y:auto;"></div>
     </div>
 </div>
 
@@ -560,13 +622,29 @@
             { id: 'x20', title: 'بی‌تفاوتی', type: 'vice', weight: 3 }
         ],
         rules: [
-            // General Rules
-            { id: 'r1', type: 'total_pos', targetId: null, threshold: 50, resultType: 'reward', resultText: 'تماشای فیلم یا سریال', isSpecific: false },
-            { id: 'r2', type: 'total_neg', targetId: null, threshold: 20, resultType: 'penalty', resultText: '۲۰ شنا سوئدی اضافه', isSpecific: false },
+            // General Rules (Rewards)
+            { id: 'r1', type: 'total_pos', targetId: null, threshold: 30, resultType: 'reward', resultText: 'تماشای فیلم یا سریال', isSpecific: false },
+            { id: 'r2', type: 'total_pos', targetId: null, threshold: 50, resultType: 'reward', resultText: 'خرید کتاب', isSpecific: false },
+            { id: 'r3', type: 'total_pos', targetId: null, threshold: 20, resultType: 'reward', resultText: 'خوراکی ویژه', isSpecific: false },
+            { id: 'r4', type: 'total_pos', targetId: null, threshold: 40, resultType: 'reward', resultText: 'استراحت مطلق', isSpecific: false },
+            { id: 'r5', type: 'total_pos', targetId: null, threshold: 60, resultType: 'reward', resultText: 'گردو اضافه در صبحانه', isSpecific: false },
+            { id: 'r6', type: 'total_pos', targetId: null, threshold: 70, resultType: 'reward', resultText: 'خواب بیشتر', isSpecific: false },
+            { id: 'r7', type: 'total_pos', targetId: null, threshold: 25, resultType: 'reward', resultText: 'تماس با دوست', isSpecific: false },
+            { id: 'r8', type: 'total_pos', targetId: null, threshold: 15, resultType: 'reward', resultText: 'موسیقی با صدای بلند', isSpecific: false },
+            { id: 'r9', type: 'total_pos', targetId: null, threshold: 35, resultType: 'reward', resultText: 'دوش طولانی', isSpecific: false },
+            { id: 'r10', type: 'total_pos', targetId: null, threshold: 45, resultType: 'reward', resultText: 'وب‌گردی آزاد', isSpecific: false },
             
-            // Specific Rules Examples (Can be edited)
-            { id: 'r3', type: 'specific', targetId: 'v1', threshold: 30, resultType: 'reward', resultText: 'خرید کتاب', isSpecific: true },
-            { id: 'r4', type: 'specific', targetId: 'x1', threshold: 10, resultType: 'penalty', resultText: '۱۰ هزار تومان صدقه', isSpecific: true }
+            // General Rules (Penalties)
+            { id: 'p1', type: 'total_neg', targetId: null, threshold: 15, resultType: 'penalty', resultText: '۲۰ شنا سوئدی اضافه', isSpecific: false },
+            { id: 'p2', type: 'total_neg', targetId: null, threshold: 20, resultType: 'penalty', resultText: '۲ دقیقه پلانک', isSpecific: false },
+            { id: 'p3', type: 'total_neg', targetId: null, threshold: 25, resultType: 'penalty', resultText: '۱۰ هزار تومان صدقه', isSpecific: false },
+            { id: 'p4', type: 'total_neg', targetId: null, threshold: 30, resultType: 'penalty', resultText: 'حذف وعده شام', isSpecific: false },
+            { id: 'p5', type: 'total_neg', targetId: null, threshold: 10, resultType: 'penalty', resultText: 'محرومیت از اینترنت (۲ ساعت)', isSpecific: false },
+            { id: 'p6', type: 'total_neg', targetId: null, threshold: 35, resultType: 'penalty', resultText: 'نوشتن ۱۰۰ بار جمله مثبت', isSpecific: false },
+            { id: 'p7', type: 'total_neg', targetId: null, threshold: 40, resultType: 'penalty', resultText: 'تمیز کردن کامل اتاق', isSpecific: false },
+            { id: 'p8', type: 'total_neg', targetId: null, threshold: 50, resultType: 'penalty', resultText: 'دوش آب سرد', isSpecific: false },
+            { id: 'p9', type: 'total_neg', targetId: null, threshold: 45, resultType: 'penalty', resultText: 'خواندن ۱۰ صفحه کتاب سخت', isSpecific: false },
+            { id: 'p10', type: 'total_neg', targetId: null, threshold: 12, resultType: 'penalty', resultText: 'محرومیت از موسیقی', isSpecific: false }
         ],
         logs: {} 
     };
@@ -575,73 +653,42 @@
     let viewingDate = new Date();
     let currentEditorMode = null; 
     let currentRuleFilter = 'virtue';
-    let editingItemId = null; // For tracking what we are editing
+    let editingItemId = null; 
+    let currentActionFilter = 'all';
 
-    // --- Helper: Persian Date Converter (Updated) ---
+    // --- Helper: Persian Date Converter (Updated per Instruction 3) ---
     function getVerbalDate(date) {
         const weekDays = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه'];
         const months = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
         
-        // Convert to Persian Calendar first
-        const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
+        const options = { year: 'numeric', month: 'numeric', day: 'numeric', weekday: 'long' };
         const parts = new Intl.DateTimeFormat('fa-IR', options).formatToParts(date);
         
-        let y, m, d;
+        let y, m, d, wd;
         parts.forEach(p => {
             if(p.type === 'year') y = p.value;
             if(p.type === 'month') m = p.value;
             if(p.type === 'day') d = p.value;
+            if(p.type === 'weekday') wd = p.value;
         });
 
+        // Fix numeric string from fa to integer for conversion
         const parseFa = (s) => parseInt(s.replace(/[۰-۹]/g, c => c.charCodeAt(0) - 1776));
         const dayInt = parseFa(d);
         const yearInt = parseFa(y);
-        const monthInt = parseFa(m);
+        const monthInt = parseFa(m); // month index 1-12
 
-        const numToWord = (n) => {
-            if (n === 0) return 'صفر';
-            const ones = ['','یک','دو','سه','چهار','پنج','شش',' هفت','هشت','نه'];
-            const teens = ['ده','یازده','دوازده','سیزده','چهارده','پانزده','شانزده','هفده','هجده','نوزده'];
-            const tens = ['','','بیست','سی','چهل','پنجاه','شصت','هفتاد','هشتاد','نود'];
-            const hundreds = ['','صد','دویست','سیصد','چهارصد','پانصد','ششصد','هفتصد','هشتصد','نهصد'];
-            
-            let str = '';
-            
-            if (n >= 1000) {
-                const th = Math.floor(n / 1000);
-                const rem = n % 1000;
-                str += (th === 1 ? 'هزار' : ones[th] + ' هزار');
-                if (rem > 0) str += ' و ' + numToWord(rem); 
-                return str;
-            }
-            
-            const h = Math.floor(n / 100);
-            const t = Math.floor((n % 100) / 10);
-            const o = n % 10;
-            
-            if (h > 0) { str += hundreds[h]; if(t>0 || o>0) str += ' و '; }
-            if (t >= 2) {
-                str += tens[t];
-                if (o > 0) str += ' و ' + ones[o];
-            } else if (t === 1) {
-                str += teens[o];
-            } else {
-                str += ones[o];
-            }
-            return str;
-        };
-
-        const dayOrdinals = ["", "یکم", "دوم", "سوم", "چهارم", "پنجم", "ششم", "هفتم", "هشتم", "نهم", "دهم", 
-                   "یازدهم", "دوازدهم", "سیزدهم", "چهاردهم", "پانزدهم", "شانزدهم", "هفدهم", "هجدهم", "نوزدهم", "بیستم",
-                   "بیست و یکم", "بیست و دوم", "بیست و سوم", "بیست و چهارم", "بیست و پنجم", "بیست و ششم", "بیست و هفتم", "بیست و هشتم", "بیست و نهم", "سی‌ام", "سی و یکم"];
+        // Simple 1404 logic
+        // Format: سه‌شنبه،  ۱۴۰۳/۰۹/۱۱
+        // The instruction asks for specific format:
+        // "سه‌شنبه،  ۱۴۰۳/۰۹/۱۱"
+        // So we construct it manually with fa digits.
         
-        const dayWord = dayOrdinals[dayInt];
-        const yearWord = numToWord(yearInt);
-        const monthNameStr = months[monthInt - 1];
-        const weekDayName = new Intl.DateTimeFormat('fa-IR', {weekday: 'long'}).format(date);
-
-        // Output Format: سه‌شنبه، یازدهم آذر هزار و چهارصد و چهار
-        return `${weekDayName}، ${dayWord} ${monthNameStr} ${yearWord}`;
+        const yStr = y;
+        const mStr = m.padStart(2,'۰'); // Ensure 2 digits
+        const dStr = d.padStart(2,'۰');
+        
+        return `${wd}، ${yStr}/${mStr}/${dStr}`;
     }
 
     function getKey(date) { return date.toLocaleDateString('en-CA'); }
@@ -708,7 +755,6 @@
         const key = getKey(viewingDate);
         const todayKey = getKey(new Date());
         
-        // Header Date
         const dateNum = new Intl.DateTimeFormat('fa-IR').format(viewingDate);
         const weekDay = new Intl.DateTimeFormat('fa-IR', {weekday:'long'}).format(viewingDate);
         document.getElementById('headerDateDisplay').innerText = (key === todayKey ? "امروز، " : "") + `${weekDay} ${dateNum}`;
@@ -717,7 +763,6 @@
         if(!db.logs[key]) db.logs[key] = { behaviors: {}, actions: [], manifestoRead: false, consumed: {} };
         const log = db.logs[key];
 
-        // Manifesto Button
         const manBtn = document.querySelector('.manifesto-btn');
         const manText = document.getElementById('manifestoBtnText');
         if (log.manifestoRead) {
@@ -780,22 +825,18 @@
         const scoreCard = document.getElementById('scoreCard');
         scoreCard.className = 'score-card ' + (totalScore > 0 ? 'positive' : (totalScore < 0 ? 'negative' : 'neutral'));
 
-        // Pending Actions
-        const pendingDiv = document.getElementById('homePendingActions');
-        const pendingActions = log.actions.filter(a => !a.done);
+        // Pending Actions Summary (Instruction 1)
+        const pendingDiv = document.getElementById('homePendingSummary');
+        const actions = log.actions;
+        const pendingReward = actions.filter(a => a.type === 'reward' && !a.done).length;
+        const pendingPenalty = actions.filter(a => a.type === 'penalty' && !a.done).length;
         
-        if (pendingActions.length > 0) {
-            pendingDiv.innerHTML = `<div style="font-weight:bold; margin-bottom:5px; color:var(--warning);">اقدامات انجام نشده (${pendingActions.length}):</div>`;
-            pendingActions.forEach(a => {
-                pendingDiv.innerHTML += `
-                    <div class="action-item" style="padding:10px; font-size:0.9rem;">
-                        <div class="action-badge ${a.type === 'reward' ? 'badge-reward' : 'badge-penalty'}">${a.type === 'reward' ? 'پاداش' : 'جریمه'}</div>
-                        <div style="margin-right:10px;">${a.text}</div>
-                    </div>
-                `;
-            });
+        if (pendingReward > 0 || pendingPenalty > 0) {
+            pendingDiv.style.display = 'flex';
+            document.getElementById('pendingRewardCount').innerText = pendingReward;
+            document.getElementById('pendingPenaltyCount').innerText = pendingPenalty;
         } else {
-            pendingDiv.innerHTML = '';
+            pendingDiv.style.display = 'none';
         }
 
         checkTriggers(key, totalScore, posScore, negScore);
@@ -836,12 +877,12 @@
                 currentValue = total;
                  if (rule.resultType === 'reward') {
                      if (currentValue - consumedValue >= rule.threshold) {
-                         showTriggerAlert(rule);
+                         showTriggerAlert(rule, currentValue);
                          break; 
                      }
                  } else {
                      if (currentValue <= (consumedValue - Math.abs(rule.threshold))) {
-                         showTriggerAlert(rule);
+                         showTriggerAlert(rule, currentValue);
                          break;
                      }
                  }
@@ -849,14 +890,14 @@
             else if (rule.type === 'total_pos') {
                 currentValue = posTotal;
                 if (currentValue - consumedValue >= rule.threshold) {
-                     showTriggerAlert(rule);
+                     showTriggerAlert(rule, currentValue);
                      break;
                 }
             }
             else if (rule.type === 'total_neg') {
                 currentValue = negTotal;
                 if (currentValue - consumedValue >= rule.threshold) {
-                     showTriggerAlert(rule);
+                     showTriggerAlert(rule, currentValue);
                      break;
                 }
             }
@@ -868,29 +909,43 @@
                 currentValue = count * b.weight; 
                 
                 if (currentValue - consumedValue >= rule.threshold) {
-                     showTriggerAlert(rule);
+                     showTriggerAlert(rule, currentValue);
                      break;
                 }
             }
         }
     }
 
-    function showTriggerAlert(rule) {
+    function showTriggerAlert(rule, triggerValue) {
         const area = document.getElementById('triggerArea');
         area.style.display = 'block';
         
         const typeLabel = rule.resultType === 'reward' ? '🎉 پاداش:' : '⚠️ جریمه:';
         const color = rule.resultType === 'reward' ? 'var(--success)' : 'var(--danger)';
         const bg = rule.resultType === 'reward' ? '#ecfdf5' : '#fef2f2';
+        
+        // Reason construction (Instruction 3)
+        let reason = '';
+        if(rule.type === 'specific') {
+            const b = db.behaviors.find(x => x.id === rule.targetId);
+            reason = `به دلیل: ${b.title} (امتیاز ${triggerValue})`;
+        } else if(rule.type === 'total_pos') {
+            reason = `به دلیل: مجموع امتیاز مثبت (${triggerValue})`;
+        } else if(rule.type === 'total_neg') {
+            reason = `به دلیل: مجموع امتیاز منفی (${triggerValue})`;
+        } else {
+            reason = `به دلیل: تراز کل (${triggerValue})`;
+        }
 
         area.innerHTML = `
             <div class="trigger-box" style="display:block; border-color:${color}; background:${bg}">
                 <div class="trigger-header" style="color:${color}">
                     ${typeLabel} حد نصاب "${getRuleDescription(rule)}" پر شد.
                 </div>
-                <div style="margin-bottom:10px;">${rule.resultText}</div>
+                <div style="margin-bottom:5px; font-weight:bold;">${rule.resultText}</div>
+                <div style="margin-bottom:10px; font-size:0.8rem; color:var(--text-light);">${reason}</div>
                 <div class="trigger-actions">
-                    <button class="btn btn-accept" onclick="acceptTrigger('${rule.id}')">ثبت در اقدامات</button>
+                    <button class="btn btn-accept" onclick="acceptTrigger('${rule.id}', '${reason}')">ثبت در اقدامات</button>
                     <button class="btn btn-change" onclick="ignoreTrigger('${rule.id}')">نادیده گرفتن</button>
                 </div>
             </div>
@@ -907,15 +962,18 @@
         return 'امتیاز کل';
     }
 
-    function acceptTrigger(ruleId) {
+    function acceptTrigger(ruleId, reasonText) {
         const key = getKey(viewingDate);
         const rule = db.rules.find(r => r.id === ruleId);
         const log = db.logs[key];
 
+        // Save with Metadata (Instruction 3)
         log.actions.push({
             id: Date.now(),
             text: rule.resultText,
             type: rule.resultType,
+            reason: reasonText,
+            date: key,
             done: false
         });
 
@@ -937,15 +995,14 @@
     }
 
     // ==========================================
-    // 5. MANIFESTO
+    // 5. MANIFESTO (Instruction 2 & 3 fixed)
     // ==========================================
     
     function openManifestoModal() {
         const name = db.user.name;
         
         const now = new Date();
-        const dateStr = getVerbalDate(now);
-        // Custom Time Format: ۹:۱۸ دقیقه
+        const dateStr = getVerbalDate(now); // Fixed Format
         const h = now.getHours().toLocaleString('fa-IR');
         const m = now.getMinutes().toLocaleString('fa-IR').padStart(2,'۰');
         const formattedTime = `${h}:${m} دقیقه`;
@@ -1014,21 +1071,74 @@
     }
 
     // ==========================================
-    // 6. ACTIONS LIST
+    // 6. ACTIONS LIST & DETAILS (Instruction 1 & 2 & 3)
     // ==========================================
+
+    function openActionDetails(filterType) {
+        const key = getKey(viewingDate);
+        const actions = db.logs[key]?.actions || [];
+        // Filter for Pending only in Home popup
+        const filtered = actions.filter(a => !a.done && (filterType === 'all' || a.type === filterType));
+        
+        const container = document.getElementById('actionDetailList');
+        container.innerHTML = '';
+        document.getElementById('actionDetailTitle').innerText = filterType === 'reward' ? 'پاداش‌های انجام نشده' : 'جریمه‌های انجام نشده';
+        
+        if(filtered.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:#999;">موردی یافت نشد.</p>';
+        }
+
+        filtered.forEach(a => {
+             container.innerHTML += `
+                <div class="action-detail-item">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span class="action-badge ${a.type==='reward'?'badge-reward':'badge-penalty'}">${a.type==='reward'?'پاداش':'جریمه'}</span>
+                        <span style="font-size:0.8rem; color:var(--text-light);">${a.date}</span>
+                    </div>
+                    <div style="font-weight:bold; margin:8px 0;">${a.text}</div>
+                    <div class="action-detail-meta">${a.reason || 'ثبت شده توسط سیستم'}</div>
+                </div>
+            `;
+        });
+        
+        document.getElementById('actionDetailsModal').style.display = 'flex';
+    }
+
+    function filterActionType(type) {
+        currentActionFilter = type;
+        // Update button styles
+        document.getElementById('filterAllBtn').classList.remove('active');
+        document.getElementById('filterRewardBtn').classList.remove('active');
+        document.getElementById('filterPenaltyBtn').classList.remove('active');
+        
+        if(type === 'all') document.getElementById('filterAllBtn').classList.add('active');
+        else if(type === 'reward') document.getElementById('filterRewardBtn').classList.add('active');
+        else document.getElementById('filterPenaltyBtn').classList.add('active');
+
+        renderActionsTab();
+    }
+    
+    function filterActionList() { renderActionsTab(); }
 
     function renderActionsTab() {
         const key = getKey(viewingDate);
         const actions = db.logs[key]?.actions || [];
+        const search = document.getElementById('actionSearch').value.toLowerCase();
         const container = document.getElementById('actionsListFull');
         container.innerHTML = '';
 
-        if (actions.length === 0) {
-            container.innerHTML = '<p style="text-align:center; color:#999;">هیچ اقدامی ثبت نشده است.</p>';
+        const filtered = actions.filter(a => {
+            if (currentActionFilter !== 'all' && a.type !== currentActionFilter) return false;
+            if (search && !a.text.toLowerCase().includes(search)) return false;
+            return true;
+        });
+
+        if (filtered.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:#999;">موردی یافت نشد.</p>';
             return;
         }
 
-        actions.forEach(a => {
+        filtered.forEach(a => {
             container.innerHTML += `
                 <div class="action-item ${a.done ? 'done' : ''}">
                     <div class="action-checkbox ${a.done ? 'checked' : ''}" onclick="toggleAction(${a.id})">
@@ -1037,6 +1147,7 @@
                     <div class="action-content">
                         <span class="action-badge ${a.type==='reward'?'badge-reward':'badge-penalty'}">${a.type==='reward'?'پاداش':'جریمه'}</span>
                         <span style="font-weight:bold; display:block; margin-top:4px;">${a.text}</span>
+                        <span style="font-size:0.75rem; color:var(--text-light); display:block; margin-top:2px;">${a.reason || ''}</span>
                     </div>
                     <i class="fas fa-trash btn-icon delete" onclick="deleteAction(${a.id})"></i>
                 </div>
@@ -1051,6 +1162,7 @@
             action.done = !action.done;
             saveDB();
             renderActionsTab();
+            renderHome(); // Update home summary
         }
     }
 
@@ -1060,10 +1172,11 @@
         db.logs[key].actions = db.logs[key].actions.filter(a => a.id !== id);
         saveDB();
         renderActionsTab();
+        renderHome();
     }
 
     // ==========================================
-    // 7. EDITORS (Full CRUD)
+    // 7. EDITORS (Full CRUD & Instruction 4)
     // ==========================================
 
     function openEditor(type) {
@@ -1076,7 +1189,7 @@
         document.getElementById('behaviorFields').style.display = type === 'behavior' ? 'block' : 'none';
         document.getElementById('ruleFields').style.display = type === 'rule' ? 'block' : 'none';
         
-        resetEditorForm(); // Clear form state
+        resetEditorForm(); 
 
         if(type === 'rule') {
             populateTargetSelect();
@@ -1109,7 +1222,6 @@
         
         const resTypeInput = document.getElementById('ruleResultType');
         const resTypeDisp = document.getElementById('ruleResultTypeDisplay');
-        const autoInd = document.getElementById('ruleAutoTypeIndicator');
         
         if (type === 'total_pos') {
             resTypeInput.value = 'reward'; resTypeDisp.value = 'پاداش';
@@ -1117,10 +1229,6 @@
             resTypeInput.value = 'penalty'; resTypeDisp.value = 'جریمه';
         } else if (type === 'specific') {
             updateRuleResultTypeBasedOnTarget();
-        }
-        
-        if (type === 'total_net') {
-            // Reset to neutral, user will likely set threshold sign
         }
     }
 
@@ -1203,7 +1311,7 @@
     function filterEditorList() { renderEditorList(); }
 
     function editItem(type, index) {
-        editingItemId = index; // Storing index for splice
+        editingItemId = index; 
         document.getElementById('formTitle').innerText = "ویرایش مورد";
         document.getElementById('cancelEditBtn').style.display = 'inline-block';
         
@@ -1228,13 +1336,13 @@
         document.getElementById('formTitle').innerText = "افزودن جدید";
         document.getElementById('cancelEditBtn').style.display = 'none';
         
-        // Clear Inputs
         document.getElementById('behTitle').value = '';
         document.getElementById('ruleResultText').value = '';
         document.getElementById('ruleThreshold').value = '';
     }
 
     function saveEditorItem() {
+        // Instruction 4: Auto scroll to new item is inherent as we append to list and re-render
         if (currentEditorMode === 'behavior') {
             const title = document.getElementById('behTitle').value.trim();
             const type = document.getElementById('behType').value;
@@ -1243,12 +1351,10 @@
             if(!title) return alert('عنوان الزامی است');
             
             if (editingItemId !== null) {
-                // Edit
                 db.behaviors[editingItemId].title = title;
                 db.behaviors[editingItemId].type = type;
                 db.behaviors[editingItemId].weight = weight;
             } else {
-                // Add
                 db.behaviors.push({
                     id: 'b' + Date.now(),
                     title, type, weight
@@ -1285,6 +1391,9 @@
         saveDB();
         resetEditorForm();
         renderEditorList();
+        // Scroll to bottom of list
+        const container = document.getElementById('editorListContainer');
+        container.scrollTop = container.scrollHeight;
     }
 
     function deleteItem(type, index) {
@@ -1349,7 +1458,6 @@
                 location.reload();
             }
         } else {
-            // Clear Today
             const key = getKey(new Date());
             if (db.logs[key]) {
                 delete db.logs[key];
@@ -1364,16 +1472,3 @@
 </script>
 </body>
 </html>
-
-آخرین دستور من: حتما حتما کد را کامل بفرست
-نمیخوام یه وقت کد  را مختصر کرده باشی یا چیزی از کد کم کرده باشی حتی اگر یک کد کوچک باشد یا حتی یک کلمه یا یک حرف باشد 
-کد را صحیح و دقیق با آخرین ویرایش ها و  با آخرین تغییرات میفرستی هرچند خیلی خیلی خیلی طولانی بشه
-کامل میفرستی با تمام جزئیات
-کامل میفرستی
-کد رو کامل کامل
-حتی اندازه یک ذره کم نمیزاری
-ویرایش ها را کامل انجام میدی و هیچ چیزی حذف نمیکنی حتی ذره ای
-لطفا کد را کامل و با تمام جزئیات بنویس و فقط ویرایش خواسته شده را انجام بده و کامل بفرست و هیچ چیزی از کد کم نکن و ویرایش دیگه ای هم نده و فقط ویرایش خواسته شده را انجام بده و کامل بفرست
-لطفا حتی ذره ای دیگر از کد کم نکنی و ویرایش دیگری ندهی 
-کد را کامل ویرایش کن و صحیح و دقیق بفرست
- حتی ذره ای دیگه از کد کم نکنی و به هیچ عنوان ذره ای دیگه در کد تغییر ندهی و لطفا فقط ویرایش خواسته شده را انجام بده و کامل بفرست
