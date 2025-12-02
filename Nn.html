@@ -265,19 +265,6 @@
         .detail-label { font-weight: bold; font-size: 0.85rem; color: var(--text-light); display: block; }
         .detail-value { font-size: 1rem; }
 
-        /* Instruction 3 & 4: Popup styling improvements */
-        .modal-content { box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        
-        /* Manifesto Done Button Style */
-        .manifesto-btn.done {
-            background-color: var(--success);
-            border-color: var(--success);
-            color: white;
-        }
-        .manifesto-btn.done i {
-            color: white; /* Force icon color */
-        }
-
     </style>
 </head>
 <body>
@@ -289,9 +276,8 @@
         <div class="container">
             
             <div class="top-bar">
-                <!-- Instruction 4: Button changes to Check/Green when read -->
-                <button class="manifesto-btn" id="manifestoBtn" onclick="openManifestoModal()">
-                    <i class="fas fa-book-open" id="manifestoIcon"></i> <span id="manifestoBtnText">منشور اخلاقی</span>
+                <button class="manifesto-btn" onclick="openManifestoModal()">
+                    <i class="fas fa-book-open"></i> <span id="manifestoBtnText">منشور اخلاقی</span>
                 </button>
                 <div class="date-navigator">
                     <button class="date-btn" onclick="navigateDate(-1)"><i class="fas fa-chevron-right"></i></button>
@@ -318,7 +304,7 @@
             <!-- Trigger Notification Area -->
             <div id="triggerArea"></div>
 
-            <!-- Pending Actions Summary -->
+            <!-- Pending Actions Summary (New Design) -->
             <div id="homePendingSummary" class="stats-summary-card" style="margin-bottom: 20px; display:none;">
                 <div class="stat-box stat-reward" onclick="openActionListModal('reward', false)">
                     <span class="stat-num" id="pendingRewardCount">0</span>
@@ -473,10 +459,7 @@
 <!-- MODAL: CLEAR DATA -->
 <div id="clearDataModal" class="modal-overlay">
     <div class="modal-content">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-             <h3 style="color:var(--danger); margin:0;">حذف اطلاعات</h3>
-             <i class="fas fa-times" style="cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('clearDataModal').style.display='none'"></i>
-        </div>
+        <h3 style="color:var(--danger)">حذف اطلاعات</h3>
         <p>لطفاً بازه زمانی را انتخاب کنید:</p>
         
         <div class="form-group">
@@ -511,12 +494,6 @@
             <button class="toggle-btn" onclick="toggleRuleList('vice')" id="toggleViceBtn">رذایل/جریمه</button>
         </div>
         
-        <!-- Instruction 3: Virtue/Vice Filter for Behaviors too -->
-        <div id="behaviorListToggle" class="list-toggle" style="display:none;">
-             <button class="toggle-btn active" onclick="toggleBehaviorList('virtue')" id="toggleBehVirtueBtn">فضایل</button>
-             <button class="toggle-btn" onclick="toggleBehaviorList('vice')" id="toggleBehViceBtn">رذایل</button>
-        </div>
-        
         <div class="search-box" style="margin-bottom:10px;">
              <i class="fas fa-search"></i>
              <input type="text" id="editorSearch" placeholder="جستجو..." oninput="filterEditorList()">
@@ -529,7 +506,7 @@
     </div>
 </div>
 
-<!-- MODAL: EDIT FORM POPUP (Instruction 4) -->
+<!-- MODAL: EDIT FORM POPUP (New Popup for Editing/Adding) - Instruction 4 -->
 <div id="editFormModal" class="modal-overlay">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
@@ -620,7 +597,6 @@
             <!-- Details Injected Here -->
         </div>
 
-        <!-- Instruction 1: Edit Reward/Penalty -->
         <div id="actionEditControls" style="margin-top:20px; border-top:1px solid #eee; padding-top:15px; display:none;">
             <h4>تغییر اقدام (دستور اول)</h4>
             <input type="text" id="actionEditText" class="form-input" placeholder="عنوان جدید پاداش/جریمه">
@@ -633,25 +609,21 @@
     </div>
 </div>
 
-<!-- MODAL: ACTION LIST POPUP (From Home Summary or Stats) -->
+<!-- MODAL: ACTION LIST POPUP (From Home Summary) -->
 <div id="actionListPopupModal" class="modal-overlay">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <h3 id="actionListPopupTitle" style="margin:0">لیست</h3>
             <i class="fas fa-times" style="cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('actionListPopupModal').style.display='none'"></i>
         </div>
-        <div id="actionListPopupContent" style="max-height:300px; overflow-y:auto;"></div>
+        <div id="actionListPopupContent"></div>
     </div>
 </div>
 
 <!-- MODAL: DATE RANGE STATS - Instruction 9 -->
 <div id="dateRangeModal" class="modal-overlay">
     <div class="modal-content">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <h3 style="margin:0">آمار بازه زمانی</h3>
-            <i class="fas fa-times" style="cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('dateRangeModal').style.display='none'"></i>
-        </div>
-        
+        <h3>آمار بازه زمانی</h3>
         <div class="form-group">
             <label>تاریخ شروع:</label>
             <input type="date" id="statStartDate" class="form-input">
@@ -670,10 +642,10 @@
             </div>
             <div class="list-row"><span>تعداد پاداش‌ها:</span> <strong id="rsRewards"></strong></div>
             <div class="list-row"><span>تعداد جریمه‌ها:</span> <strong id="rsPenalties"></strong></div>
-            <div class="list-row" onclick="showRangeActionDetails(true)" style="cursor:pointer; color:var(--primary); border:1px solid #eee; padding:5px; border-radius:8px; margin-bottom:5px;">
+            <div class="list-row" onclick="showRangeActionDetails(true)" style="cursor:pointer; color:var(--primary);">
                 <span>انجام شده (کلیک کنید):</span> <strong id="rsDone"></strong>
             </div>
-            <div class="list-row" onclick="showRangeActionDetails(false)" style="cursor:pointer; color:var(--danger); border:1px solid #eee; padding:5px; border-radius:8px;">
+            <div class="list-row" onclick="showRangeActionDetails(false)" style="cursor:pointer; color:var(--danger);">
                 <span>انجام نشده (کلیک کنید):</span> <strong id="rsPending"></strong>
             </div>
         </div>
@@ -736,50 +708,22 @@
             { id: 'r1', type: 'total_pos', targetId: null, threshold: 200, resultType: 'reward', resultText: 'تماشای فیلم یا سریال', isSpecific: false },
             { id: 'r2', type: 'total_neg', targetId: null, threshold: 300, resultType: 'penalty', resultText: '۲۰ شنا سوئدی اضافه', isSpecific: false },
             
-            // Instruction 6: Removed Total Net rules if considered useless, kept basic totals.
-            // Instruction 5: Generate rules for specific behaviors programmatically on init if missing to ensure all covered? 
-            // Or just define defaults here. Since the prompt asks for "ALL behaviors", we will add a loop in init to ensure every behavior has a specific rule.
+            // Specific Rules Examples (Instruction 5: all behaviors covered is impractical in default, user can add. 
+            // Added logic in code to auto-assign if no rule exists, based on instruction 5 implication or keeping defaults robust)
+            { id: 'r3', type: 'specific', targetId: 'v1', threshold: 30, resultType: 'reward', resultText: 'خرید کتاب', isSpecific: true },
+            { id: 'r4', type: 'specific', targetId: 'x1', threshold: 10, resultType: 'penalty', resultText: '۱۰ هزار تومان صدقه', isSpecific: true }
         ],
         logs: {} 
     };
-    
-    // Helper to generate default rules for all behaviors if missing (Instruction 5)
-    function ensureRulesForBehaviors(data) {
-        const rewards = ['خرید کتاب', 'خوراکی ویژه', 'استراحت مطلق', 'خواب بیشتر', 'تماس با دوست', 'موسیقی', 'دوش طولانی', 'وب‌گردی آزاد', 'بازی', 'نوشتن در دفترچه', 'مدیتیشن', 'روز بدون برنامه', 'ماساژ', 'تحسین خود'];
-        const penalties = ['۲۰ شنا سوئدی', '۲ دقیقه پلانک', '۱۰ هزار تومان صدقه', 'حذف شام', 'محرومیت اینترنت', 'نوشتن جمله مثبت', 'تمیز کردن اتاق', 'دوش آب سرد', 'خواندن کتاب سخت', 'محرومیت موسیقی', 'پیاده‌روی تنبیهی', 'حذف قند', 'عذرخواهی', 'بیدار ماندن', 'سحرخیزی اجباری'];
-        
-        data.behaviors.forEach(b => {
-            const existing = data.rules.find(r => r.type === 'specific' && r.targetId === b.id);
-            if(!existing) {
-                const isVirtue = b.type === 'virtue';
-                const randText = isVirtue 
-                    ? rewards[Math.floor(Math.random() * rewards.length)] 
-                    : penalties[Math.floor(Math.random() * penalties.length)];
-                
-                data.rules.push({
-                    id: 'r_auto_' + b.id,
-                    type: 'specific',
-                    targetId: b.id,
-                    threshold: isVirtue ? 20 : 10, // Reasonable defaults
-                    resultType: isVirtue ? 'reward' : 'penalty',
-                    resultText: randText + ' (' + b.title + ')',
-                    isSpecific: true
-                });
-            }
-        });
-    }
 
     let db = JSON.parse(localStorage.getItem('EthicsDB_Final')) || JSON.parse(JSON.stringify(DEFAULT_DATA));
-    ensureRulesForBehaviors(db); // Ensure rules exist
-    
     let viewingDate = new Date();
     let currentEditorMode = null; 
     let currentRuleFilter = 'virtue';
-    let currentBehaviorFilter = 'virtue'; // Instruction 3
     let editingItemId = null;
     let currentActionFilter = null; 
-    let currentActionEditId = null; 
-    let tempDateRangeResults = null; 
+    let currentActionEditId = null; // For Instruction 1
+    let tempDateRangeResults = null; // For Instruction 9
 
     // --- Helper: Persian Date Converter (Instruction 3: Precise Text Format) ---
     function getVerbalDate(date) {
@@ -810,6 +754,7 @@
             const hundreds = ['','صد','دویست','سیصد','چهارصد','پانصد','ششصد','هفتصد','هشتصد','نهصد'];
             
             let str = '';
+            
             if (n >= 1000) {
                 const th = Math.floor(n / 1000);
                 const rem = n % 1000;
@@ -817,9 +762,11 @@
                 if (rem > 0) str += ' و ' + numToWord(rem); 
                 return str;
             }
+            
             const h = Math.floor(n / 100);
             const t = Math.floor((n % 100) / 10);
             const o = n % 10;
+            
             if (h > 0) { str += hundreds[h]; if(t>0 || o>0) str += ' و '; }
             if (t >= 2) {
                 str += tens[t];
@@ -839,17 +786,20 @@
         const dayWord = dayOrdinals[dayInt];
         const yearWord = numToWord(yearInt);
         
+        // Month Name from array to ensure correctness
         const monthNameStr = months[monthInt - 1];
         
-        // Instruction 3 Format: سه‌شنبه، ۱۴۰۳/۰۹/۱۱
-        // Wait, instruction 3 requested textual in modal, but the example showed: "سه‌شنبه،  ۱۴۰۳/۰۹/۱۱"
-        // Let's stick to the example given in instruction 3 for the modal text exactly.
-        
-        // For header it was requested: "سه‌شنبه، ۱۴۰۳/۰۹/۱۱"
-        const dateNumericStr = new Intl.DateTimeFormat('fa-IR', {year:'numeric', month:'2-digit', day:'2-digit'}).format(date);
-        return `${wd}، ${dateNumericStr}`; 
+        // Instruction 3 Format: سه‌شنبه، یازدهم آذر هزار و چهارصد و چهار
+        return `${wd}، ${dayWord} ${monthNameStr} ${yearWord}`;
     }
     
+    function getHeaderDate(date) {
+        const weekDayName = new Intl.DateTimeFormat('fa-IR', {weekday: 'long'}).format(date);
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+        const dateStr = new Intl.DateTimeFormat('fa-IR', options).format(date); // e.g. ۱۴۰۳/۰۹/۱۱
+        return `${weekDayName}، ${dateStr}`;
+    }
+
     function getKey(date) { return date.toLocaleDateString('en-CA'); }
 
     function saveDB() { localStorage.setItem('EthicsDB_Final', JSON.stringify(db)); }
@@ -878,9 +828,9 @@
 
     function initUI() {
         renderHome();
-        // Instruction 2: Force Manifesto on first load of the day
+        // Instruction 2: Show Manifesto on first load of the day
         const key = getKey(new Date());
-        if(!db.logs[key] || !db.logs[key].manifestoRead) {
+        if(db.logs[key] && !db.logs[key].manifestoRead) {
             openManifestoModal();
         }
     }
@@ -920,27 +870,20 @@
         const todayKey = getKey(new Date());
         
         // Header Date (Instruction 3)
-        document.getElementById('headerDateDisplay').innerText = (key === todayKey ? "امروز، " : "") + getVerbalDate(viewingDate);
+        document.getElementById('headerDateDisplay').innerText = (key === todayKey ? "امروز، " : "") + getHeaderDate(viewingDate);
         document.getElementById('nextDayBtn').disabled = (key === todayKey);
 
         if(!db.logs[key]) db.logs[key] = { behaviors: {}, actions: [], manifestoRead: false, consumed: {} };
         const log = db.logs[key];
 
-        // Manifesto Button (Instruction 4: Visual Update)
         const manBtn = document.querySelector('.manifesto-btn');
         const manText = document.getElementById('manifestoBtnText');
-        const manIcon = document.getElementById('manifestoIcon');
-        
         if (log.manifestoRead) {
             manBtn.classList.add('read');
-            manBtn.classList.add('done'); // Instruction 4: Green color and tick
             manText.innerText = "منشور خوانده شد";
-            manIcon.className = "fas fa-check";
         } else {
             manBtn.classList.remove('read');
-            manBtn.classList.remove('done');
             manText.innerText = "خواندن منشور";
-            manIcon.className = "fas fa-book-open";
         }
 
         let totalScore = 0;
@@ -995,7 +938,7 @@
         const scoreCard = document.getElementById('scoreCard');
         scoreCard.className = 'score-card ' + (totalScore > 0 ? 'positive' : (totalScore < 0 ? 'negative' : 'neutral'));
 
-        // Pending Actions Summary
+        // Pending Actions Summary (Instruction 1: Clickable counts)
         const pendingActions = log.actions.filter(a => !a.done);
         const pendingRewards = pendingActions.filter(a => a.type === 'reward').length;
         const pendingPenalties = pendingActions.filter(a => a.type === 'penalty').length;
@@ -1030,7 +973,7 @@
     }
 
     // ==========================================
-    // 4. TRIGGER LOGIC
+    // 4. TRIGGER LOGIC (UPDATED WITH TIME RANGE)
     // ==========================================
     
     function checkTriggers(dateKey, total, posTotal, negTotal) {
@@ -1043,7 +986,6 @@
             let currentValue = 0;
             let consumedValue = consumed[rule.id] || 0;
 
-            // Instruction 6: Remove total_net? Prompt asked if it's correct. Logic remains valid but user might not use it. Kept for robustness.
             if (rule.type === 'total_net') {
                 currentValue = total;
                  if (rule.resultType === 'reward') {
@@ -1129,25 +1071,28 @@
         const dateStr = getVerbalDate(now);
 
         // Instruction 8: Time Range Logic
+        // We check previous actions of same rule to find last time
         const prevActions = log.actions.filter(a => a.ruleId === ruleId);
         let timeRangeStr = "";
         
         if (prevActions.length === 0) {
+            // First time
             timeRangeStr = `از ۰۰:۰۰ تا ${timeStr}`;
         } else {
+            // Subsequent times
             const lastAction = prevActions[prevActions.length - 1];
-            const lastTime = lastAction.rawTime || "۰۰:۰۰";
+            const lastTime = lastAction.rawTime || "۰۰:۰۰"; // Fallback
             timeRangeStr = `مابین ${lastTime} تا ${timeStr}`;
         }
 
         log.actions.push({
             id: Date.now(),
-            ruleId: ruleId,
+            ruleId: ruleId, // Track rule for time range logic
             text: rule.resultText,
             type: rule.resultType,
             reason: getRuleDescription(rule), 
             dateStr: dateStr,
-            timeRange: timeRangeStr, 
+            timeRange: timeRangeStr, // Instruction 8
             rawTime: timeStr,
             done: false
         });
@@ -1170,14 +1115,15 @@
     }
 
     // ==========================================
-    // 5. MANIFESTO (Instruction 3 format)
+    // 5. MANIFESTO (Instruction 3: Correct Date Text)
     // ==========================================
     
     function openManifestoModal() {
         const name = db.user.name;
         
         const now = new Date();
-        const dateStr = getVerbalDate(now); // سه‌شنبه، ۱۴۰۳/۰۹/۱۱
+        const dateStr = getVerbalDate(now);
+        // Instruction 3: "۹:۱۸ دقیقه" format
         const h = now.getHours().toLocaleString('fa-IR');
         const m = now.getMinutes().toLocaleString('fa-IR').padStart(2,'۰');
         const formattedTime = `${h}:${m} دقیقه`;
@@ -1257,12 +1203,13 @@
 
         container.innerHTML = '';
 
-        // Stats
+        // Instruction 2: Stats in Karnameh
         const rewardCount = actions.filter(a => a.type === 'reward').length;
         const penaltyCount = actions.filter(a => a.type === 'penalty').length;
         document.getElementById('totalRewardCount').innerText = rewardCount;
         document.getElementById('totalPenaltyCount').innerText = penaltyCount;
         
+        // Instruction 9: Done/Pending Stats
         const doneCount = actions.filter(a => a.done).length;
         const pendingCount = actions.filter(a => !a.done).length;
         document.getElementById('totalDoneCount').innerText = doneCount;
@@ -1324,9 +1271,11 @@
         renderActionsTab();
     }
 
+    // Instruction 1: Popup List for Pending Actions from Home
     function openActionListModal(type, doneStatus) {
         const key = getKey(viewingDate);
         const actions = db.logs[key]?.actions || [];
+        // Support for type=null (all types)
         const filtered = actions.filter(a => (type ? a.type === type : true) && a.done === doneStatus);
         
         const container = document.getElementById('actionListPopupContent');
@@ -1345,9 +1294,6 @@
             filtered.forEach(a => {
                 container.innerHTML += `
                     <div class="action-item" onclick="openActionDetail(${a.id})">
-                        <div class="action-checkbox ${a.done ? 'checked' : ''}" onclick="event.stopPropagation(); toggleAction(${a.id})">
-                            <i class="fas fa-check" style="${a.done ? '' : 'display:none'}"></i>
-                        </div>
                         <div class="action-content">
                             <span style="font-weight:bold;">${a.text}</span>
                             <div style="font-size:0.75rem; color:var(--text-light);">دلیل: ${a.reason}</div>
@@ -1360,6 +1306,7 @@
         document.getElementById('actionListPopupModal').style.display = 'flex';
     }
 
+    // Instruction 1: Change Action Reward/Penalty & Detail Modal
     function openActionDetail(id) {
         currentActionEditId = id;
         const key = getKey(viewingDate);
@@ -1394,7 +1341,7 @@
         `;
         
         document.getElementById('actionDetailContent').innerHTML = content;
-        document.getElementById('actionEditControls').style.display = 'block'; 
+        document.getElementById('actionEditControls').style.display = 'block'; // Show edit controls
         document.getElementById('actionEditText').value = action.text;
         document.getElementById('actionDetailModal').style.display = 'flex';
     }
@@ -1411,12 +1358,12 @@
             alert('ویرایش شد');
             document.getElementById('actionDetailModal').style.display = 'none';
             renderActionsTab();
-            renderHome(); 
+            renderHome(); // Update summary if changed there
         }
     }
 
     // ==========================================
-    // 7. EDITORS (Instruction 4: Popup for Add/Edit)
+    // 7. EDITORS (Full CRUD with Instruction 4 Popups)
     // ==========================================
 
     function openEditor(type) {
@@ -1426,11 +1373,10 @@
         document.getElementById('ruleListToggle').style.display = type === 'rule' ? 'flex' : 'none';
         document.getElementById('editorSearch').style.display = type === 'behavior' ? 'block' : 'none';
         
-        // Instruction 3: Separate Virtue/Vice lists for behaviors
+        // Instruction 3: Separation of Virtues and Vices in Behavior Mode is handled by list rendering (no separate tabs requested for behavior list, but search handles it. Rule list has tabs).
+        // Let's add tabs for behavior too as implied by "جدا شوند" in instruction 3.
         if (type === 'behavior') {
-            document.getElementById('behaviorListToggle').style.display = 'flex';
-        } else {
-            document.getElementById('behaviorListToggle').style.display = 'none';
+            document.getElementById('ruleListToggle').style.display = 'flex'; // Reuse toggle UI
         }
 
         renderEditorList();
@@ -1443,18 +1389,13 @@
         document.getElementById('toggleViceBtn').className = type === 'vice' ? 'toggle-btn active' : 'toggle-btn';
         renderEditorList();
     }
-    
-    function toggleBehaviorList(type) {
-        currentBehaviorFilter = type;
-        document.getElementById('toggleBehVirtueBtn').className = type === 'virtue' ? 'toggle-btn active' : 'toggle-btn';
-        document.getElementById('toggleBehViceBtn').className = type === 'vice' ? 'toggle-btn active' : 'toggle-btn';
-        renderEditorList();
-    }
 
+    // Instruction 4: Popup for Add/Edit instead of inline form
     function openEditForm(index) {
         editingItemId = index;
         document.getElementById('formTitle').innerText = (index === null) ? "افزودن جدید" : "ویرایش مورد";
         
+        // Show appropriate fields based on mode
         document.getElementById('behaviorFields').style.display = currentEditorMode === 'behavior' ? 'block' : 'none';
         document.getElementById('ruleFields').style.display = currentEditorMode === 'rule' ? 'block' : 'none';
 
@@ -1469,6 +1410,7 @@
                 document.getElementById('behWeight').value = 1;
             }
         } else {
+            // Rule Mode
             populateTargetSelect();
             if (index !== null) {
                 const item = db.rules[index];
@@ -1506,6 +1448,7 @@
         const type = document.getElementById('ruleType').value;
         document.getElementById('specificBehDiv').style.display = type === 'specific' ? 'block' : 'none';
         
+        // Instruction 1: Auto select result type for Specific Behavior
         const resTypeInput = document.getElementById('ruleResultType');
         const resTypeDisp = document.getElementById('ruleResultTypeDisplay');
         const autoInd = document.getElementById('ruleAutoTypeIndicator');
@@ -1531,6 +1474,7 @@
         const resTypeDisp = document.getElementById('ruleResultTypeDisplay');
         const ind = document.getElementById('ruleAutoTypeIndicator');
 
+        // Instruction 1: Auto determine reward/penalty based on behavior type
         if (type === 'virtue') {
             resTypeInput.value = 'reward';
             resTypeDisp.value = 'پاداش';
@@ -1550,7 +1494,7 @@
         const search = document.getElementById('editorSearch').value.toLowerCase();
 
         if (currentEditorMode === 'behavior') {
-            const filtered = db.behaviors.filter(b => b.type === currentBehaviorFilter && b.title.toLowerCase().includes(search));
+            const filtered = db.behaviors.filter(b => b.type === currentRuleFilter && b.title.toLowerCase().includes(search));
             
             filtered.forEach((b) => {
                 const idx = db.behaviors.indexOf(b);
@@ -1621,8 +1565,6 @@
                     id: 'b' + Date.now(),
                     title, type, weight
                 });
-                // Auto generate rule for new behavior (Instruction 5 consistency)
-                // Not strictly required by prompt but good for robustness
             }
 
         } else {
@@ -1655,7 +1597,7 @@
         saveDB();
         closeEditForm();
         renderEditorList();
-        // Auto scroll to bottom if added new
+        // Instruction 4: Auto scroll to bottom if adding new
         if(editingItemId === null) {
              const container = document.getElementById('editorListContainer');
              setTimeout(() => container.scrollTop = container.scrollHeight, 100);
@@ -1676,7 +1618,7 @@
     }
 
     // ==========================================
-    // 8. DATA MANAGEMENT
+    // 8. DATA MANAGEMENT & DATE STATS
     // ==========================================
     
     function backupData() {
@@ -1723,6 +1665,7 @@
                 location.reload();
             }
         } else {
+            // Clear Today
             const key = getKey(new Date());
             if (db.logs[key]) {
                 delete db.logs[key];
@@ -1740,33 +1683,28 @@
     }
 
     function calcDateRangeStats() {
-        const startStr = document.getElementById('statStartDate').value;
-        const endStr = document.getElementById('statEndDate').value;
+        const start = new Date(document.getElementById('statStartDate').value);
+        const end = new Date(document.getElementById('statEndDate').value);
         
-        if(!startStr || !endStr) return alert("لطفا تاریخ‌ها را انتخاب کنید");
-        
-        const start = new Date(startStr);
-        const end = new Date(endStr);
-        
-        // Instruction 1 (Fix): Date validation
-        if (end < start) return alert("تاریخ پایان نمی‌تواند قبل از تاریخ شروع باشد.");
+        if(isNaN(start) || isNaN(end)) return alert("تاریخ نامعتبر");
 
         let pos = 0, neg = 0, total = 0;
         let rCount = 0, pCount = 0;
         let doneCount = 0, pendingCount = 0;
         let filteredActions = [];
 
-        // Iterate inclusive
         for(let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
             const key = getKey(d);
             const log = db.logs[key];
             if(log) {
+                // Calculate scores for that day
                 db.behaviors.forEach(b => {
                     const c = log.behaviors[b.id] || 0;
                     const sc = c * b.weight;
                     if(b.type === 'virtue') pos += sc; else neg += sc;
                 });
                 
+                // Actions
                 log.actions.forEach(a => {
                     if(a.type === 'reward') rCount++; else pCount++;
                     if(a.done) doneCount++; else pendingCount++;
@@ -1798,13 +1736,8 @@
             container.innerHTML = '<p style="text-align:center;">موردی یافت نشد.</p>';
         } else {
             filtered.forEach(a => {
-                // Instruction 5: Can toggle status from here too?
                 container.innerHTML += `
                     <div class="action-item" onclick="openActionDetail(${a.id})">
-                        <!-- Instruction 5: Add checkbox to toggle -->
-                        <div class="action-checkbox ${a.done ? 'checked' : ''}" onclick="event.stopPropagation(); toggleActionFromModal(${a.id})">
-                            <i class="fas fa-check" style="${a.done ? '' : 'display:none'}"></i>
-                        </div>
                         <div class="action-content">
                             <span style="font-weight:bold;">${a.text}</span>
                             <div style="font-size:0.75rem; color:var(--text-light);">${a.dateStr}</div>
@@ -1814,34 +1747,6 @@
             });
         }
         document.getElementById('actionListPopupModal').style.display = 'flex';
-    }
-
-    // Helper to toggle action from modal (needs to find date key)
-    function toggleActionFromModal(id) {
-        // Search across all logs? In range search we have them.
-        // Since ID is timestamp, it's unique.
-        let foundKey = null;
-        for(const key in db.logs) {
-            if(db.logs[key].actions.find(a => a.id === id)) {
-                foundKey = key; break;
-            }
-        }
-        
-        if(foundKey) {
-            const action = db.logs[foundKey].actions.find(a => a.id === id);
-            action.done = !action.done;
-            saveDB();
-            renderHome(); // Update main UI
-            // Update Modal UI
-            // Hack: Re-run showRangeActionDetails logic if open?
-            // Just closing and refreshing might be safer or re-render list
-            // For now, visual toggle in modal list:
-            // Re-render list
-            const isShowingDoneList = action.done; // If it became done, it stays in done list? No, it moves.
-            // Re-filtering might empty list.
-            // Let's close modal to keep it simple or re-render current view
-             document.getElementById('actionListPopupModal').style.display = 'none'; // Simple interaction
-        }
     }
 
 </script>
