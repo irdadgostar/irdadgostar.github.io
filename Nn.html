@@ -1,15 +1,15 @@
-<!DOCTYPE html>
+   <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>سامانه جامع پایش اخلاق | نسخه نهایی و کامل</title>
+    <title>سامانه جامع پایش اخلاق | نسخه حرفه‌ای</title>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --bg-body: #f8fafc;
+            --bg-body: #f1f5f9;
             --surface: #ffffff;
             --primary: #3b82f6;
             --primary-dark: #1d4ed8;
@@ -20,8 +20,9 @@
             --neutral: #64748b;
             --text-main: #0f172a;
             --text-light: #64748b;
-            --border-radius: 16px;
-            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --border-radius: 18px;
+            --shadow: 0 4px 15px -3px rgba(0,0,0,0.1), 0 2px 6px -2px rgba(0,0,0,0.05);
+            --card-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
@@ -30,47 +31,48 @@
             background-color: var(--bg-body);
             color: var(--text-main);
             font-family: 'Vazirmatn', sans-serif;
-            margin: 0; padding: 0; padding-bottom: 100px;
+            margin: 0; padding: 0; padding-bottom: 110px;
             overflow-x: hidden;
         }
 
         .container { max-width: 600px; margin: 0 auto; padding: 15px; }
 
-        /* --- Header Area --- */
+        /* --- Header Area (Fixed Sizing) --- */
         .top-bar {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 15px; padding: 0 5px;
+            display: flex; justify-content: space-between; align-items: stretch;
+            margin-bottom: 20px; gap: 10px; height: 45px;
         }
 
         .manifesto-btn {
+            flex: 1;
             background: var(--surface); color: var(--primary);
-            border: 1px solid var(--primary); padding: 8px 16px;
-            border-radius: 50px; font-size: 0.85rem; font-weight: bold;
-            display: flex; align-items: center; gap: 6px; cursor: pointer;
-            box-shadow: var(--shadow); transition: 0.2s;
-            /* Fixed width to prevent resizing */
-            min-width: 140px; justify-content: center;
+            border: 1px solid var(--primary); 
+            border-radius: 12px; font-size: 0.8rem; font-weight: bold;
+            display: flex; align-items: center; justify-content: center; gap: 6px; 
+            cursor: pointer; box-shadow: var(--shadow); transition: 0.2s;
+            padding: 0 10px;
         }
         .manifesto-btn.read { background: var(--success); color: white; border-color: var(--success); }
 
         .date-navigator {
-            display: flex; align-items: center; gap: 15px;
-            background: var(--surface); padding: 6px 12px;
+            flex: 1;
+            display: flex; align-items: center; justify-content: space-between;
+            background: var(--surface); padding: 0 8px;
             border-radius: 12px; box-shadow: var(--shadow);
+            border: 1px solid #e2e8f0;
         }
-        .date-btn { background: none; border: none; color: var(--text-main); font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; }
+        .date-btn { background: none; border: none; color: var(--text-main); font-size: 1rem; cursor: pointer; display: flex; align-items: center; padding: 5px; }
         .date-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-        .date-text { font-weight: bold; font-size: 0.9rem; }
+        .date-text { font-weight: bold; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* --- Dynamic Score Card --- */
         .score-card {
             color: white; padding: 25px; border-radius: 24px;
-            text-align: center; box-shadow: var(--shadow);
+            text-align: center; box-shadow: var(--card-shadow);
             margin-bottom: 25px; transition: background 0.5s ease;
             position: relative; overflow: hidden;
         }
         
-        /* Dynamic Background Classes */
         .score-card.neutral { background: linear-gradient(135deg, #64748b 0%, #475569 100%); }
         .score-card.positive { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
         .score-card.negative { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); }
@@ -86,7 +88,7 @@
         .sub-val { font-weight: 800; font-size: 1.2rem; }
         .sub-lbl { font-size: 0.75rem; opacity: 0.8; }
 
-        /* --- Lists --- */
+        /* --- Modern Card Design (Instruction 4 & 5) --- */
         .section-header {
             display: flex; justify-content: space-between; align-items: center;
             margin: 25px 0 10px 0; padding: 0 5px;
@@ -95,41 +97,75 @@
         .virtue-text { color: var(--success-dark); }
         .vice-text { color: var(--danger-dark); }
 
-        .card {
-            background: var(--surface); border-radius: var(--border-radius);
-            padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow);
-            border-right: 5px solid transparent; position: relative;
-            transition: transform 0.2s, box-shadow 0.2s;
+        .modern-card {
+            background: var(--surface); border-radius: 20px;
+            margin-bottom: 15px; box-shadow: var(--shadow);
+            display: flex; align-items: stretch; overflow: hidden;
+            transition: transform 0.1s;
+            height: 80px; /* Fixed height for consistency */
         }
-        .card:active { transform: scale(0.98); }
-        .card.virtue { border-right-color: var(--success); }
-        .card.vice { border-right-color: var(--danger); }
+        .modern-card:active { transform: scale(0.98); }
 
-        .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .item-name { font-weight: 700; font-size: 1rem; color: var(--text-main); }
-        .item-weight { font-size: 0.7rem; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: var(--text-light); }
+        /* Side Buttons */
+        .card-btn {
+            width: 60px; border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; color: white; transition: background 0.2s;
+        }
+        .card-btn.minus { background: #fee2e2; color: var(--danger); }
+        .card-btn.minus:active { background: var(--danger); color: white; }
         
-        /* Stepper */
-        .stepper { display: flex; align-items: center; background: #f8fafc; border-radius: 10px; padding: 3px; border: 1px solid #e2e8f0; }
-        .step-btn {
-            width: 30px; height: 30px; border: none; background: white; border-radius: 8px;
-            font-size: 1.2rem; cursor: pointer; color: var(--text-main);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center;
-        }
-        .step-val { width: 30px; text-align: center; font-weight: bold; font-size: 1rem; }
+        .card-btn.plus { background: #d1fae5; color: var(--success); }
+        .card-btn.plus:active { background: var(--success); color: white; }
 
-        .note-input {
-            width: 100%; border: none; border-top: 1px solid #f1f5f9;
-            padding: 8px 0 0 0; margin-top: 5px; font-size: 0.85rem;
-            background: transparent; color: var(--text-main);
+        /* Center Content */
+        .card-info {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 0 10px; text-align: center;
+            border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9;
+        }
+        .card-title { font-weight: 800; font-size: 1rem; color: var(--text-main); margin-bottom: 4px; }
+        .card-meta { display: flex; gap: 8px; justify-content: center; }
+        .meta-badge {
+            font-size: 0.7rem; padding: 2px 8px; border-radius: 6px;
+            background: #f1f5f9; color: var(--text-light); font-weight: bold;
+        }
+        .meta-badge.count {
+            background: var(--primary); color: white; /* Count style */
         }
 
+
+        /* --- Settings Grid (Instruction 3) --- */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .setting-block {
+            background: white; border-radius: 20px;
+            padding: 20px 10px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center;
+            box-shadow: var(--shadow);
+            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+            aspect-ratio: 1/1; /* Square blocks */
+            border: 1px solid transparent;
+        }
+        .setting-block:active { transform: scale(0.96); }
+        .setting-block i { font-size: 2rem; margin-bottom: 10px; color: var(--primary); }
+        .setting-block span { font-weight: bold; font-size: 0.9rem; color: var(--text-main); }
+        
+        .setting-block.danger { border-color: #fee2e2; }
+        .setting-block.danger i { color: var(--danger); }
+        
         /* --- Action List (Tasks) --- */
         .action-item {
             background: white; border-radius: 12px; padding: 15px; margin-bottom: 10px;
             display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow);
-            border: 1px solid #f1f5f9;
-            cursor: pointer; /* Clickable to show details */
+            border: 1px solid #f1f5f9; cursor: pointer;
         }
         .action-checkbox {
             width: 24px; height: 24px; border-radius: 6px; border: 2px solid #cbd5e1;
@@ -141,7 +177,7 @@
         .badge-reward { background: #d1fae5; color: #065f46; }
         .badge-penalty { background: #fee2e2; color: #991b1b; }
 
-        /* Stats Summary Box in Actions Tab */
+        /* Stats Summary Box */
         .stats-summary-card {
             background: var(--surface); padding: 15px; border-radius: 12px; box-shadow: var(--shadow);
             display: flex; justify-content: space-around; margin-bottom: 20px;
@@ -152,7 +188,6 @@
         .stat-label { font-size: 0.8rem; color: var(--text-light); }
         .stat-reward { color: var(--success); border: 1px solid #d1fae5; }
         .stat-penalty { color: var(--danger); border: 1px solid #fee2e2; }
-
 
         /* --- Trigger Alert Box --- */
         .trigger-box {
@@ -166,6 +201,7 @@
         .btn-accept { background: var(--primary); color: white; flex: 1; }
         .btn-change { background: white; border: 1px solid #cbd5e1; color: var(--text-light); }
         .btn-danger-outline { background: white; border: 1px solid var(--danger); color: var(--danger); }
+        .btn-danger { background: var(--danger); color: white; border:none; }
 
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -183,25 +219,23 @@
         .nav-item i { font-size: 1.4rem; }
         .nav-item.active { color: var(--primary); }
 
-        /* --- Modal --- */
-        /* LAYER MANAGEMENT (FIXED) */
+        /* --- Modals & Layers --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); backdrop-filter: blur(3px);
             z-index: 2000; display: none; align-items: center; justify-content: center;
         }
         
-        /* Specific Z-Indices to ensure correct layering */
         #manifestoModal { z-index: 2000; }
         #nameModal { z-index: 2000; }
         #clearDataModal { z-index: 2000; }
         #editorModal { z-index: 2000; }
         #dateRangeModal { z-index: 2000; }
+        #backupModal { z-index: 2000; } /* New Backup Modal */
         
-        /* These must be higher as they can open ON TOP of others */
-        #actionListPopupModal { z-index: 2100; } /* On top of home or range stats */
-        #editFormModal { z-index: 2100; } /* On top of editor */
-        #actionDetailModal { z-index: 2200; } /* On top of action list popup */
+        #actionListPopupModal { z-index: 2100; }
+        #editFormModal { z-index: 2100; }
+        #actionDetailModal { z-index: 2200; }
 
         .modal-content {
             background: white; width: 90%; max-width: 500px; border-radius: 20px;
@@ -209,7 +243,7 @@
             position: relative;
         }
 
-        /* Settings Forms */
+        /* Forms & Inputs */
         .form-group { margin-bottom: 15px; }
         .form-label { display: block; margin-bottom: 5px; font-size: 0.9rem; font-weight: bold; }
         .form-input, .form-select { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: inherit; }
@@ -218,27 +252,10 @@
         .btn-icon.edit { color: var(--primary); }
         .btn-icon.delete { color: var(--danger); }
         
-        /* Search Bar */
-        .search-box {
-            margin-bottom: 15px;
-            position: relative;
-        }
-        .search-box input {
-            width: 100%;
-            padding: 10px 35px 10px 10px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-family: inherit;
-        }
-        .search-box i {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-light);
-        }
+        .search-box { margin-bottom: 15px; position: relative; }
+        .search-box input { width: 100%; padding: 10px 35px 10px 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: inherit; }
+        .search-box i { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-light); }
 
-        /* Manifesto Text */
         .manifesto-content {
             font-size: 0.95rem; line-height: 1.8; text-align: justify;
             background: #f8fafc; padding: 15px; border-radius: 12px;
@@ -246,38 +263,14 @@
             margin: 15px 0;
         }
 
-        /* Tab Visibility */
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         
-        /* Toggle Switch for Lists */
-        .list-toggle {
-            display: flex;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 15px;
-        }
-        .toggle-btn {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            background: white;
-            cursor: pointer;
-            font-weight: bold;
-            color: var(--text-light);
-        }
-        .toggle-btn.active {
-            background: var(--primary);
-            color: white;
-        }
+        .list-toggle { display: flex; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; margin-bottom: 15px; }
+        .toggle-btn { flex: 1; padding: 10px; border: none; background: white; cursor: pointer; font-weight: bold; color: var(--text-light); }
+        .toggle-btn.active { background: var(--primary); color: white; }
         
-        /* Action Details in Modal */
-        .detail-row {
-            margin-bottom: 10px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
+        .detail-row { margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         .detail-label { font-weight: bold; font-size: 0.85rem; color: var(--text-light); display: block; }
         .detail-value { font-size: 1rem; }
 
@@ -291,6 +284,7 @@
 <div id="tab-home" class="tab-content active">
     <div class="container">
         
+        <!-- Header: Matching Size (Instruction 1) -->
         <div class="top-bar">
             <button class="manifesto-btn" onclick="openManifestoModal()">
                 <i class="fas fa-book-open" id="manifestoIcon"></i> <span id="manifestoBtnText">منشور اخلاقی</span>
@@ -317,10 +311,8 @@
             </div>
         </div>
 
-        <!-- Trigger Notification Area -->
         <div id="triggerArea"></div>
 
-        <!-- Pending Actions Summary (New Design) -->
         <div id="homePendingSummary" class="stats-summary-card" style="margin-bottom: 20px; display:none;">
             <div class="stat-box stat-reward" onclick="openActionListModal('reward', false)">
                 <span class="stat-num" id="pendingRewardCount">0</span>
@@ -332,13 +324,12 @@
             </div>
         </div>
 
-        <!-- Search -->
         <div class="search-box">
             <i class="fas fa-search"></i>
             <input type="text" id="homeSearch" placeholder="جستجو در رفتارها..." oninput="filterHomeList()">
         </div>
 
-        <!-- Virtues -->
+        <!-- Virtues (Cards: Instruction 4 & 5) -->
         <div class="section-header">
             <span class="section-title virtue"><i class="fas fa-check-circle"></i> فضایل</span>
         </div>
@@ -353,12 +344,11 @@
     </div>
 </div>
 
-<!-- TAB: ACTIONS (KARNAMEH) -->
+<!-- TAB: ACTIONS -->
 <div id="tab-actions" class="tab-content">
     <div class="container">
         <h2 style="margin-top:0;">کارنامه عملی</h2>
         
-        <!-- Stats / Filter Buttons -->
         <div class="stats-summary-card">
             <div class="stat-box stat-reward" onclick="filterActionsTab('reward')">
                 <span class="stat-num" id="totalRewardCount">0</span>
@@ -370,13 +360,11 @@
             </div>
         </div>
 
-         <!-- Search Actions -->
         <div class="search-box">
             <i class="fas fa-search"></i>
             <input type="text" id="actionsSearch" placeholder="جستجو در کارنامه..." oninput="renderActionsTab()">
         </div>
 
-        <!-- Stats Detail (Completed/Pending) Instruction 9 -->
         <div style="margin-bottom: 15px; display:flex; gap:10px; overflow-x:auto; padding-bottom:5px;">
              <div class="stat-box" style="min-width:100px; background:#f0f9ff;" onclick="openActionListModal(null, true)">
                 <span class="stat-num" id="totalDoneCount">0</span>
@@ -396,32 +384,35 @@
     </div>
 </div>
 
-<!-- TAB: SETTINGS -->
+<!-- TAB: SETTINGS (Redesigned: Instruction 3) -->
 <div id="tab-settings" class="tab-content">
     <div class="container">
         <h2>تنظیمات</h2>
         
-        <div class="card">
-            <h3>رفتارها (فضایل و رذایل)</h3>
-            <button class="btn btn-accept" style="width:100%" onclick="openEditor('behavior')">مدیریت لیست رفتارها</button>
-        </div>
+        <div class="settings-grid">
+            <!-- Block 1: Behaviors -->
+            <div class="setting-block" onclick="openEditor('behavior')">
+                <i class="fas fa-list-check"></i>
+                <span>مدیریت رفتارها</span>
+            </div>
 
-        <div class="card">
-            <h3>قوانین پاداش و جریمه</h3>
-            <p style="font-size:0.8rem; color:var(--text-light);">تعیین کنید در چه امتیازی چه اتفاقی بیفتد.</p>
-            <button class="btn btn-accept" style="width:100%" onclick="openEditor('rule')">مدیریت قوانین</button>
-        </div>
+            <!-- Block 2: Rules -->
+            <div class="setting-block" onclick="openEditor('rule')">
+                <i class="fas fa-gavel"></i>
+                <span>پیکربندی عواقب</span>
+            </div>
 
-        <div class="card">
-            <h3>پشتیبان‌گیری</h3>
-            <button class="btn btn-accept" style="background:var(--success); width:100%" onclick="backupData()">دانلود فایل پشتیبان</button>
-            <input type="file" id="restoreFile" style="display:none" onchange="restoreData(this)">
-            <button class="btn btn-change" style="width:100%; margin-top:10px;" onclick="document.getElementById('restoreFile').click()">بازگردانی اطلاعات</button>
-        </div>
+            <!-- Block 3: Backup (New Popup) -->
+            <div class="setting-block" onclick="openBackupModal()">
+                <i class="fas fa-save"></i>
+                <span>پشتیبان‌گیری</span>
+            </div>
 
-        <div class="card" style="border-right-color: var(--danger);">
-            <h3 style="color:var(--danger);">پاکسازی داده‌ها</h3>
-            <button class="btn btn-danger-outline" style="width:100%" onclick="openClearDataModal()">حذف اطلاعات</button>
+            <!-- Block 4: Clear Data -->
+            <div class="setting-block danger" onclick="openClearDataModal()">
+                <i class="fas fa-trash-alt"></i>
+                <span>پاکسازی</span>
+            </div>
         </div>
         
         <br><br><br>
@@ -430,7 +421,6 @@
 </div>
 
 <!-- NAVIGATION -->
-
 <div class="nav-bar">
     <button class="nav-item active" onclick="switchTab('home')">
         <i class="fas fa-home"></i>
@@ -447,23 +437,19 @@
 </div>
 
 <!-- MODAL: MANIFESTO -->
-
 <div id="manifestoModal" class="modal-overlay">
     <div class="modal-content" style="position:relative; max-height:85vh; display:flex; flex-direction:column;">
         <div style="position:absolute; top:15px; left:15px; z-index:10; cursor:pointer;" onclick="document.getElementById('manifestoModal').style.display='none'">
             <i class="fas fa-times" style="font-size:1.2rem; color:var(--text-light);"></i>
         </div>
         <h3 style="text-align:center; color:var(--primary); margin-top:0;">مرور عهدنامه</h3>
-        <div class="manifesto-content" id="manifestoTextContainer">
-            <!-- Text injected via JS -->
-        </div>
+        <div class="manifesto-content" id="manifestoTextContainer"></div>
         <button id="manifestoConfirmBtn" class="btn btn-accept" style="width:100%; opacity:0.5;" disabled onclick="confirmManifestoRead()">تایید و تعهد</button>
         <p style="text-align:center; font-size:0.75rem; color:red; margin-top:5px;">(لطفاً تا انتها مطالعه کنید)</p>
     </div>
 </div>
 
-<!-- MODAL: ONBOARDING (NAME) -->
-
+<!-- MODAL: ONBOARDING -->
 <div id="nameModal" class="modal-overlay">
     <div class="modal-content" style="text-align:center;">
         <h3>خوش آمدید</h3>
@@ -474,8 +460,29 @@
     </div>
 </div>
 
-<!-- MODAL: CLEAR DATA -->
+<!-- MODAL: BACKUP (New for Instruction 3) -->
+<div id="backupModal" class="modal-overlay">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h3 style="margin:0">پشتیبان‌گیری</h3>
+            <i class="fas fa-times" style="cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('backupModal').style.display='none'"></i>
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-light);">برای ذخیره اطلاعات خود یا بازگردانی فایل قبلی استفاده کنید.</p>
+        
+        <button class="btn btn-accept" style="width:100%; margin-bottom:15px;" onclick="backupData()">
+            <i class="fas fa-download"></i> دانلود فایل پشتیبان
+        </button>
+        
+        <div style="border-top:1px solid #eee; padding-top:15px;">
+             <input type="file" id="restoreFile" style="display:none" onchange="restoreData(this)">
+             <button class="btn btn-change" style="width:100%;" onclick="document.getElementById('restoreFile').click()">
+                 <i class="fas fa-upload"></i> بازگردانی اطلاعات
+             </button>
+        </div>
+    </div>
+</div>
 
+<!-- MODAL: CLEAR DATA -->
 <div id="clearDataModal" class="modal-overlay">
     <div class="modal-content" style="position:relative;">
         <div style="position:absolute; top:15px; left:15px; cursor:pointer;" onclick="document.getElementById('clearDataModal').style.display='none'">
@@ -484,16 +491,11 @@
         <h3 style="color:var(--danger)">حذف اطلاعات</h3>
         <p>لطفاً بازه زمانی را انتخاب کنید:</p>
         <div class="form-group">
-            <label>
-                <input type="radio" name="clearOption" value="today" checked> امروز
-            </label>
+            <label><input type="radio" name="clearOption" value="today" checked> امروز</label>
         </div>
         <div class="form-group">
-            <label>
-                <input type="radio" name="clearOption" value="all"> تمام اطلاعات (بازگشت به تنظیمات کارخانه)
-            </label>
+            <label><input type="radio" name="clearOption" value="all"> تمام اطلاعات (بازگشت به تنظیمات کارخانه)</label>
         </div>
-        
         <div style="display:flex; gap:10px; margin-top:20px;">
             <button class="btn btn-danger" style="flex:1" onclick="performClearData()">حذف کن</button>
             <button class="btn btn-change" style="flex:1" onclick="document.getElementById('clearDataModal').style.display='none'">انصراف</button>
@@ -501,140 +503,112 @@
     </div>
 </div>
 
-<!-- MODAL: EDITOR (GENERIC POPUP) - Instruction 4 -->
-
+<!-- MODAL: EDITOR -->
 <div id="editorModal" class="modal-overlay">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <h3 id="editorTitle" style="margin:0">ویرایش</h3>
             <i class="fas fa-times" style="cursor:pointer; font-size:1.2rem;" onclick="closeEditor()"></i>
         </div>
-
-    <!-- Toggle for Lists in Rule Mode -->
-    <div id="ruleListToggle" class="list-toggle" style="display:none;">
-        <button class="toggle-btn active" onclick="toggleRuleList('virtue')" id="toggleVirtueBtn">فضایل/پاداش</button>
-        <button class="toggle-btn" onclick="toggleRuleList('vice')" id="toggleViceBtn">رذایل/جریمه</button>
+        <div id="ruleListToggle" class="list-toggle" style="display:none;">
+            <button class="toggle-btn active" onclick="toggleRuleList('virtue')" id="toggleVirtueBtn">فضایل/پاداش</button>
+            <button class="toggle-btn" onclick="toggleRuleList('vice')" id="toggleViceBtn">رذایل/جریمه</button>
+        </div>
+        <div class="search-box" style="margin-bottom:10px;">
+             <i class="fas fa-search"></i>
+             <input type="text" id="editorSearch" placeholder="جستجو..." oninput="filterEditorList()">
+        </div>
+        <div id="editorListContainer" style="max-height:300px; overflow-y:auto; margin-bottom:20px;"></div>
+        <button class="btn btn-accept" onclick="openEditForm(null)" style="width:100%">+ افزودن مورد جدید</button>
     </div>
-    
-    <div class="search-box" style="margin-bottom:10px;">
-         <i class="fas fa-search"></i>
-         <input type="text" id="editorSearch" placeholder="جستجو..." oninput="filterEditorList()">
-    </div>
-
-    <div id="editorListContainer" style="max-height:300px; overflow-y:auto; margin-bottom:20px;"></div>
-
-    <!-- Floating Button for Add New -->
-    <button class="btn btn-accept" onclick="openEditForm(null)" style="width:100%">+ افزودن مورد جدید</button>
-</div>
 </div>
 
-<!-- MODAL: EDIT FORM POPUP (New Popup for Editing/Adding) - Instruction 4 -->
-
+<!-- MODAL: EDIT FORM -->
 <div id="editFormModal" class="modal-overlay">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <h3 id="formTitle" style="margin:0">افزودن/ویرایش</h3>
             <i class="fas fa-times" style="cursor:pointer; font-size:1.2rem;" onclick="closeEditForm()"></i>
         </div>
-
-    <input type="hidden" id="editId" value="">
-    
-    <!-- Fields for Behavior -->
-    <div id="behaviorFields" style="display:none;">
-        <div class="form-group">
-            <input type="text" id="behTitle" class="form-input" placeholder="عنوان رفتار">
-        </div>
-        <div class="form-group" style="display:flex; gap:10px;">
-            <select id="behType" class="form-select">
-                <option value="virtue">فضیلت (مثبت)</option>
-                <option value="vice">رذیلت (منفی)</option>
-            </select>
-            <input type="number" id="behWeight" class="form-input" placeholder="امتیاز" value="1">
-        </div>
-    </div>
-
-    <!-- Fields for Rules -->
-    <div id="ruleFields" style="display:none;">
-        <div class="form-group">
-            <label class="form-label">نوع شرط:</label>
-            <select id="ruleType" class="form-select" onchange="toggleRuleInputs()">
-                <option value="total_pos">مجموع امتیاز مثبت روزانه</option>
-                <option value="total_neg">مجموع امتیاز منفی روزانه</option>
-                <option value="total_net">امتیاز خالص (برآیند)</option>
-                <option value="specific">رفتار خاص</option>
-            </select>
-        </div>
-        
-        <div class="form-group" id="specificBehDiv" style="display:none;">
-            <label class="form-label">انتخاب رفتار:</label>
-            <select id="ruleTargetId" class="form-select" onchange="updateRuleResultTypeBasedOnTarget()"></select>
-            <!-- Instruction 1: Automatic Type Indicator -->
-            <div id="ruleAutoTypeIndicator" style="font-size:0.8rem; margin-top:5px; padding:5px; border-radius:4px; display:inline-block;"></div>
-        </div>
-
-        <div class="form-group">
-            <label class="form-label">حد نصاب (تعداد/امتیاز):</label>
-            <input type="number" id="ruleThreshold" class="form-input" placeholder="مثلا 20">
-        </div>
-
-        <div class="form-group">
-            <label class="form-label">نتیجه (خودکار تعیین می‌شود):</label>
-            <div style="display:flex; gap:5px;">
-                 <input type="text" id="ruleResultTypeDisplay" class="form-input" style="width:80px; background:#eee; color:#555;" disabled>
-                 <input type="hidden" id="ruleResultType">
-                <input type="text" id="ruleResultText" class="form-input" placeholder="مثلا: دیدن فیلم">
+        <input type="hidden" id="editId" value="">
+        <div id="behaviorFields" style="display:none;">
+            <div class="form-group">
+                <input type="text" id="behTitle" class="form-input" placeholder="عنوان رفتار">
+            </div>
+            <div class="form-group" style="display:flex; gap:10px;">
+                <select id="behType" class="form-select">
+                    <option value="virtue">فضیلت (مثبت)</option>
+                    <option value="vice">رذیلت (منفی)</option>
+                </select>
+                <input type="number" id="behWeight" class="form-input" placeholder="امتیاز" value="1">
             </div>
         </div>
-        
-        <!-- Instruction 8: Time Range -->
-        <div class="form-group">
-            <label class="form-label">محدوده زمانی (اختیاری):</label>
-            <div style="display:flex; gap:5px; align-items:center;">
-                <span>از</span>
-                <input type="time" id="ruleStartTime" class="form-input">
-                <span>تا</span>
-                <input type="time" id="ruleEndTime" class="form-input">
+        <div id="ruleFields" style="display:none;">
+            <div class="form-group">
+                <label class="form-label">نوع شرط:</label>
+                <select id="ruleType" class="form-select" onchange="toggleRuleInputs()">
+                    <option value="total_pos">مجموع امتیاز مثبت روزانه</option>
+                    <option value="total_neg">مجموع امتیاز منفی روزانه</option>
+                    <option value="total_net">امتیاز خالص (برآیند)</option>
+                    <option value="specific">رفتار خاص</option>
+                </select>
+            </div>
+            <div class="form-group" id="specificBehDiv" style="display:none;">
+                <label class="form-label">انتخاب رفتار:</label>
+                <select id="ruleTargetId" class="form-select" onchange="updateRuleResultTypeBasedOnTarget()"></select>
+                <div id="ruleAutoTypeIndicator" style="font-size:0.8rem; margin-top:5px; padding:5px; border-radius:4px; display:inline-block;"></div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">حد نصاب (تعداد/امتیاز):</label>
+                <input type="number" id="ruleThreshold" class="form-input" placeholder="مثلا 20">
+            </div>
+            <div class="form-group">
+                <label class="form-label">نتیجه (خودکار تعیین می‌شود):</label>
+                <div style="display:flex; gap:5px;">
+                     <input type="text" id="ruleResultTypeDisplay" class="form-input" style="width:80px; background:#eee; color:#555;" disabled>
+                     <input type="hidden" id="ruleResultType">
+                    <input type="text" id="ruleResultText" class="form-input" placeholder="مثلا: دیدن فیلم">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">محدوده زمانی (اختیاری):</label>
+                <div style="display:flex; gap:5px; align-items:center;">
+                    <span>از</span>
+                    <input type="time" id="ruleStartTime" class="form-input">
+                    <span>تا</span>
+                    <input type="time" id="ruleEndTime" class="form-input">
+                </div>
+            </div>
+            <div class="form-group">
+                <label style="font-size:0.8rem; display:flex; align-items:center; gap:5px;">
+                    <input type="checkbox" id="ruleIsSpecific"> این پاداش/جریمه اختصاصی است (تصادفی انتخاب نشود)
+                </label>
             </div>
         </div>
-
-        <div class="form-group">
-            <label style="font-size:0.8rem; display:flex; align-items:center; gap:5px;">
-                <input type="checkbox" id="ruleIsSpecific"> این پاداش/جریمه اختصاصی است (تصادفی انتخاب نشود)
-            </label>
-        </div>
+        <button class="btn btn-accept" style="width:100%; margin-top:15px;" onclick="saveEditorItem()">ذخیره</button>
     </div>
-
-    <button class="btn btn-accept" style="width:100%; margin-top:15px;" onclick="saveEditorItem()">ذخیره</button>
-</div>
 </div>
 
 <!-- MODAL: ACTION DETAILS -->
-
 <div id="actionDetailModal" class="modal-overlay">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <h3 id="actionDetailTitle" style="margin:0">جزئیات اقدام</h3>
             <i class="fas fa-times" style="cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('actionDetailModal').style.display='none'"></i>
         </div>
-
-    <div id="actionDetailContent">
-        <!-- Details Injected Here -->
-    </div>
-
-    <div id="actionEditControls" style="margin-top:20px; border-top:1px solid #eee; padding-top:15px; display:none;">
-        <h4>تغییر اقدام (دستور اول)</h4>
-        <input type="text" id="actionEditText" class="form-input" placeholder="عنوان جدید پاداش/جریمه">
-        <button class="btn btn-accept" style="margin-top:10px; width:100%;" onclick="saveActionEdit()">ثبت تغییر</button>
-    </div>
-    
-    <div style="margin-top:20px; text-align:right;">
-         <button class="btn btn-outline" onclick="document.getElementById('actionDetailModal').style.display='none'">بستن</button>
+        <div id="actionDetailContent"></div>
+        <div id="actionEditControls" style="margin-top:20px; border-top:1px solid #eee; padding-top:15px; display:none;">
+            <h4>تغییر اقدام (دستور اول)</h4>
+            <input type="text" id="actionEditText" class="form-input" placeholder="عنوان جدید پاداش/جریمه">
+            <button class="btn btn-accept" style="margin-top:10px; width:100%;" onclick="saveActionEdit()">ثبت تغییر</button>
+        </div>
+        <div style="margin-top:20px; text-align:right;">
+             <button class="btn btn-outline" onclick="document.getElementById('actionDetailModal').style.display='none'">بستن</button>
+        </div>
     </div>
 </div>
-</div>
 
-<!-- MODAL: ACTION LIST POPUP (From Home Summary) -->
-
+<!-- MODAL: ACTION LIST POPUP -->
 <div id="actionListPopupModal" class="modal-overlay">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
@@ -645,8 +619,7 @@
     </div>
 </div>
 
-<!-- MODAL: DATE RANGE STATS - Instruction 9 -->
-
+<!-- MODAL: DATE RANGE STATS -->
 <div id="dateRangeModal" class="modal-overlay">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
@@ -662,23 +635,22 @@
             <input type="date" id="statEndDate" class="form-input">
         </div>
         <button class="btn btn-accept" onclick="calcDateRangeStats()">محاسبه</button>
-
-    <div id="rangeStatsResult" style="margin-top:20px; display:none;">
-        <div class="sub-scores" style="background:#f8fafc; padding:15px;">
-            <div class="sub-score-item"><span>مثبت:</span> <strong id="rsPos" style="color:var(--success)"></strong></div>
-            <div class="sub-score-item"><span>منفی:</span> <strong id="rsNeg" style="color:var(--danger)"></strong></div>
-            <div class="sub-score-item"><span>کل:</span> <strong id="rsTotal"></strong></div>
-        </div>
-        <div class="list-row"><span>تعداد پاداش‌ها:</span> <strong id="rsRewards"></strong></div>
-        <div class="list-row"><span>تعداد جریمه‌ها:</span> <strong id="rsPenalties"></strong></div>
-        <div class="list-row" onclick="showRangeActionDetails(true)" style="cursor:pointer; color:var(--primary);">
-            <span>انجام شده (کلیک کنید):</span> <strong id="rsDone"></strong>
-        </div>
-        <div class="list-row" onclick="showRangeActionDetails(false)" style="cursor:pointer; color:var(--danger);">
-            <span>انجام نشده (کلیک کنید):</span> <strong id="rsPending"></strong>
+        <div id="rangeStatsResult" style="margin-top:20px; display:none;">
+            <div class="sub-scores" style="background:#f8fafc; padding:15px;">
+                <div class="sub-score-item"><span>مثبت:</span> <strong id="rsPos" style="color:var(--success)"></strong></div>
+                <div class="sub-score-item"><span>منفی:</span> <strong id="rsNeg" style="color:var(--danger)"></strong></div>
+                <div class="sub-score-item"><span>کل:</span> <strong id="rsTotal"></strong></div>
+            </div>
+            <div class="list-row"><span>تعداد پاداش‌ها:</span> <strong id="rsRewards"></strong></div>
+            <div class="list-row"><span>تعداد جریمه‌ها:</span> <strong id="rsPenalties"></strong></div>
+            <div class="list-row" onclick="showRangeActionDetails(true)" style="cursor:pointer; color:var(--primary);">
+                <span>انجام شده (کلیک کنید):</span> <strong id="rsDone"></strong>
+            </div>
+            <div class="list-row" onclick="showRangeActionDetails(false)" style="cursor:pointer; color:var(--danger);">
+                <span>انجام نشده (کلیک کنید):</span> <strong id="rsPending"></strong>
+            </div>
         </div>
     </div>
-</div>
 </div>
 
 <script>
@@ -689,7 +661,7 @@
     const DEFAULT_DATA = {
         user: { name: "" },
         behaviors: [
-            // Virtues (Instruction 5 - List Updated)
+            // Virtues
             { id: 'v1', title: 'خردورزی', type: 'virtue', weight: 5 },
             { id: 'v2', title: 'انضباط شخصی', type: 'virtue', weight: 4 },
             { id: 'v3', title: 'صداقت', type: 'virtue', weight: 5 },
@@ -733,11 +705,10 @@
             { id: 'x20', title: 'بی‌تفاوتی', type: 'vice', weight: 3 }
         ],
         rules: [
-            // General Rules (Instruction 5 & New Instruction: Totals)
+            // General Rules
             { id: 'r_total_pos', type: 'total_pos', targetId: null, threshold: 200, resultType: 'reward', resultText: 'تماشای فیلم یا سریال', isSpecific: false },
             { id: 'r_total_neg', type: 'total_neg', targetId: null, threshold: 300, resultType: 'penalty', resultText: '۲۰ شنا سوئدی اضافه', isSpecific: false },
-            
-            // Specific Rules for EVERY Virtue (20 items - as requested "don't miss one")
+            // Specific Rules (Virtues)
             { id: 'rv1', type: 'specific', targetId: 'v1', threshold: 25, resultType: 'reward', resultText: 'پاداش خردورزی', isSpecific: true },
             { id: 'rv2', type: 'specific', targetId: 'v2', threshold: 20, resultType: 'reward', resultText: 'پاداش انضباط', isSpecific: true },
             { id: 'rv3', type: 'specific', targetId: 'v3', threshold: 25, resultType: 'reward', resultText: 'پاداش صداقت', isSpecific: true },
@@ -758,8 +729,7 @@
             { id: 'rv18', type: 'specific', targetId: 'v18', threshold: 10, resultType: 'reward', resultText: 'پاداش سکوت', isSpecific: true },
             { id: 'rv19', type: 'specific', targetId: 'v19', threshold: 10, resultType: 'reward', resultText: 'پاداش محیط زیست', isSpecific: true },
             { id: 'rv20', type: 'specific', targetId: 'v20', threshold: 20, resultType: 'reward', resultText: 'پاداش عزت نفس', isSpecific: true },
-
-            // Specific Rules for EVERY Vice (20 items - as requested "don't miss one")
+            // Specific Rules (Vices)
             { id: 'rx1', type: 'specific', targetId: 'x1', threshold: 10, resultType: 'penalty', resultText: 'جریمه دروغ', isSpecific: true },
             { id: 'rx2', type: 'specific', targetId: 'x2', threshold: 8, resultType: 'penalty', resultText: 'جریمه غیبت', isSpecific: true },
             { id: 'rx3', type: 'specific', targetId: 'x3', threshold: 8, resultType: 'penalty', resultText: 'جریمه توهین', isSpecific: true },
@@ -786,6 +756,9 @@
 
     let db = JSON.parse(localStorage.getItem('EthicsDB_Final')) || JSON.parse(JSON.stringify(DEFAULT_DATA));
     let viewingDate = new Date();
+    // Normalize viewingDate to remove time component for consistent comparisons
+    viewingDate.setHours(0,0,0,0);
+    
     let currentEditorMode = null; 
     let currentRuleFilter = 'virtue';
     let editingItemId = null;
@@ -793,7 +766,7 @@
     let currentActionEditId = null; 
     let tempDateRangeResults = null; 
 
-    // --- Helper: Persian Date Converter (Instruction 3: Precise Text Format) ---
+    // --- Helper: Persian Date Converter ---
     function getVerbalDate(date) {
         const weekDays = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه'];
         const months = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
@@ -917,12 +890,14 @@
     // 3. HOME LOGIC
     // ==========================================
 
+    // Instruction 2 Fix: Logic for Date Navigation
     function navigateDate(delta) {
         const newDate = new Date(viewingDate);
         newDate.setDate(newDate.getDate() + delta);
+        newDate.setHours(0,0,0,0); // Ensure time is stripped
         
         const today = new Date();
-        today.setHours(0,0,0,0);
+        today.setHours(0,0,0,0); // Ensure today is also strictly date
         
         if (newDate > today) return; 
         
@@ -945,10 +920,9 @@
         const manText = document.getElementById('manifestoBtnText');
         const manIcon = document.getElementById('manifestoIcon');
 
-        // Manifesto Button Logic (Corrected)
+        // Manifesto Button Logic
         if (log.manifestoRead) {
             manBtn.classList.add('read');
-            // Text DOES NOT change, Icon becomes tick, color is handled by CSS class 'read'
             manIcon.className = 'fas fa-check';
         } else {
             manBtn.classList.remove('read');
@@ -980,19 +954,22 @@
                 negScore += itemScore; 
             }
 
+            // Instruction 4 & 5: Modern Card Design + Count Indicator
             const html = `
-                <div class="card ${b.type}">
-                    <div class="card-top">
-                        <div>
-                            <div class="item-name">${b.title}</div>
-                            <div class="item-weight">ضریب: ${b.weight} | امتیاز: ${itemScore}</div>
-                        </div>
-                        <div class="stepper">
-                            <button class="step-btn" onclick="updateCount('${b.id}', -1)">-</button>
-                            <div class="step-val">${count}</div>
-                            <button class="step-btn" onclick="updateCount('${b.id}', 1)">+</button>
+                <div class="modern-card ${b.type}">
+                    <button class="card-btn minus" onclick="updateCount('${b.id}', -1)">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <div class="card-info">
+                        <div class="card-title">${b.title}</div>
+                        <div class="card-meta">
+                            <span class="meta-badge">ضریب: ${b.weight}</span>
+                            <span class="meta-badge count">تعداد: ${count}</span>
                         </div>
                     </div>
+                    <button class="card-btn plus" onclick="updateCount('${b.id}', 1)">
+                        <i class="fas fa-plus"></i>
+                    </button>
                 </div>
             `;
 
@@ -1042,7 +1019,7 @@
     }
 
     // ==========================================
-    // 4. TRIGGER LOGIC (UPDATED WITH TIME RANGE)
+    // 4. TRIGGER LOGIC
     // ==========================================
     
     function checkTriggers(dateKey, total, posTotal, negTotal) {
@@ -1181,7 +1158,7 @@
     }
 
     // ==========================================
-    // 5. MANIFESTO (Instruction 3: Correct Date Text)
+    // 5. MANIFESTO
     // ==========================================
     
     function openManifestoModal() {
@@ -1269,13 +1246,11 @@
 
         container.innerHTML = '';
 
-        // Instruction 2: Stats in Karnameh
         const rewardCount = actions.filter(a => a.type === 'reward').length;
         const penaltyCount = actions.filter(a => a.type === 'penalty').length;
         document.getElementById('totalRewardCount').innerText = rewardCount;
         document.getElementById('totalPenaltyCount').innerText = penaltyCount;
         
-        // Instruction 9: Done/Pending Stats
         const doneCount = actions.filter(a => a.done).length;
         const pendingCount = actions.filter(a => !a.done).length;
         document.getElementById('totalDoneCount').innerText = doneCount;
@@ -1319,7 +1294,6 @@
         renderActionsTab();
     }
 
-    // Updated toggleAction to handle range stats (by optional key)
     function toggleAction(id, forcedKey = null) {
         const key = forcedKey || getKey(viewingDate);
         const action = db.logs[key]?.actions.find(a => a.id === id);
@@ -1327,18 +1301,13 @@
             action.done = !action.done;
             saveDB();
             
-            // Refresh views
             if (document.getElementById('dateRangeModal').style.display === 'flex') {
-                // If in range mode, refresh the list
-                 const isDoneList = document.getElementById('actionListPopupTitle').innerText.includes('انجام شده');
-                 // Refresh calc is complex, so simpler is to refresh the popup list
-                 // To fully refresh, we re-calc range stats to get updated objects
                  calcDateRangeStats();
-                 showRangeActionDetails(isDoneList); // Keeps the list open
+                 const isDoneList = document.getElementById('actionListPopupTitle').innerText.includes('انجام شده');
+                 showRangeActionDetails(isDoneList); 
             } else {
                 renderActionsTab();
-                renderHome(); // For pending counts
-                // If popup list is open (from Home)
+                renderHome(); 
                 if(document.getElementById('actionListPopupModal').style.display === 'flex') {
                     const type = document.getElementById('actionListPopupTitle').innerText.includes('پاداش') ? 'reward' : (document.getElementById('actionListPopupTitle').innerText.includes('جریمه') ? 'penalty' : null);
                     const isDone = document.getElementById('actionListPopupTitle').innerText.includes('انجام شده');
@@ -1356,12 +1325,9 @@
         renderActionsTab();
     }
 
-    // Instruction 1: Popup List for Pending Actions from Home
-    // Instruction Update: Add Checkbox here too
     function openActionListModal(type, doneStatus) {
         const key = getKey(viewingDate);
         const actions = db.logs[key]?.actions || [];
-        // Support for type=null (all types)
         const filtered = actions.filter(a => (type ? a.type === type : true) && a.done === doneStatus);
         
         const container = document.getElementById('actionListPopupContent');
@@ -1395,26 +1361,17 @@
         document.getElementById('actionListPopupModal').style.display = 'flex';
     }
 
-    // Instruction 1: Change Action Reward/Penalty & Detail Modal
     function openActionDetail(id) {
         currentActionEditId = id;
         
-        // Find action: could be today OR from range stats
-        // We look in current view date first
         let key = getKey(viewingDate);
         let action = db.logs[key]?.actions.find(a => a.id === id);
         
-        // If not found, check temp range results if available
         if(!action && tempDateRangeResults) {
              const tempObj = tempDateRangeResults.find(a => a.id === id);
-             if(tempObj) {
-                 // We need to find the real record in DB to get updated properties
-                 // tempObj should have stored dateKey, but we need to ensure it.
-                 // In calcDateRangeStats, we will attach dateKey to temp objects
-                 if(tempObj._dateKey) {
-                     key = tempObj._dateKey;
-                     action = db.logs[key].actions.find(a => a.id === id);
-                 }
+             if(tempObj && tempObj._dateKey) {
+                 key = tempObj._dateKey;
+                 action = db.logs[key].actions.find(a => a.id === id);
              }
         }
 
@@ -1448,7 +1405,7 @@
         `;
         
         document.getElementById('actionDetailContent').innerHTML = content;
-        document.getElementById('actionEditControls').style.display = 'block'; // Show edit controls
+        document.getElementById('actionEditControls').style.display = 'block'; 
         document.getElementById('actionEditText').value = action.text;
         document.getElementById('actionDetailModal').style.display = 'flex';
     }
@@ -1457,7 +1414,6 @@
         const newText = document.getElementById('actionEditText').value.trim();
         if (!newText) return alert('متن خالی است');
         
-        // Same logic to find action
         let key = getKey(viewingDate);
         let action = db.logs[key]?.actions.find(a => a.id === currentActionEditId);
         
@@ -1475,7 +1431,7 @@
             alert('ویرایش شد');
             document.getElementById('actionDetailModal').style.display = 'none';
             renderActionsTab();
-            renderHome(); // Update summary if changed there
+            renderHome(); 
             
             if(document.getElementById('dateRangeModal').style.display === 'flex') {
                 calcDateRangeStats();
@@ -1486,7 +1442,7 @@
     }
 
     // ==========================================
-    // 7. EDITORS (Full CRUD with Instruction 4 Popups)
+    // 7. EDITORS
     // ==========================================
 
     function openEditor(type) {
@@ -1497,7 +1453,7 @@
         document.getElementById('editorSearch').style.display = type === 'behavior' ? 'block' : 'none';
         
         if (type === 'behavior') {
-            document.getElementById('ruleListToggle').style.display = 'flex'; // Reuse toggle UI
+            document.getElementById('ruleListToggle').style.display = 'flex'; 
         }
 
         renderEditorList();
@@ -1511,12 +1467,10 @@
         renderEditorList();
     }
 
-    // Instruction 4: Popup for Add/Edit instead of inline form
     function openEditForm(index) {
         editingItemId = index;
         document.getElementById('formTitle').innerText = (index === null) ? "افزودن جدید" : "ویرایش مورد";
         
-        // Show appropriate fields based on mode
         document.getElementById('behaviorFields').style.display = currentEditorMode === 'behavior' ? 'block' : 'none';
         document.getElementById('ruleFields').style.display = currentEditorMode === 'rule' ? 'block' : 'none';
 
@@ -1531,7 +1485,6 @@
                 document.getElementById('behWeight').value = 1;
             }
         } else {
-            // Rule Mode
             populateTargetSelect();
             if (index !== null) {
                 const item = db.rules[index];
@@ -1569,7 +1522,6 @@
         const type = document.getElementById('ruleType').value;
         document.getElementById('specificBehDiv').style.display = type === 'specific' ? 'block' : 'none';
         
-        // Instruction 1: Auto select result type for Specific Behavior
         const resTypeInput = document.getElementById('ruleResultType');
         const resTypeDisp = document.getElementById('ruleResultTypeDisplay');
         const autoInd = document.getElementById('ruleAutoTypeIndicator');
@@ -1595,7 +1547,6 @@
         const resTypeDisp = document.getElementById('ruleResultTypeDisplay');
         const ind = document.getElementById('ruleAutoTypeIndicator');
 
-        // Instruction 1: Auto determine reward/penalty based on behavior type
         if (type === 'virtue') {
             resTypeInput.value = 'reward';
             resTypeDisp.value = 'پاداش';
@@ -1718,7 +1669,6 @@
         saveDB();
         closeEditForm();
         renderEditorList();
-        // Instruction 4: Auto scroll to bottom if adding new
         if(editingItemId === null) {
              const container = document.getElementById('editorListContainer');
              setTimeout(() => container.scrollTop = container.scrollHeight, 100);
@@ -1739,9 +1689,14 @@
     }
 
     // ==========================================
-    // 8. DATA MANAGEMENT & DATE STATS
+    // 8. DATA MANAGEMENT
     // ==========================================
     
+    // Instruction 3: Backup Modal Logic
+    function openBackupModal() {
+        document.getElementById('backupModal').style.display = 'flex';
+    }
+
     function backupData() {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
         const downloadAnchorNode = document.createElement('a');
@@ -1809,7 +1764,6 @@
         
         if(isNaN(start) || isNaN(end)) return alert("تاریخ نامعتبر");
         
-        // Corrected: End Date cannot be before Start Date
         if (end < start) return alert("تاریخ پایان نمی‌تواند قبل از تاریخ شروع باشد.");
 
         let pos = 0, neg = 0, total = 0;
@@ -1821,18 +1775,15 @@
             const key = getKey(d);
             const log = db.logs[key];
             if(log) {
-                // Calculate scores for that day
                 db.behaviors.forEach(b => {
                     const c = log.behaviors[b.id] || 0;
                     const sc = c * b.weight;
                     if(b.type === 'virtue') pos += sc; else neg += sc;
                 });
                 
-                // Actions
                 log.actions.forEach(a => {
                     if(a.type === 'reward') rCount++; else pCount++;
                     if(a.done) doneCount++; else pendingCount++;
-                    // Attach the dateKey so we can toggle it later
                     a._dateKey = key;
                     filteredActions.push(a);
                 });
@@ -1852,7 +1803,6 @@
         tempDateRangeResults = filteredActions;
     }
 
-    // Instruction: Checkable List inside Range Stats
     function showRangeActionDetails(doneStatus) {
         const filtered = tempDateRangeResults.filter(a => a.done === doneStatus);
         const container = document.getElementById('actionListPopupContent');
