@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -7,6 +7,8 @@
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Confetti Library for Rewards -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
             --bg-body: #f1f5f9;
@@ -33,10 +35,17 @@
             font-family: 'Vazirmatn', sans-serif;
             margin: 0; padding: 0; padding-bottom: 110px;
             overflow-x: hidden;
-            transition: background-color 0.3s;
         }
 
         .container { max-width: 600px; margin: 0 auto; padding: 15px; }
+
+        /* --- Animations Overlay --- */
+        #redFlashOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(239, 68, 68, 0.4);
+            z-index: 9999; pointer-events: none;
+            opacity: 0; transition: opacity 0.1s;
+        }
 
         /* --- Header Area --- */
         .top-bar {
@@ -67,7 +76,7 @@
         .date-btn:disabled { opacity: 0.3; cursor: not-allowed; }
         .date-text { font-weight: bold; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* --- Dynamic Score Card --- */
+        /* --- Score Card --- */
         .score-card {
             color: white; padding: 25px; border-radius: 24px;
             text-align: center; box-shadow: var(--card-shadow);
@@ -108,17 +117,27 @@
         }
         .modern-card:active { transform: scale(0.98); }
 
+        /* Side Buttons Logic (Instruction 5) */
         .card-btn {
             width: 55px; border: none; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
             font-size: 1.4rem; color: white; transition: background 0.2s;
         }
-        .card-btn.minus { background: #fee2e2; color: var(--danger); }
-        .card-btn.minus:active { background: var(--danger); color: white; }
         
-        .card-btn.plus { background: #d1fae5; color: var(--success); }
-        .card-btn.plus:active { background: var(--success); color: white; }
+        /* Virtue Styles */
+        .card-btn.virtue-plus { background: #d1fae5; color: var(--success); }
+        .card-btn.virtue-plus:active { background: var(--success); color: white; }
+        .card-btn.virtue-minus { background: #fee2e2; color: var(--danger); }
+        .card-btn.virtue-minus:active { background: var(--danger); color: white; }
 
+        /* Vice Styles (Instruction 5: Opposite/Distinct) */
+        /* Adding a vice is BAD (Red), Removing/Reducing is GOOD/Correction (Neutral/Green) */
+        .card-btn.vice-plus { background: #fee2e2; color: var(--danger); }
+        .card-btn.vice-plus:active { background: var(--danger); color: white; }
+        .card-btn.vice-minus { background: #e2e8f0; color: var(--neutral); } /* Gray for undoing vice */
+        .card-btn.vice-minus:active { background: var(--neutral); color: white; }
+
+        /* Center Content */
         .card-info {
             flex: 1; display: flex; flex-direction: column;
             align-items: center; justify-content: center;
@@ -131,12 +150,15 @@
             font-size: 0.7rem; padding: 3px 8px; border-radius: 6px;
             background: #f1f5f9; color: var(--text-light); font-weight: bold;
         }
-        .meta-badge.count { background: var(--text-main); color: white; }
+        .meta-badge.count {
+            background: var(--text-main); color: white;
+        }
         
+        /* Threshold Info (Instruction 6) */
         .next-threshold {
-            font-size: 0.75rem; color: var(--primary); margin-top: 8px;
-            background: #eff6ff; padding: 3px 10px; border-radius: 50px;
-            display: inline-flex; align-items: center; gap: 4px; border: 1px solid #dbeafe;
+            font-size: 0.7rem; color: var(--primary-dark); margin-top: 5px;
+            background: #dbeafe; padding: 3px 10px; border-radius: 50px;
+            display: inline-flex; align-items: center; gap: 4px; font-weight: bold;
         }
 
         /* --- Settings Grid --- */
@@ -147,7 +169,8 @@
             background: white; border-radius: 20px; padding: 20px 10px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             text-align: center; box-shadow: var(--shadow); cursor: pointer;
-            transition: transform 0.2s; aspect-ratio: 1/1; border: 1px solid transparent;
+            transition: transform 0.2s, box-shadow 0.2s; aspect-ratio: 1/1;
+            border: 1px solid transparent;
         }
         .setting-block:active { transform: scale(0.96); }
         .setting-block i { font-size: 2rem; margin-bottom: 10px; color: var(--primary); }
@@ -171,7 +194,6 @@
         .badge-reward { background: #d1fae5; color: #065f46; }
         .badge-penalty { background: #fee2e2; color: #991b1b; }
 
-        /* --- Stats Summary --- */
         .stats-summary-card {
             background: var(--surface); padding: 15px; border-radius: 12px; box-shadow: var(--shadow);
             display: flex; justify-content: space-around; margin-bottom: 20px;
@@ -199,31 +221,6 @@
 
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- Animations (Confetti / Shake) --- */
-        #animation-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 9999; overflow: hidden;
-        }
-        
-        .confetti {
-            position: absolute; width: 10px; height: 10px;
-            background-color: #f00; animation: fall linear forwards;
-        }
-        @keyframes fall {
-            to { transform: translateY(100vh) rotate(720deg); }
-        }
-
-        .shake-screen {
-            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-            background-color: rgba(239, 68, 68, 0.1) !important; /* Red tint */
-        }
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-4px, 0, 0); }
-            20%, 80% { transform: translate3d(8px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-16px, 0, 0); }
-            40%, 60% { transform: translate3d(16px, 0, 0); }
-        }
-
         /* --- Bottom Nav --- */
         .nav-bar {
             position: fixed; bottom: 0; left: 0; width: 100%; background: white;
@@ -244,20 +241,21 @@
             background: rgba(0,0,0,0.5); backdrop-filter: blur(3px);
             z-index: 2000; display: none; align-items: center; justify-content: center;
         }
+        
         #manifestoModal { z-index: 2000; }
         #nameModal { z-index: 2000; }
         #clearDataModal { z-index: 2000; }
         #editorModal { z-index: 2000; }
         #dateRangeModal { z-index: 2000; }
-        #backupModal { z-index: 2000; }
-        
+        #backupModal { z-index: 2000; } 
         #actionListPopupModal { z-index: 2100; }
         #editFormModal { z-index: 2100; }
         #actionDetailModal { z-index: 2200; }
 
         .modal-content {
             background: white; width: 90%; max-width: 500px; border-radius: 20px;
-            padding: 20px; max-height: 90vh; overflow-y: auto; position: relative;
+            padding: 20px; max-height: 90vh; overflow-y: auto;
+            position: relative;
         }
 
         .form-group { margin-bottom: 15px; }
@@ -294,7 +292,7 @@
 </head>
 <body>
 
-<div id="animation-overlay"></div>
+<div id="redFlashOverlay"></div>
 
 <div id="app">
 
@@ -302,7 +300,6 @@
 <div id="tab-home" class="tab-content active">
     <div class="container">
         
-        <!-- Header -->
         <div class="top-bar">
             <button class="manifesto-btn" onclick="openManifestoModal()">
                 <i class="fas fa-book-open" id="manifestoIcon"></i> <span id="manifestoBtnText">منشور اخلاقی</span>
@@ -697,7 +694,7 @@
             { id: 'x12', title: 'بدقولی', type: 'vice', weight: 4 },
             { id: 'x13', title: 'کنترل‌گری', type: 'vice', weight: 3 },
             { id: 'x14', title: 'قربانی‌نمایی', type: 'vice', weight: 3 },
-            { id: 'x15', title: 'نگاه آلوده', type: 'vice', weight: 5 }, // Updated Title
+            { id: 'x15', title: 'نگاه آلوده', type: 'vice', weight: 5 }, // Instruction 2: Label Updated
             { id: 'x16', title: 'کینه و انتقام‌جویی', type: 'vice', weight: 4 },
             { id: 'x17', title: 'خیانت', type: 'vice', weight: 6 },
             { id: 'x18', title: 'چاپلوسی', type: 'vice', weight: 3 },
@@ -891,10 +888,10 @@
     function navigateDate(delta) {
         const newDate = new Date(viewingDate);
         newDate.setDate(newDate.getDate() + delta);
-        newDate.setHours(0,0,0,0); 
+        newDate.setHours(0,0,0,0);
         
         const today = new Date();
-        today.setHours(0,0,0,0); 
+        today.setHours(0,0,0,0);
         
         if (newDate > today) return; 
         
@@ -913,7 +910,6 @@
         const log = db.logs[key];
 
         const manBtn = document.querySelector('.manifesto-btn');
-        const manText = document.getElementById('manifestoBtnText');
         const manIcon = document.getElementById('manifestoIcon');
 
         if (log.manifestoRead) {
@@ -949,25 +945,37 @@
                 negScore += itemScore; 
             }
 
-            // Threshold Calculation (Dynamic from Last Consumed)
+            // Instruction 4 & 6: Threshold Logic Fixed
             let thresholdInfo = "";
             const specificRule = db.rules.find(r => r.type === 'specific' && r.targetId === b.id);
             if (specificRule) {
-                 const consumed = (log.consumed && log.consumed[specificRule.id]) || 0;
+                 const consumed = log.consumed && log.consumed[specificRule.id] ? log.consumed[specificRule.id] : 0;
                  const currentVal = count * b.weight;
-                 // Calculate gap to next interval
-                 const nextTarget = consumed + specificRule.threshold;
-                 const needed = nextTarget - currentVal;
+                 // Calculate needed for NEXT threshold relative to what has been consumed
+                 const needed = (consumed + specificRule.threshold) - currentVal;
                  
+                 // Show always if tracking next step
                  if (needed > 0) {
                      const typeText = specificRule.resultType === 'reward' ? 'پاداش' : 'جریمه';
                      thresholdInfo = `<div class="next-threshold"><i class="fas fa-info-circle"></i> ${needed} امتیاز تا ${typeText}</div>`;
                  }
             }
 
+            // Instruction 5: Distinct Buttons for Virtue vs Vice
+            let btnMinusClass = "";
+            let btnPlusClass = "";
+            
+            if (b.type === 'virtue') {
+                btnMinusClass = "virtue-minus";
+                btnPlusClass = "virtue-plus";
+            } else {
+                btnMinusClass = "vice-minus"; // Undo/Correction (Green/Neutral)
+                btnPlusClass = "vice-plus";   // Commit Vice (Red/Danger)
+            }
+
             const html = `
                 <div class="modern-card ${b.type}">
-                    <button class="card-btn minus" onclick="updateCount('${b.id}', -1)">
+                    <button class="card-btn ${btnMinusClass}" onclick="updateCount('${b.id}', -1, '${b.type}')">
                         <i class="fas fa-minus"></i>
                     </button>
                     <div class="card-info">
@@ -978,7 +986,7 @@
                         </div>
                         ${thresholdInfo}
                     </div>
-                    <button class="card-btn plus" onclick="updateCount('${b.id}', 1)">
+                    <button class="card-btn ${btnPlusClass}" onclick="updateCount('${b.id}', 1, '${b.type}')">
                         <i class="fas fa-plus"></i>
                     </button>
                 </div>
@@ -1015,7 +1023,8 @@
         renderHome();
     }
 
-    function updateCount(behId, delta) {
+    // Instruction 3: Animations on Update
+    function updateCount(behId, delta, type) {
         const key = getKey(viewingDate);
         const log = db.logs[key];
         const current = log.behaviors[behId] || 0;
@@ -1025,11 +1034,28 @@
             log.behaviors[behId] = newVal;
             saveDB();
             renderHome();
+            
+            // Trigger Visual Effects
+            if (delta > 0) {
+                if (type === 'virtue') {
+                    // Confetti for Virtue Increase
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 }
+                    });
+                } else if (type === 'vice') {
+                    // Red Flash for Vice Increase
+                    const flash = document.getElementById('redFlashOverlay');
+                    flash.style.opacity = '1';
+                    setTimeout(() => { flash.style.opacity = '0'; }, 300);
+                }
+            }
         }
     }
 
     // ==========================================
-    // 4. TRIGGER LOGIC & ANIMATION
+    // 4. TRIGGER LOGIC
     // ==========================================
     
     function checkTriggers(dateKey, total, posTotal, negTotal) {
@@ -1158,11 +1184,7 @@
         }
 
         saveDB();
-        document.getElementById('triggerArea').style.display = 'none';
-        
-        // Trigger Animation (Instruction 3)
-        showCelebration(rule.resultType);
-        
+        document.getElementById('triggerArea').style.display = 'none'; 
         renderHome(); 
     }
 
@@ -1170,31 +1192,8 @@
         document.getElementById('triggerArea').style.display = 'none';
     }
 
-    // Animation Function
-    function showCelebration(type) {
-        const overlay = document.getElementById('animation-overlay');
-        overlay.innerHTML = '';
-        
-        if (type === 'reward') {
-            // Confetti
-            for(let i=0; i<30; i++) {
-                const conf = document.createElement('div');
-                conf.classList.add('confetti');
-                conf.style.left = Math.random() * 100 + 'vw';
-                conf.style.backgroundColor = `hsl(${Math.random()*360}, 100%, 50%)`;
-                conf.style.animationDuration = (Math.random() * 1 + 1) + 's';
-                overlay.appendChild(conf);
-            }
-            setTimeout(() => { overlay.innerHTML = ''; }, 2000);
-        } else {
-            // Shake
-            document.body.classList.add('shake-screen');
-            setTimeout(() => { document.body.classList.remove('shake-screen'); }, 500);
-        }
-    }
-
     // ==========================================
-    // 5. MANIFESTO (Updated Text)
+    // 5. MANIFESTO (Instruction 1: Updated Text)
     // ==========================================
     
     function openManifestoModal() {
@@ -1228,8 +1227,7 @@
 
             در این لحظه تمامِ خشم‌ها، شهوت‌ها و غم‌هایم را به خاک می‌سپارم. در این لحظه دوباره شکوفا شدم و جان تازه‌ای گرفتم. من خودم را دوست دارم و به خودم احترام میگذارم... من در امنیت و آرامشم... من آرامـم...<br><br>
 
-            من برای خودم و دیگران ارزش بسیاری قائل هستم و برای همگی قدرت، سلامتی، زیبایی، انصاف و عدالت آرزو می‌کنم. باشد که هیچ انسانی مورد ظلم واقع نشود و من نیز ابزارِ ظلم نباشم.<br><br>
-
+            من برای خودم و دیگران ارزش بسیاری قائل هستم و برای همگی قدرت، سلامتی، زیبایی، انصاف و عدالت آرزو می‌کنم. باشد که هیچ انسانی مورد ظلم واقع نشود و من نیز ابزارِ ظلم نباشم.<br>
             من گواهی می‌دهم که انسان هستم و کرامت دارم.<br>
             من گواهی می‌دهم که از عقل و خردم بهره ببرم و استفاده کنم.<br>
             من گواهی میدهم، فارق از هر دیدگاهی که دارم اخلاق مدار باشم و رفتاری انسان دوستانه داشته باشم.<br>
@@ -1270,7 +1268,7 @@
     }
 
     // ==========================================
-    // 6. ACTIONS LIST (KARNAMEH) & POPUP
+    // 6. ACTIONS LIST & POPUP
     // ==========================================
 
     function renderActionsTab() {
@@ -1775,7 +1773,6 @@
                 location.reload();
             }
         } else {
-            // Clear Today
             const key = getKey(new Date());
             if (db.logs[key]) {
                 delete db.logs[key];
