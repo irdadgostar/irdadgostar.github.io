@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+   <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -37,34 +37,6 @@
 
         .container { max-width: 600px; margin: 0 auto; padding: 15px; }
 
-        /* --- Visual Effects Overlay --- */
-        #effectOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 9999;
-            display: none;
-        }
-        
-        /* Happy Effect */
-        @keyframes happyBurst {
-            0% { opacity: 0.8; transform: scale(0.5); background: radial-gradient(circle, rgba(16,185,129,0.4) 0%, transparent 70%); }
-            100% { opacity: 0; transform: scale(2); background: radial-gradient(circle, rgba(16,185,129,0) 0%, transparent 70%); }
-        }
-        .effect-happy {
-            animation: happyBurst 0.6s ease-out forwards;
-            display: block !important;
-        }
-
-        /* Sad/Warning Effect */
-        @keyframes sadFlash {
-            0% { background-color: rgba(239, 68, 68, 0); }
-            10% { background-color: rgba(239, 68, 68, 0.3); }
-            100% { background-color: rgba(239, 68, 68, 0); }
-        }
-        .effect-sad {
-            animation: sadFlash 0.4s ease-out forwards;
-            display: block !important;
-        }
-
         /* --- Header Area --- */
         .top-bar {
             display: flex; justify-content: space-between; align-items: stretch;
@@ -94,13 +66,14 @@
         .date-btn:disabled { opacity: 0.3; cursor: not-allowed; }
         .date-text { font-weight: bold; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* --- Score Card --- */
+        /* --- Dynamic Score Card --- */
         .score-card {
             color: white; padding: 25px; border-radius: 24px;
             text-align: center; box-shadow: var(--card-shadow);
             margin-bottom: 25px; transition: background 0.5s ease;
             position: relative; overflow: hidden;
         }
+        
         .score-card.neutral { background: linear-gradient(135deg, #64748b 0%, #475569 100%); }
         .score-card.positive { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
         .score-card.negative { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); }
@@ -129,30 +102,45 @@
             background: var(--surface); border-radius: 20px;
             margin-bottom: 15px; box-shadow: var(--shadow);
             display: flex; align-items: stretch; overflow: hidden;
-            transition: transform 0.1s;
-            min-height: 90px;
+            transition: transform 0.1s, background-color 0.3s;
+            min-height: 100px;
+            position: relative;
         }
         .modern-card:active { transform: scale(0.98); }
 
-        /* Card Buttons */
+        /* Animations */
+        @keyframes happyPop {
+            0% { transform: scale(1); background-color: var(--surface); }
+            50% { transform: scale(1.05); background-color: #dcfce7; box-shadow: 0 0 20px #22c55e; }
+            100% { transform: scale(1); background-color: var(--surface); }
+        }
+        @keyframes angryShake {
+            0% { transform: translateX(0); background-color: var(--surface); }
+            25% { transform: translateX(-5px); background-color: #fee2e2; }
+            50% { transform: translateX(5px); background-color: #fee2e2; box-shadow: 0 0 20px #ef4444; }
+            75% { transform: translateX(-5px); background-color: #fee2e2; }
+            100% { transform: translateX(0); background-color: var(--surface); }
+        }
+
+        .anim-happy { animation: happyPop 0.4s ease-out; }
+        .anim-angry { animation: angryShake 0.4s ease-in-out; }
+
+        /* Side Buttons */
         .card-btn {
-            width: 55px; border: none; cursor: pointer;
+            width: 60px; border: none; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.4rem; color: white; transition: background 0.2s;
+            font-size: 1.4rem; color: white; transition: background 0.2s, filter 0.2s;
         }
         
-        /* Virtue Colors (Standard) */
-        .modern-card.virtue .card-btn.minus { background: #fee2e2; color: var(--danger); }
-        .modern-card.virtue .card-btn.minus:active { background: var(--danger); color: white; }
-        .modern-card.virtue .card-btn.plus { background: #d1fae5; color: var(--success); }
-        .modern-card.virtue .card-btn.plus:active { background: var(--success); color: white; }
+        /* Virtue Colors (Positive Logic) */
+        .virtue .card-btn.minus { background: #cbd5e1; color: #475569; } /* Neutral/Gray for reducing virtue */
+        .virtue .card-btn.plus { background: #10b981; color: white; } /* Green for doing virtue */
+        .virtue .card-btn.plus:active { filter: brightness(0.9); }
 
-        /* Vice Colors (Reversed - Instruction 5) */
-        /* Adding to Vice is Bad (Red), Removing from Vice is Good (Green) */
-        .modern-card.vice .card-btn.plus { background: #fee2e2; color: var(--danger); }
-        .modern-card.vice .card-btn.plus:active { background: var(--danger); color: white; }
-        .modern-card.vice .card-btn.minus { background: #d1fae5; color: var(--success); }
-        .modern-card.vice .card-btn.minus:active { background: var(--success); color: white; }
+        /* Vice Colors (Negative Logic) */
+        .vice .card-btn.minus { background: #cbd5e1; color: #475569; } /* Neutral/Gray for reducing vice */
+        .vice .card-btn.plus { background: #ef4444; color: white; } /* Red for doing vice */
+        .vice .card-btn.plus:active { filter: brightness(0.9); }
 
         /* Center Content */
         .card-info {
@@ -161,35 +149,46 @@
             padding: 8px 5px; text-align: center;
             border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9;
         }
-        .card-title { font-weight: 800; font-size: 1rem; color: var(--text-main); margin-bottom: 6px; }
-        .card-meta { display: flex; gap: 6px; justify-content: center; align-items: center; flex-wrap: wrap; }
+        .card-title { font-weight: 800; font-size: 1.05rem; color: var(--text-main); margin-bottom: 6px; }
+        .card-meta { display: flex; gap: 6px; justify-content: center; align-items: center; flex-wrap: wrap; margin-bottom: 5px; }
         .meta-badge {
-            font-size: 0.7rem; padding: 3px 8px; border-radius: 6px;
+            font-size: 0.75rem; padding: 3px 8px; border-radius: 6px;
             background: #f1f5f9; color: var(--text-light); font-weight: bold;
         }
-        .meta-badge.count { background: var(--text-main); color: white; }
-        
-        /* Threshold Info (Instruction 6 & 4) */
-        .next-threshold {
-            font-size: 0.7rem; color: var(--primary); margin-top: 6px;
-            background: #eff6ff; padding: 3px 10px; border-radius: 50px;
-            display: inline-flex; align-items: center; gap: 4px; border: 1px solid #dbeafe;
+        .meta-badge.count {
+            background: var(--text-main); color: white;
         }
+        .next-threshold {
+            font-size: 0.75rem; font-weight:bold;
+            padding: 4px 10px; border-radius: 50px;
+            display: inline-flex; align-items: center; gap: 5px;
+            margin-top: 4px;
+        }
+        .next-threshold.reward { color: #047857; background: #d1fae5; border: 1px solid #a7f3d0; }
+        .next-threshold.penalty { color: #b91c1c; background: #fee2e2; border: 1px solid #fecaca; }
 
         /* --- Settings Grid --- */
         .settings-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
         }
         .setting-block {
-            background: white; border-radius: 20px; padding: 20px 10px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            text-align: center; box-shadow: var(--shadow);
+            background: white; border-radius: 20px;
+            padding: 20px 10px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center;
+            box-shadow: var(--shadow);
             cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
-            aspect-ratio: 1/1; border: 1px solid transparent;
+            aspect-ratio: 1/1;
+            border: 1px solid transparent;
         }
         .setting-block:active { transform: scale(0.96); }
         .setting-block i { font-size: 2rem; margin-bottom: 10px; color: var(--primary); }
         .setting-block span { font-weight: bold; font-size: 0.9rem; color: var(--text-main); }
+        
         .setting-block.danger { border-color: #fee2e2; }
         .setting-block.danger i { color: var(--danger); }
         
@@ -209,7 +208,7 @@
         .badge-reward { background: #d1fae5; color: #065f46; }
         .badge-penalty { background: #fee2e2; color: #991b1b; }
 
-        /* Stats Summary */
+        /* Stats Summary Box */
         .stats-summary-card {
             background: var(--surface); padding: 15px; border-radius: 12px; box-shadow: var(--shadow);
             display: flex; justify-content: space-around; margin-bottom: 20px;
@@ -221,7 +220,7 @@
         .stat-reward { color: var(--success); border: 1px solid #d1fae5; }
         .stat-penalty { color: var(--danger); border: 1px solid #fee2e2; }
 
-        /* --- Trigger Box --- */
+        /* --- Trigger Alert Box --- */
         .trigger-box {
             background: #fff7ed; border: 1px solid #ffedd5; border-radius: 16px;
             padding: 15px; margin-bottom: 20px; display: none;
@@ -237,7 +236,7 @@
 
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- Nav --- */
+        /* --- Bottom Nav --- */
         .nav-bar {
             position: fixed; bottom: 0; left: 0; width: 100%; background: white;
             display: flex; justify-content: space-around; padding: 12px 0;
@@ -251,7 +250,7 @@
         .nav-item i { font-size: 1.4rem; }
         .nav-item.active { color: var(--primary); }
 
-        /* --- Modals --- */
+        /* --- Modals & Layers --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); backdrop-filter: blur(3px);
@@ -308,8 +307,6 @@
     </style>
 </head>
 <body>
-
-<div id="effectOverlay"></div>
 
 <div id="app">
 
@@ -424,14 +421,17 @@
                 <i class="fas fa-list-check"></i>
                 <span>مدیریت رفتارها</span>
             </div>
+
             <div class="setting-block" onclick="openEditor('rule')">
                 <i class="fas fa-gavel"></i>
                 <span>پیکربندی عواقب</span>
             </div>
+
             <div class="setting-block" onclick="openBackupModal()">
                 <i class="fas fa-save"></i>
                 <span>پشتیبان‌گیری</span>
             </div>
+
             <div class="setting-block danger" onclick="openClearDataModal()">
                 <i class="fas fa-trash-alt"></i>
                 <span>پاکسازی</span>
@@ -491,9 +491,11 @@
             <i class="fas fa-times" style="cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('backupModal').style.display='none'"></i>
         </div>
         <p style="font-size:0.9rem; color:var(--text-light);">برای ذخیره اطلاعات خود یا بازگردانی فایل قبلی استفاده کنید.</p>
+        
         <button class="btn btn-accept" style="width:100%; margin-bottom:15px;" onclick="backupData()">
             <i class="fas fa-download"></i> دانلود فایل پشتیبان
         </button>
+        
         <div style="border-top:1px solid #eee; padding-top:15px;">
              <input type="file" id="restoreFile" style="display:none" onchange="restoreData(this)">
              <button class="btn btn-change" style="width:100%;" onclick="document.getElementById('restoreFile').click()">
@@ -777,6 +779,7 @@
 
     let db = JSON.parse(localStorage.getItem('EthicsDB_Final')) || JSON.parse(JSON.stringify(DEFAULT_DATA));
     let viewingDate = new Date();
+    // Normalize viewingDate to remove time component for consistent comparisons
     viewingDate.setHours(0,0,0,0);
     
     let currentEditorMode = null; 
@@ -910,13 +913,14 @@
     // 3. HOME LOGIC
     // ==========================================
 
+    // Instruction 2 Fix: Logic for Date Navigation
     function navigateDate(delta) {
         const newDate = new Date(viewingDate);
         newDate.setDate(newDate.getDate() + delta);
-        newDate.setHours(0,0,0,0);
+        newDate.setHours(0,0,0,0); // Ensure time is stripped
         
         const today = new Date();
-        today.setHours(0,0,0,0);
+        today.setHours(0,0,0,0); // Ensure today is also strictly date
         
         if (newDate > today) return; 
         
@@ -928,6 +932,7 @@
         const key = getKey(viewingDate);
         const todayKey = getKey(new Date());
         
+        // Header Date (Corrected: No "امروز" prefix)
         document.getElementById('headerDateDisplay').innerText = getHeaderDate(viewingDate);
         document.getElementById('nextDayBtn').disabled = (key === todayKey);
 
@@ -938,6 +943,7 @@
         const manText = document.getElementById('manifestoBtnText');
         const manIcon = document.getElementById('manifestoIcon');
 
+        // Manifesto Button Logic
         if (log.manifestoRead) {
             manBtn.classList.add('read');
             manIcon.className = 'fas fa-check';
@@ -971,27 +977,30 @@
                 negScore += itemScore; 
             }
 
-            // Instruction 4 & 6: Calculate Next Threshold (Persistent Calculation)
+            // Instruction 4 & 6: Calculate Next Threshold with Re-calculation logic
             let thresholdInfo = "";
             const specificRule = db.rules.find(r => r.type === 'specific' && r.targetId === b.id);
             if (specificRule) {
-                 // Consumed score reflects score already "paid" for rewards/penalties
                  const consumed = log.consumed && log.consumed[specificRule.id] ? log.consumed[specificRule.id] : 0;
                  const currentVal = count * b.weight;
+                 // Logic: The next target is always (consumed + threshold)
+                 // If the user reaches it, consumed increases, so the target shifts automatically.
+                 const nextTarget = consumed + specificRule.threshold;
+                 const needed = nextTarget - currentVal;
                  
-                 // Needed = (Next Target Score) - (Current Score)
-                 // Next Target Score = (Already Consumed Score) + (Threshold Step)
-                 const needed = (consumed + specificRule.threshold) - currentVal;
-                 
+                 // If needed > 0, we show it. 
+                 // If needed <= 0, it means a trigger is active (pending acceptance), so we can hide or show 0.
+                 // The prompt asks to show how much is left.
                  if (needed > 0) {
                      const typeText = specificRule.resultType === 'reward' ? 'پاداش' : 'جریمه';
-                     thresholdInfo = `<div class="next-threshold"><i class="fas fa-info-circle"></i> ${needed} امتیاز تا ${typeText}</div>`;
+                     const typeClass = specificRule.resultType === 'reward' ? 'reward' : 'penalty';
+                     thresholdInfo = `<div class="next-threshold ${typeClass}"><i class="fas fa-flag"></i> ${needed} امتیاز تا ${typeText}</div>`;
                  }
             }
 
-            // Instruction 5: Modern Card Design with Reversed Buttons for Vices
+            // Instruction 5: Distinct Buttons for Virtue vs Vice is handled by CSS classes (.virtue/.vice)
             const html = `
-                <div class="modern-card ${b.type}">
+                <div class="modern-card ${b.type}" id="card-${b.id}">
                     <button class="card-btn minus" onclick="updateCount('${b.id}', -1)">
                         <i class="fas fa-minus"></i>
                     </button>
@@ -999,7 +1008,7 @@
                         <div class="card-title">${b.title}</div>
                         <div class="card-meta">
                             <span class="meta-badge">ضریب: ${b.weight}</span>
-                            <span class="meta-badge count">تعداد: ${count}</span>
+                            <span class="meta-badge count">مرتبه: ${count}</span>
                         </div>
                         ${thresholdInfo}
                     </div>
@@ -1041,47 +1050,37 @@
         renderHome();
     }
 
-    // Instruction 3: Visual Effect Trigger
-    function triggerVisualEffect(type) {
-        const overlay = document.getElementById('effectOverlay');
-        overlay.className = ''; // Reset
-        void overlay.offsetWidth; // Trigger Reflow
-        
-        if (type === 'happy') {
-            overlay.classList.add('effect-happy');
-        } else {
-            overlay.classList.add('effect-sad');
-        }
-        
-        // Auto hide handled by CSS animation completion, but let's ensure cleanup
-        setTimeout(() => { overlay.className = ''; }, 1000);
-    }
-
     function updateCount(behId, delta) {
         const key = getKey(viewingDate);
         const log = db.logs[key];
         const current = log.behaviors[behId] || 0;
         const newVal = current + delta;
         
-        if (newVal >= 0) {
-            // Determine Effect Type
-            const behavior = db.behaviors.find(b => b.id === behId);
-            if (behavior) {
-                let effectType = 'happy';
-                if (behavior.type === 'virtue') {
-                    if (delta > 0) effectType = 'happy'; // Good deed increased
-                    else effectType = 'sad';   // Good deed decreased (oops)
-                } else {
-                    // Vice
-                    if (delta > 0) effectType = 'sad';   // Bad deed increased
-                    else effectType = 'happy'; // Bad deed decreased
-                }
-                triggerVisualEffect(effectType);
-            }
+        // Instruction 3: Visual Feedback (Animation)
+        // Find behavior type
+        const beh = db.behaviors.find(b => b.id === behId);
+        const card = document.getElementById(`card-${behId}`);
+        
+        if(card) {
+            // Remove existing anim classes to restart
+            card.classList.remove('anim-happy', 'anim-angry');
+            void card.offsetWidth; // Trigger reflow
 
+            if (beh.type === 'virtue') {
+                if (delta > 0) card.classList.add('anim-happy'); // Doing good -> Happy
+                // if delta < 0 (undoing good) -> No special effect
+            } else {
+                if (delta > 0) card.classList.add('anim-angry'); // Doing bad -> Shake/Red
+                // if delta < 0 (undoing bad) -> No special effect
+            }
+        }
+
+        if (newVal >= 0) {
             log.behaviors[behId] = newVal;
             saveDB();
-            renderHome();
+            // Delay render slightly to let animation start, but render is fast enough usually.
+            // We call render to update numbers.
+            setTimeout(renderHome, 300); // Small delay to let user see the click feedback
         }
     }
 
@@ -1183,6 +1182,7 @@
         const timeStr = now.toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit', hour12:false});
         const dateStr = getVerbalDate(now);
 
+        // Instruction 8: Time Range Logic
         const prevActions = log.actions.filter(a => a.ruleId === ruleId);
         let timeRangeStr = "";
         
@@ -1259,8 +1259,7 @@
 
             در این لحظه تمامِ خشم‌ها، شهوت‌ها و غم‌هایم را به خاک می‌سپارم. در این لحظه دوباره شکوفا شدم و جان تازه‌ای گرفتم. من خودم را دوست دارم و به خودم احترام میگذارم... من در امنیت و آرامشم... من آرامـم...<br><br>
 
-            من برای خودم و دیگران ارزش بسیاری قائل هستم و برای همگی قدرت، سلامتی، زیبایی، انصاف و عدالت آرزو می‌کنم. باشد که هیچ انسانی مورد ظلم واقع نشود و من نیز ابزارِ ظلم نباشم.<br><br>
-
+            من برای خودم و دیگران ارزش بسیاری قائل هستم و برای همگی قدرت، سلامتی، زیبایی، انصاف و عدالت آرزو می‌کنم. باشد که هیچ انسانی مورد ظلم واقع نشود و من نیز ابزارِ ظلم نباشم.<br>
             من گواهی می‌دهم که انسان هستم و کرامت دارم.<br>
             من گواهی می‌دهم که از عقل و خردم بهره ببرم و استفاده کنم.<br>
             من گواهی میدهم، فارق از هر دیدگاهی که دارم اخلاق مدار باشم و رفتاری انسان دوستانه داشته باشم.<br>
@@ -1758,7 +1757,6 @@
     // 8. DATA MANAGEMENT
     // ==========================================
     
-    // Instruction 3: Backup Modal Logic
     function openBackupModal() {
         document.getElementById('backupModal').style.display = 'flex';
     }
@@ -1819,7 +1817,6 @@
         }
     }
 
-    // Instruction 9: Date Range Stats
     function openDateRangeStats() {
         document.getElementById('dateRangeModal').style.display = 'flex';
     }
