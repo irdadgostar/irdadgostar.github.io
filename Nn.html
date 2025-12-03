@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -33,7 +33,6 @@
             font-family: 'Vazirmatn', sans-serif;
             margin: 0; padding: 0; padding-bottom: 110px;
             overflow-x: hidden;
-            position: relative; /* For overlays */
         }
 
         .container { max-width: 600px; margin: 0 auto; padding: 15px; }
@@ -109,52 +108,49 @@
         }
         .modern-card:active { transform: scale(0.98); }
 
-        /* Animations for Cards */
+        /* Click Animations (Subtle) */
         @keyframes happyPop {
             0% { transform: scale(1); background-color: var(--surface); }
-            50% { transform: scale(1.05); background-color: #dcfce7; box-shadow: 0 0 20px #22c55e; }
+            50% { transform: scale(1.05); background-color: #dcfce7; }
             100% { transform: scale(1); background-color: var(--surface); }
         }
         @keyframes angryShake {
             0% { transform: translateX(0); background-color: var(--surface); }
-            25% { transform: translateX(-5px); background-color: #fee2e2; }
-            50% { transform: translateX(5px); background-color: #fee2e2; box-shadow: 0 0 20px #ef4444; }
-            75% { transform: translateX(-5px); background-color: #fee2e2; }
+            25% { transform: translateX(-3px); background-color: #fee2e2; }
+            50% { transform: translateX(3px); background-color: #fee2e2; }
+            75% { transform: translateX(-3px); background-color: #fee2e2; }
             100% { transform: translateX(0); background-color: var(--surface); }
         }
 
         .anim-happy { animation: happyPop 0.4s ease-out; }
         .anim-angry { animation: angryShake 0.4s ease-in-out; }
 
-        /* --- Special Effects (Reward/Penalty) --- */
-        /* Penalty Shake & Red Overlay */
-        @keyframes screenShake {
-            0% { transform: translate(0, 0); }
-            10%, 90% { transform: translate(-4px, 0); }
-            20%, 80% { transform: translate(4px, 0); }
-            30%, 50%, 70% { transform: translate(-4px, 0); }
-            40%, 60% { transform: translate(4px, 0); }
-            100% { transform: translate(0, 0); }
-        }
-        .effect-shake-screen {
-            animation: screenShake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-        }
-        .effect-red-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 0, 0, 0.15); z-index: 9999;
-            pointer-events: none; animation: fadeOut 1.5s forwards;
+        /* Major Effects (Reward/Penalty Trigger) */
+        .penalty-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(220, 38, 38, 0.2); /* Red tint */
+            z-index: 9999; pointer-events: none;
+            display: none;
+            animation: bigShake 0.6s cubic-bezier(.36,.07,.19,.97) both;
         }
         
-        /* Reward Flower/Confetti */
+        @keyframes bigShake {
+            10%, 90% { transform: translate3d(-4px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+            40%, 60% { transform: translate3d(8px, 0, 0); }
+        }
+
         .flower-particle {
-            position: fixed; top: -50px; z-index: 9999;
-            font-size: 20px; pointer-events: none;
-            animation: fall linear forwards;
+            position: absolute; pointer-events: none;
+            font-size: 1.5rem; z-index: 9998;
+            animation: flyOut 1s ease-out forwards;
         }
-        @keyframes fall {
-            to { transform: translateY(110vh) rotate(360deg); }
+
+        @keyframes flyOut {
+            0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(1.5); opacity: 0; }
         }
-        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 
         /* Side Buttons */
         .card-btn {
@@ -163,12 +159,10 @@
             font-size: 1.4rem; color: white; transition: background 0.2s, filter 0.2s;
         }
         
-        /* Virtue Colors (Positive Logic) */
         .virtue .card-btn.minus { background: #cbd5e1; color: #475569; }
         .virtue .card-btn.plus { background: #10b981; color: white; }
         .virtue .card-btn.plus:active { filter: brightness(0.9); }
 
-        /* Vice Colors (Negative Logic) */
         .vice .card-btn.minus { background: #cbd5e1; color: #475569; }
         .vice .card-btn.plus { background: #ef4444; color: white; }
         .vice .card-btn.plus:active { filter: brightness(0.9); }
@@ -338,6 +332,8 @@
     </style>
 </head>
 <body>
+
+<div id="penaltyOverlay" class="penalty-overlay"></div>
 
 <div id="app">
 
@@ -959,7 +955,7 @@
         renderHome();
     }
 
-    function renderHome() {
+    function renderHome(triggeringId = null) {
         const key = getKey(viewingDate);
         const todayKey = getKey(new Date());
         
@@ -1074,7 +1070,7 @@
             pendingSummaryDiv.style.display = 'none';
         }
 
-        checkTriggers(key, totalScore, posScore, negScore);
+        checkTriggers(key, totalScore, posScore, negScore, triggeringId);
     }
 
     function filterHomeList() {
@@ -1087,7 +1083,7 @@
         const current = log.behaviors[behId] || 0;
         const newVal = current + delta;
         
-        // Instruction 3: Visual Feedback (Animation)
+        // Instruction 3: Visual Feedback (Click Animation)
         // Find behavior type
         const beh = db.behaviors.find(b => b.id === behId);
         const card = document.getElementById(`card-${behId}`);
@@ -1110,16 +1106,16 @@
             log.behaviors[behId] = newVal;
             saveDB();
             // Delay render slightly to let animation start, but render is fast enough usually.
-            // We call render to update numbers.
-            setTimeout(renderHome, 300); // Small delay to let user see the click feedback
+            // We call render to update numbers. We pass the behId to check triggers specifically for it.
+            setTimeout(() => renderHome(behId), 300); // Small delay to let user see the click feedback
         }
     }
 
     // ==========================================
-    // 4. TRIGGER LOGIC
+    // 4. TRIGGER LOGIC & VISUAL EFFECTS
     // ==========================================
     
-    function checkTriggers(dateKey, total, posTotal, negTotal) {
+    function checkTriggers(dateKey, total, posTotal, negTotal, triggeringBehId) {
         const log = db.logs[dateKey];
         const consumed = log.consumed || {};
         const triggerArea = document.getElementById('triggerArea');
@@ -1133,12 +1129,12 @@
                 currentValue = total;
                  if (rule.resultType === 'reward') {
                      if (currentValue - consumedValue >= rule.threshold) {
-                         showTriggerAlert(rule);
+                         showTriggerAlert(rule, triggeringBehId);
                          break; 
                      }
                  } else {
                      if (currentValue <= (consumedValue - Math.abs(rule.threshold))) {
-                         showTriggerAlert(rule);
+                         showTriggerAlert(rule, triggeringBehId);
                          break;
                      }
                  }
@@ -1146,14 +1142,14 @@
             else if (rule.type === 'total_pos') {
                 currentValue = posTotal;
                 if (currentValue - consumedValue >= rule.threshold) {
-                     showTriggerAlert(rule);
+                     showTriggerAlert(rule, triggeringBehId);
                      break;
                 }
             }
             else if (rule.type === 'total_neg') {
                 currentValue = negTotal;
                 if (currentValue - consumedValue >= rule.threshold) {
-                     showTriggerAlert(rule);
+                     showTriggerAlert(rule, triggeringBehId);
                      break;
                 }
             }
@@ -1165,25 +1161,17 @@
                 currentValue = count * b.weight; 
                 
                 if (currentValue - consumedValue >= rule.threshold) {
-                     showTriggerAlert(rule);
+                     showTriggerAlert(rule, triggeringBehId);
                      break;
                 }
             }
         }
     }
 
-    function showTriggerAlert(rule) {
+    function showTriggerAlert(rule, triggeringBehId) {
         const area = document.getElementById('triggerArea');
         area.style.display = 'block';
         
-        // --- NEW: Trigger Animation Effects for Reward/Penalty ---
-        if(rule.resultType === 'reward') {
-            triggerRewardEffect();
-        } else {
-            triggerPenaltyEffect();
-        }
-        // ---------------------------------------------------------
-
         const typeLabel = rule.resultType === 'reward' ? '🎉 پاداش:' : '⚠️ جریمه:';
         const color = rule.resultType === 'reward' ? 'var(--success)' : 'var(--danger)';
         const bg = rule.resultType === 'reward' ? '#ecfdf5' : '#fef2f2';
@@ -1200,33 +1188,73 @@
                 </div>
             </div>
         `;
-    }
 
-    function triggerRewardEffect() {
-        // Create 20 flower particles
-        const emojis = ['🌸', '🌼', '🌺', '🌻', '🌹', '🌷'];
-        for(let i=0; i<25; i++) {
-            const el = document.createElement('div');
-            el.className = 'flower-particle';
-            el.innerText = emojis[Math.floor(Math.random() * emojis.length)];
-            el.style.left = Math.random() * 100 + 'vw';
-            el.style.animationDuration = (2 + Math.random() * 3) + 's';
-            el.style.fontSize = (20 + Math.random() * 20) + 'px';
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 5000);
+        // Trigger Major Visual Effects
+        if (rule.resultType === 'reward') {
+            // Trigger Flower Shower on the card that caused it, or screen center if nonspecific
+            if(triggeringBehId) {
+                triggerFlowerEffect(triggeringBehId);
+            } else {
+                // If triggered by total score, maybe pick random flower shower
+                triggerFlowerEffect(null); // Center effect not implemented, but card effect is safe
+            }
+        } else if (rule.resultType === 'penalty') {
+            // Trigger Red Shake Overlay
+            triggerPenaltyEffect();
         }
     }
 
+    // --- Visual Effect Functions ---
+
     function triggerPenaltyEffect() {
-        // Shake screen
-        document.body.classList.add('effect-shake-screen');
-        setTimeout(() => document.body.classList.remove('effect-shake-screen'), 500);
+        const overlay = document.getElementById('penaltyOverlay');
+        overlay.style.display = 'block';
+        // Reset animation
+        overlay.style.animation = 'none';
+        overlay.offsetHeight; /* trigger reflow */
+        overlay.style.animation = 'bigShake 0.6s cubic-bezier(.36,.07,.19,.97) both';
         
-        // Red overlay
-        const overlay = document.createElement('div');
-        overlay.className = 'effect-red-overlay';
-        document.body.appendChild(overlay);
-        setTimeout(() => overlay.remove(), 1500);
+        setTimeout(() => {
+            overlay.style.display = 'none';
+        }, 650);
+    }
+
+    function triggerFlowerEffect(cardId) {
+        let rect;
+        if(cardId) {
+            const card = document.getElementById('card-' + cardId);
+            if(card) rect = card.getBoundingClientRect();
+        }
+        
+        // If no card specific (total score), assume center of screen roughly or skip
+        const centerX = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+        const centerY = rect ? rect.top + rect.height / 2 : window.innerHeight / 3;
+
+        // Create particles
+        const emojis = ['🌸', '🎉', '🌷', '✨', '💐', '🌼'];
+        for (let i = 0; i < 20; i++) {
+            const el = document.createElement('div');
+            el.classList.add('flower-particle');
+            el.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+            
+            // Random direction
+            const angle = Math.random() * 2 * Math.PI;
+            const velocity = 50 + Math.random() * 100;
+            const tx = Math.cos(angle) * velocity + 'px';
+            const ty = Math.sin(angle) * velocity + 'px';
+            
+            el.style.left = centerX + 'px';
+            el.style.top = centerY + 'px';
+            el.style.setProperty('--tx', tx);
+            el.style.setProperty('--ty', ty);
+            
+            document.body.appendChild(el);
+            
+            // Remove after animation
+            setTimeout(() => {
+                el.remove();
+            }, 1000);
+        }
     }
 
     function getRuleDescription(rule) {
@@ -1883,7 +1911,6 @@
         }
     }
 
-    // Instruction 9: Date Range Stats
     function openDateRangeStats() {
         document.getElementById('dateRangeModal').style.display = 'flex';
     }
