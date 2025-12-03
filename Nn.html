@@ -7,8 +7,6 @@
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Confetti Library for Rewards -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
             --bg-body: #f1f5f9;
@@ -28,7 +26,7 @@
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-    
+
         body {
             background-color: var(--bg-body);
             color: var(--text-main);
@@ -38,14 +36,6 @@
         }
 
         .container { max-width: 600px; margin: 0 auto; padding: 15px; }
-
-        /* --- Animations Overlay --- */
-        #redFlashOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(239, 68, 68, 0.4);
-            z-index: 9999; pointer-events: none;
-            opacity: 0; transition: opacity 0.1s;
-        }
 
         /* --- Header Area --- */
         .top-bar {
@@ -76,7 +66,7 @@
         .date-btn:disabled { opacity: 0.3; cursor: not-allowed; }
         .date-text { font-weight: bold; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* --- Score Card --- */
+        /* --- Dynamic Score Card --- */
         .score-card {
             color: white; padding: 25px; border-radius: 24px;
             text-align: center; box-shadow: var(--card-shadow);
@@ -117,25 +107,19 @@
         }
         .modern-card:active { transform: scale(0.98); }
 
-        /* Side Buttons Logic (Instruction 5) */
+        /* Side Buttons */
         .card-btn {
             width: 55px; border: none; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
             font-size: 1.4rem; color: white; transition: background 0.2s;
         }
+        /* Style for Reddish Button (Negative/Danger) */
+        .card-btn.style-red { background: #fee2e2; color: var(--danger); }
+        .card-btn.style-red:active { background: var(--danger); color: white; }
         
-        /* Virtue Styles */
-        .card-btn.virtue-plus { background: #d1fae5; color: var(--success); }
-        .card-btn.virtue-plus:active { background: var(--success); color: white; }
-        .card-btn.virtue-minus { background: #fee2e2; color: var(--danger); }
-        .card-btn.virtue-minus:active { background: var(--danger); color: white; }
-
-        /* Vice Styles (Instruction 5: Opposite/Distinct) */
-        /* Adding a vice is BAD (Red), Removing/Reducing is GOOD/Correction (Neutral/Green) */
-        .card-btn.vice-plus { background: #fee2e2; color: var(--danger); }
-        .card-btn.vice-plus:active { background: var(--danger); color: white; }
-        .card-btn.vice-minus { background: #e2e8f0; color: var(--neutral); } /* Gray for undoing vice */
-        .card-btn.vice-minus:active { background: var(--neutral); color: white; }
+        /* Style for Greenish Button (Positive/Success) */
+        .card-btn.style-green { background: #d1fae5; color: var(--success); }
+        .card-btn.style-green:active { background: var(--success); color: white; }
 
         /* Center Content */
         .card-info {
@@ -153,28 +137,34 @@
         .meta-badge.count {
             background: var(--text-main); color: white;
         }
-        
-        /* Threshold Info (Instruction 6) */
         .next-threshold {
-            font-size: 0.7rem; color: var(--primary-dark); margin-top: 5px;
-            background: #dbeafe; padding: 3px 10px; border-radius: 50px;
-            display: inline-flex; align-items: center; gap: 4px; font-weight: bold;
+            font-size: 0.65rem; color: var(--primary); margin-top: 5px;
+            background: #eff6ff; padding: 2px 8px; border-radius: 50px;
+            display: inline-flex; align-items: center; gap: 4px;
         }
 
         /* --- Settings Grid --- */
         .settings-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
         }
         .setting-block {
-            background: white; border-radius: 20px; padding: 20px 10px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            text-align: center; box-shadow: var(--shadow); cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s; aspect-ratio: 1/1;
+            background: white; border-radius: 20px;
+            padding: 20px 10px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center;
+            box-shadow: var(--shadow);
+            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+            aspect-ratio: 1/1;
             border: 1px solid transparent;
         }
         .setting-block:active { transform: scale(0.96); }
         .setting-block i { font-size: 2rem; margin-bottom: 10px; color: var(--primary); }
         .setting-block span { font-weight: bold; font-size: 0.9rem; color: var(--text-main); }
+        
         .setting-block.danger { border-color: #fee2e2; }
         .setting-block.danger i { color: var(--danger); }
         
@@ -194,6 +184,7 @@
         .badge-reward { background: #d1fae5; color: #065f46; }
         .badge-penalty { background: #fee2e2; color: #991b1b; }
 
+        /* Stats Summary Box */
         .stats-summary-card {
             background: var(--surface); padding: 15px; border-radius: 12px; box-shadow: var(--shadow);
             display: flex; justify-content: space-around; margin-bottom: 20px;
@@ -205,7 +196,7 @@
         .stat-reward { color: var(--success); border: 1px solid #d1fae5; }
         .stat-penalty { color: var(--danger); border: 1px solid #fee2e2; }
 
-        /* --- Trigger Alert --- */
+        /* --- Trigger Alert Box --- */
         .trigger-box {
             background: #fff7ed; border: 1px solid #ffedd5; border-radius: 16px;
             padding: 15px; margin-bottom: 20px; display: none;
@@ -221,6 +212,25 @@
 
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* --- Visual Effects Overlays (New for Instruction 3) --- */
+        #rewardOverlay, #penaltyOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 9999; pointer-events: none; display: none;
+            align-items: center; justify-content: center;
+        }
+        #rewardOverlay { background: rgba(0, 255, 0, 0.1); }
+        #penaltyOverlay { background: rgba(255, 0, 0, 0.2); }
+        
+        .effect-content { font-size: 5rem; animation: popIn 0.8s ease-out forwards; text-align: center; }
+        .effect-text { display: block; font-size: 2rem; color: #065f46; font-weight: bold; text-shadow: 0 2px 5px rgba(0,0,0,0.2); margin-top: 10px; }
+        .penalty-text { color: #991b1b; }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+
         /* --- Bottom Nav --- */
         .nav-bar {
             position: fixed; bottom: 0; left: 0; width: 100%; background: white;
@@ -235,7 +245,7 @@
         .nav-item i { font-size: 1.4rem; }
         .nav-item.active { color: var(--primary); }
 
-        /* --- Modals --- */
+        /* --- Modals & Layers --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); backdrop-filter: blur(3px);
@@ -247,7 +257,8 @@
         #clearDataModal { z-index: 2000; }
         #editorModal { z-index: 2000; }
         #dateRangeModal { z-index: 2000; }
-        #backupModal { z-index: 2000; } 
+        #backupModal { z-index: 2000; }
+        
         #actionListPopupModal { z-index: 2100; }
         #editFormModal { z-index: 2100; }
         #actionDetailModal { z-index: 2200; }
@@ -258,6 +269,7 @@
             position: relative;
         }
 
+        /* Forms & Inputs */
         .form-group { margin-bottom: 15px; }
         .form-label { display: block; margin-bottom: 5px; font-size: 0.9rem; font-weight: bold; }
         .form-input, .form-select { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: inherit; }
@@ -292,142 +304,166 @@
 </head>
 <body>
 
-<div id="redFlashOverlay"></div>
+<!-- Effects Overlays -->
+<div id="rewardOverlay">
+    <div class="effect-content">
+        🎉✨🎊
+        <span class="effect-text">پاداش ثبت شد!</span>
+    </div>
+</div>
+<div id="penaltyOverlay">
+    <div class="effect-content">
+        ⚠️⛔️
+        <span class="effect-text penalty-text">جریمه ثبت شد!</span>
+    </div>
+</div>
 
 <div id="app">
 
 <!-- TAB: HOME -->
+
 <div id="tab-home" class="tab-content active">
     <div class="container">
-        
-        <div class="top-bar">
-            <button class="manifesto-btn" onclick="openManifestoModal()">
-                <i class="fas fa-book-open" id="manifestoIcon"></i> <span id="manifestoBtnText">منشور اخلاقی</span>
-            </button>
-            <div class="date-navigator">
-                <button class="date-btn" onclick="navigateDate(-1)"><i class="fas fa-chevron-right"></i></button>
-                <div class="date-text" id="headerDateDisplay">...</div>
-                <button class="date-btn" id="nextDayBtn" onclick="navigateDate(1)" disabled><i class="fas fa-chevron-left"></i></button>
-            </div>
+    
+    <div class="top-bar">
+        <button class="manifesto-btn" onclick="openManifestoModal()">
+            <i class="fas fa-book-open" id="manifestoIcon"></i> <span id="manifestoBtnText">منشور اخلاقی</span>
+        </button>
+        <div class="date-navigator">
+            <button class="date-btn" onclick="navigateDate(-1)"><i class="fas fa-chevron-right"></i></button>
+            <div class="date-text" id="headerDateDisplay">...</div>
+            <button class="date-btn" id="nextDayBtn" onclick="navigateDate(1)" disabled><i class="fas fa-chevron-left"></i></button>
         </div>
-
-        <div class="score-card neutral" id="scoreCard">
-            <div class="score-label">تراز امروز</div>
-            <div class="main-score" id="totalScoreDisplay">0</div>
-            <div class="sub-scores">
-                <div class="sub-score-item">
-                    <span class="sub-val" id="posScoreDisplay">0</span>
-                    <span class="sub-lbl">مثبت</span>
-                </div>
-                <div class="sub-score-item">
-                    <span class="sub-val" id="negScoreDisplay">0</span>
-                    <span class="sub-lbl">منفی</span>
-                </div>
-            </div>
-        </div>
-
-        <div id="triggerArea"></div>
-
-        <div id="homePendingSummary" class="stats-summary-card" style="margin-bottom: 20px; display:none;">
-            <div class="stat-box stat-reward" onclick="openActionListModal('reward', false)">
-                <span class="stat-num" id="pendingRewardCount">0</span>
-                <span class="stat-label">پاداش مانده</span>
-            </div>
-            <div class="stat-box stat-penalty" onclick="openActionListModal('penalty', false)">
-                <span class="stat-num" id="pendingPenaltyCount">0</span>
-                <span class="stat-label">جریمه مانده</span>
-            </div>
-        </div>
-
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" id="homeSearch" placeholder="جستجو در رفتارها..." oninput="filterHomeList()">
-        </div>
-
-        <!-- Virtues -->
-        <div class="section-header">
-            <span class="section-title virtue"><i class="fas fa-check-circle"></i> فضایل</span>
-        </div>
-        <div id="virtuesList"></div>
-
-        <!-- Vices -->
-        <div class="section-header">
-            <span class="section-title vice"><i class="fas fa-times-circle"></i> رذایل</span>
-        </div>
-        <div id="vicesList"></div>
-
     </div>
+
+    <div class="score-card neutral" id="scoreCard">
+        <div class="score-label">تراز امروز</div>
+        <div class="main-score" id="totalScoreDisplay">0</div>
+        <div class="sub-scores">
+            <div class="sub-score-item">
+                <span class="sub-val" id="posScoreDisplay">0</span>
+                <span class="sub-lbl">مثبت</span>
+            </div>
+            <div class="sub-score-item">
+                <span class="sub-val" id="negScoreDisplay">0</span>
+                <span class="sub-lbl">منفی</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="triggerArea"></div>
+
+    <div id="homePendingSummary" class="stats-summary-card" style="margin-bottom: 20px; display:none;">
+        <div class="stat-box stat-reward" onclick="openActionListModal('reward', false)">
+            <span class="stat-num" id="pendingRewardCount">0</span>
+            <span class="stat-label">پاداش مانده</span>
+        </div>
+        <div class="stat-box stat-penalty" onclick="openActionListModal('penalty', false)">
+            <span class="stat-num" id="pendingPenaltyCount">0</span>
+            <span class="stat-label">جریمه مانده</span>
+        </div>
+    </div>
+
+    <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="homeSearch" placeholder="جستجو در رفتارها..." oninput="filterHomeList()">
+    </div>
+
+    <!-- Virtues -->
+    <div class="section-header">
+        <span class="section-title virtue-text"><i class="fas fa-check-circle"></i> فضایل</span>
+    </div>
+    <div id="virtuesList"></div>
+
+    <!-- Vices -->
+    <div class="section-header">
+        <span class="section-title vice-text"><i class="fas fa-times-circle"></i> رذایل</span>
+    </div>
+    <div id="vicesList"></div>
+
+</div>
 </div>
 
 <!-- TAB: ACTIONS -->
+
 <div id="tab-actions" class="tab-content">
     <div class="container">
         <h2 style="margin-top:0;">کارنامه عملی</h2>
         
-        <div class="stats-summary-card">
-            <div class="stat-box stat-reward" onclick="filterActionsTab('reward')">
-                <span class="stat-num" id="totalRewardCount">0</span>
-                <span class="stat-label">کل پاداش‌ها</span>
-            </div>
-            <div class="stat-box stat-penalty" onclick="filterActionsTab('penalty')">
-                <span class="stat-num" id="totalPenaltyCount">0</span>
-                <span class="stat-label">کل جریمه‌ها</span>
-            </div>
+    <div class="stats-summary-card">
+        <div class="stat-box stat-reward" onclick="filterActionsTab('reward')">
+            <span class="stat-num" id="totalRewardCount">0</span>
+            <span class="stat-label">کل پاداش‌ها</span>
         </div>
-
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" id="actionsSearch" placeholder="جستجو در کارنامه..." oninput="renderActionsTab()">
+        <div class="stat-box stat-penalty" onclick="filterActionsTab('penalty')">
+            <span class="stat-num" id="totalPenaltyCount">0</span>
+            <span class="stat-label">کل جریمه‌ها</span>
         </div>
-
-        <div style="margin-bottom: 15px; display:flex; gap:10px; overflow-x:auto; padding-bottom:5px;">
-             <div class="stat-box" style="min-width:100px; background:#f0f9ff;" onclick="openActionListModal(null, true)">
-                <span class="stat-num" id="totalDoneCount">0</span>
-                <span class="stat-label">انجام شده</span>
-            </div>
-            <div class="stat-box" style="min-width:100px; background:#fff1f2;" onclick="openActionListModal(null, false)">
-                <span class="stat-num" id="totalPendingCount">0</span>
-                <span class="stat-label">انجام نشده</span>
-            </div>
-             <div class="stat-box" style="min-width:120px; background:#fef3c7;" onclick="openDateRangeStats()">
-                <span class="stat-num"><i class="fas fa-calendar-alt"></i></span>
-                <span class="stat-label">آمار بازه زمانی</span>
-            </div>
-        </div>
-
-        <div id="actionsListFull"></div>
     </div>
+
+    <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="actionsSearch" placeholder="جستجو در کارنامه..." oninput="renderActionsTab()">
+    </div>
+
+    <div style="margin-bottom: 15px; display:flex; gap:10px; overflow-x:auto; padding-bottom:5px;">
+         <div class="stat-box" style="min-width:100px; background:#f0f9ff;" onclick="openActionListModal(null, true)">
+            <span class="stat-num" id="totalDoneCount">0</span>
+            <span class="stat-label">انجام شده</span>
+        </div>
+        <div class="stat-box" style="min-width:100px; background:#fff1f2;" onclick="openActionListModal(null, false)">
+            <span class="stat-num" id="totalPendingCount">0</span>
+            <span class="stat-label">انجام نشده</span>
+        </div>
+         <div class="stat-box" style="min-width:120px; background:#fef3c7;" onclick="openDateRangeStats()">
+            <span class="stat-num"><i class="fas fa-calendar-alt"></i></span>
+            <span class="stat-label">آمار بازه زمانی</span>
+        </div>
+    </div>
+
+    <div id="actionsListFull"></div>
+</div>
 </div>
 
 <!-- TAB: SETTINGS -->
+
 <div id="tab-settings" class="tab-content">
     <div class="container">
         <h2>تنظیمات</h2>
         
-        <div class="settings-grid">
-            <div class="setting-block" onclick="openEditor('behavior')">
-                <i class="fas fa-list-check"></i>
-                <span>مدیریت رفتارها</span>
-            </div>
-            <div class="setting-block" onclick="openEditor('rule')">
-                <i class="fas fa-gavel"></i>
-                <span>پیکربندی عواقب</span>
-            </div>
-            <div class="setting-block" onclick="openBackupModal()">
-                <i class="fas fa-save"></i>
-                <span>پشتیبان‌گیری</span>
-            </div>
-            <div class="setting-block danger" onclick="openClearDataModal()">
-                <i class="fas fa-trash-alt"></i>
-                <span>پاکسازی</span>
-            </div>
+    <div class="settings-grid">
+        <!-- Block 1: Behaviors -->
+        <div class="setting-block" onclick="openEditor('behavior')">
+            <i class="fas fa-list-check"></i>
+            <span>مدیریت رفتارها</span>
         </div>
-        <br><br><br>
+
+        <!-- Block 2: Rules -->
+        <div class="setting-block" onclick="openEditor('rule')">
+            <i class="fas fa-gavel"></i>
+            <span>پیکربندی عواقب</span>
+        </div>
+
+        <!-- Block 3: Backup -->
+        <div class="setting-block" onclick="openBackupModal()">
+            <i class="fas fa-save"></i>
+            <span>پشتیبان‌گیری</span>
+        </div>
+
+        <!-- Block 4: Clear Data -->
+        <div class="setting-block danger" onclick="openClearDataModal()">
+            <i class="fas fa-trash-alt"></i>
+            <span>پاکسازی</span>
+        </div>
     </div>
+    
+    <br><br><br>
+</div>
 </div>
 </div>
 
 <!-- NAVIGATION -->
+
 <div class="nav-bar">
     <button class="nav-item active" onclick="switchTab('home')">
         <i class="fas fa-home"></i>
@@ -443,7 +479,8 @@
     </button>
 </div>
 
-<!-- MODALS -->
+<!-- MODAL: MANIFESTO -->
+
 <div id="manifestoModal" class="modal-overlay">
     <div class="modal-content" style="position:relative; max-height:85vh; display:flex; flex-direction:column;">
         <div style="position:absolute; top:15px; left:15px; z-index:10; cursor:pointer;" onclick="document.getElementById('manifestoModal').style.display='none'">
@@ -456,6 +493,8 @@
     </div>
 </div>
 
+<!-- MODAL: ONBOARDING -->
+
 <div id="nameModal" class="modal-overlay">
     <div class="modal-content" style="text-align:center;">
         <h3>خوش آمدید</h3>
@@ -465,6 +504,8 @@
         <button class="btn btn-accept" onclick="saveName()">ثبت و شروع</button>
     </div>
 </div>
+
+<!-- MODAL: BACKUP -->
 
 <div id="backupModal" class="modal-overlay">
     <div class="modal-content">
@@ -484,6 +525,8 @@
         </div>
     </div>
 </div>
+
+<!-- MODAL: CLEAR DATA -->
 
 <div id="clearDataModal" class="modal-overlay">
     <div class="modal-content" style="position:relative;">
@@ -505,6 +548,8 @@
     </div>
 </div>
 
+<!-- MODAL: EDITOR -->
+
 <div id="editorModal" class="modal-overlay">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
@@ -523,6 +568,8 @@
         <button class="btn btn-accept" onclick="openEditForm(null)" style="width:100%">+ افزودن مورد جدید</button>
     </div>
 </div>
+
+<!-- MODAL: EDIT FORM -->
 
 <div id="editFormModal" class="modal-overlay">
     <div class="modal-content">
@@ -589,6 +636,8 @@
     </div>
 </div>
 
+<!-- MODAL: ACTION DETAILS -->
+
 <div id="actionDetailModal" class="modal-overlay">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
@@ -607,6 +656,8 @@
     </div>
 </div>
 
+<!-- MODAL: ACTION LIST POPUP -->
+
 <div id="actionListPopupModal" class="modal-overlay">
     <div class="modal-content">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
@@ -616,6 +667,8 @@
         <div id="actionListPopupContent"></div>
     </div>
 </div>
+
+<!-- MODAL: DATE RANGE STATS -->
 
 <div id="dateRangeModal" class="modal-overlay">
     <div class="modal-content">
@@ -694,7 +747,7 @@
             { id: 'x12', title: 'بدقولی', type: 'vice', weight: 4 },
             { id: 'x13', title: 'کنترل‌گری', type: 'vice', weight: 3 },
             { id: 'x14', title: 'قربانی‌نمایی', type: 'vice', weight: 3 },
-            { id: 'x15', title: 'نگاه آلوده', type: 'vice', weight: 5 }, // Instruction 2: Label Updated
+            { id: 'x15', title: 'نگاه آلوده', type: 'vice', weight: 5 },
             { id: 'x16', title: 'کینه و انتقام‌جویی', type: 'vice', weight: 4 },
             { id: 'x17', title: 'خیانت', type: 'vice', weight: 6 },
             { id: 'x18', title: 'چاپلوسی', type: 'vice', weight: 3 },
@@ -888,10 +941,10 @@
     function navigateDate(delta) {
         const newDate = new Date(viewingDate);
         newDate.setDate(newDate.getDate() + delta);
-        newDate.setHours(0,0,0,0);
+        newDate.setHours(0,0,0,0); 
         
         const today = new Date();
-        today.setHours(0,0,0,0);
+        today.setHours(0,0,0,0); 
         
         if (newDate > today) return; 
         
@@ -910,6 +963,7 @@
         const log = db.logs[key];
 
         const manBtn = document.querySelector('.manifesto-btn');
+        const manText = document.getElementById('manifestoBtnText');
         const manIcon = document.getElementById('manifestoIcon');
 
         if (log.manifestoRead) {
@@ -945,37 +999,41 @@
                 negScore += itemScore; 
             }
 
-            // Instruction 4 & 6: Threshold Logic Fixed
+            // Calculation Logic for "Next Threshold" (Instruction 4)
+            // Logic: Needed = (Consumed + Threshold) - Current.
+            // When trigger hits, consumed updates, so this keeps calculating relative to new base.
             let thresholdInfo = "";
             const specificRule = db.rules.find(r => r.type === 'specific' && r.targetId === b.id);
             if (specificRule) {
                  const consumed = log.consumed && log.consumed[specificRule.id] ? log.consumed[specificRule.id] : 0;
                  const currentVal = count * b.weight;
-                 // Calculate needed for NEXT threshold relative to what has been consumed
                  const needed = (consumed + specificRule.threshold) - currentVal;
                  
-                 // Show always if tracking next step
+                 // Show only if there is a gap. If 0 or less, it's triggered/pending.
                  if (needed > 0) {
                      const typeText = specificRule.resultType === 'reward' ? 'پاداش' : 'جریمه';
                      thresholdInfo = `<div class="next-threshold"><i class="fas fa-info-circle"></i> ${needed} امتیاز تا ${typeText}</div>`;
                  }
             }
 
-            // Instruction 5: Distinct Buttons for Virtue vs Vice
-            let btnMinusClass = "";
-            let btnPlusClass = "";
+            // Button Color Logic (Instruction 5)
+            // Virtue: Minus = Red Style, Plus = Green Style
+            // Vice: Minus = Green Style (Good), Plus = Red Style (Bad)
+            let btnMinusClass = 'card-btn';
+            let btnPlusClass = 'card-btn';
             
             if (b.type === 'virtue') {
-                btnMinusClass = "virtue-minus";
-                btnPlusClass = "virtue-plus";
+                btnMinusClass += ' style-red';
+                btnPlusClass += ' style-green';
             } else {
-                btnMinusClass = "vice-minus"; // Undo/Correction (Green/Neutral)
-                btnPlusClass = "vice-plus";   // Commit Vice (Red/Danger)
+                // For Vice: reducing (-) is Good (Green), increasing (+) is Bad (Red)
+                btnMinusClass += ' style-green';
+                btnPlusClass += ' style-red';
             }
 
             const html = `
                 <div class="modern-card ${b.type}">
-                    <button class="card-btn ${btnMinusClass}" onclick="updateCount('${b.id}', -1, '${b.type}')">
+                    <button class="${btnMinusClass}" onclick="updateCount('${b.id}', -1)">
                         <i class="fas fa-minus"></i>
                     </button>
                     <div class="card-info">
@@ -986,7 +1044,7 @@
                         </div>
                         ${thresholdInfo}
                     </div>
-                    <button class="card-btn ${btnPlusClass}" onclick="updateCount('${b.id}', 1, '${b.type}')">
+                    <button class="${btnPlusClass}" onclick="updateCount('${b.id}', 1)">
                         <i class="fas fa-plus"></i>
                     </button>
                 </div>
@@ -1023,35 +1081,48 @@
         renderHome();
     }
 
-    // Instruction 3: Animations on Update
-    function updateCount(behId, delta, type) {
+    function updateCount(behId, delta) {
         const key = getKey(viewingDate);
         const log = db.logs[key];
         const current = log.behaviors[behId] || 0;
         const newVal = current + delta;
         
+        // Capture previous trigger state
+        const wasTriggerVisible = document.getElementById('triggerArea').style.display === 'block';
+
         if (newVal >= 0) {
             log.behaviors[behId] = newVal;
             saveDB();
             renderHome();
             
-            // Trigger Visual Effects
-            if (delta > 0) {
-                if (type === 'virtue') {
-                    // Confetti for Virtue Increase
-                    confetti({
-                        particleCount: 100,
-                        spread: 70,
-                        origin: { y: 0.6 }
-                    });
-                } else if (type === 'vice') {
-                    // Red Flash for Vice Increase
-                    const flash = document.getElementById('redFlashOverlay');
-                    flash.style.opacity = '1';
-                    setTimeout(() => { flash.style.opacity = '0'; }, 300);
+            // Visual Effect Logic (Instruction 3)
+            // Check if a NEW trigger has appeared after this update
+            const isTriggerVisible = document.getElementById('triggerArea').style.display === 'block';
+            
+            // If trigger wasn't visible but now is, it means we hit a threshold
+            if (!wasTriggerVisible && isTriggerVisible) {
+                const triggerText = document.getElementById('triggerArea').innerText;
+                if (triggerText.includes('پاداش')) {
+                    triggerVisualEffect('reward');
+                } else if (triggerText.includes('جریمه')) {
+                    triggerVisualEffect('penalty');
                 }
             }
         }
+    }
+    
+    function triggerVisualEffect(type) {
+        const overlay = document.getElementById(type === 'reward' ? 'rewardOverlay' : 'penaltyOverlay');
+        overlay.style.display = 'flex';
+        // Reset animation
+        const content = overlay.querySelector('.effect-content');
+        content.style.animation = 'none';
+        content.offsetHeight; /* trigger reflow */
+        content.style.animation = 'popIn 0.8s ease-out forwards';
+        
+        setTimeout(() => {
+            overlay.style.display = 'none';
+        }, 1200);
     }
 
     // ==========================================
@@ -1063,7 +1134,8 @@
         const consumed = log.consumed || {};
         const triggerArea = document.getElementById('triggerArea');
         triggerArea.innerHTML = ''; 
-        
+        triggerArea.style.display = 'none';
+
         for (let rule of db.rules) {
             let currentValue = 0;
             let consumedValue = consumed[rule.id] || 0;
@@ -1193,7 +1265,7 @@
     }
 
     // ==========================================
-    // 5. MANIFESTO (Instruction 1: Updated Text)
+    // 5. MANIFESTO
     // ==========================================
     
     function openManifestoModal() {
@@ -1206,37 +1278,38 @@
         const formattedTime = `${h}:${m} دقیقه`;
 
         const text = `
-            من <strong>${name}</strong> در تاریخ <strong>${dateStr}</strong> و ساعت <strong>${formattedTime}</strong> منشور اخلاقی‌ام را مرور می‌کنم.<br><br>
-            
-            <strong style="color:var(--primary);">منشور اخلاق</strong><br>
-            من به این زندگی و فرصت یگانه‌ی آن احترام می‌گذارم.<br>
-            اصلِ بنیادینِ من، کاهشِ رنج و ساختنِ دنیایی بهتر است.<br>
-            من خرد و عقلانیت را راهنمای خود قرار می‌دهم.<br>
-            من مسئولِ احساسات، انتخاب‌ها و آینده‌ی خود هستم.<br>
-            بسیار سپاسگزارم برای نَفَسی که می‌کشم و توانی که برای تغییر دارم.<br><br>
+منشور اخلاق<br>
+من به این زندگی و فرصت یگانه‌ی آن احترام می‌گذارم.<br>
+اصلِ بنیادینِ من، کاهشِ رنج و ساختنِ دنیایی بهتر است.<br>
+من خرد و عقلانیت را راهنمای خود قرار می‌دهم.<br>
+من مسئولِ احساسات، انتخاب‌ها و آینده‌ی خود هستم.<br>
+بسیار سپاسگزارم برای نَفَسی که می‌کشم و توانی که برای تغییر دارم.<br><br>
 
-            من متعهد می‌شوم که صادق باشم و با خود و دیگران صادقانه رفتار کنم.<br>
-            من متعهد می‌شوم که به حریم خصوصی دیگران و تفاوت‌های انسان‌ها احترام بگذارم.<br>
-            من متعهد می‌شوم که از خط قرمزهای آسیب به دیگران عبور نکنم.<br>
-            من متعهد میشوم تا تلاش کنم امروز، نسخه‌ای قوی‌تر و مهربان‌تر از دیروزِ خود باشم.<br><br>
+من متعهد می‌شوم که صادق باشم و با خود و دیگران صادقانه رفتار کنم.<br>
+من متعهد می‌شوم که به حریم خصوصی دیگران و تفاوت‌های انسان‌ها احترام بگذارم.<br>
+من متعهد می‌شوم که از خط قرمزهای آسیب به دیگران عبور نکنم.<br>
+من متعهد میشوم تا تلاش کنم امروز، نسخه‌ای قوی‌تر و مهربان‌تر از دیروزِ خود باشم.<br><br>
 
-            من در برابرِ قوانینِ طبیعت و واقعیت‌های جهان سر فرود می‌آورم.<br>
-            من آن‌چه را که در کنترلم نیست، می‌پذیرم.<br>
-            من انعطاف‌پذیرم، مثل درخت در برابر باد و تعصب را رها می‌کنم تا نشکنم.<br>
-            من طبیعت را دوست دارم و با آن درست رفتار می‌کنم.<br><br>
+من در برابرِ قوانینِ طبیعت و واقعیت‌های جهان سر فرود می‌آورم.<br>
+من آن‌چه را که در کنترلم نیست، می‌پذیرم.<br>
+من انعطاف‌پذیرم، مثل درخت در برابر باد و تعصب را رها می‌کنم تا نشکنم.<br>
+من طبیعت را دوست دارم و با آن درست رفتار می‌کنم.<br><br>
 
-            در این لحظه تمامِ خشم‌ها، شهوت‌ها و غم‌هایم را به خاک می‌سپارم. در این لحظه دوباره شکوفا شدم و جان تازه‌ای گرفتم. من خودم را دوست دارم و به خودم احترام میگذارم... من در امنیت و آرامشم... من آرامـم...<br><br>
+در این لحظه تمامِ خشم‌ها، شهوت‌ها و غم‌هایم را به خاک می‌سپارم. در این لحظه دوباره شکوفا شدم و جان تازه‌ای گرفتم. من خودم را دوست دارم و به خودم احترام میگذارم... من در امنیت و آرامشم... من آرامـم...<br><br>
 
-            من برای خودم و دیگران ارزش بسیاری قائل هستم و برای همگی قدرت، سلامتی، زیبایی، انصاف و عدالت آرزو می‌کنم. باشد که هیچ انسانی مورد ظلم واقع نشود و من نیز ابزارِ ظلم نباشم.<br>
-            من گواهی می‌دهم که انسان هستم و کرامت دارم.<br>
-            من گواهی می‌دهم که از عقل و خردم بهره ببرم و استفاده کنم.<br>
-            من گواهی میدهم، فارق از هر دیدگاهی که دارم اخلاق مدار باشم و رفتاری انسان دوستانه داشته باشم.<br>
-            گواهی می‌دهم ظلم نکنم، ستم نکنم و برای برپایی عدالت تلاش کنم.<br><br>
+من برای خودم و دیگران ارزش بسیاری قائل هستم و برای همگی قدرت، سلامتی، زیبایی، انصاف و عدالت آرزو می‌کنم. باشد که هیچ انسانی مورد ظلم واقع نشود و من نیز ابزارِ ظلم نباشم.<br><br>
 
-            سلام بر من که ارزشمندم.<br>
-            سلام بر تمام انسان‌های نیک‌ و نیک‌اندیش.<br>
-            سلام بر صلح و آگاهی و عقلانیت.<br>
-            پایان.
+من گواهی می‌دهم که انسان هستم و کرامت دارم.<br>
+من گواهی می‌دهم که از عقل و خردم بهره ببرم و استفاده کنم.<br>
+من گواهی میدهم، فارق از هر دیدگاهی که دارم اخلاق مدار باشم و رفتاری انسان دوستانه داشته باشم.<br>
+گواهی می‌دهم ظلم نکنم، ستم نکنم و برای برپایی عدالت تلاش کنم.<br><br>
+
+سلام بر من که ارزشمندم.<br>
+سلام بر تمام انسان‌های نیک‌ و نیک‌اندیش.<br>
+سلام بر صلح و آگاهی و عقلانیت.<br>
+پایان.
+<br><br>
+<small style="color:#666">تایید شده توسط <strong>${name}</strong> در تاریخ ${dateStr}، ساعت ${formattedTime}</small>
         `;
 
         const container = document.getElementById('manifestoTextContainer');
@@ -1268,7 +1341,7 @@
     }
 
     // ==========================================
-    // 6. ACTIONS LIST & POPUP
+    // 6. ACTIONS LIST (KARNAMEH) & POPUP
     // ==========================================
 
     function renderActionsTab() {
@@ -1428,7 +1501,7 @@
                 <span class="detail-value">${action.dateStr}</span>
             </div>
             <div class="detail-row">
-                <span class="detail-label">محدوده زمانی (دستور ۸):</span>
+                <span class="detail-label">محدوده زمانی:</span>
                 <span class="detail-value">${action.timeRange || '-'}</span>
             </div>
             <div class="detail-row">
@@ -1773,6 +1846,7 @@
                 location.reload();
             }
         } else {
+            // Clear Today
             const key = getKey(new Date());
             if (db.logs[key]) {
                 delete db.logs[key];
@@ -1784,6 +1858,7 @@
         }
     }
 
+    // Instruction 9: Date Range Stats
     function openDateRangeStats() {
         document.getElementById('dateRangeModal').style.display = 'flex';
     }
