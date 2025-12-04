@@ -33,7 +33,7 @@
             font-family: 'Vazirmatn', sans-serif;
             margin: 0; padding: 0; padding-bottom: 110px;
             overflow-x: hidden;
-            position: relative; /* For red overlay positioning */
+            position: relative; /* For red overlay */
         }
 
         .container { max-width: 600px; margin: 0 auto; padding: 15px; }
@@ -102,79 +102,66 @@
         .modern-card {
             background: var(--surface); border-radius: 20px;
             margin-bottom: 15px; box-shadow: var(--shadow);
-            display: flex; align-items: stretch; overflow: hidden;
+            display: flex; align-items: stretch; overflow: visible; /* Changed for confetti */
             transition: transform 0.1s, background-color 0.3s;
             min-height: 100px;
             position: relative;
-            z-index: 10; /* Ensure visual effects play nicely */
+            z-index: 1;
         }
         .modern-card:active { transform: scale(0.98); }
 
-        /* Button Feedback Animations */
-        @keyframes happyPop {
-            0% { transform: scale(1); background-color: var(--surface); }
-            50% { transform: scale(1.05); background-color: #dcfce7; box-shadow: 0 0 20px #22c55e; }
-            100% { transform: scale(1); background-color: var(--surface); }
-        }
-        @keyframes angryShakeButton {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-            100% { transform: translateX(0); }
-        }
-
-        .anim-happy { animation: happyPop 0.4s ease-out; }
-        .anim-angry { animation: angryShakeButton 0.4s ease-in-out; }
-
-        /* --- Special Effects (Confetti & Penalty Overlay) --- */
+        /* --- Animations & Effects --- */
         
-        /* 1. Red Overlay for Penalty */
-        #penaltyOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(239, 68, 68, 0.2); /* Red tint */
-            z-index: 9999;
-            pointer-events: none; /* Let clicks pass through */
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+        /* 1. Happy/Reward (Golbaran) on Card */
+        @keyframes flowerExplode {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: scale(1.5) translateY(-50px) rotate(45deg); opacity: 0; }
         }
-        #penaltyOverlay.active { display: block; opacity: 1; }
-
-        /* Screen Shake Animation Class (Applied to Body) */
-        .shake-screen {
-            animation: shakeScreen 0.5s cubic-bezier(.36,.07,.19,.97) both;
-        }
-        @keyframes shakeScreen {
-            10%, 90% { transform: translate3d(-4px, 0, 0); }
-            20%, 80% { transform: translate3d(6px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
-            40%, 60% { transform: translate3d(8px, 0, 0); }
+        @keyframes goldPulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(255, 215, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
         }
 
-        /* 2. Confetti / Flower Shower */
-        .confetti-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 9998;
-            overflow: hidden; display: none;
+        .effect-reward {
+            animation: goldPulse 1s ease-out;
+            z-index: 10;
         }
-        .confetti-container.active { display: block; }
-        
-        .confetti-piece {
+        .effect-reward::before, .effect-reward::after {
+            content: '🌸';
             position: absolute;
-            width: 15px; height: 15px;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23F59E0B'%3E%3Cpath d='M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z'/%3E%3C/svg%3E"); /* Flower/Star shape */
-            background-size: cover;
-            animation: confettiFall linear forwards;
+            top: 50%; left: 50%;
+            font-size: 2rem;
+            pointer-events: none;
+            z-index: 20;
+            display: block;
         }
-        /* Alternative flower shape */
-        .confetti-piece.flower {
-             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23ec4899' d='M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z'/%3E%3C/svg%3E"); /* Check/Flower placeholder */
+        .effect-reward::before { animation: flowerExplode 1s ease-out forwards; color: #ec4899; }
+        .effect-reward::after { animation: flowerExplode 1s ease-out 0.2s forwards; content: '💐'; left: 40%; top: 40%; }
+
+        /* 2. Penalty/Angry (Page Shake & Red Overlay) */
+        @keyframes pageShake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        @keyframes redFlash {
+            0% { background-color: rgba(255, 0, 0, 0); }
+            50% { background-color: rgba(255, 0, 0, 0.15); }
+            100% { background-color: rgba(255, 0, 0, 0); }
         }
 
-        @keyframes confettiFall {
-            0% { transform: translateY(0) rotate(0deg) scale(0.5); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(720deg) scale(1.2); opacity: 0; }
+        body.effect-penalty {
+            animation: pageShake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        body.effect-penalty::after {
+            content: '';
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: transparent;
+            animation: redFlash 0.5s ease-in-out;
+            pointer-events: none;
+            z-index: 9999;
         }
 
         /* Side Buttons */
@@ -184,12 +171,12 @@
             font-size: 1.4rem; color: white; transition: background 0.2s, filter 0.2s;
         }
         
-        /* Virtue Colors */
+        /* Virtue Colors (Positive Logic) */
         .virtue .card-btn.minus { background: #cbd5e1; color: #475569; }
         .virtue .card-btn.plus { background: #10b981; color: white; }
         .virtue .card-btn.plus:active { filter: brightness(0.9); }
 
-        /* Vice Colors */
+        /* Vice Colors (Negative Logic) */
         .vice .card-btn.minus { background: #cbd5e1; color: #475569; }
         .vice .card-btn.plus { background: #ef4444; color: white; }
         .vice .card-btn.plus:active { filter: brightness(0.9); }
@@ -359,10 +346,6 @@
     </style>
 </head>
 <body>
-
-<!-- Visual Effect Containers -->
-<div id="penaltyOverlay"></div>
-<div id="confettiContainer" class="confetti-container"></div>
 
 <div id="app">
 
@@ -944,8 +927,7 @@
     }
 
     function initUI() {
-        renderHome(false);
-        // Instruction 2: Show Manifesto on first load of the day
+        renderHome();
         const key = getKey(new Date());
         if(db.logs[key] && !db.logs[key].manifestoRead) {
             openManifestoModal();
@@ -961,7 +943,7 @@
         const indices = { 'home': 0, 'actions': 1, 'settings': 2 };
         document.querySelectorAll('.nav-item')[indices[tabId]].classList.add('active');
 
-        if (tabId === 'home') renderHome(false);
+        if (tabId === 'home') renderHome();
         if (tabId === 'actions') renderActionsTab();
     }
 
@@ -969,26 +951,25 @@
     // 3. HOME LOGIC
     // ==========================================
 
-    // Instruction 2 Fix: Logic for Date Navigation
     function navigateDate(delta) {
         const newDate = new Date(viewingDate);
         newDate.setDate(newDate.getDate() + delta);
-        newDate.setHours(0,0,0,0); // Ensure time is stripped
+        newDate.setHours(0,0,0,0); 
         
         const today = new Date();
-        today.setHours(0,0,0,0); // Ensure today is also strictly date
+        today.setHours(0,0,0,0);
         
         if (newDate > today) return; 
         
         viewingDate = newDate;
-        renderHome(false);
+        renderHome();
     }
 
-    function renderHome(userInteraction = false) {
+    // Updated renderHome to accept optional specific card ID to render animation on
+    function renderHome(interactiveCardId = null) {
         const key = getKey(viewingDate);
         const todayKey = getKey(new Date());
         
-        // Header Date
         document.getElementById('headerDateDisplay').innerText = getHeaderDate(viewingDate);
         document.getElementById('nextDayBtn').disabled = (key === todayKey);
 
@@ -999,7 +980,6 @@
         const manText = document.getElementById('manifestoBtnText');
         const manIcon = document.getElementById('manifestoIcon');
 
-        // Manifesto Button Logic
         if (log.manifestoRead) {
             manBtn.classList.add('read');
             manIcon.className = 'fas fa-check';
@@ -1033,7 +1013,7 @@
                 negScore += itemScore; 
             }
 
-            // Instruction 4 & 6: Calculate Next Threshold with Re-calculation logic
+            // Calculation of next threshold (re-calculation logic)
             let thresholdInfo = "";
             const specificRule = db.rules.find(r => r.type === 'specific' && r.targetId === b.id);
             if (specificRule) {
@@ -1049,7 +1029,6 @@
                  }
             }
 
-            // Instruction 5: Distinct Buttons for Virtue vs Vice is handled by CSS classes (.virtue/.vice)
             const html = `
                 <div class="modern-card ${b.type}" id="card-${b.id}">
                     <button class="card-btn minus" onclick="updateCount('${b.id}', -1)">
@@ -1080,7 +1059,6 @@
         const scoreCard = document.getElementById('scoreCard');
         scoreCard.className = 'score-card ' + (totalScore > 0 ? 'positive' : (totalScore < 0 ? 'negative' : 'neutral'));
 
-        // Pending Actions Summary
         const pendingActions = log.actions.filter(a => !a.done);
         const pendingRewards = pendingActions.filter(a => a.type === 'reward').length;
         const pendingPenalties = pendingActions.filter(a => a.type === 'penalty').length;
@@ -1094,11 +1072,11 @@
             pendingSummaryDiv.style.display = 'none';
         }
 
-        checkTriggers(key, totalScore, posScore, negScore, userInteraction);
+        checkTriggers(key, totalScore, posScore, negScore, interactiveCardId);
     }
 
     function filterHomeList() {
-        renderHome(false);
+        renderHome();
     }
 
     function updateCount(behId, delta) {
@@ -1107,145 +1085,91 @@
         const current = log.behaviors[behId] || 0;
         const newVal = current + delta;
         
-        // Instruction 3: Visual Feedback (Animation) for simple card interaction
-        const beh = db.behaviors.find(b => b.id === behId);
-        const card = document.getElementById(`card-${behId}`);
-        
-        if(card) {
-            card.classList.remove('anim-happy', 'anim-angry');
-            void card.offsetWidth; // Trigger reflow
-
-            if (beh.type === 'virtue') {
-                if (delta > 0) card.classList.add('anim-happy'); 
-            } else {
-                if (delta > 0) card.classList.add('anim-angry'); 
-            }
-        }
-
         if (newVal >= 0) {
             log.behaviors[behId] = newVal;
             saveDB();
-            // Pass userInteraction=true so checkTriggers knows this came from a click
-            // And pass the specific behavior ID to check specifically against it
-            lastModifiedBehaviorId = behId;
-            setTimeout(() => renderHome(true), 300); 
+            renderHome(behId); // Pass ID to check for animation trigger
         }
     }
 
     // ==========================================
-    // 4. TRIGGER LOGIC & VISUAL EFFECTS
+    // 4. TRIGGER LOGIC (Animation Logic Added)
     // ==========================================
     
-    let lastModifiedBehaviorId = null;
-
-    function triggerHappyEffect(cardId) {
-        // Confetti
-        const container = document.getElementById('confettiContainer');
-        container.innerHTML = '';
-        container.classList.add('active');
-        
-        // Identify Card Position for "Flower shower from around the card"
-        const card = document.getElementById(`card-${cardId}`);
-        let rect = { top: window.innerHeight / 2, left: window.innerWidth / 2, width: 0, height: 0 };
-        if (card) {
-            rect = card.getBoundingClientRect();
-        }
-
-        const colors = ['#FCD34D', '#34D399', '#60A5FA', '#F472B6'];
-        
-        for(let i=0; i<40; i++) {
-            const piece = document.createElement('div');
-            piece.classList.add('confetti-piece');
-            if(Math.random() > 0.5) piece.classList.add('flower');
-            
-            // Random start position near the card
-            const startX = rect.left + Math.random() * rect.width;
-            const startY = rect.top + Math.random() * rect.height;
-            
-            piece.style.left = startX + 'px';
-            piece.style.top = startY + 'px';
-            piece.style.animationDuration = (Math.random() * 2 + 2) + 's';
-            piece.style.transform = `rotate(${Math.random() * 360}deg)`;
-            
-            container.appendChild(piece);
-        }
-
-        setTimeout(() => {
-            container.classList.remove('active');
-            container.innerHTML = '';
-        }, 3500);
-    }
-
-    function triggerAngryEffect() {
-        // Screen Shake
-        document.body.classList.add('shake-screen');
-        setTimeout(() => document.body.classList.remove('shake-screen'), 500);
-
-        // Red Overlay
-        const overlay = document.getElementById('penaltyOverlay');
-        overlay.classList.add('active');
-        setTimeout(() => overlay.classList.remove('active'), 1000);
-    }
-
-    function checkTriggers(dateKey, total, posTotal, negTotal, isUserInteraction = false) {
+    function checkTriggers(dateKey, total, posTotal, negTotal, interactiveCardId = null) {
         const log = db.logs[dateKey];
         const consumed = log.consumed || {};
         const triggerArea = document.getElementById('triggerArea');
         triggerArea.innerHTML = ''; 
         
-        let foundTrigger = false;
+        let triggeredRule = null;
 
         for (let rule of db.rules) {
             let currentValue = 0;
             let consumedValue = consumed[rule.id] || 0;
-            let hit = false;
 
             if (rule.type === 'total_net') {
                 currentValue = total;
                  if (rule.resultType === 'reward') {
-                     if (currentValue - consumedValue >= rule.threshold) hit = true;
+                     if (currentValue - consumedValue >= rule.threshold) {
+                         triggeredRule = rule; break; 
+                     }
                  } else {
-                     if (currentValue <= (consumedValue - Math.abs(rule.threshold))) hit = true;
+                     if (currentValue <= (consumedValue - Math.abs(rule.threshold))) {
+                         triggeredRule = rule; break;
+                     }
                  }
             } 
             else if (rule.type === 'total_pos') {
                 currentValue = posTotal;
-                if (currentValue - consumedValue >= rule.threshold) hit = true;
+                if (currentValue - consumedValue >= rule.threshold) {
+                     triggeredRule = rule; break;
+                }
             }
             else if (rule.type === 'total_neg') {
                 currentValue = negTotal;
-                if (currentValue - consumedValue >= rule.threshold) hit = true;
+                if (currentValue - consumedValue >= rule.threshold) {
+                     triggeredRule = rule; break;
+                }
             }
             else if (rule.type === 'specific') {
                 const bId = rule.targetId;
                 const b = db.behaviors.find(x => x.id === bId);
-                if (b) {
-                    const count = log.behaviors[bId] || 0;
-                    currentValue = count * b.weight; 
-                    if (currentValue - consumedValue >= rule.threshold) hit = true;
+                if (!b) continue;
+                const count = log.behaviors[bId] || 0;
+                currentValue = count * b.weight; 
+                
+                if (currentValue - consumedValue >= rule.threshold) {
+                     triggeredRule = rule; break;
                 }
             }
+        }
 
-            if (hit) {
-                showTriggerAlert(rule);
-                foundTrigger = true;
-                
-                // VISUAL EFFECT TRIGGER (Instruction 2)
-                if (isUserInteraction) {
-                    // Only trigger effect if this rule relates to what was just modified
-                    // Or if it's a general rule affected by the score change
-                    // Ideally, trigger visually if we JUST hit it.
-                    // Since checkTriggers is called right after update, this implies we just hit it.
-                    
-                    if (rule.resultType === 'reward') {
-                        // Pass specific card ID if specific rule, or last modified ID for general rules
-                        const targetId = (rule.type === 'specific') ? rule.targetId : lastModifiedBehaviorId;
-                        triggerHappyEffect(targetId);
+        if (triggeredRule) {
+            showTriggerAlert(triggeredRule);
+            // Interactive Animation Logic
+            if (interactiveCardId) {
+                // Determine if the interaction caused this trigger
+                // For specific rules, check ID match. For general rules, any interaction counts.
+                let shouldAnimate = false;
+                if (triggeredRule.type === 'specific' && triggeredRule.targetId === interactiveCardId) {
+                    shouldAnimate = true;
+                } else if (['total_pos', 'total_neg', 'total_net'].includes(triggeredRule.type)) {
+                    shouldAnimate = true;
+                }
+
+                if (shouldAnimate) {
+                    if (triggeredRule.resultType === 'reward') {
+                        const card = document.getElementById(`card-${interactiveCardId}`);
+                        if(card) {
+                            card.classList.add('effect-reward');
+                            setTimeout(() => card.classList.remove('effect-reward'), 2000);
+                        }
                     } else {
-                        triggerAngryEffect();
+                        document.body.classList.add('effect-penalty');
+                        setTimeout(() => document.body.classList.remove('effect-penalty'), 1000);
                     }
                 }
-                break; // Show one at a time
             }
         }
     }
@@ -1291,7 +1215,6 @@
         const timeStr = now.toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit', hour12:false});
         const dateStr = getVerbalDate(now);
 
-        // Time Range Logic
         const prevActions = log.actions.filter(a => a.ruleId === ruleId);
         let timeRangeStr = "";
         
@@ -1325,7 +1248,7 @@
 
         saveDB();
         document.getElementById('triggerArea').style.display = 'none'; 
-        renderHome(false); 
+        renderHome(); 
     }
 
     function ignoreTrigger() {
@@ -1345,7 +1268,6 @@
         const m = now.getMinutes().toLocaleString('fa-IR').padStart(2,'۰');
         const formattedTime = `${h}:${m} دقیقه`;
 
-        // Instruction 1: New Manifesto Text
         const text = `
             من <strong>${name}</strong> در تاریخ <strong>${dateStr}</strong> و ساعت <strong>${formattedTime}</strong> منشور اخلاقی‌ام را مرور می‌کنم.<br><br>
             
@@ -1405,7 +1327,7 @@
         db.logs[key].manifestoRead = true;
         saveDB();
         document.getElementById('manifestoModal').style.display = 'none';
-        renderHome(false);
+        renderHome();
     }
 
     // ==========================================
@@ -1481,7 +1403,7 @@
                  showRangeActionDetails(isDoneList); 
             } else {
                 renderActionsTab();
-                renderHome(false); 
+                renderHome(); 
                 if(document.getElementById('actionListPopupModal').style.display === 'flex') {
                     const type = document.getElementById('actionListPopupTitle').innerText.includes('پاداش') ? 'reward' : (document.getElementById('actionListPopupTitle').innerText.includes('جریمه') ? 'penalty' : null);
                     const isDone = document.getElementById('actionListPopupTitle').innerText.includes('انجام شده');
@@ -1605,7 +1527,7 @@
             alert('ویرایش شد');
             document.getElementById('actionDetailModal').style.display = 'none';
             renderActionsTab();
-            renderHome(false); 
+            renderHome(); 
             
             if(document.getElementById('dateRangeModal').style.display === 'flex') {
                 calcDateRangeStats();
@@ -1859,7 +1781,7 @@
 
     function closeEditor() {
         document.getElementById('editorModal').style.display = 'none';
-        renderHome(false);
+        renderHome();
     }
 
     // ==========================================
@@ -1919,7 +1841,7 @@
             if (db.logs[key]) {
                 delete db.logs[key];
                 saveDB();
-                renderHome(false);
+                renderHome();
                 document.getElementById('clearDataModal').style.display = 'none';
                 alert('اطلاعات امروز پاک شد.');
             }
