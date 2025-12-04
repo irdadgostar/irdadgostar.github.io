@@ -1,15 +1,15 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>سامانه جامع پایش اخلاق | نسخه نهایی</title>
+    <title>سامانه جامع پایش اخلاق | نسخه حرفه‌ای</title>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --bg-body: #f8fafc;
+            --bg-body: #f1f5f9;
             --surface: #ffffff;
             --primary: #3b82f6;
             --primary-dark: #1d4ed8;
@@ -20,8 +20,8 @@
             --neutral: #64748b;
             --text-main: #0f172a;
             --text-light: #64748b;
-            --border-radius: 20px;
-            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --border-radius: 18px;
+            --shadow: 0 4px 15px -3px rgba(0,0,0,0.1), 0 2px 6px -2px rgba(0,0,0,0.05);
             --card-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
         }
 
@@ -33,7 +33,7 @@
             font-family: 'Vazirmatn', sans-serif;
             margin: 0; padding: 0; padding-bottom: 110px;
             overflow-x: hidden;
-            transition: background 0.3s;
+            position: relative;
         }
 
         .container { max-width: 600px; margin: 0 auto; padding: 15px; }
@@ -41,15 +41,15 @@
         /* --- Header Area --- */
         .top-bar {
             display: flex; justify-content: space-between; align-items: stretch;
-            margin-bottom: 20px; gap: 12px; height: 48px;
+            margin-bottom: 20px; gap: 10px; height: 45px;
         }
 
         .manifesto-btn {
             flex: 1;
             background: var(--surface); color: var(--primary);
             border: 1px solid var(--primary); 
-            border-radius: 14px; font-size: 0.85rem; font-weight: 800;
-            display: flex; align-items: center; justify-content: center; gap: 8px; 
+            border-radius: 12px; font-size: 0.8rem; font-weight: bold;
+            display: flex; align-items: center; justify-content: center; gap: 6px; 
             cursor: pointer; box-shadow: var(--shadow); transition: 0.2s;
             padding: 0 10px; min-width: 0;
         }
@@ -58,27 +58,28 @@
         .date-navigator {
             flex: 1;
             display: flex; align-items: center; justify-content: space-between;
-            background: var(--surface); padding: 0 5px;
-            border-radius: 14px; box-shadow: var(--shadow);
+            background: var(--surface); padding: 0 8px;
+            border-radius: 12px; box-shadow: var(--shadow);
             border: 1px solid #e2e8f0;
             min-width: 0;
         }
-        .date-btn { background: none; border: none; color: var(--text-main); font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; padding: 0 10px; height: 100%; }
+        .date-btn { background: none; border: none; color: var(--text-main); font-size: 1rem; cursor: pointer; display: flex; align-items: center; padding: 5px; }
         .date-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-        .date-text { font-weight: 800; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .date-text { font-weight: bold; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* --- Score Card --- */
+        /* --- Dynamic Score Card --- */
         .score-card {
             color: white; padding: 25px; border-radius: 24px;
             text-align: center; box-shadow: var(--card-shadow);
             margin-bottom: 25px; transition: background 0.5s ease;
             position: relative; overflow: hidden;
         }
+        
         .score-card.neutral { background: linear-gradient(135deg, #64748b 0%, #475569 100%); }
         .score-card.positive { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
         .score-card.negative { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); }
 
-        .main-score { font-size: 3.5rem; font-weight: 900; line-height: 1; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .main-score { font-size: 4rem; font-weight: 900; line-height: 1; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .score-label { font-size: 0.9rem; opacity: 0.9; letter-spacing: 1px; margin-bottom: 5px; }
         
         .sub-scores {
@@ -86,151 +87,134 @@
             background: rgba(0,0,0,0.15); padding: 10px; border-radius: 16px;
         }
         .sub-score-item { display: flex; flex-direction: column; }
-        .sub-val { font-weight: 800; font-size: 1.1rem; }
+        .sub-val { font-weight: 800; font-size: 1.2rem; }
         .sub-lbl { font-size: 0.75rem; opacity: 0.8; }
 
-        /* --- Modern Action Cards --- */
+        /* --- Modern Card Design --- */
         .section-header {
             display: flex; justify-content: space-between; align-items: center;
-            margin: 30px 0 15px 0; padding: 0 5px;
+            margin: 25px 0 10px 0; padding: 0 5px;
         }
         .section-title { font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
         .virtue-text { color: var(--success-dark); }
         .vice-text { color: var(--danger-dark); }
 
         .modern-card {
-            background: var(--surface); border-radius: 22px;
-            margin-bottom: 16px; box-shadow: var(--shadow);
+            background: var(--surface); border-radius: 20px;
+            margin-bottom: 15px; box-shadow: var(--shadow);
             display: flex; align-items: stretch; overflow: hidden;
-            transition: transform 0.1s, box-shadow 0.2s;
-            min-height: 95px; position: relative;
-            border: 2px solid transparent; /* Prepare for click effect */
+            transition: transform 0.1s, background-color 0.3s;
+            min-height: 100px;
+            position: relative;
+            border-right: 5px solid transparent;
         }
-        .modern-card:active { transform: scale(0.99); }
-        
-        /* Click Feedback Classes */
-        .click-virtue { border-color: var(--success); box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
-        .click-vice { border-color: var(--danger); box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); }
+        .modern-card:active { transform: scale(0.98); }
 
+        /* Distinct Styles for Virtue/Vice */
+        .modern-card.virtue {
+            background: #f0fdf4; /* Very light green */
+            border-right-color: var(--success);
+        }
+        .modern-card.vice {
+            background: #fef2f2; /* Very light red */
+            border-right-color: var(--danger);
+        }
+
+        /* Side Buttons */
         .card-btn {
             width: 60px; border: none; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.3rem; color: white; transition: filter 0.2s;
+            font-size: 1.4rem; color: white; transition: background 0.2s, filter 0.2s;
         }
-        .card-btn:active { filter: brightness(0.9); }
-
-        /* Virtues: + Green, - Gray */
-        .virtue .card-btn.minus { background: #f1f5f9; color: #94a3b8; }
-        .virtue .card-btn.plus { background: #10b981; color: white; }
         
-        /* Vices: + Red, - Greenish */
-        .vice .card-btn.minus { background: #d1fae5; color: #059669; }
-        .vice .card-btn.plus { background: #ef4444; color: white; }
+        /* Virtue Colors */
+        .modern-card.virtue .card-btn.minus { background: #cbd5e1; color: #475569; }
+        .modern-card.virtue .card-btn.plus { background: #10b981; color: white; }
+        
+        /* Vice Colors (Reversed/Distinct logic) */
+        .modern-card.vice .card-btn.minus { background: #cbd5e1; color: #475569; }
+        .modern-card.vice .card-btn.plus { background: #ef4444; color: white; }
 
+        /* Center Content */
         .card-info {
             flex: 1; display: flex; flex-direction: column;
             align-items: center; justify-content: center;
-            padding: 10px 5px; text-align: center;
-            border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9;
+            padding: 8px 5px; text-align: center;
+            border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;
         }
-        .card-title { font-weight: 800; font-size: 1rem; color: var(--text-main); margin-bottom: 6px; }
+        .card-title { font-weight: 800; font-size: 1.05rem; color: var(--text-main); margin-bottom: 6px; }
+        .card-meta { display: flex; gap: 6px; justify-content: center; align-items: center; flex-wrap: wrap; margin-bottom: 5px; }
+        .meta-badge {
+            font-size: 0.75rem; padding: 3px 8px; border-radius: 6px;
+            background: rgba(255,255,255,0.7); border: 1px solid #e2e8f0; color: var(--text-light); font-weight: bold;
+        }
+        .meta-badge.count {
+            background: var(--text-main); color: white; border: none;
+        }
         
-        .card-stats { display: flex; gap: 6px; justify-content: center; align-items: center; flex-wrap: wrap; }
-        .stat-pill {
-            font-size: 0.75rem; padding: 3px 10px; border-radius: 8px;
-            background: #f8fafc; color: var(--text-light); font-weight: bold; border: 1px solid #e2e8f0;
+        .next-threshold {
+            font-size: 0.75rem; font-weight:bold;
+            padding: 4px 10px; border-radius: 50px;
+            display: inline-flex; align-items: center; gap: 5px;
+            margin-top: 4px;
         }
-        .stat-pill.count { background: var(--text-main); color: white; border-color: var(--text-main); }
-
-        .threshold-info {
-            font-size: 0.7rem; margin-top: 6px; padding: 3px 10px;
-            border-radius: 50px; display: inline-flex; align-items: center; gap: 5px;
-            font-weight: bold;
-        }
-        .threshold-info.reward { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
-        .threshold-info.penalty { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
-
-        /* --- Animation Effects (Trigger Only) --- */
-        
-        /* Modern Confetti Particle */
-        .confetti {
-            position: fixed; z-index: 9999;
-            width: 10px; height: 10px;
-            background-color: #f00;
-            animation: confetti-fall 1.5s ease-out forwards;
-            pointer-events: none;
-        }
-        @keyframes confetti-fall {
-            0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
-            100% { transform: translate(var(--tx), var(--ty)) rotate(var(--r)) scale(0.5); opacity: 0; }
-        }
-
-        /* Penalty Vignette Overlay */
-        .penalty-vignette {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            box-shadow: inset 0 0 100px rgba(220, 38, 38, 0.8);
-            z-index: 9998; pointer-events: none;
-            opacity: 0; transition: opacity 0.2s;
-        }
-        .penalty-vignette.active { opacity: 1; }
-
-        /* Card Shake Animation */
-        .card-shake {
-            animation: horizontal-shaking 0.4s;
-        }
-        @keyframes horizontal-shaking {
-            0% { transform: translateX(0) }
-            25% { transform: translateX(5px) }
-            50% { transform: translateX(-5px) }
-            75% { transform: translateX(5px) }
-            100% { transform: translateX(0) }
-        }
+        .next-threshold.reward { color: #047857; background: #d1fae5; border: 1px solid #a7f3d0; }
+        .next-threshold.penalty { color: #b91c1c; background: #fee2e2; border: 1px solid #fecaca; }
 
         /* --- Settings Grid --- */
         .settings-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
         }
-        .setting-card {
-            background: white; border-radius: 24px; padding: 25px 15px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            text-align: center; gap: 12px; box-shadow: var(--shadow);
+        .setting-block {
+            background: white; border-radius: 20px;
+            padding: 20px 10px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center;
+            box-shadow: var(--shadow);
             cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
-            aspect-ratio: 1; border: 1px solid transparent;
+            aspect-ratio: 1/1;
+            border: 1px solid transparent;
         }
-        .setting-card:active { transform: scale(0.96); }
-        .setting-card i { font-size: 2.2rem; color: var(--primary); margin-bottom: 5px; }
-        .setting-card span { font-weight: 800; font-size: 0.95rem; color: var(--text-main); }
-        .setting-card.danger { border-color: #fee2e2; }
-        .setting-card.danger i { color: var(--danger); }
-
-        /* --- Lists & General --- */
+        .setting-block:active { transform: scale(0.96); }
+        .setting-block i { font-size: 2rem; margin-bottom: 10px; color: var(--primary); }
+        .setting-block span { font-weight: bold; font-size: 0.9rem; color: var(--text-main); }
+        
+        .setting-block.danger { border-color: #fee2e2; }
+        .setting-block.danger i { color: var(--danger); }
+        
+        /* --- Action List --- */
         .action-item {
-            background: white; border-radius: 16px; padding: 15px; margin-bottom: 12px;
+            background: white; border-radius: 12px; padding: 15px; margin-bottom: 10px;
             display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow);
             border: 1px solid #f1f5f9; cursor: pointer;
         }
         .action-checkbox {
-            width: 26px; height: 26px; border-radius: 8px; border: 2px solid #cbd5e1;
+            width: 24px; height: 24px; border-radius: 6px; border: 2px solid #cbd5e1;
             display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
-            color: white; transition: 0.2s;
         }
-        .action-checkbox.checked { background: var(--success); border-color: var(--success); }
+        .action-checkbox.checked { background: var(--success); border-color: var(--success); color: white; }
         .action-content { flex: 1; }
-        .action-badge { font-size: 0.7rem; padding: 3px 8px; border-radius: 6px; font-weight: bold; }
+        .action-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
         .badge-reward { background: #d1fae5; color: #065f46; }
         .badge-penalty { background: #fee2e2; color: #991b1b; }
 
+        /* Stats Summary Box */
         .stats-summary-card {
-            background: var(--surface); padding: 20px; border-radius: 16px; box-shadow: var(--shadow);
+            background: var(--surface); padding: 15px; border-radius: 12px; box-shadow: var(--shadow);
             display: flex; justify-content: space-around; margin-bottom: 20px;
         }
-        .stat-box { text-align: center; width: 45%; cursor: pointer; }
-        .stat-num { font-size: 1.6rem; font-weight: 900; display: block; }
-        .stat-label { font-size: 0.85rem; color: var(--text-light); }
-        .stat-reward { color: var(--success); }
-        .stat-penalty { color: var(--danger); }
+        .stat-box { text-align: center; cursor: pointer; padding: 10px; border-radius: 8px; transition: background 0.2s; width: 45%; }
+        .stat-box:active { background: #f1f5f9; }
+        .stat-num { font-size: 1.5rem; font-weight: bold; display: block; }
+        .stat-label { font-size: 0.8rem; color: var(--text-light); }
+        .stat-reward { color: var(--success); border: 1px solid #d1fae5; }
+        .stat-penalty { color: var(--danger); border: 1px solid #fee2e2; }
 
-        /* --- Trigger Box --- */
+        /* --- Trigger Alert Box --- */
         .trigger-box {
             background: #fff7ed; border: 1px solid #ffedd5; border-radius: 16px;
             padding: 15px; margin-bottom: 20px; display: none;
@@ -238,16 +222,55 @@
         }
         .trigger-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-weight: bold; }
         .trigger-actions { display: flex; gap: 10px; }
-        .btn { padding: 10px 16px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; font-size: 0.9rem; flex:1; display:flex; align-items:center; justify-content:center; gap:5px;}
-        .btn-accept { background: var(--primary); color: white; }
+        .btn { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
+        .btn-accept { background: var(--primary); color: white; flex: 1; }
         .btn-change { background: white; border: 1px solid #cbd5e1; color: var(--text-light); }
         .btn-danger-outline { background: white; border: 1px solid var(--danger); color: var(--danger); }
-        .btn-danger { background: var(--danger); color: white; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-danger { background: var(--danger); color: white; border:none; }
 
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- Navbar --- */
+        /* --- Global Animations (Overlays) --- */
+        
+        /* Red Flash Overlay */
+        .red-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(239, 68, 68, 0.3);
+            z-index: 9999;
+            pointer-events: none;
+            animation: flashRed 0.5s ease-out forwards;
+            display: none;
+        }
+        @keyframes flashRed {
+            0% { opacity: 0; } 20% { opacity: 1; } 100% { opacity: 0; }
+        }
+        
+        /* Screen Shake */
+        .shake-body {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+
+        /* Particle/Flower Animation styles */
+        .particle {
+            position: absolute;
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1000;
+            animation: particle-fade 1s ease-out forwards;
+        }
+        @keyframes particle-fade {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        /* --- Bottom Nav --- */
         .nav-bar {
             position: fixed; bottom: 0; left: 0; width: 100%; background: white;
             display: flex; justify-content: space-around; padding: 12px 0;
@@ -256,70 +279,70 @@
         }
         .nav-item {
             background: none; border: none; display: flex; flex-direction: column;
-            align-items: center; color: #94a3b8; gap: 6px; font-size: 0.75rem; cursor: pointer;
+            align-items: center; color: #94a3b8; gap: 5px; font-size: 0.7rem; cursor: pointer;
         }
-        .nav-item i { font-size: 1.5rem; }
+        .nav-item i { font-size: 1.4rem; }
         .nav-item.active { color: var(--primary); }
 
-        /* --- Modals --- */
+        /* --- Modals & Layers --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(3px);
             z-index: 2000; display: none; align-items: center; justify-content: center;
         }
-        /* Z-Index Hierarchy */
-        #manifestoModal { z-index: 2050; }
-        #nameModal { z-index: 2050; }
-        #clearDataModal { z-index: 2050; }
-        #editorModal { z-index: 2050; }
-        #dateRangeModal { z-index: 2050; }
-        #backupModal { z-index: 2050; }
+        
+        #manifestoModal { z-index: 2000; }
+        #nameModal { z-index: 2000; }
+        #clearDataModal { z-index: 2000; }
+        #editorModal { z-index: 2000; }
+        #dateRangeModal { z-index: 2000; }
+        #backupModal { z-index: 2000; } 
+        
         #actionListPopupModal { z-index: 2100; }
         #editFormModal { z-index: 2100; }
         #actionDetailModal { z-index: 2200; }
 
         .modal-content {
-            background: white; width: 90%; max-width: 500px; border-radius: 24px;
-            padding: 25px; max-height: 85vh; overflow-y: auto;
-            position: relative; box-shadow: var(--shadow);
+            background: white; width: 90%; max-width: 500px; border-radius: 20px;
+            padding: 20px; max-height: 90vh; overflow-y: auto;
+            position: relative;
         }
 
         .form-group { margin-bottom: 15px; }
-        .form-label { display: block; margin-bottom: 6px; font-size: 0.9rem; font-weight: bold; }
-        .form-input, .form-select { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 12px; font-family: inherit; font-size:1rem;}
-        
-        .list-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
-        .btn-icon { background: none; border: none; color: var(--text-light); cursor: pointer; font-size: 1.1rem; padding:5px; }
+        .form-label { display: block; margin-bottom: 5px; font-size: 0.9rem; font-weight: bold; }
+        .form-input, .form-select { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: inherit; }
+        .list-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+        .btn-icon { background: none; border: none; color: var(--text-light); cursor: pointer; font-size: 1rem; }
         .btn-icon.edit { color: var(--primary); }
         .btn-icon.delete { color: var(--danger); }
-
+        
         .search-box { margin-bottom: 15px; position: relative; }
-        .search-box input { width: 100%; padding: 12px 40px 12px 15px; border: 1px solid #e2e8f0; border-radius: 14px; font-family: inherit; }
-        .search-box i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-light); }
+        .search-box input { width: 100%; padding: 10px 35px 10px 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: inherit; }
+        .search-box i { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-light); }
 
         .manifesto-content {
-            font-size: 1rem; line-height: 1.9; text-align: justify;
-            background: #f8fafc; padding: 20px; border-radius: 16px;
+            font-size: 0.95rem; line-height: 1.8; text-align: justify;
+            background: #f8fafc; padding: 15px; border-radius: 12px;
             max-height: 60vh; overflow-y: auto; border: 1px solid #e2e8f0;
             margin: 15px 0;
         }
 
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-
-        .list-toggle { display: flex; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; margin-bottom: 15px; }
-        .toggle-btn { flex: 1; padding: 12px; border: none; background: white; cursor: pointer; font-weight: bold; color: var(--text-light); }
+        
+        .list-toggle { display: flex; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; margin-bottom: 15px; }
+        .toggle-btn { flex: 1; padding: 10px; border: none; background: white; cursor: pointer; font-weight: bold; color: var(--text-light); }
         .toggle-btn.active { background: var(--primary); color: white; }
-
-        .detail-row { margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
-        .detail-label { font-weight: bold; font-size: 0.85rem; color: var(--text-light); display: block; margin-bottom:4px; }
-        .detail-value { font-size: 1.05rem; }
+        
+        .detail-row { margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .detail-label { font-weight: bold; font-size: 0.85rem; color: var(--text-light); display: block; }
+        .detail-value { font-size: 1rem; }
 
     </style>
 </head>
 <body>
 
-<div id="penaltyVignette" class="penalty-vignette"></div>
+<div id="redOverlay" class="red-overlay"></div>
 
 <div id="app">
 
@@ -405,17 +428,17 @@
             <input type="text" id="actionsSearch" placeholder="جستجو در کارنامه..." oninput="renderActionsTab()">
         </div>
 
-        <div style="margin-bottom: 20px; display:flex; gap:10px; overflow-x:auto; padding-bottom:10px;">
-             <div class="stat-box" style="min-width:110px; background:#f0f9ff; padding:10px; border-radius:12px;" onclick="openActionListModal(null, true)">
-                <span class="stat-num" style="font-size:1.2rem;" id="totalDoneCount">0</span>
+        <div style="margin-bottom: 15px; display:flex; gap:10px; overflow-x:auto; padding-bottom:5px;">
+             <div class="stat-box" style="min-width:100px; background:#f0f9ff;" onclick="openActionListModal(null, true)">
+                <span class="stat-num" id="totalDoneCount">0</span>
                 <span class="stat-label">انجام شده</span>
             </div>
-            <div class="stat-box" style="min-width:110px; background:#fff1f2; padding:10px; border-radius:12px;" onclick="openActionListModal(null, false)">
-                <span class="stat-num" style="font-size:1.2rem;" id="totalPendingCount">0</span>
+            <div class="stat-box" style="min-width:100px; background:#fff1f2;" onclick="openActionListModal(null, false)">
+                <span class="stat-num" id="totalPendingCount">0</span>
                 <span class="stat-label">انجام نشده</span>
             </div>
-             <div class="stat-box" style="min-width:110px; background:#fef3c7; padding:10px; border-radius:12px;" onclick="openDateRangeStats()">
-                <span class="stat-num" style="font-size:1.2rem;"><i class="fas fa-calendar-alt"></i></span>
+             <div class="stat-box" style="min-width:120px; background:#fef3c7;" onclick="openDateRangeStats()">
+                <span class="stat-num"><i class="fas fa-calendar-alt"></i></span>
                 <span class="stat-label">آمار بازه زمانی</span>
             </div>
         </div>
@@ -430,22 +453,22 @@
         <h2>تنظیمات</h2>
         
         <div class="settings-grid">
-            <div class="setting-card" onclick="openEditor('behavior')">
+            <div class="setting-block" onclick="openEditor('behavior')">
                 <i class="fas fa-list-check"></i>
                 <span>مدیریت رفتارها</span>
             </div>
 
-            <div class="setting-card" onclick="openEditor('rule')">
+            <div class="setting-block" onclick="openEditor('rule')">
                 <i class="fas fa-gavel"></i>
                 <span>پیکربندی عواقب</span>
             </div>
 
-            <div class="setting-card" onclick="openBackupModal()">
+            <div class="setting-block" onclick="openBackupModal()">
                 <i class="fas fa-save"></i>
                 <span>پشتیبان‌گیری</span>
             </div>
 
-            <div class="setting-card danger" onclick="openClearDataModal()">
+            <div class="setting-block danger" onclick="openClearDataModal()">
                 <i class="fas fa-trash-alt"></i>
                 <span>پاکسازی</span>
             </div>
@@ -744,56 +767,55 @@
             // General Rules
             { id: 'r_total_pos', type: 'total_pos', targetId: null, threshold: 200, resultType: 'reward', resultText: 'تماشای فیلم یا سریال', isSpecific: false },
             { id: 'r_total_neg', type: 'total_neg', targetId: null, threshold: 300, resultType: 'penalty', resultText: '۲۰ شنا سوئدی اضافه', isSpecific: false },
-            
-            // Specific Rules (Virtues) - REINSTATED SPECIFIC TEXT
-            { id: 'rv1', type: 'specific', targetId: 'v1', threshold: 25, resultType: 'reward', resultText: 'خرید یک جلد کتاب', isSpecific: true },
-            { id: 'rv2', type: 'specific', targetId: 'v2', threshold: 20, resultType: 'reward', resultText: 'رفتن به کافی‌شاپ', isSpecific: true },
-            { id: 'rv3', type: 'specific', targetId: 'v3', threshold: 25, resultType: 'reward', resultText: 'تماشای مستند علمی', isSpecific: true },
-            { id: 'rv4', type: 'specific', targetId: 'v4', threshold: 20, resultType: 'reward', resultText: 'یک ساعت استراحت مطلق', isSpecific: true },
-            { id: 'rv5', type: 'specific', targetId: 'v5', threshold: 15, resultType: 'reward', resultText: 'تماس با یک دوست قدیمی', isSpecific: true },
-            { id: 'rv6', type: 'specific', targetId: 'v6', threshold: 25, resultType: 'reward', resultText: 'کمک مالی به خیریه (اختیاری)', isSpecific: true },
-            { id: 'rv7', type: 'specific', targetId: 'v7', threshold: 30, resultType: 'reward', resultText: 'شام مورد علاقه', isSpecific: true },
-            { id: 'rv8', type: 'specific', targetId: 'v8', threshold: 15, resultType: 'reward', resultText: 'پیاده‌روی در پارک', isSpecific: true },
-            { id: 'rv9', type: 'specific', targetId: 'v9', threshold: 10, resultType: 'reward', resultText: 'نوشتن خاطرات مثبت', isSpecific: true },
-            { id: 'rv10', type: 'specific', targetId: 'v10', threshold: 20, resultType: 'reward', resultText: 'دیدن آموزش جدید', isSpecific: true },
-            { id: 'rv11', type: 'specific', targetId: 'v11', threshold: 10, resultType: 'reward', resultText: 'خرید گل برای خود', isSpecific: true },
-            { id: 'rv12', type: 'specific', targetId: 'v12', threshold: 25, resultType: 'reward', resultText: 'دعوت دوستان به چای', isSpecific: true },
-            { id: 'rv13', type: 'specific', targetId: 'v13', threshold: 25, resultType: 'reward', resultText: 'مطالعه آزاد', isSpecific: true },
-            { id: 'rv14', type: 'specific', targetId: 'v14', threshold: 20, resultType: 'reward', resultText: 'کوهنوردی سبک', isSpecific: true },
-            { id: 'rv15', type: 'specific', targetId: 'v15', threshold: 15, resultType: 'reward', resultText: 'مدیتیشن طولانی', isSpecific: true },
-            { id: 'rv16', type: 'specific', targetId: 'v16', threshold: 20, resultType: 'reward', resultText: 'گوش دادن به موسیقی بیکلام', isSpecific: true },
-            { id: 'rv17', type: 'specific', targetId: 'v17', threshold: 15, resultType: 'reward', resultText: 'دیدن طلوع خورشید', isSpecific: true },
-            { id: 'rv18', type: 'specific', targetId: 'v18', threshold: 10, resultType: 'reward', resultText: 'روزه سکوت (یک ساعت)', isSpecific: true },
-            { id: 'rv19', type: 'specific', targetId: 'v19', threshold: 10, resultType: 'reward', resultText: 'کاشت یک گیاه', isSpecific: true },
-            { id: 'rv20', type: 'specific', targetId: 'v20', threshold: 20, resultType: 'reward', resultText: 'خرید لباس ورزشی', isSpecific: true },
-
-            // Specific Rules (Vices) - REINSTATED SPECIFIC TEXT
-            { id: 'rx1', type: 'specific', targetId: 'x1', threshold: 10, resultType: 'penalty', resultText: '۱۰ هزار تومان صدقه', isSpecific: true },
-            { id: 'rx2', type: 'specific', targetId: 'x2', threshold: 8, resultType: 'penalty', resultText: 'ذکر استغفار (۱۰۰ مرتبه)', isSpecific: true },
-            { id: 'rx3', type: 'specific', targetId: 'x3', threshold: 8, resultType: 'penalty', resultText: 'عذرخواهی از طرف مقابل', isSpecific: true },
-            { id: 'rx4', type: 'specific', targetId: 'x4', threshold: 12, resultType: 'penalty', resultText: '۲۰ هزار تومان صدقه', isSpecific: true },
-            { id: 'rx5', type: 'specific', targetId: 'x5', threshold: 8, resultType: 'penalty', resultText: 'مطالعه درباره گناه زبان', isSpecific: true },
-            { id: 'rx6', type: 'specific', targetId: 'x6', threshold: 9, resultType: 'penalty', resultText: '۳۰ دقیقه ورزش اجباری', isSpecific: true },
-            { id: 'rx7', type: 'specific', targetId: 'x7', threshold: 9, resultType: 'penalty', resultText: 'دعا برای فرد مورد حسادت', isSpecific: true },
-            { id: 'rx8', type: 'specific', targetId: 'x8', threshold: 9, resultType: 'penalty', resultText: 'سکوت به مدت یک ساعت', isSpecific: true },
-            { id: 'rx9', type: 'specific', targetId: 'x9', threshold: 6, resultType: 'penalty', resultText: 'حذف یک وعده غذایی چرب', isSpecific: true },
-            { id: 'rx10', type: 'specific', targetId: 'x10', threshold: 6, resultType: 'penalty', resultText: '۵ هزار تومان جریمه مالی', isSpecific: true },
-            { id: 'rx11', type: 'specific', targetId: 'x11', threshold: 12, resultType: 'penalty', resultText: 'سلام کردن به ۵ نفر (پیش‌دستی)', isSpecific: true },
-            { id: 'rx12', type: 'specific', targetId: 'x12', threshold: 12, resultType: 'penalty', resultText: 'جبران قول با هدیه', isSpecific: true },
-            { id: 'rx13', type: 'specific', targetId: 'x13', threshold: 9, resultType: 'penalty', resultText: 'تمرین رها کردن (نوشتن)', isSpecific: true },
-            { id: 'rx14', type: 'specific', targetId: 'x14', threshold: 9, resultType: 'penalty', resultText: 'شکرگزاری بابت ۳ نعمت', isSpecific: true },
-            { id: 'rx15', type: 'specific', targetId: 'x15', threshold: 10, resultType: 'penalty', resultText: '۵۰ هزار تومان صدقه فوری', isSpecific: true },
-            { id: 'rx16', type: 'specific', targetId: 'x16', threshold: 12, resultType: 'penalty', resultText: 'هدیه دادن به فرد مورد کینه', isSpecific: true },
-            { id: 'rx17', type: 'specific', targetId: 'x17', threshold: 15, resultType: 'penalty', resultText: '۱۰۰ هزار تومان جریمه', isSpecific: true },
-            { id: 'rx18', type: 'specific', targetId: 'x18', threshold: 9, resultType: 'penalty', resultText: 'نقد کردن خود در جمع', isSpecific: true },
-            { id: 'rx19', type: 'specific', targetId: 'x19', threshold: 12, resultType: 'penalty', resultText: 'خواندن کتاب امیدبخش', isSpecific: true },
-            { id: 'rx20', type: 'specific', targetId: 'x20', threshold: 9, resultType: 'penalty', resultText: 'کمک داوطلبانه', isSpecific: true }
+            // Specific Rules (Virtues)
+            { id: 'rv1', type: 'specific', targetId: 'v1', threshold: 25, resultType: 'reward', resultText: 'پاداش خردورزی', isSpecific: true },
+            { id: 'rv2', type: 'specific', targetId: 'v2', threshold: 20, resultType: 'reward', resultText: 'پاداش انضباط', isSpecific: true },
+            { id: 'rv3', type: 'specific', targetId: 'v3', threshold: 25, resultType: 'reward', resultText: 'پاداش صداقت', isSpecific: true },
+            { id: 'rv4', type: 'specific', targetId: 'v4', threshold: 20, resultType: 'reward', resultText: 'پاداش مسئولیت', isSpecific: true },
+            { id: 'rv5', type: 'specific', targetId: 'v5', threshold: 15, resultType: 'reward', resultText: 'پاداش همدلی', isSpecific: true },
+            { id: 'rv6', type: 'specific', targetId: 'v6', threshold: 25, resultType: 'reward', resultText: 'پاداش کمک', isSpecific: true },
+            { id: 'rv7', type: 'specific', targetId: 'v7', threshold: 30, resultType: 'reward', resultText: 'پاداش کنترل خشم', isSpecific: true },
+            { id: 'rv8', type: 'specific', targetId: 'v8', threshold: 15, resultType: 'reward', resultText: 'پاداش احترام', isSpecific: true },
+            { id: 'rv9', type: 'specific', targetId: 'v9', threshold: 10, resultType: 'reward', resultText: 'پاداش شکرگزاری', isSpecific: true },
+            { id: 'rv10', type: 'specific', targetId: 'v10', threshold: 20, resultType: 'reward', resultText: 'پاداش یادگیری', isSpecific: true },
+            { id: 'rv11', type: 'specific', targetId: 'v11', threshold: 10, resultType: 'reward', resultText: 'پاداش نظافت', isSpecific: true },
+            { id: 'rv12', type: 'specific', targetId: 'v12', threshold: 25, resultType: 'reward', resultText: 'پاداش وفای به عهد', isSpecific: true },
+            { id: 'rv13', type: 'specific', targetId: 'v13', threshold: 25, resultType: 'reward', resultText: 'پاداش عدالت', isSpecific: true },
+            { id: 'rv14', type: 'specific', targetId: 'v14', threshold: 20, resultType: 'reward', resultText: 'پاداش شجاعت', isSpecific: true },
+            { id: 'rv15', type: 'specific', targetId: 'v15', threshold: 15, resultType: 'reward', resultText: 'پاداش تاب‌آوری', isSpecific: true },
+            { id: 'rv16', type: 'specific', targetId: 'v16', threshold: 20, resultType: 'reward', resultText: 'پاداش رازداری', isSpecific: true },
+            { id: 'rv17', type: 'specific', targetId: 'v17', threshold: 15, resultType: 'reward', resultText: 'پاداش سحرخیزی', isSpecific: true },
+            { id: 'rv18', type: 'specific', targetId: 'v18', threshold: 10, resultType: 'reward', resultText: 'پاداش سکوت', isSpecific: true },
+            { id: 'rv19', type: 'specific', targetId: 'v19', threshold: 10, resultType: 'reward', resultText: 'پاداش حفظ محیط زیست', isSpecific: true },
+            { id: 'rv20', type: 'specific', targetId: 'v20', threshold: 20, resultType: 'reward', resultText: 'پاداش عزت نفس', isSpecific: true },
+            // Specific Rules (Vices)
+            { id: 'rx1', type: 'specific', targetId: 'x1', threshold: 10, resultType: 'penalty', resultText: 'جریمه دروغ', isSpecific: true },
+            { id: 'rx2', type: 'specific', targetId: 'x2', threshold: 8, resultType: 'penalty', resultText: 'جریمه غیبت', isSpecific: true },
+            { id: 'rx3', type: 'specific', targetId: 'x3', threshold: 8, resultType: 'penalty', resultText: 'جریمه توهین', isSpecific: true },
+            { id: 'rx4', type: 'specific', targetId: 'x4', threshold: 12, resultType: 'penalty', resultText: 'جریمه تهمت', isSpecific: true },
+            { id: 'rx5', type: 'specific', targetId: 'x5', threshold: 8, resultType: 'penalty', resultText: 'جریمه سخن‌چینی', isSpecific: true },
+            { id: 'rx6', type: 'specific', targetId: 'x6', threshold: 9, resultType: 'penalty', resultText: 'جریمه تنبلی', isSpecific: true },
+            { id: 'rx7', type: 'specific', targetId: 'x7', threshold: 9, resultType: 'penalty', resultText: 'جریمه حسادت', isSpecific: true },
+            { id: 'rx8', type: 'specific', targetId: 'x8', threshold: 9, resultType: 'penalty', resultText: 'جریمه قضاوت', isSpecific: true },
+            { id: 'rx9', type: 'specific', targetId: 'x9', threshold: 6, resultType: 'penalty', resultText: 'جریمه پرخوری', isSpecific: true },
+            { id: 'rx10', type: 'specific', targetId: 'x10', threshold: 6, resultType: 'penalty', resultText: 'جریمه اسراف', isSpecific: true },
+            { id: 'rx11', type: 'specific', targetId: 'x11', threshold: 12, resultType: 'penalty', resultText: 'جریمه تکبر', isSpecific: true },
+            { id: 'rx12', type: 'specific', targetId: 'x12', threshold: 12, resultType: 'penalty', resultText: 'جریمه بدقولی', isSpecific: true },
+            { id: 'rx13', type: 'specific', targetId: 'x13', threshold: 9, resultType: 'penalty', resultText: 'جریمه کنترل‌گری', isSpecific: true },
+            { id: 'rx14', type: 'specific', targetId: 'x14', threshold: 9, resultType: 'penalty', resultText: 'جریمه قربانی‌نمایی', isSpecific: true },
+            { id: 'rx15', type: 'specific', targetId: 'x15', threshold: 10, resultType: 'penalty', resultText: 'جریمه نگاه آلوده', isSpecific: true },
+            { id: 'rx16', type: 'specific', targetId: 'x16', threshold: 12, resultType: 'penalty', resultText: 'جریمه کینه', isSpecific: true },
+            { id: 'rx17', type: 'specific', targetId: 'x17', threshold: 15, resultType: 'penalty', resultText: 'جریمه خیانت', isSpecific: true },
+            { id: 'rx18', type: 'specific', targetId: 'x18', threshold: 9, resultType: 'penalty', resultText: 'جریمه چاپلوسی', isSpecific: true },
+            { id: 'rx19', type: 'specific', targetId: 'x19', threshold: 12, resultType: 'penalty', resultText: 'جریمه ناامیدی', isSpecific: true },
+            { id: 'rx20', type: 'specific', targetId: 'x20', threshold: 9, resultType: 'penalty', resultText: 'جریمه بی‌تفاوتی', isSpecific: true }
         ],
         logs: {} 
     };
 
     let db = JSON.parse(localStorage.getItem('EthicsDB_Final')) || JSON.parse(JSON.stringify(DEFAULT_DATA));
     let viewingDate = new Date();
+    // Normalize viewingDate to remove time component for consistent comparisons
     viewingDate.setHours(0,0,0,0);
     
     let currentEditorMode = null; 
@@ -803,6 +825,7 @@
     let currentActionEditId = null; 
     let tempDateRangeResults = null; 
 
+    // --- Helper: Persian Date Converter ---
     function getVerbalDate(date) {
         const weekDays = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه'];
         const months = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
@@ -878,6 +901,10 @@
 
     function saveDB() { localStorage.setItem('EthicsDB_Final', JSON.stringify(db)); }
 
+    // ==========================================
+    // 2. INITIALIZATION
+    // ==========================================
+    
     window.onload = () => {
         if(!db.user.name) {
             document.getElementById('nameModal').style.display = 'flex';
@@ -898,6 +925,7 @@
 
     function initUI() {
         renderHome();
+        // Instruction 2: Show Manifesto on first load of the day
         const key = getKey(new Date());
         if(db.logs[key] && !db.logs[key].manifestoRead) {
             openManifestoModal();
@@ -917,13 +945,17 @@
         if (tabId === 'actions') renderActionsTab();
     }
 
+    // ==========================================
+    // 3. HOME LOGIC
+    // ==========================================
+
     function navigateDate(delta) {
         const newDate = new Date(viewingDate);
         newDate.setDate(newDate.getDate() + delta);
         newDate.setHours(0,0,0,0); 
         
         const today = new Date();
-        today.setHours(0,0,0,0); 
+        today.setHours(0,0,0,0);
         
         if (newDate > today) return; 
         
@@ -978,38 +1010,46 @@
                 negScore += itemScore; 
             }
 
-            // Correct Calculation for "Points until next Reward/Penalty"
+            // Calculation for next reward/penalty with consumed logic
             let thresholdInfo = "";
             const specificRule = db.rules.find(r => r.type === 'specific' && r.targetId === b.id);
             if (specificRule) {
                  const consumed = log.consumed && log.consumed[specificRule.id] ? log.consumed[specificRule.id] : 0;
                  const currentVal = count * b.weight;
-                 // Formula: We need to see if we reached the NEXT step (consumed + threshold)
-                 // If pending triggers exist (currentVal > consumed + threshold), needed is effectively 0 or negative, so we hide it until resolved.
-                 const nextTarget = consumed + specificRule.threshold;
-                 const needed = nextTarget - currentVal;
                  
-                 // Show only if not currently pending a trigger
+                 // If currentVal >= consumed + threshold, action is pending (so 0 to next)
+                 // If not, calculate remaining
+                 const target = consumed + specificRule.threshold;
+                 let needed = target - currentVal;
+                 
+                 // If needed <= 0, it means a trigger is pending acceptance. 
+                 // We can either show "Pending" or show the distance to the NEXT one (consumed + 2*threshold)
+                 // But simplest is: if needed <= 0, don't show distance, show "Pending"
+                 // Or just hide it as per logic. Prompt asks to show calculation.
+                 // Correct logic: if (currentVal >= target) waiting for confirm. 
+                 // If confirmed, 'consumed' increases, and 'needed' becomes positive again.
+                 
                  if (needed > 0) {
                      const typeText = specificRule.resultType === 'reward' ? 'پاداش' : 'جریمه';
                      const typeClass = specificRule.resultType === 'reward' ? 'reward' : 'penalty';
-                     thresholdInfo = `<div class="threshold-info ${typeClass}"><i class="fas fa-flag"></i> ${needed} امتیاز تا ${typeText}</div>`;
+                     thresholdInfo = `<div class="next-threshold ${typeClass}"><i class="fas fa-flag"></i> ${needed} امتیاز تا ${typeText}</div>`;
                  } else {
-                     // If needed <= 0, it means a trigger is likely pending acceptance
-                     thresholdInfo = `<div class="threshold-info" style="background:#fff7ed; color:#c2410c; border:1px solid #ffedd5;"><i class="fas fa-exclamation-circle"></i> در انتظار ثبت</div>`;
+                     // Action Pending state
+                     const typeClass = specificRule.resultType === 'reward' ? 'reward' : 'penalty';
+                     thresholdInfo = `<div class="next-threshold ${typeClass}" style="opacity:0.7">اقدام لازم است</div>`;
                  }
             }
 
             const html = `
-                <div class="modern-card ${b.type} ${b.type === 'virtue' ? 'virtue' : 'vice'}" id="card-${b.id}">
+                <div class="modern-card ${b.type}" id="card-${b.id}">
                     <button class="card-btn minus" onclick="updateCount('${b.id}', -1)">
                         <i class="fas fa-minus"></i>
                     </button>
                     <div class="card-info">
                         <div class="card-title">${b.title}</div>
-                        <div class="card-stats">
-                            <span class="stat-pill">ضریب: ${b.weight}</span>
-                            <span class="stat-pill count">مرتبه: ${count}</span>
+                        <div class="card-meta">
+                            <span class="meta-badge">ضریب: ${b.weight}</span>
+                            <span class="meta-badge count">مرتبه: ${count}</span>
                         </div>
                         ${thresholdInfo}
                     </div>
@@ -1030,6 +1070,7 @@
         const scoreCard = document.getElementById('scoreCard');
         scoreCard.className = 'score-card ' + (totalScore > 0 ? 'positive' : (totalScore < 0 ? 'negative' : 'neutral'));
 
+        // Pending Actions Summary
         const pendingActions = log.actions.filter(a => !a.done);
         const pendingRewards = pendingActions.filter(a => a.type === 'reward').length;
         const pendingPenalties = pendingActions.filter(a => a.type === 'penalty').length;
@@ -1053,94 +1094,92 @@
     function updateCount(behId, delta) {
         const key = getKey(viewingDate);
         const log = db.logs[key];
-        const current = log.behaviors[behId] || 0;
-        const newVal = current + delta;
+        const currentCount = log.behaviors[behId] || 0;
+        const newCount = currentCount + delta;
         
-        // Immediate Feedback (Border Flash)
+        if (newCount < 0) return;
+
+        // --- ANIMATION LOGIC (On Threshold Crossing ONLY) ---
+        // We need to calculate score BEFORE and AFTER to see if we crossed a line relative to consumed score
         const beh = db.behaviors.find(b => b.id === behId);
-        const card = document.getElementById(`card-${behId}`);
-        if(card && delta > 0) {
-            const flashClass = beh.type === 'virtue' ? 'click-virtue' : 'click-vice';
-            card.classList.add(flashClass);
-            setTimeout(() => card.classList.remove(flashClass), 200);
-        }
-
-        if (newVal >= 0) {
-            // 1. Calculate stats BEFORE update to check for crossing
-            let oldScore = current * beh.weight;
+        
+        // 1. Get specific rule for this behavior
+        const specificRule = db.rules.find(r => r.type === 'specific' && r.targetId === behId);
+        
+        if (specificRule) {
+            const consumed = log.consumed && log.consumed[specificRule.id] ? log.consumed[specificRule.id] : 0;
+            const threshold = specificRule.threshold;
             
-            // 2. Update DB
-            log.behaviors[behId] = newVal;
-            saveDB();
+            const prevScore = currentCount * beh.weight;
+            const newScore = newCount * beh.weight;
             
-            // 3. Calculate stats AFTER update
-            let newScore = newVal * beh.weight;
-
-            // 4. Check if we CROSSED a specific threshold just now
-            const specificRule = db.rules.find(r => r.type === 'specific' && r.targetId === behId);
-            if (specificRule) {
-                const consumed = log.consumed && log.consumed[specificRule.id] ? log.consumed[specificRule.id] : 0;
-                const threshold = specificRule.threshold;
-                // "Crossing" means oldScore < target AND newScore >= target
-                // Target is always relative to last consumed: (consumed + threshold)
-                if (oldScore < (consumed + threshold) && newScore >= (consumed + threshold)) {
-                    if (specificRule.resultType === 'reward') {
-                        triggerRewardEffect(card);
-                    } else {
-                        triggerPenaltyEffect();
-                    }
+            // Pending score is total score minus what we've already "paid" for
+            const prevPending = prevScore - consumed;
+            const newPending = newScore - consumed;
+            
+            // Check if we JUST crossed the threshold upwards
+            if (prevPending < threshold && newPending >= threshold) {
+                // Trigger Animation
+                if (specificRule.resultType === 'reward') {
+                    triggerRewardAnimation(document.getElementById(`card-${behId}`));
+                } else {
+                    triggerPenaltyAnimation();
                 }
             }
-
-            renderHome();
         }
+
+        // Save
+        log.behaviors[behId] = newCount;
+        saveDB();
+        renderHome();
     }
 
-    function triggerRewardEffect(cardElement) {
-        if (!cardElement) return;
+    // --- Animation Implementation ---
+    function triggerRewardAnimation(cardElement) {
+        if(!cardElement) return;
+        
+        // Create particles
         const rect = cardElement.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
 
-        const colors = ['#f00', '#0f0', '#00f', '#ff0', '#0ff', '#f0f', '#ffd700'];
-        
-        for (let i = 0; i < 40; i++) {
-            const el = document.createElement('div');
-            el.className = 'confetti';
-            el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            el.style.left = centerX + 'px';
-            el.style.top = centerY + 'px';
+        for (let i = 0; i < 30; i++) {
+            const p = document.createElement('div');
+            p.classList.add('particle');
+            p.style.backgroundColor = ['#f472b6', '#4ade80', '#fbbf24', '#60a5fa'][Math.floor(Math.random()*4)];
+            p.style.left = centerX + 'px';
+            p.style.top = centerY + 'px';
             
-            // Random physics
-            const angle = Math.random() * 360;
-            const velocity = 50 + Math.random() * 200;
-            const tx = Math.cos(angle * Math.PI / 180) * velocity;
-            const ty = Math.sin(angle * Math.PI / 180) * velocity;
-            const r = Math.random() * 720;
-
-            el.style.setProperty('--tx', `${tx}px`);
-            el.style.setProperty('--ty', `${ty}px`);
-            el.style.setProperty('--r', `${r}deg`);
-
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 1500);
+            // Random direction
+            const angle = Math.random() * 2 * Math.PI;
+            const velocity = 50 + Math.random() * 100;
+            const tx = Math.cos(angle) * velocity + 'px';
+            const ty = Math.sin(angle) * velocity + 'px';
+            
+            p.style.setProperty('--tx', tx);
+            p.style.setProperty('--ty', ty);
+            
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 1000);
         }
     }
 
-    function triggerPenaltyEffect() {
-        // 1. Shake card logic is generic here (screen shake)
-        document.body.classList.add('screen-shake');
-        const overlay = document.getElementById('penaltyVignette');
-        overlay.classList.add('active');
+    function triggerPenaltyAnimation() {
+        document.body.classList.add('shake-body');
+        const overlay = document.getElementById('redOverlay');
+        overlay.style.display = 'block';
         
-        if (navigator.vibrate) navigator.vibrate(300);
-
+        // Reset after animation
         setTimeout(() => {
-            document.body.classList.remove('screen-shake');
-            overlay.classList.remove('active');
-        }, 500);
+            document.body.classList.remove('shake-body');
+            overlay.style.display = 'none';
+        }, 500); // 0.5s match css animation
     }
 
+    // ==========================================
+    // 4. TRIGGER LOGIC
+    // ==========================================
+    
     function checkTriggers(dateKey, total, posTotal, negTotal) {
         const log = db.logs[dateKey];
         const consumed = log.consumed || {};
@@ -1275,6 +1314,10 @@
         document.getElementById('triggerArea').style.display = 'none';
     }
 
+    // ==========================================
+    // 5. MANIFESTO
+    // ==========================================
+    
     function openManifestoModal() {
         const name = db.user.name;
         
@@ -1346,6 +1389,133 @@
         renderHome();
     }
 
+    // ==========================================
+    // 6. ACTIONS LIST (KARNAMEH) & POPUP
+    // ==========================================
+
+    function renderActionsTab() {
+        const key = getKey(viewingDate);
+        const actions = db.logs[key]?.actions || [];
+        const container = document.getElementById('actionsListFull');
+        const searchTerm = document.getElementById('actionsSearch').value.toLowerCase();
+
+        container.innerHTML = '';
+
+        const rewardCount = actions.filter(a => a.type === 'reward').length;
+        const penaltyCount = actions.filter(a => a.type === 'penalty').length;
+        document.getElementById('totalRewardCount').innerText = rewardCount;
+        document.getElementById('totalPenaltyCount').innerText = penaltyCount;
+        
+        const doneCount = actions.filter(a => a.done).length;
+        const pendingCount = actions.filter(a => !a.done).length;
+        document.getElementById('totalDoneCount').innerText = doneCount;
+        document.getElementById('totalPendingCount').innerText = pendingCount;
+
+        let filteredActions = actions;
+        
+        if (currentActionFilter) {
+            filteredActions = filteredActions.filter(a => a.type === currentActionFilter);
+        }
+
+        if (searchTerm) {
+            filteredActions = filteredActions.filter(a => a.text.toLowerCase().includes(searchTerm) || a.reason.toLowerCase().includes(searchTerm));
+        }
+
+        if (filteredActions.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:#999;">موردی یافت نشد.</p>';
+            return;
+        }
+
+        filteredActions.forEach(a => {
+            container.innerHTML += `
+                <div class="action-item ${a.done ? 'done' : ''}" onclick="openActionDetail(${a.id})">
+                    <div class="action-checkbox ${a.done ? 'checked' : ''}" onclick="event.stopPropagation(); toggleAction(${a.id})">
+                        <i class="fas fa-check" style="${a.done ? '' : 'display:none'}"></i>
+                    </div>
+                    <div class="action-content">
+                        <span class="action-badge ${a.type==='reward'?'badge-reward':'badge-penalty'}">${a.type==='reward'?'پاداش':'جریمه'}</span>
+                        <span style="font-weight:bold; display:block; margin-top:4px;">${a.text}</span>
+                        <div style="font-size:0.75rem; color:var(--text-light); margin-top:2px;">دلیل: ${a.reason}</div>
+                    </div>
+                    <i class="fas fa-trash btn-icon delete" onclick="event.stopPropagation(); deleteAction(${a.id})"></i>
+                </div>
+            `;
+        });
+    }
+    
+    function filterActionsTab(type) {
+        if(currentActionFilter === type) currentActionFilter = null;
+        else currentActionFilter = type;
+        renderActionsTab();
+    }
+
+    function toggleAction(id, forcedKey = null) {
+        const key = forcedKey || getKey(viewingDate);
+        const action = db.logs[key]?.actions.find(a => a.id === id);
+        if(action) {
+            action.done = !action.done;
+            saveDB();
+            
+            if (document.getElementById('dateRangeModal').style.display === 'flex') {
+                 calcDateRangeStats();
+                 const isDoneList = document.getElementById('actionListPopupTitle').innerText.includes('انجام شده');
+                 showRangeActionDetails(isDoneList); 
+            } else {
+                renderActionsTab();
+                renderHome(); 
+                if(document.getElementById('actionListPopupModal').style.display === 'flex') {
+                    const type = document.getElementById('actionListPopupTitle').innerText.includes('پاداش') ? 'reward' : (document.getElementById('actionListPopupTitle').innerText.includes('جریمه') ? 'penalty' : null);
+                    const isDone = document.getElementById('actionListPopupTitle').innerText.includes('انجام شده');
+                    openActionListModal(type, isDone);
+                }
+            }
+        }
+    }
+
+    function deleteAction(id) {
+        if(!confirm('حذف شود؟')) return;
+        const key = getKey(viewingDate);
+        db.logs[key].actions = db.logs[key].actions.filter(a => a.id !== id);
+        saveDB();
+        renderActionsTab();
+    }
+
+    function openActionListModal(type, doneStatus) {
+        const key = getKey(viewingDate);
+        const actions = db.logs[key]?.actions || [];
+        const filtered = actions.filter(a => (type ? a.type === type : true) && a.done === doneStatus);
+        
+        const container = document.getElementById('actionListPopupContent');
+        let title = "";
+        if (type === 'reward') title = 'پاداش‌ها';
+        else if (type === 'penalty') title = 'جریمه‌ها';
+        else title = 'اقدامات';
+        
+        title += (doneStatus ? ' (انجام شده)' : ' (مانده)');
+        document.getElementById('actionListPopupTitle').innerText = title;
+        
+        container.innerHTML = '';
+        if(filtered.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:#999">موردی نیست.</p>';
+        } else {
+            filtered.forEach(a => {
+                container.innerHTML += `
+                    <div class="action-item" onclick="openActionDetail(${a.id})">
+                        <div class="action-checkbox ${a.done ? 'checked' : ''}" onclick="event.stopPropagation(); toggleAction(${a.id})">
+                             <i class="fas fa-check" style="${a.done ? '' : 'display:none'}"></i>
+                        </div>
+                        <div class="action-content">
+                            <span style="font-weight:bold;">${a.text}</span>
+                            <div style="font-size:0.75rem; color:var(--text-light);">دلیل: ${a.reason}</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        document.getElementById('actionListPopupModal').style.display = 'flex';
+    }
+
     function openActionDetail(id) {
         currentActionEditId = id;
         
@@ -1391,30 +1561,17 @@
         
         document.getElementById('actionDetailContent').innerHTML = content;
         
-        // Lock editing if done
+        // Disable edit if done
         const editDiv = document.getElementById('actionEditControls');
-        const editInput = document.getElementById('actionEditText');
-        const editBtn = editDiv.querySelector('button');
-        
         if (action.done) {
-            editDiv.style.opacity = '0.5';
-            editInput.disabled = true;
-            editInput.value = "اقدام انجام شده و قابل ویرایش نیست";
-            editBtn.disabled = true;
-            editDiv.style.display = 'block';
+            editDiv.style.display = 'none';
         } else {
-            editDiv.style.opacity = '1';
-            editInput.disabled = false;
-            editInput.value = action.text;
-            editBtn.disabled = false;
             editDiv.style.display = 'block';
+            document.getElementById('actionEditText').value = action.text;
         }
         
         document.getElementById('actionDetailModal').style.display = 'flex';
     }
-
-    // Other core functions remain same (saveActionEdit, editors, etc.) 
-    // Ensuring all existing logic is preserved as requested.
 
     function saveActionEdit() {
         const newText = document.getElementById('actionEditText').value.trim();
@@ -1438,6 +1595,7 @@
             document.getElementById('actionDetailModal').style.display = 'none';
             renderActionsTab();
             renderHome(); 
+            
             if(document.getElementById('dateRangeModal').style.display === 'flex') {
                 calcDateRangeStats();
                 const isDone = document.getElementById('actionListPopupTitle').innerText.includes('انجام شده');
@@ -1446,12 +1604,21 @@
         }
     }
 
+    // ==========================================
+    // 7. EDITORS
+    // ==========================================
+
     function openEditor(type) {
         currentEditorMode = type;
         document.getElementById('editorTitle').innerText = type === 'behavior' ? 'مدیریت رفتارها' : 'مدیریت قوانین';
+        
         document.getElementById('ruleListToggle').style.display = type === 'rule' ? 'flex' : 'none';
         document.getElementById('editorSearch').style.display = type === 'behavior' ? 'block' : 'none';
-        if (type === 'behavior') document.getElementById('ruleListToggle').style.display = 'flex'; 
+        
+        if (type === 'behavior') {
+            document.getElementById('ruleListToggle').style.display = 'flex'; 
+        }
+
         renderEditorList();
         document.getElementById('editorModal').style.display = 'flex';
     }
@@ -1466,6 +1633,7 @@
     function openEditForm(index) {
         editingItemId = index;
         document.getElementById('formTitle').innerText = (index === null) ? "افزودن جدید" : "ویرایش مورد";
+        
         document.getElementById('behaviorFields').style.display = currentEditorMode === 'behavior' ? 'block' : 'none';
         document.getElementById('ruleFields').style.display = currentEditorMode === 'rule' ? 'block' : 'none';
 
@@ -1496,6 +1664,7 @@
                  toggleRuleInputs();
             }
         }
+        
         document.getElementById('editFormModal').style.display = 'flex';
     }
 
@@ -1507,7 +1676,7 @@
         const sel = document.getElementById('ruleTargetId');
         sel.innerHTML = '';
         db.behaviors.forEach(b => {
-            sel.innerHTML += `<option value="${b.id}" data-type="${b.type}">${b.title} (ضریب: ${b.weight})</option>`;
+            sel.innerHTML += `<option value="${b.id}" data-type="${b.type}">${b.title}</option>`;
         });
         updateRuleResultTypeBasedOnTarget();
     }
@@ -1536,16 +1705,19 @@
         const sel = document.getElementById('ruleTargetId');
         if (sel.selectedIndex === -1) return;
         const type = sel.options[sel.selectedIndex].getAttribute('data-type');
+        
         const resTypeInput = document.getElementById('ruleResultType');
         const resTypeDisp = document.getElementById('ruleResultTypeDisplay');
         const ind = document.getElementById('ruleAutoTypeIndicator');
 
         if (type === 'virtue') {
-            resTypeInput.value = 'reward'; resTypeDisp.value = 'پاداش';
+            resTypeInput.value = 'reward';
+            resTypeDisp.value = 'پاداش';
             ind.innerText = "رفتار مثبت -> پاداش (خودکار)";
             ind.style.background = "#d1fae5"; ind.style.color = "#065f46";
         } else {
-            resTypeInput.value = 'penalty'; resTypeDisp.value = 'جریمه';
+            resTypeInput.value = 'penalty';
+            resTypeDisp.value = 'جریمه';
             ind.innerText = "رفتار منفی -> جریمه (خودکار)";
             ind.style.background = "#fee2e2"; ind.style.color = "#991b1b";
         }
@@ -1558,6 +1730,7 @@
 
         if (currentEditorMode === 'behavior') {
             const filtered = db.behaviors.filter(b => b.type === currentRuleFilter && b.title.toLowerCase().includes(search));
+            
             filtered.forEach((b) => {
                 const idx = db.behaviors.indexOf(b);
                 container.innerHTML += `
@@ -1579,7 +1752,9 @@
                     const b = db.behaviors.find(x => x.id === r.targetId);
                     if(b && b.type === 'virtue') isVirtue = true;
                 }
-                else if (r.type === 'total_net') { isVirtue = r.resultType === 'reward'; }
+                else if (r.type === 'total_net') {
+                    isVirtue = r.resultType === 'reward';
+                }
                 return (currentRuleFilter === 'virtue' && isVirtue) || (currentRuleFilter === 'vice' && !isVirtue);
             });
 
@@ -1588,14 +1763,11 @@
             filteredRules.forEach((r) => {
                 const originalIdx = db.rules.indexOf(r);
                 let desc = getRuleDescription(r);
-                if (r.type === 'specific') {
-                    const b = db.behaviors.find(x => x.id === r.targetId);
-                    if(b) desc += ` (ضریب: ${b.weight})`;
-                }
+                // Instruction 4: Show threshold/weight
                 container.innerHTML += `
                     <div class="list-row">
-                        <div style="font-size:0.9rem;">
-                            <strong>${desc}</strong> > ${Math.abs(r.threshold)}
+                        <div style="font-size:0.85rem;">
+                            <strong>${desc}</strong> | حد نصاب: ${Math.abs(r.threshold)}
                             <div style="color:var(--text-light); margin-top:2px;">${r.resultText}</div>
                         </div>
                         <div>
@@ -1619,12 +1791,18 @@
             if(!title) return alert('عنوان الزامی است');
             
             if (editingItemId !== null) {
+                // Edit
                 db.behaviors[editingItemId].title = title;
                 db.behaviors[editingItemId].type = type;
                 db.behaviors[editingItemId].weight = weight;
             } else {
-                db.behaviors.push({ id: 'b' + Date.now(), title, type, weight });
+                // Add
+                db.behaviors.push({
+                    id: 'b' + Date.now(),
+                    title, type, weight
+                });
             }
+
         } else {
             const rType = document.getElementById('ruleType').value;
             const target = document.getElementById('ruleTargetId').value;
@@ -1674,7 +1852,13 @@
         renderHome();
     }
 
-    function openBackupModal() { document.getElementById('backupModal').style.display = 'flex'; }
+    // ==========================================
+    // 8. DATA MANAGEMENT
+    // ==========================================
+    
+    function openBackupModal() {
+        document.getElementById('backupModal').style.display = 'flex';
+    }
 
     function backupData() {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
@@ -1707,16 +1891,20 @@
         reader.readAsText(file);
     }
     
-    function openClearDataModal() { document.getElementById('clearDataModal').style.display = 'flex'; }
+    function openClearDataModal() {
+        document.getElementById('clearDataModal').style.display = 'flex';
+    }
     
     function performClearData() {
         const option = document.querySelector('input[name="clearOption"]:checked').value;
+        
         if (option === 'all') {
             if(confirm("آیا مطمئنید؟ تمام اطلاعات شما پاک خواهد شد.")) {
                 localStorage.removeItem('EthicsDB_Final');
                 location.reload();
             }
         } else {
+            // Clear Today
             const key = getKey(new Date());
             if (db.logs[key]) {
                 delete db.logs[key];
@@ -1728,13 +1916,16 @@
         }
     }
 
-    function openDateRangeStats() { document.getElementById('dateRangeModal').style.display = 'flex'; }
+    function openDateRangeStats() {
+        document.getElementById('dateRangeModal').style.display = 'flex';
+    }
 
     function calcDateRangeStats() {
         const start = new Date(document.getElementById('statStartDate').value);
         const end = new Date(document.getElementById('statEndDate').value);
         
         if(isNaN(start) || isNaN(end)) return alert("تاریخ نامعتبر");
+        
         if (end < start) return alert("تاریخ پایان نمی‌تواند قبل از تاریخ شروع باشد.");
 
         let pos = 0, neg = 0, total = 0;
