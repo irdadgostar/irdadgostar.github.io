@@ -103,9 +103,24 @@
             display: flex; align-items: stretch; overflow: hidden;
             transition: transform 0.1s;
             min-height: 95px; position: relative;
-            border: 1px solid #f8fafc;
+            border: 2px solid transparent; /* Prepared for glow */
         }
         .modern-card:active { transform: scale(0.99); }
+
+        /* Card Glow Animations (Micro-interactions) */
+        @keyframes glowGreen {
+            0% { border-color: transparent; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+            50% { border-color: #10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+            100% { border-color: transparent; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        }
+        @keyframes glowRed {
+            0% { border-color: transparent; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+            50% { border-color: #ef4444; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+            100% { border-color: transparent; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        }
+
+        .card-glow-success { animation: glowGreen 0.6s ease-out; }
+        .card-glow-danger { animation: glowRed 0.6s ease-out; }
 
         .card-btn {
             width: 60px; border: none; cursor: pointer;
@@ -114,12 +129,12 @@
         }
         .card-btn:active { filter: brightness(0.9); }
 
-        /* Colors based on Type */
+        /* Colors based on Type (Instruction 5) */
         /* Virtues: + is Green, - is Gray/Neutral */
         .virtue .card-btn.minus { background: #f1f5f9; color: #94a3b8; }
         .virtue .card-btn.plus { background: #10b981; color: white; }
         
-        /* Vices: + is Red (Bad), - is Greenish (Good/Reducing) */
+        /* Vices: + is Red (Bad - adding vice), - is Greenish (Good - reducing vice) */
         .vice .card-btn.minus { background: #d1fae5; color: #059669; }
         .vice .card-btn.plus { background: #ef4444; color: white; }
 
@@ -146,36 +161,29 @@
         .threshold-info.reward { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
         .threshold-info.penalty { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
 
-        /* --- Animation Effects --- */
+        /* --- Animation Effects (Confetti & Pulse) --- */
         
-        /* Flower/Confetti Particle */
-        .particle {
-            position: fixed; pointer-events: none; z-index: 9999;
-            font-size: 20px;
-            animation: particle-anim 1.2s ease-out forwards;
-        }
-        @keyframes particle-anim {
-            0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
-            100% { transform: translate(var(--tx), var(--ty)) scale(1.2) rotate(var(--r)); opacity: 0; }
-        }
-
-        /* Screen Red Shake */
-        .screen-shake {
-            animation: shakeRed 0.5s cubic-bezier(.36,.07,.19,.97) both;
-        }
-        .red-overlay {
+        /* Confetti Canvas */
+        #confettiCanvas {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(239, 68, 68, 0.25); 
-            z-index: 9998; pointer-events: none;
-            opacity: 0; transition: opacity 0.1s;
+            pointer-events: none; z-index: 9999; display: none;
         }
-        .red-overlay.active { opacity: 1; }
 
-        @keyframes shakeRed {
-            10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-            40%, 60% { transform: translate3d(4px, 0, 0); }
+        /* Screen Red Pulse Vignette */
+        .red-vignette {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            box-shadow: inset 0 0 0 0 rgba(239, 68, 68, 0.7);
+            z-index: 9998; pointer-events: none;
+            transition: box-shadow 0.1s ease-out;
+        }
+        .red-vignette.active {
+            animation: pulseRed 0.6s ease-out;
+        }
+        
+        @keyframes pulseRed {
+            0% { box-shadow: inset 0 0 0 0 rgba(239, 68, 68, 0); }
+            50% { box-shadow: inset 0 0 100px 50px rgba(239, 68, 68, 0.5); }
+            100% { box-shadow: inset 0 0 0 0 rgba(239, 68, 68, 0); }
         }
 
         /* --- Settings Grid --- */
@@ -310,7 +318,9 @@
 </head>
 <body>
 
-<div id="penaltyOverlay" class="red-overlay"></div>
+<!-- Effect Overlays -->
+<canvas id="confettiCanvas"></canvas>
+<div id="redVignette" class="red-vignette"></div>
 
 <div id="app">
 
@@ -624,11 +634,19 @@
             <i class="fas fa-times" style="cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('actionDetailModal').style.display='none'"></i>
         </div>
         <div id="actionDetailContent"></div>
+        
+        <!-- Editable Controls (Will be hidden if action is done) -->
         <div id="actionEditControls" style="margin-top:20px; border-top:1px solid #eee; padding-top:15px; display:none;">
             <h4>تغییر اقدام</h4>
             <input type="text" id="actionEditText" class="form-input" placeholder="عنوان جدید پاداش/جریمه">
             <button class="btn btn-accept" style="margin-top:10px; width:100%;" onclick="saveActionEdit()">ثبت تغییر</button>
         </div>
+        
+        <!-- Read-only Message -->
+        <div id="actionLockedMessage" style="margin-top:20px; border-top:1px solid #eee; padding-top:15px; display:none; color:var(--neutral); text-align:center;">
+            <i class="fas fa-lock"></i> این اقدام انجام شده و قابل ویرایش نیست.
+        </div>
+
         <div style="margin-top:20px; text-align:right;">
              <button class="btn btn-outline" onclick="document.getElementById('actionDetailModal').style.display='none'">بستن</button>
         </div>
@@ -682,13 +700,13 @@
 
 <script>
     // ==========================================
-    // 1. DATA STRUCTURE & INITIALIZATION
+    // 1. DATA & STATE
     // ==========================================
     
+    // Default DB
     const DEFAULT_DATA = {
         user: { name: "" },
         behaviors: [
-            // Virtues
             { id: 'v1', title: 'خردورزی', type: 'virtue', weight: 5 },
             { id: 'v2', title: 'انضباط شخصی', type: 'virtue', weight: 4 },
             { id: 'v3', title: 'صداقت', type: 'virtue', weight: 5 },
@@ -709,7 +727,6 @@
             { id: 'v18', title: 'سکوتِ آگاهانه', type: 'virtue', weight: 2 },
             { id: 'v19', title: 'حفظ محیط زیست', type: 'virtue', weight: 2 },
             { id: 'v20', title: 'عزت نفس', type: 'virtue', weight: 4 },
-            // Vices
             { id: 'x1', title: 'دروغ', type: 'vice', weight: 5 },
             { id: 'x2', title: 'غیبت', type: 'vice', weight: 4 },
             { id: 'x3', title: 'توهین و فحاشی', type: 'vice', weight: 4 },
@@ -732,10 +749,8 @@
             { id: 'x20', title: 'بی‌تفاوتی', type: 'vice', weight: 3 }
         ],
         rules: [
-            // General Rules
             { id: 'r_total_pos', type: 'total_pos', targetId: null, threshold: 200, resultType: 'reward', resultText: 'تماشای فیلم یا سریال', isSpecific: false },
             { id: 'r_total_neg', type: 'total_neg', targetId: null, threshold: 300, resultType: 'penalty', resultText: '۲۰ شنا سوئدی اضافه', isSpecific: false },
-            // Specific Rules (Virtues)
             { id: 'rv1', type: 'specific', targetId: 'v1', threshold: 25, resultType: 'reward', resultText: 'پاداش خردورزی', isSpecific: true },
             { id: 'rv2', type: 'specific', targetId: 'v2', threshold: 20, resultType: 'reward', resultText: 'پاداش انضباط', isSpecific: true },
             { id: 'rv3', type: 'specific', targetId: 'v3', threshold: 25, resultType: 'reward', resultText: 'پاداش صداقت', isSpecific: true },
@@ -756,7 +771,6 @@
             { id: 'rv18', type: 'specific', targetId: 'v18', threshold: 10, resultType: 'reward', resultText: 'پاداش سکوت', isSpecific: true },
             { id: 'rv19', type: 'specific', targetId: 'v19', threshold: 10, resultType: 'reward', resultText: 'پاداش محیط زیست', isSpecific: true },
             { id: 'rv20', type: 'specific', targetId: 'v20', threshold: 20, resultType: 'reward', resultText: 'پاداش عزت نفس', isSpecific: true },
-            // Specific Rules (Vices)
             { id: 'rx1', type: 'specific', targetId: 'x1', threshold: 10, resultType: 'penalty', resultText: 'جریمه دروغ', isSpecific: true },
             { id: 'rx2', type: 'specific', targetId: 'x2', threshold: 8, resultType: 'penalty', resultText: 'جریمه غیبت', isSpecific: true },
             { id: 'rx3', type: 'specific', targetId: 'x3', threshold: 8, resultType: 'penalty', resultText: 'جریمه توهین', isSpecific: true },
@@ -782,8 +796,9 @@
     };
 
     let db = JSON.parse(localStorage.getItem('EthicsDB_Final')) || JSON.parse(JSON.stringify(DEFAULT_DATA));
+    
+    // Viewing date state
     let viewingDate = new Date();
-    // Normalize viewingDate to remove time component for consistent comparisons
     viewingDate.setHours(0,0,0,0);
     
     let currentEditorMode = null; 
@@ -793,14 +808,16 @@
     let currentActionEditId = null; 
     let tempDateRangeResults = null; 
 
-    // --- Helper: Persian Date Converter ---
+    // **Session State to track currently triggered rules before acceptance**
+    // This prevents re-firing animations for the same trigger condition.
+    let triggeredRulesSession = new Set();
+
+    // --- Helpers ---
     function getVerbalDate(date) {
         const weekDays = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه'];
         const months = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
-        
         const options = { year: 'numeric', month: 'numeric', day: 'numeric', weekday: 'long' };
         const parts = new Intl.DateTimeFormat('fa-IR', options).formatToParts(date);
-        
         let y, m, d, wd;
         parts.forEach(p => {
             if(p.type === 'year') y = p.value;
@@ -808,21 +825,17 @@
             if(p.type === 'day') d = p.value;
             if(p.type === 'weekday') wd = p.value;
         });
-
         const parseFa = (s) => parseInt(s.replace(/[۰-۹]/g, c => c.charCodeAt(0) - 1776));
         const dayInt = parseFa(d);
         const yearInt = parseFa(y);
         const monthInt = parseFa(m); 
-
         const numToWord = (n) => {
             if (n === 0) return 'صفر';
             const ones = ['','یک','دو','سه','چهار','پنج','شش',' هفت','هشت','نه'];
             const teens = ['ده','یازده','دوازده','سیزده','چهارده','پانزده','شانزده','هفده','هجده','نوزده'];
             const tens = ['','','بیست','سی','چهل','پنجاه','شصت','هفتاد','هشتاد','نود'];
             const hundreds = ['','صد','دویست','سیصد','چهارصد','پانصد','ششصد','هفتصد','هشتصد','نهصد'];
-            
             let str = '';
-            
             if (n >= 1000) {
                 const th = Math.floor(n / 1000);
                 const rem = n % 1000;
@@ -830,31 +843,19 @@
                 if (rem > 0) str += ' و ' + numToWord(rem); 
                 return str;
             }
-            
             const h = Math.floor(n / 100);
             const t = Math.floor((n % 100) / 10);
             const o = n % 10;
-            
             if (h > 0) { str += hundreds[h]; if(t>0 || o>0) str += ' و '; }
-            if (t >= 2) {
-                str += tens[t];
-                if (o > 0) str += ' و ' + ones[o];
-            } else if (t === 1) {
-                str += teens[o];
-            } else {
-                str += ones[o];
-            }
+            if (t >= 2) { str += tens[t]; if (o > 0) str += ' و ' + ones[o]; } 
+            else if (t === 1) { str += teens[o]; } 
+            else { str += ones[o]; }
             return str;
         };
-
-        const dayOrdinals = ["", "یکم", "دوم", "سوم", "چهارم", "پنجم", "ششم", "هفتم", "هشتم", "نهم", "دهم", 
-                   "یازدهم", "دوازدهم", "سیزدهم", "چهاردهم", "پانزدهم", "شانزدهم", "هفدهم", "هجدهم", "نوزدهم", "بیستم",
-                   "بیست و یکم", "بیست و دوم", "بیست و سوم", "بیست و چهارم", "بیست و پنجم", "بیست و ششم", "بیست و هفتم", "بیست و هشتم", "بیست و نهم", "سی‌ام", "سی و یکم"];
-        
+        const dayOrdinals = ["", "یکم", "دوم", "سوم", "چهارم", "پنجم", "ششم", "هفتم", "هشتم", "نهم", "دهم", "یازدهم", "دوازدهم", "سیزدهم", "چهاردهم", "پانزدهم", "شانزدهم", "هفدهم", "هجدهم", "نوزدهم", "بیستم", "بیست و یکم", "بیست و دوم", "بیست و سوم", "بیست و چهارم", "بیست و پنجم", "بیست و ششم", "بیست و هفتم", "بیست و هشتم", "بیست و نهم", "سی‌ام", "سی و یکم"];
         const dayWord = dayOrdinals[dayInt];
         const yearWord = numToWord(yearInt);
         const monthNameStr = months[monthInt - 1];
-        
         return `${wd}، ${dayWord} ${monthNameStr} ${yearWord}`;
     }
     
@@ -866,7 +867,6 @@
     }
 
     function getKey(date) { return date.toLocaleDateString('en-CA'); }
-
     function saveDB() { localStorage.setItem('EthicsDB_Final', JSON.stringify(db)); }
 
     // ==========================================
@@ -902,18 +902,15 @@
     function switchTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        
         document.getElementById('tab-' + tabId).classList.add('active');
-        
         const indices = { 'home': 0, 'actions': 1, 'settings': 2 };
         document.querySelectorAll('.nav-item')[indices[tabId]].classList.add('active');
-
         if (tabId === 'home') renderHome();
         if (tabId === 'actions') renderActionsTab();
     }
 
     // ==========================================
-    // 3. HOME LOGIC
+    // 3. HOME LOGIC & ANIMATIONS
     // ==========================================
 
     function navigateDate(delta) {
@@ -927,6 +924,8 @@
         if (newDate > today) return; 
         
         viewingDate = newDate;
+        // Reset trigger session state when changing date to avoid stale state issues
+        triggeredRulesSession.clear();
         renderHome();
     }
 
@@ -941,9 +940,7 @@
         const log = db.logs[key];
 
         const manBtn = document.querySelector('.manifesto-btn');
-        const manText = document.getElementById('manifestoBtnText');
         const manIcon = document.getElementById('manifestoIcon');
-
         if (log.manifestoRead) {
             manBtn.classList.add('read');
             manIcon.className = 'fas fa-check';
@@ -984,16 +981,30 @@
                  const consumed = log.consumed && log.consumed[specificRule.id] ? log.consumed[specificRule.id] : 0;
                  const currentVal = count * b.weight;
                  
-                 // Calculate remainder to find how much more is needed
-                 // Assuming thresholds are cumulative steps (e.g. 20, 40, 60...)
-                 // We want (consumed + threshold) - currentVal
-                 const nextTarget = consumed + specificRule.threshold;
-                 const needed = nextTarget - currentVal;
+                 // If there's a pending trigger for this rule (it's in session but not consumed), 
+                 // we don't show "points remaining" because they just hit it.
+                 // We calculate the NEXT target based on consumed + threshold.
+                 // If user hit threshold (20) and consumed is 0 -> Target 20. Current 20. Diff 0.
+                 // If trigger accepted -> consumed becomes 20 -> Target 40. Current 20. Diff 20.
                  
-                 if (needed > 0) {
-                     const typeText = specificRule.resultType === 'reward' ? 'پاداش' : 'جریمه';
-                     const typeClass = specificRule.resultType === 'reward' ? 'reward' : 'penalty';
-                     thresholdInfo = `<div class="threshold-info ${typeClass}"><i class="fas fa-flag"></i> ${needed} امتیاز تا ${typeText}</div>`;
+                 // However, we want to know if we are currently "in trigger state".
+                 let isTriggerActive = false;
+                 // We can check if we hit the threshold relative to consumed
+                 if (currentVal - consumed >= specificRule.threshold) {
+                     isTriggerActive = true;
+                 }
+
+                 if (!isTriggerActive) {
+                     const nextTarget = consumed + specificRule.threshold;
+                     const needed = nextTarget - currentVal;
+                     if (needed > 0) {
+                         const typeText = specificRule.resultType === 'reward' ? 'پاداش' : 'جریمه';
+                         const typeClass = specificRule.resultType === 'reward' ? 'reward' : 'penalty';
+                         thresholdInfo = `<div class="threshold-info ${typeClass}"><i class="fas fa-flag"></i> ${needed} امتیاز تا ${typeText}</div>`;
+                     }
+                 } else {
+                     // If trigger active (waiting to be logged), hide the count or show "Reached"
+                     // The prompt asks to calculate from the last one. If pending, we wait.
                  }
             }
 
@@ -1010,7 +1021,7 @@
                         </div>
                         ${thresholdInfo}
                     </div>
-                    <button class="card-btn plus" onclick="updateCount('${b.id}', 1)">
+                    <button class="card-btn plus" onclick="updateCount('${b.id}', 1, event)">
                         <i class="fas fa-plus"></i>
                     </button>
                 </div>
@@ -1047,27 +1058,53 @@
         renderHome();
     }
 
-    function updateCount(behId, delta) {
+    function updateCount(behId, delta, event) {
         const key = getKey(viewingDate);
         const log = db.logs[key];
         const current = log.behaviors[behId] || 0;
         const newVal = current + delta;
         
+        // Micro-interaction: Card Glow on Click
+        const beh = db.behaviors.find(b => b.id === behId);
+        const card = document.getElementById(`card-${behId}`);
+        
+        if(card) {
+            // Remove animation classes to restart
+            card.classList.remove('card-glow-success', 'card-glow-danger');
+            void card.offsetWidth; // Trigger reflow
+
+            if (beh.type === 'virtue') {
+                if (delta > 0) card.classList.add('card-glow-success'); 
+            } else {
+                if (delta > 0) card.classList.add('card-glow-danger'); 
+            }
+        }
+
         if (newVal >= 0) {
             log.behaviors[behId] = newVal;
             saveDB();
             
-            // Trigger Check Logic for Animation
+            // Check for Macro-interaction (Reward/Penalty Trigger)
             const triggerCheck = checkTriggers(key, 0, 0, 0, true); 
             
             if (triggerCheck && triggerCheck.triggeredNow) {
                 if (triggerCheck.type === 'reward') {
-                    // Trigger Flower Animation on Card Center
-                    const card = document.getElementById(`card-${behId}`);
-                    triggerRewardEffect(card);
+                    // Confetti from click position or card center
+                    let x, y;
+                    if (event && event.clientX) {
+                        x = event.clientX;
+                        y = event.clientY;
+                    } else if (card) {
+                        const rect = card.getBoundingClientRect();
+                        x = rect.left + rect.width / 2;
+                        y = rect.top + rect.height / 2;
+                    } else {
+                        x = window.innerWidth / 2;
+                        y = window.innerHeight / 2;
+                    }
+                    fireConfetti(x, y);
                 } else if (triggerCheck.type === 'penalty') {
-                    // Trigger Screen Shake
-                    triggerPenaltyEffect();
+                    fireRedPulse();
                 }
             }
 
@@ -1075,52 +1112,75 @@
         }
     }
 
-    function triggerRewardEffect(cardElement) {
-        if (!cardElement) return;
-        const rect = cardElement.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
+    // --- ANIMATIONS ---
 
-        const emojis = ['🌸', '💐', '🌺', '🌷', '🌻', '✨', '🎉', '🎊'];
+    function fireConfetti(x, y) {
+        const canvas = document.getElementById('confettiCanvas');
+        canvas.style.display = 'block';
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const ctx = canvas.getContext('2d');
         
-        for (let i = 0; i < 30; i++) {
-            const el = document.createElement('div');
-            el.innerText = emojis[Math.floor(Math.random() * emojis.length)];
-            el.className = 'particle';
-            el.style.left = centerX + 'px';
-            el.style.top = centerY + 'px';
-            
-            const angle = Math.random() * 360;
-            const velocity = 60 + Math.random() * 150;
-            const tx = Math.cos(angle * Math.PI / 180) * velocity;
-            const ty = Math.sin(angle * Math.PI / 180) * velocity;
-            const r = Math.random() * 360;
-
-            el.style.setProperty('--tx', `${tx}px`);
-            el.style.setProperty('--ty', `${ty}px`);
-            el.style.setProperty('--r', `${r}deg`);
-
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 1200);
+        const particles = [];
+        const colors = ['#FFD700', '#FF4500', '#32CD32', '#1E90FF', '#FF69B4'];
+        
+        for (let i = 0; i < 60; i++) {
+            particles.push({
+                x: x,
+                y: y,
+                vx: (Math.random() - 0.5) * 15,
+                vy: (Math.random() - 2) * 15, // Upward initial velocity
+                size: Math.random() * 8 + 4,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                gravity: 0.5,
+                drag: 0.96,
+                rotation: Math.random() * 360,
+                rotationSpeed: (Math.random() - 0.5) * 10
+            });
         }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let active = false;
+            
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += p.gravity;
+                p.vx *= p.drag;
+                p.rotation += p.rotationSpeed;
+                
+                if (p.y < canvas.height + 20) active = true;
+
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rotation * Math.PI / 180);
+                ctx.fillStyle = p.color;
+                ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                ctx.restore();
+            });
+
+            if (active) requestAnimationFrame(animate);
+            else {
+                canvas.style.display = 'none';
+            }
+        }
+        animate();
     }
 
-    function triggerPenaltyEffect() {
-        document.body.classList.add('screen-shake');
-        const overlay = document.getElementById('penaltyOverlay');
-        overlay.classList.add('active');
+    function fireRedPulse() {
+        const vignette = document.getElementById('redVignette');
+        vignette.classList.remove('active');
+        void vignette.offsetWidth; // Reflow
+        vignette.classList.add('active');
         
-        // Vibration API
-        if (navigator.vibrate) navigator.vibrate(300);
-
-        setTimeout(() => {
-            document.body.classList.remove('screen-shake');
-            overlay.classList.remove('active');
-        }, 500);
+        if (navigator.vibrate) navigator.vibrate(200);
+        
+        setTimeout(() => vignette.classList.remove('active'), 600);
     }
 
     // ==========================================
-    // 4. TRIGGER LOGIC
+    // 4. TRIGGER LOGIC (FIXED LOGIC)
     // ==========================================
     
     function checkTriggers(dateKey, total, posTotal, negTotal, checkOnly = false) {
@@ -1142,74 +1202,88 @@
         const triggerArea = document.getElementById('triggerArea');
         if (!checkOnly) triggerArea.innerHTML = ''; 
         
+        let triggerResult = null;
+
         for (let rule of db.rules) {
             let currentValue = 0;
             let consumedValue = consumed[rule.id] || 0;
 
-            if (rule.type === 'total_net') {
-                currentValue = total;
-                 if (rule.resultType === 'reward') {
-                     if (currentValue - consumedValue >= rule.threshold) {
-                         if(checkOnly) return { triggeredNow: true, type: 'reward' };
-                         showTriggerAlert(rule); break; 
-                     }
-                 } else {
-                     if (currentValue <= (consumedValue - Math.abs(rule.threshold))) {
-                         if(checkOnly) return { triggeredNow: true, type: 'penalty' };
-                         showTriggerAlert(rule); break;
-                     }
-                 }
-            } 
-            else if (rule.type === 'total_pos') {
-                currentValue = posTotal;
-                if (currentValue - consumedValue >= rule.threshold) {
-                     if(checkOnly) return { triggeredNow: true, type: 'reward' };
-                     showTriggerAlert(rule); break;
-                }
-            }
-            else if (rule.type === 'total_neg') {
-                currentValue = negTotal;
-                if (currentValue - consumedValue >= rule.threshold) {
-                     if(checkOnly) return { triggeredNow: true, type: 'penalty' };
-                     showTriggerAlert(rule); break;
-                }
-            }
+            // Determine current value based on rule type
+            if (rule.type === 'total_net') currentValue = total;
+            else if (rule.type === 'total_pos') currentValue = posTotal;
+            else if (rule.type === 'total_neg') currentValue = negTotal;
             else if (rule.type === 'specific') {
                 const bId = rule.targetId;
                 const b = db.behaviors.find(x => x.id === bId);
                 if (!b) continue;
                 const count = log.behaviors[bId] || 0;
                 currentValue = count * b.weight; 
-                
-                if (currentValue - consumedValue >= rule.threshold) {
-                     if(checkOnly) return { triggeredNow: true, type: rule.resultType };
-                     showTriggerAlert(rule); break;
+            }
+
+            // Check Condition
+            let isTriggered = false;
+            if (rule.resultType === 'reward' || rule.type === 'total_pos') {
+                if (currentValue - consumedValue >= rule.threshold) isTriggered = true;
+            } else {
+                // For penalty or total_neg
+                if (rule.type === 'total_net') {
+                     if (currentValue <= (consumedValue - Math.abs(rule.threshold))) isTriggered = true;
+                } else {
+                     if (currentValue - consumedValue >= rule.threshold) isTriggered = true;
+                }
+            }
+
+            if (isTriggered) {
+                // IMPORTANT: Check if we have already triggered this session for this milestone?
+                if (checkOnly) {
+                    if (!triggeredRulesSession.has(rule.id)) {
+                        triggerResult = { triggeredNow: true, type: rule.resultType };
+                        // We do NOT add to set here, we add it when we actually SHOW the alert.
+                        // CheckOnly is just for animation.
+                        return triggerResult; 
+                    }
+                } else {
+                    // Rendering mode
+                    if (!triggeredRulesSession.has(rule.id)) {
+                        triggeredRulesSession.add(rule.id); // Mark as triggered so we don't animate again
+                        showTriggerAlert(rule);
+                    } else {
+                        // Even if already in session, we show the box until it is accepted/dismissed
+                        showTriggerAlert(rule);
+                    }
                 }
             }
         }
-        return null;
+        return triggerResult;
     }
 
     function showTriggerAlert(rule) {
         const area = document.getElementById('triggerArea');
+        // Prevent duplicates in UI
+        if (area.innerHTML.includes(rule.resultText)) return;
+
         area.style.display = 'block';
         
         const typeLabel = rule.resultType === 'reward' ? '🎉 پاداش:' : '⚠️ جریمه:';
         const color = rule.resultType === 'reward' ? 'var(--success)' : 'var(--danger)';
         const bg = rule.resultType === 'reward' ? '#ecfdf5' : '#fef2f2';
 
-        area.innerHTML = `
-            <div class="trigger-box" style="display:block; border-color:${color}; background:${bg}">
-                <div class="trigger-header" style="color:${color}">
-                    ${typeLabel} حد نصاب "${getRuleDescription(rule)}" پر شد.
-                </div>
-                <div style="margin-bottom:10px;">${rule.resultText}</div>
-                <div class="trigger-actions">
-                    <button class="btn btn-accept" onclick="acceptTrigger('${rule.id}')">ثبت در اقدامات</button>
-                    <button class="btn btn-change" onclick="ignoreTrigger('${rule.id}')">نادیده گرفتن</button>
-                </div>
+        const div = document.createElement('div');
+        div.className = 'trigger-box';
+        div.style.borderColor = color;
+        div.style.background = bg;
+        div.style.display = 'block';
+        div.innerHTML = `
+            <div class="trigger-header" style="color:${color}">
+                ${typeLabel} حد نصاب "${getRuleDescription(rule)}" پر شد.
+            </div>
+            <div style="margin-bottom:10px;">${rule.resultText}</div>
+            <div class="trigger-actions">
+                <button class="btn btn-accept" onclick="acceptTrigger('${rule.id}')">ثبت در اقدامات</button>
+                <button class="btn btn-change" onclick="ignoreTrigger('${rule.id}')">نادیده گرفتن</button>
             </div>
         `;
+        area.appendChild(div);
     }
 
     function getRuleDescription(rule) {
@@ -1254,6 +1328,7 @@
             done: false
         });
 
+        // Update Consumed
         if (!log.consumed[ruleId]) log.consumed[ruleId] = 0;
         
         if (rule.type === 'total_net' && rule.resultType === 'penalty') {
@@ -1262,13 +1337,19 @@
              log.consumed[ruleId] += rule.threshold;
         }
 
+        // Remove from session set so if they reach it again later today, it triggers again
+        triggeredRulesSession.delete(ruleId);
+
         saveDB();
-        document.getElementById('triggerArea').style.display = 'none'; 
+        document.getElementById('triggerArea').innerHTML = ''; 
         renderHome(); 
     }
 
-    function ignoreTrigger() {
-        document.getElementById('triggerArea').style.display = 'none';
+    function ignoreTrigger(ruleId) {
+        // Just hide the UI for now, but keep in session so it doesn't animate again immediately
+        // Ideally, "Ignoring" might mean "Don't consume points but hide box".
+        // Or "Skip this reward". Assuming "Skip":
+        document.getElementById('triggerArea').innerHTML = '';
     }
 
     // ==========================================
@@ -1517,8 +1598,17 @@
         `;
         
         document.getElementById('actionDetailContent').innerHTML = content;
-        document.getElementById('actionEditControls').style.display = 'block'; 
         document.getElementById('actionEditText').value = action.text;
+        
+        // Locking Logic
+        if (action.done) {
+            document.getElementById('actionEditControls').style.display = 'none';
+            document.getElementById('actionLockedMessage').style.display = 'block';
+        } else {
+            document.getElementById('actionEditControls').style.display = 'block';
+            document.getElementById('actionLockedMessage').style.display = 'none';
+        }
+
         document.getElementById('actionDetailModal').style.display = 'flex';
     }
 
@@ -1538,6 +1628,7 @@
         }
         
         if (action) {
+            if (action.done) return alert('این اقدام انجام شده و قابل ویرایش نیست.');
             action.text = newText;
             saveDB();
             alert('ویرایش شد');
