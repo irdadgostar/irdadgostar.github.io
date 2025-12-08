@@ -3,366 +3,499 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محاسبه‌گر بودجه هوشمند</title>
-    <!-- فونت وزیرمتن برای زیبایی -->
+    <title>مدیریت بودجه حرفه‌ای | نسخه پیشرفته</title>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --primary: #2563eb;
-            --success: #16a34a;
-            --danger: #dc2626;
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --text: #1e293b;
-            --border: #e2e8f0;
+            --bg-gradient: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --primary: #3b82f6;
+            --secondary: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-dark: #1e293b;
+            --border-radius: 16px;
         }
 
         * {
             box-sizing: border-box;
             font-family: 'Vazirmatn', sans-serif;
+            outline: none;
         }
 
         body {
-            background-color: var(--bg);
-            color: var(--text);
+            background: var(--bg-gradient);
             margin: 0;
             padding: 20px;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            min-height: 100vh;
+            align-items: flex-start;
+            color: var(--text-dark);
         }
 
-        .container {
-            background-color: var(--card);
+        .dashboard {
+            background: var(--card-bg);
             width: 100%;
-            max-width: 800px;
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            text-align: center;
-            color: var(--primary);
-            margin-bottom: 30px;
-            font-size: 1.8rem;
-        }
-
-        /* بخش ورودی مبلغ کل */
-        .main-input-section {
-            background: #eff6ff;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            border: 1px solid #bfdbfe;
-            text-align: center;
-        }
-
-        .main-input-section label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-
-        .amount-input-wrapper {
-            position: relative;
-            max-width: 300px;
-            margin: 0 auto;
-        }
-
-        #totalAmount {
-            width: 100%;
-            padding: 12px;
-            font-size: 1.2rem;
-            border: 2px solid var(--primary);
-            border-radius: 8px;
-            text-align: center;
-            direction: ltr; /* برای تایپ راحت عدد */
-        }
-
-        .currency-label {
-            margin-top: 5px;
-            font-size: 0.9rem;
-            color: #64748b;
-        }
-
-        /* بخش ردیف‌های بودجه */
-        .budget-rows {
+            max-width: 900px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            gap: 15px;
         }
 
-        .row {
-            display: grid;
-            grid-template-columns: 2fr 1fr 2fr 40px;
-            gap: 10px;
-            align-items: center;
-            padding: 15px;
+        /* هدر و تنظیمات */
+        .header {
             background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            transition: all 0.2s;
-        }
-
-        .row:hover {
-            border-color: var(--primary);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-
-        .row input {
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 1rem;
-        }
-
-        .row input[type="number"] {
-            text-align: center;
-            direction: ltr;
-        }
-
-        .result-display {
-            background: #f1f5f9;
-            padding: 10px;
-            border-radius: 6px;
-            text-align: center;
-            font-weight: bold;
-            color: var(--primary);
-            font-size: 1rem;
-        }
-
-        .btn-delete {
-            background: #fee2e2;
-            color: var(--danger);
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            transition: 0.2s;
-        }
-
-        .btn-delete:hover {
-            background: #fecaca;
-        }
-
-        /* بخش فوتر و وضعیت */
-        .status-bar {
-            position: sticky;
-            bottom: 0;
-            background: var(--card);
-            padding: 15px;
-            margin-top: 20px;
-            border-top: 2px solid var(--border);
+            padding: 25px;
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
-            box-shadow: 0 -4px 6px -1px rgba(0,0,0,0.05);
+            gap: 15px;
         }
 
-        .total-percent {
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
-
-        .status-valid { color: var(--success); }
-        .status-invalid { color: var(--danger); }
-
-        .controls {
+        .title-box h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--primary);
             display: flex;
+            align-items: center;
             gap: 10px;
         }
 
-        button.primary-btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
+        .settings-box select {
+            padding: 8px 15px;
             border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 0.9rem;
+            background: #f8fafc;
             cursor: pointer;
+        }
+
+        /* ورودی اصلی پول */
+        .input-hero {
+            background: #eff6ff;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .input-group {
+            position: relative;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .input-group i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary);
+            font-size: 1.2rem;
+        }
+
+        .main-input {
+            width: 100%;
+            padding: 15px 50px 15px 15px;
+            font-size: 1.5rem;
+            border: 2px solid #bfdbfe;
+            border-radius: 12px;
+            text-align: center;
             font-weight: bold;
+            color: var(--primary);
+            transition: 0.3s;
+            direction: ltr;
+        }
+
+        .main-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        /* نوار پیشرفت درصد */
+        .progress-container {
+            margin-top: 15px;
+            background: #e2e8f0;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--success);
+            width: 0%;
+            transition: width 0.3s ease, background 0.3s;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        /* لیست آیتم‌ها */
+        .items-list {
+            padding: 20px;
+            background: #f8fafc;
+            flex-grow: 1;
+        }
+
+        .budget-item {
+            display: grid;
+            grid-template-columns: 3fr 1.5fr 3fr 40px;
+            gap: 15px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #e2e8f0;
+            align-items: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .budget-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-color: var(--primary);
+        }
+
+        .item-name {
+            font-weight: bold;
+            border: none;
+            background: transparent;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        .percent-input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .percent-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            direction: ltr;
+        }
+
+        .percent-symbol {
+            position: absolute;
+            left: 10px;
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+
+        .amount-display {
+            background: #f1f5f9;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 800;
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            border-right: 4px solid var(--primary);
+        }
+
+        .btn-remove {
+            color: #94a3b8;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
             transition: 0.2s;
         }
 
-        button.primary-btn:hover { background-color: #1d4ed8; }
+        .btn-remove:hover { color: var(--danger); }
 
-        button.add-btn {
-            background-color: var(--success);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
+        /* دکمه‌ها و اکشن‌ها */
+        .actions {
+            padding: 20px;
+            background: #fff;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
         }
-        
-        button.add-btn:hover { background-color: #15803d; }
 
-        /* حالت موبایل */
-        @media (max-width: 600px) {
-            .row {
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+            font-size: 1rem;
+        }
+
+        .btn-calc {
+            background: var(--primary);
+            color: white;
+            flex-grow: 2;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+        .btn-calc:hover { background: #1d4ed8; transform: translateY(-1px); }
+        .btn-calc:active { transform: translateY(1px); }
+
+        .btn-add {
+            background: #eff6ff;
+            color: var(--primary);
+            border: 1px solid #bfdbfe;
+        }
+        .btn-add:hover { background: #dbeafe; }
+
+        /* رسپانسیو */
+        @media (max-width: 650px) {
+            .budget-item {
                 grid-template-columns: 1fr 1fr;
-                gap: 8px;
+                gap: 10px;
             }
-            .row input:first-child { grid-column: 1 / -1; } /* نام آیتم کل عرض را بگیرد */
-            .result-display { grid-column: 1 / 2; }
-            .btn-delete { grid-column: 2 / 3; width: 100%; }
-            .status-bar { flex-direction: column; text-align: center; }
-            .controls { width: 100%; justify-content: center; }
+            .item-name { grid-column: 1 / -1; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 5px;}
+            .btn-remove { grid-column: 2 / 3; justify-self: end; grid-row: 1; }
+            .percent-input-group { grid-column: 1 / 2; }
+            .amount-display { grid-column: 2 / 3; }
+            .header { justify-content: center; }
+            .actions { flex-direction: column-reverse; }
+            .btn { width: 100%; justify-content: center; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>مدیریت بودجه هوشمند</h1>
-
-    <div class="main-input-section">
-        <label for="totalAmount">مبلغ کل دریافتی (تومان) را وارد کنید:</label>
-        <div class="amount-input-wrapper">
-            <input type="text" id="totalAmount" placeholder="مثلا: 3,000,000" onkeyup="formatCurrency(this)">
+<div class="dashboard">
+    <!-- هدر -->
+    <div class="header">
+        <div class="title-box">
+            <h1><i class="fas fa-wallet"></i> ماشین حساب بودجه</h1>
         </div>
-        <div class="currency-label">مبلغ به تومان محاسبه می‌شود</div>
+        <div class="settings-box">
+            <select id="currencySelector" onchange="reCalculate()">
+                <option value="تومان">نمایش به تومان</option>
+                <option value="ریال">نمایش به ریال</option>
+            </select>
+        </div>
     </div>
 
-    <div id="budgetRows" class="budget-rows">
-        <!-- ردیف‌ها توسط جاوااسکریپت ساخته می‌شوند -->
+    <!-- ورودی پول -->
+    <div class="input-hero">
+        <label style="display:block; margin-bottom:10px; color:#64748b;">مبلغ ورودی را وارد کنید:</label>
+        <div class="input-group">
+            <i class="fas fa-coins"></i>
+            <input type="text" id="totalAmount" class="main-input" placeholder="0" onkeyup="handleMainInput(this)">
+        </div>
+        
+        <!-- نوار وضعیت درصد -->
+        <div style="max-width: 400px; margin: 20px auto 0;">
+            <div class="progress-container">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+            <div class="progress-info">
+                <span id="percentText">جمع درصد: ۰٪</span>
+                <span id="statusMessage" style="color: var(--success)">همه چی مرتبه</span>
+            </div>
+        </div>
     </div>
 
-    <div class="status-bar">
-        <div id="statusText" class="total-percent">جمع کل درصد: 0%</div>
-        <div class="controls">
-            <button class="add-btn" onclick="addNewRow()">+ افزودن آیتم جدید</button>
-            <button class="primary-btn" onclick="calculate()">محاسبه دقیق</button>
-        </div>
+    <!-- لیست ردیف‌ها -->
+    <div id="itemsList" class="items-list">
+        <!-- ردیف‌ها توسط جاوااسکریپت پر می‌شوند -->
+    </div>
+
+    <!-- دکمه‌ها -->
+    <div class="actions">
+        <button class="btn btn-add" onclick="addRow()"><i class="fas fa-plus"></i> آیتم جدید</button>
+        <button class="btn btn-calc" onclick="calculateAll()"><i class="fas fa-calculator"></i> محاسبه کن</button>
     </div>
 </div>
 
 <script>
-    // داده‌های پیش‌فرض بر اساس برنامه امیرحسین
-    const defaultData = [
-        { name: "۱. کرایه شهری (اتوبوس/تاکسی)", percent: 27 },
-        { name: "۲. خورد و خوراک (تخم‌مرغ/نان...)", percent: 12 },
-        { name: "۳. سفر (پس‌انداز مشهد)", percent: 25 },
+    // تنظیمات اولیه و داده‌های پیش‌فرض امیرحسین
+    const defaultBudgets = [
+        { name: "۱. کرایه شهری", percent: 27 },
+        { name: "۲. خورد و خوراک", percent: 12 },
+        { name: "۳. سفر (مشهد)", percent: 25 },
         { name: "۴. دوا و درمان", percent: 3 },
-        { name: "۵. شارژ، نت و لوازم تحریر", percent: 10 },
-        { name: "۶. زیبایی و مکمل (روغن/قرص)", percent: 7 },
+        { name: "۵. شارژ و اینترنت", percent: 10 },
+        { name: "۶. زیبایی و مکمل", percent: 7 },
         { name: "۷. لباس", percent: 5 },
         { name: "۸. ضروری و اضطراری", percent: 5 },
         { name: "۹. هدیه و تفریح", percent: 3 },
-        { name: "۱۰. پس‌انداز کل (دست نزن)", percent: 3 }
+        { name: "۱۰. پس‌انداز کل", percent: 3 }
     ];
 
-    const rowsContainer = document.getElementById('budgetRows');
-    const statusText = document.getElementById('statusText');
+    const itemsContainer = document.getElementById('itemsList');
+    const currencySelector = document.getElementById('currencySelector');
+    let currentCurrency = "تومان";
 
-    // تابع برای فرمت کردن عدد به صورت ۳ رقم ۳ رقم (پول)
-    function formatNumber(num) {
-        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    // تبدیل اعداد فارسی به انگلیسی (قلب تپنده برنامه)
+    function toEnglishDigits(str) {
+        if(!str) return "";
+        return str.toString().replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
     }
 
-    // تابع برای برداشتن کاما از عدد جهت محاسبه
-    function parseNumber(str) {
-        return parseFloat(str.replace(/,/g, '')) || 0;
+    // تبدیل اعداد انگلیسی به فارسی برای نمایش
+    function toPersianDigits(num) {
+        if(num === null || num === undefined) return "";
+        return num.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
     }
 
-    // فرمت کردن خودکار ورودی مبلغ کل هنگام تایپ
-    function formatCurrency(input) {
-        let value = input.value.replace(/,/g, '');
-        if (!isNaN(value) && value !== "") {
-            input.value = parseInt(value).toLocaleString();
-        }
-        calculate(); // محاسبه زنده هنگام تایپ
+    // فرمت کردن پول (سه رقم سه رقم)
+    function formatMoney(amount) {
+        if (isNaN(amount)) return "0";
+        // حذف اعشار اضافی
+        amount = Math.round(amount);
+        return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 
-    // ایجاد ردیف‌ها در ابتدای کار
+    // شروع برنامه
     function init() {
-        defaultData.forEach(item => {
-            createRow(item.name, item.percent);
+        defaultBudgets.forEach(item => {
+            createRowHTML(item.name, item.percent);
         });
-        updateStatus();
+        updatePercentBar();
     }
 
-    // ساختن یک ردیف جدید HTML
-    function createRow(name = "", percent = 0) {
+    // ساخت HTML برای هر ردیف
+    function createRowHTML(name, percent) {
         const div = document.createElement('div');
-        div.className = 'row';
+        div.className = 'budget-item';
         div.innerHTML = `
-            <input type="text" placeholder="نام هزینه" value="${name}">
-            <input type="number" placeholder="درصد" value="${percent}" min="0" max="100" oninput="updateStatus(); calculate()">
-            <div class="result-display">0 تومان</div>
-            <button class="btn-delete" onclick="deleteRow(this)" title="حذف">×</button>
+            <input type="text" class="item-name" value="${name}" placeholder="نام هزینه">
+            <div class="percent-input-group">
+                <input type="tel" class="percent-input" value="${percent}" oninput="handlePercentChange(this)" placeholder="0">
+                <span class="percent-symbol">%</span>
+            </div>
+            <div class="amount-display">0 ${currentCurrency}</div>
+            <button class="btn-remove" onclick="removeRow(this)"><i class="fas fa-trash-alt"></i></button>
         `;
-        rowsContainer.appendChild(div);
+        itemsContainer.appendChild(div);
     }
 
-    // افزودن ردیف جدید توسط کاربر
-    function addNewRow() {
-        createRow("هزینه جدید", 0);
-        updateStatus();
+    // اضافه کردن ردیف جدید
+    function addRow() {
+        createRowHTML("هزینه جدید", 0);
+        updatePercentBar();
     }
 
     // حذف ردیف
-    function deleteRow(btn) {
+    function removeRow(btn) {
         btn.parentElement.remove();
-        updateStatus();
-        calculate();
+        updatePercentBar();
+        calculateAll();
     }
 
-    // بررسی جمع درصدها (اعتبارسنجی)
-    function updateStatus() {
-        let totalPercent = 0;
-        const rows = document.querySelectorAll('.row');
+    // مدیریت ورودی پول اصلی
+    function handleMainInput(input) {
+        // ۱. حذف کاماها و تبدیل به انگلیسی
+        let rawValue = toEnglishDigits(input.value).replace(/,/g, '');
         
-        rows.forEach(row => {
-            const percentInput = row.querySelector('input[type="number"]');
-            totalPercent += parseFloat(percentInput.value) || 0;
-        });
-
-        // نمایش وضعیت
-        if (totalPercent === 100) {
-            statusText.innerHTML = `جمع درصد: ${totalPercent}% <span style='font-size:0.8em'>✅ (تکمیل)</span>`;
-            statusText.className = "total-percent status-valid";
-        } else if (totalPercent > 100) {
-            const extra = totalPercent - 100;
-            statusText.innerHTML = `جمع درصد: ${totalPercent}% <span style='font-size:0.8em'>⚠️ (${extra}% اضافه است!)</span>`;
-            statusText.className = "total-percent status-invalid";
-        } else {
-            const remain = 100 - totalPercent;
-            statusText.innerHTML = `جمع درصد: ${totalPercent}% <span style='font-size:0.8em'>(${remain}% باقی‌مانده)</span>`;
-            statusText.className = "total-percent"; // رنگ معمولی
+        // ۲. اگر عدد نیست، پاک کن
+        if (isNaN(rawValue) || rawValue === '') {
+            calculateAll(); // ریست کردن مقادیر
+            return;
         }
+
+        // ۳. فرمت کردن و نمایش مجدد در اینپوت
+        input.value = parseInt(rawValue).toLocaleString('en-US');
         
-        return totalPercent;
+        // ۴. انجام محاسبات
+        calculateAll();
     }
 
-    // محاسبه اصلی
-    function calculate() {
-        const totalAmountStr = document.getElementById('totalAmount').value;
-        const totalAmount = parseNumber(totalAmountStr);
-        const rows = document.querySelectorAll('.row');
+    // مدیریت تغییر درصدها
+    function handlePercentChange(input) {
+        let val = toEnglishDigits(input.value);
+        // جلوگیری از ورود حروف
+        if(isNaN(val)) input.value = 0;
+        
+        updatePercentBar();
+        calculateAll();
+    }
+
+    // بروزرسانی نوار وضعیت درصد
+    function updatePercentBar() {
+        let totalPercent = 0;
+        const rows = document.querySelectorAll('.budget-item');
+        
+        rows.forEach(row => {
+            let pVal = row.querySelector('.percent-input').value;
+            totalPercent += parseFloat(toEnglishDigits(pVal)) || 0;
+        });
+
+        const bar = document.getElementById('progressBar');
+        const text = document.getElementById('percentText');
+        const msg = document.getElementById('statusMessage');
+
+        // محدود کردن عرض بار به ۱۰۰ (برای گرافیک)
+        let visualPercent = totalPercent > 100 ? 100 : totalPercent;
+        bar.style.width = visualPercent + '%';
+        text.innerText = `جمع درصد: ${toPersianDigits(totalPercent)}٪`;
+
+        if (totalPercent === 100) {
+            bar.style.backgroundColor = 'var(--success)';
+            msg.innerText = "✅ تکمیل و دقیق";
+            msg.style.color = 'var(--success)';
+        } else if (totalPercent > 100) {
+            bar.style.backgroundColor = 'var(--danger)';
+            msg.innerText = `⚠️ ${toPersianDigits(totalPercent - 100)}٪ اضافه است!`;
+            msg.style.color = 'var(--danger)';
+        } else {
+            bar.style.backgroundColor = 'var(--warning)';
+            msg.innerText = `🔵 ${toPersianDigits(100 - totalPercent)}٪ باقی‌مانده`;
+            msg.style.color = 'var(--text-dark)';
+        }
+    }
+
+    // تابع اصلی محاسبه
+    function calculateAll() {
+        const totalInput = document.getElementById('totalAmount');
+        const rawTotal = parseFloat(toEnglishDigits(totalInput.value).replace(/,/g, '')) || 0;
+        
+        currentCurrency = currencySelector.value;
+        const rows = document.querySelectorAll('.budget-item');
 
         rows.forEach(row => {
-            const percent = parseFloat(row.querySelector('input[type="number"]').value) || 0;
-            const resultBox = row.querySelector('.result-display');
+            const pInput = row.querySelector('.percent-input');
+            const resultBox = row.querySelector('.amount-display');
             
-            // فرمول محاسبه: (پول کل * درصد) / 100
-            const share = (totalAmount * percent) / 100;
+            const percent = parseFloat(toEnglishDigits(pInput.value)) || 0;
             
-            // نمایش عدد فرمت شده
-            resultBox.textContent = formatNumber(Math.round(share)) + " تومان";
+            // فرمول محاسبه
+            const share = (rawTotal * percent) / 100;
+            
+            // نمایش عدد فارسی شده
+            resultBox.innerText = toPersianDigits(formatMoney(share)) + " " + currentCurrency;
         });
     }
 
-    // اجرای اولیه
+    // بازخوانی واحد پول
+    function reCalculate() {
+        calculateAll();
+    }
+
+    // اجرا
     init();
 
 </script>
