@@ -1,44 +1,46 @@
-<!DOCTYPE html>
+ <!DOCTYPE html> 
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مدیریت مالی امیرحسین | V10 Fixed</title>
+    <title>مدیریت مالی حرفه‌ای | V10 Ultimate</title>
     
-    <!-- فونت‌ها -->
+    <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <!-- آیکون‌ها -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- نمودار -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- خروجی عکس -->
+    <!-- تبدیل به عکس -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
         :root {
-            --bg-body: #f0f4f8;
+            --bg-body: #f3f4f6;
             --glass-bg: rgba(255, 255, 255, 0.95);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.5);
-            --shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            --primary: #4f46e5;
-            --primary-dark: #4338ca;
+            --glass-border: 1px solid rgba(203, 213, 225, 0.8);
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            
+            --primary: #4338ca;      /* Indigo */
+            --primary-light: #6366f1;
             --text-main: #1e293b;
             --text-sec: #64748b;
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
-            --radius: 16px;
-            --nav-height: 75px;
+            --card-radius: 16px;
+            --nav-height: 70px;
         }
 
         [data-theme="dark"] {
             --bg-body: #0f172a;
-            --glass-bg: rgba(30, 41, 59, 0.95);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-            --text-main: #f8fafc;
+            --glass-bg: rgba(30, 41, 59, 0.98);
+            --glass-border: 1px solid rgba(71, 85, 105, 0.5);
+            --text-main: #f1f5f9;
             --text-sec: #94a3b8;
-            --primary: #6366f1;
-            --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            --primary: #818cf8;
+            --primary-light: #6366f1;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
         }
 
         * {
@@ -54,25 +56,25 @@
             margin: 0;
             padding: 0 0 var(--nav-height) 0;
             min-height: 100vh;
+            overflow-x: hidden;
             transition: background 0.3s;
         }
 
-        /* --- کانتینر --- */
+        /* --- کامپوننت‌های عمومی --- */
         .container {
-            max-width: 800px;
+            max-width: 600px; /* موبایل فرست */
             margin: 0 auto;
             padding: 20px;
         }
 
-        /* --- پنل‌های شیشه‌ای --- */
-        .panel {
+        .glass-panel {
             background: var(--glass-bg);
             border: var(--glass-border);
-            border-radius: var(--radius);
+            border-radius: var(--card-radius);
             box-shadow: var(--shadow);
             padding: 20px;
             margin-bottom: 20px;
-            backdrop-filter: blur(10px);
+            transition: transform 0.2s;
         }
 
         .header-row {
@@ -80,60 +82,96 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
+            border-bottom: 2px solid var(--primary-light);
             padding-bottom: 10px;
-            border-bottom: 1px solid var(--text-sec);
-            opacity: 0.8;
         }
+
         .header-row h3 { margin: 0; font-size: 1.1rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
 
-        /* --- دکمه‌ها --- */
+        /* دکمه‌ها */
         .btn {
-            padding: 8px 15px;
-            border-radius: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
             font-size: 0.9rem;
             font-weight: bold;
             cursor: pointer;
-            border: none;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 5px;
             transition: 0.2s;
+            border: none;
         }
-        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3); }
-        .btn-primary:active { transform: scale(0.95); }
-        .btn-outline { background: transparent; border: 1px solid var(--text-sec); color: var(--text-main); }
-        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
-        .btn-icon { background: transparent; color: var(--text-sec); font-size: 1.2rem; padding: 5px; cursor: pointer; }
 
-        /* --- ورودی‌ها --- */
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 2px 5px rgba(67, 56, 202, 0.3); }
+        .btn-primary:active { transform: scale(0.95); }
+
+        .btn-outline { background: transparent; border: 1px solid var(--text-sec); color: var(--text-sec); }
+        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); }
+        .btn-danger:hover { background: var(--danger); color: white; }
+
+        .btn-icon {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-sec);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+        }
+        .btn-icon:hover { background: rgba(0,0,0,0.05); color: var(--primary); }
+
+        /* ورودی‌ها */
         input, select {
-            width: 100%;
-            padding: 12px;
             background: var(--bg-body);
             border: 1px solid var(--text-sec);
-            border-radius: 10px;
             color: var(--text-main);
+            padding: 12px;
+            border-radius: 8px;
             font-size: 1rem;
+            width: 100%;
             margin-bottom: 10px;
         }
-        input:focus { border-color: var(--primary); }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(67, 56, 202, 0.1); }
 
-        /* --- HERO CARD --- */
+        /* --- پین کد (PIN Screen) --- */
+        .pin-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-body); z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .pin-dots { display: flex; gap: 15px; margin: 30px 0; }
+        .pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--primary); transition: 0.2s; }
+        .pin-dot.filled { background: var(--primary); transform: scale(1.1); }
+        
+        .numpad {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; direction: ltr; /* چپ به راست */
+        }
+        .num-key {
+            width: 70px; height: 70px; border-radius: 50%;
+            background: var(--glass-bg); border: 1px solid var(--text-sec);
+            font-size: 1.5rem; font-weight: bold; color: var(--text-main);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            box-shadow: var(--shadow); transition: 0.1s;
+        }
+        .num-key:active { background: var(--primary); color: white; transform: scale(0.9); }
+
+        /* --- کارت اعتباری (HERO) --- */
         .hero-card {
             perspective: 1000px;
-            height: 220px;
-            margin-bottom: 20px;
+            height: 200px;
+            margin-bottom: 25px;
             cursor: pointer;
         }
         .card-inner {
             position: relative;
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             text-align: center;
             transition: transform 0.8s;
             transform-style: preserve-3d;
             border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
         }
         .hero-card.flipped .card-inner { transform: rotateY(180deg); }
         
@@ -146,12 +184,20 @@
             color: white;
             display: flex; flex-direction: column; justify-content: space-between;
         }
-        .card-front { background: linear-gradient(135deg, #4f46e5, #3b82f6); }
-        .card-back { background: #1e293b; transform: rotateY(180deg); align-items: center; justify-content: center; }
+        .card-front {
+            background: linear-gradient(135deg, #4f46e5, #3b82f6);
+        }
+        .card-back {
+            background: #1e293b;
+            transform: rotateY(180deg);
+            align-items: center; justify-content: center;
+        }
 
-        .balance-val { font-size: 2.5rem; font-weight: 800; margin: 10px 0; direction: ltr; letter-spacing: 1px; }
+        .balance-label { font-size: 0.9rem; opacity: 0.8; text-align: right; display: block;}
+        .balance-value { font-size: 2.2rem; font-weight: 800; margin: 5px 0; direction: ltr; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .currency-tag { font-size: 1rem; vertical-align: middle; }
 
-        /* --- BUDGET GRID (Bento) --- */
+        /* --- BENTO GRID (بودجه) --- */
         .budget-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
@@ -162,24 +208,41 @@
         .bento-item {
             background: var(--glass-bg);
             border: var(--glass-border);
-            border-radius: 14px;
+            border-radius: 12px;
             padding: 15px;
-            display: flex; flex-direction: column; gap: 8px;
             position: relative;
+            display: flex; flex-direction: column; gap: 8px;
             box-shadow: var(--shadow);
         }
         
-        .bento-header { display: flex; justify-content: space-between; font-weight: bold; }
-        .progress-bar { height: 8px; background: rgba(0,0,0,0.1); border-radius: 4px; overflow: hidden; margin: 5px 0; }
-        .progress-fill { height: 100%; transition: width 0.5s; border-radius: 4px; }
+        .bento-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 1rem; }
         
+        .progress-bar {
+            height: 10px; background: rgba(0,0,0,0.05); border-radius: 5px; overflow: hidden; margin: 5px 0;
+        }
+        .progress-fill { height: 100%; transition: width 0.5s; border-radius: 5px; }
+        
+        /* وضعیت‌های رنگی */
         .stat-green .progress-fill { background: var(--success); }
+        .stat-green .remain-val { color: var(--success); }
+        
         .stat-yellow .progress-fill { background: var(--warning); }
+        .stat-yellow .remain-val { color: var(--warning); }
+        
         .stat-red .progress-fill { background: var(--danger); }
+        .stat-red .remain-val { color: var(--danger); }
+        .stat-red { border: 1px solid var(--danger); }
 
-        .bento-actions { display: flex; gap: 8px; margin-top: 5px; }
-        .action-btn { flex: 1; padding: 6px; border: 1px solid var(--text-sec); border-radius: 6px; background: transparent; color: var(--text-main); font-size: 0.8rem; cursor: pointer; }
-        .action-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .bento-actions {
+            margin-top: 5px;
+            display: flex; gap: 5px;
+        }
+        .action-chip {
+            flex: 1; padding: 6px; font-size: 0.8rem; border-radius: 6px;
+            border: 1px solid var(--text-sec); background: transparent; color: var(--text-main);
+            cursor: pointer; text-align: center; font-weight: bold;
+        }
+        .action-chip:hover { background: var(--primary); color: white; border-color: var(--primary); }
 
         /* --- BOTTOM NAV --- */
         .bottom-nav {
@@ -190,95 +253,64 @@
             border-top: var(--glass-border);
             display: flex; justify-content: space-around; align-items: center;
             z-index: 1000;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 -5px 10px rgba(0,0,0,0.05);
         }
-        .nav-item {
+        .nav-btn {
             background: none; border: none;
             display: flex; flex-direction: column; align-items: center; gap: 4px;
             color: var(--text-sec); font-size: 0.75rem; cursor: pointer;
-            width: 60px;
+            width: 60px; font-weight: bold;
         }
-        .nav-item i { font-size: 1.4rem; margin-bottom: 2px; transition: 0.2s; }
-        .nav-item.active { color: var(--primary); font-weight: bold; }
-        .nav-item.active i { transform: translateY(-5px); }
+        .nav-btn i { font-size: 1.4rem; margin-bottom: 2px; transition: transform 0.2s; }
+        .nav-btn.active { color: var(--primary); }
+        .nav-btn.active i { transform: translateY(-5px); }
 
-        /* --- MODAL --- */
+        /* --- MODALS --- */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8);
             z-index: 2000;
-            display: none; justify-content: center; align-items: flex-end; /* Bottom sheet on mobile */
-            backdrop-filter: blur(4px);
+            display: none; justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
         }
-        .modal.active { display: flex; }
-        
-        @media(min-width: 600px) { .modal.active { align-items: center; } }
-
+        .modal.active { display: flex; animation: fadeIn 0.2s; }
         .modal-content {
-            background: var(--glass-bg);
-            width: 100%; max-width: 500px;
+            background: var(--bg-body);
+            width: 90%; max-width: 400px;
             padding: 25px;
-            border-radius: 20px 20px 0 0;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
-            animation: slideUp 0.3s;
-            max-height: 85vh; overflow-y: auto;
-            color: var(--text-main);
+            border-radius: 20px;
+            border: 1px solid var(--text-sec);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            max-height: 90vh; overflow-y: auto;
         }
-        @media(min-width: 600px) { .modal-content { border-radius: 20px; animation: fadeIn 0.3s; } }
 
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        /* --- TAB CONTENT --- */
+        .tab-pane { display: none; padding-bottom: 20px; }
+        .tab-pane.active { display: block; animation: slideUp 0.3s; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- PIN PAD --- */
-        .pin-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-body); z-index: 9999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-        }
-        .pin-dots { display: flex; gap: 15px; margin: 30px 0; }
-        .pin-dot { width: 15px; height: 15px; border-radius: 50%; border: 2px solid var(--primary); }
-        .pin-dot.filled { background: var(--primary); }
-        
-        .numpad {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; direction: ltr;
-        }
-        .num-key {
-            width: 70px; height: 70px; border-radius: 50%;
-            background: var(--glass-bg); border: 1px solid var(--text-sec);
-            font-size: 1.6rem; font-weight: bold; color: var(--text-main);
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .num-key:active { background: var(--primary); color: white; transform: scale(0.9); }
-
-        /* --- LIST ITEMS --- */
-        .list-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.1);
-        }
-        .list-row:last-child { border: none; }
-
-        /* --- TABS --- */
-        .tab-pane { display: none; padding-bottom: 20px; }
-        .tab-pane.active { display: block; animation: fadeIn 0.4s; }
-
-        /* --- PRINT AREA --- */
+        /* --- REPORT (PRINT) --- */
         #printArea {
-            position: absolute; top: -9999px; left: -9999px; width: 800px;
-            background: white; padding: 40px; color: black; border: 2px solid #000;
+            position: absolute; top: -9999px; left: -9999px;
+            width: 800px; background: white; color: black; padding: 40px;
+            border: 2px solid #333; font-family: 'Tahoma', sans-serif;
         }
-        .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .print-table th, .print-table td { border: 1px solid #000; padding: 10px; text-align: center; }
+        .print-header { text-align: center; border-bottom: 2px solid #000; margin-bottom: 20px; padding-bottom: 15px; }
+        .print-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .print-table th { background: #eee; border: 1px solid #000; padding: 10px; }
+        .print-table td { border: 1px solid #000; padding: 8px; text-align: center; }
+        .print-summary { display: flex; justify-content: space-between; margin-top: 20px; font-weight: bold; border: 1px solid #000; padding: 10px; }
 
     </style>
 </head>
 <body>
 
-<!-- 1. PIN SCREEN -->
-<div id="pinScreen" class="pin-screen">
-    <i class="fas fa-lock" style="font-size: 4rem; color: var(--primary);"></i>
-    <h2 id="pinTitle" style="margin-top:20px;">ورود امن</h2>
-    <p id="pinSub" style="color:var(--text-sec)">رمز عبور را وارد کنید</p>
+<!-- 1. LOCK SCREEN (PIN) -->
+<div id="authModal" class="pin-screen" style="display: flex;">
+    <i class="fas fa-fingerprint" style="font-size: 4rem; color: var(--primary);"></i>
+    <h2 id="authTitle" style="margin: 15px 0 5px 0;">امنیت</h2>
+    <p id="authSub" style="font-size: 0.9rem; color: var(--text-sec); margin-bottom: 20px;">...</p>
     
     <div class="pin-dots">
         <div class="pin-dot" id="pd1"></div>
@@ -297,67 +329,73 @@
         <button class="num-key" onclick="pressKey(7)">7</button>
         <button class="num-key" onclick="pressKey(8)">8</button>
         <button class="num-key" onclick="pressKey(9)">9</button>
-        <div></div>
+        <div class="num-key" style="visibility: hidden;"></div>
         <button class="num-key" onclick="pressKey(0)">0</button>
         <button class="num-key" onclick="pressKey('del')" style="color:var(--danger)"><i class="fas fa-backspace"></i></button>
     </div>
 </div>
 
 <!-- 2. MAIN APP -->
-<div class="container" id="mainApp" style="display:none;">
+<div class="container" id="appContent" style="display:none;">
     
-    <!-- Top Bar -->
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-        <h2 style="margin:0;"><i class="fas fa-wallet" style="color:var(--primary)"></i> مالی من</h2>
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 10px;">
+        <div>
+            <h2 style="margin:0; color:var(--primary);">مدیریت مالی</h2>
+            <span style="font-size:0.8rem; color:var(--text-sec);" id="headerDate">---</span>
+        </div>
         <div style="display:flex; gap:10px;">
-            <button class="btn-icon" onclick="toggleCurrency()" style="font-size:0.9rem; font-weight:bold; border:1px solid var(--text-sec); border-radius:8px; padding:0 10px; width:auto;">
-                <span id="currLabel">تومان</span>
+            <button class="btn-icon" onclick="toggleCurrency()" title="تبدیل واحد پول">
+                <span id="currBadge" style="font-weight:bold; font-size:0.8rem; border:1px solid var(--text-sec); padding:2px 5px; border-radius:4px;">T</span>
             </button>
-            <button class="btn-icon" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+            <button class="btn-icon" onclick="toggleTheme()" title="تم شب/روز">
+                <i class="fas fa-moon"></i>
+            </button>
         </div>
     </div>
 
     <!-- TAB 1: DASHBOARD -->
-    <div id="view-home" class="tab-pane active">
+    <div id="view-dashboard" class="tab-pane active">
         <!-- Hero Card -->
         <div class="hero-card" onclick="this.classList.toggle('flipped')">
             <div class="card-inner">
                 <div class="card-front">
-                    <div style="display:flex; justify-content:space-between; opacity:0.8;">
-                        <i class="fas fa-wifi"></i>
-                        <span id="dateDisplay">----/--/--</span>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <i class="fas fa-wifi" style="opacity:0.7"></i>
+                        <span style="font-size:0.9rem; opacity:0.8">کارت هوشمند</span>
                     </div>
                     <div>
-                        <div style="font-size:0.9rem; opacity:0.9;">موجودی قابل تقسیم</div>
-                        <div class="balance-val"><span id="totalNet">0</span></div>
+                        <span class="balance-label">موجودی خالص (قابل تقسیم)</span>
+                        <div class="balance-value" id="totalBalance">0</div>
                     </div>
                     <div style="display:flex; justify-content:space-between; font-size:0.9rem; opacity:0.9;">
-                        <span>امیرحسین</span>
-                        <span>V10 Ultimate</span>
+                        <span id="userNameDisplay">کاربر</span>
+                        <span id="cardCurrency">تومان</span>
                     </div>
                 </div>
                 <div class="card-back">
-                    <h3>بدهی‌ها و اقساط</h3>
-                    <div style="font-size:2rem; font-weight:bold; color:var(--danger);" id="totalDebt">0</div>
-                    <p style="opacity:0.8">کسر شده از موجودی کل</p>
+                    <h3 style="margin:0;">وضعیت اقساط</h3>
+                    <p style="margin:5px 0;">مجموع بدهی‌های ثابت ماه:</p>
+                    <div style="font-size:1.8rem; color:var(--danger); font-weight:bold; direction:ltr;" id="totalDebtDisplay">0</div>
+                    <p style="font-size:0.8rem; margin-top:10px; opacity:0.7;">این مبلغ کسر شده است.</p>
                 </div>
             </div>
         </div>
 
         <!-- Wallets -->
-        <div class="panel">
+        <div class="glass-panel">
             <div class="header-row">
-                <h3><i class="fas fa-wallet"></i> منابع پول</h3>
+                <h3><i class="fas fa-wallet"></i> منابع مالی (کیف پول)</h3>
                 <button class="btn btn-primary" onclick="openModal('walletModal')"><i class="fas fa-plus"></i></button>
             </div>
             <div id="walletList"></div>
         </div>
 
         <!-- Debts -->
-        <div class="panel">
+        <div class="glass-panel">
             <div class="header-row">
-                <h3><i class="fas fa-file-invoice"></i> اقساط (کسر خودکار)</h3>
-                <button class="btn btn-outline" onclick="openModal('debtModal')"><i class="fas fa-plus"></i></button>
+                <h3><i class="fas fa-file-invoice-dollar"></i> اقساط و بدهی ثابت</h3>
+                <button class="btn btn-primary" onclick="openModal('debtModal')"><i class="fas fa-plus"></i></button>
             </div>
             <div id="debtList"></div>
         </div>
@@ -365,28 +403,25 @@
 
     <!-- TAB 2: BUDGET -->
     <div id="view-budget" class="tab-pane">
-        <div class="panel" style="text-align:center;">
-            <label style="color:var(--text-sec)">بودجه کل:</label>
-            <div id="budgetTotalDisplay" style="font-size:1.8rem; font-weight:bold; color:var(--primary);">0</div>
-            <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="renderUI()">
-                <i class="fas fa-calculator"></i> محاسبه و توزیع
-            </button>
+        <div class="glass-panel" style="text-align:center;">
+            <span style="color:var(--text-sec); font-size:0.9rem;">بودجه کل توزیع شده:</span>
+            <div id="distributable" style="font-size:1.5rem; font-weight:bold; color:var(--primary); direction:ltr;">0</div>
         </div>
 
-        <div class="header-row" style="margin-top:20px;">
-            <h3>ردیف‌های بودجه</h3>
-            <button class="btn btn-outline" onclick="openModal('addBudgetModal')"><i class="fas fa-plus"></i></button>
+        <div class="header-row" style="margin: 0 10px 15px 10px;">
+            <h3>مدیریت ردیف‌ها</h3>
+            <button class="btn btn-primary" onclick="openModal('addBudgetModal')"><i class="fas fa-plus"></i> جدید</button>
         </div>
 
         <div id="budgetGrid" class="budget-grid">
-            <!-- Items injected via JS -->
+            <!-- کارت‌های بودجه اینجا ساخته می‌شوند -->
         </div>
     </div>
 
     <!-- TAB 3: TOOLS -->
     <div id="view-tools" class="tab-pane">
         <!-- Goals -->
-        <div class="panel">
+        <div class="glass-panel">
             <div class="header-row">
                 <h3><i class="fas fa-bullseye"></i> اهداف پس‌انداز</h3>
                 <button class="btn btn-primary" onclick="openModal('goalModal')"><i class="fas fa-plus"></i> هدف</button>
@@ -395,50 +430,50 @@
         </div>
 
         <!-- Shopping -->
-        <div class="panel">
+        <div class="glass-panel">
             <div class="header-row">
                 <h3><i class="fas fa-shopping-cart"></i> لیست خرید</h3>
                 <button class="btn btn-primary" onclick="openModal('shopModal')"><i class="fas fa-plus"></i> کالا</button>
             </div>
             <div id="shopList"></div>
         </div>
-
-        <!-- Lending -->
-        <div class="panel">
-            <div class="header-row">
-                <h3><i class="fas fa-handshake"></i> دفترچه قرض</h3>
-                <button class="btn btn-primary" onclick="openModal('lendModal')"><i class="fas fa-plus"></i></button>
-            </div>
-            <div id="lendList"></div>
-        </div>
     </div>
 
     <!-- TAB 4: SETTINGS -->
     <div id="view-settings" class="tab-pane">
-        <div class="panel">
-            <div class="header-row"><h3>تنظیمات و پشتیبان</h3></div>
+        <div class="glass-panel">
+            <div class="header-row"><h3>تنظیمات سیستم</h3></div>
+            
             <div style="display:flex; flex-direction:column; gap:15px;">
                 
-                <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-body); padding:10px; border-radius:10px;">
-                    <span>حالت کپی (برای بانک):</span>
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:rgba(0,0,0,0.05); border-radius:8px;">
+                    <span><i class="fas fa-copy"></i> حالت کپی (خام برای بانک)</span>
                     <input type="checkbox" id="rawCopyCheck" style="width:20px; height:20px;">
                 </div>
 
-                <button class="btn btn-outline" onclick="generateImage()">
-                    <i class="fas fa-file-image"></i> دانلود فاکتور (عکس)
+                <button class="btn btn-outline" onclick="generateReportImage()">
+                    <i class="fas fa-file-image"></i> دانلود فاکتور تصویری
                 </button>
+                
                 <button class="btn btn-outline" onclick="downloadBackup()">
-                    <i class="fas fa-download"></i> دانلود فایل پشتیبان
+                    <i class="fas fa-download"></i> دانلود فایل بکاپ (JSON)
                 </button>
-                <label class="btn btn-outline" style="cursor:pointer; justify-content:center;">
-                    <i class="fas fa-upload"></i> بازیابی اطلاعات
-                    <input type="file" style="display:none;" onchange="restoreBackup(this)">
+                
+                <label class="btn btn-outline" style="cursor:pointer; text-align:center;">
+                    <i class="fas fa-upload"></i> بازیابی فایل بکاپ
+                    <input type="file" id="restoreFile" style="display:none" onchange="restoreBackup(this)">
                 </label>
+
                 <button class="btn btn-outline" onclick="showHistory()">
                     <i class="fas fa-history"></i> تاریخچه ذخیره‌ها
                 </button>
-                <button class="btn btn-outline" style="color:var(--danger); border-color:var(--danger);" onclick="resetApp()">
-                    <i class="fas fa-trash"></i> ریست کلی
+
+                <button class="btn btn-outline" onclick="changePin()">
+                    <i class="fas fa-lock"></i> تغییر رمز عبور
+                </button>
+
+                <button class="btn btn-danger" onclick="resetAll()">
+                    <i class="fas fa-trash"></i> ریست فکتوری
                 </button>
             </div>
         </div>
@@ -446,18 +481,18 @@
 
 </div>
 
-<!-- BOTTOM NAV -->
+<!-- BOTTOM NAVIGATION -->
 <nav class="bottom-nav">
-    <button class="nav-item active" onclick="switchTab('home')">
-        <i class="fas fa-home"></i> خانه
+    <button class="nav-btn active" onclick="switchTab('dashboard')">
+        <i class="fas fa-home"></i> داشبورد
     </button>
-    <button class="nav-item" onclick="switchTab('budget')">
+    <button class="nav-btn" onclick="switchTab('budget')">
         <i class="fas fa-chart-pie"></i> بودجه
     </button>
-    <button class="nav-item" onclick="switchTab('tools')">
+    <button class="nav-btn" onclick="switchTab('tools')">
         <i class="fas fa-tools"></i> ابزارها
     </button>
-    <button class="nav-item" onclick="switchTab('settings')">
+    <button class="nav-btn" onclick="switchTab('settings')">
         <i class="fas fa-cog"></i> تنظیمات
     </button>
 </nav>
@@ -468,11 +503,13 @@
 <div id="walletModal" class="modal">
     <div class="modal-content">
         <h3>افزودن کیف پول</h3>
-        <input type="text" id="wName" placeholder="نام (مثلاً: کارت سپه)">
-        <input type="number" id="wVal" placeholder="موجودی (تومان)">
+        <label>نام کیف پول:</label>
+        <input type="text" id="wName" placeholder="مثلاً: کارت ملی">
+        <label>مبلغ موجودی:</label>
+        <input type="number" id="wVal" placeholder="0">
         <div style="margin-top:20px; display:flex; gap:10px;">
             <button class="btn btn-primary" style="flex:1" onclick="addWallet()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeModal('walletModal')">لغو</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
         </div>
     </div>
 </div>
@@ -481,54 +518,28 @@
 <div id="debtModal" class="modal">
     <div class="modal-content">
         <h3>افزودن قسط ثابت</h3>
-        <input type="text" id="dName" placeholder="عنوان (مثلاً: قسط وام)">
-        <input type="number" id="dVal" placeholder="مبلغ (تومان)">
+        <label>عنوان قسط:</label>
+        <input type="text" id="dName" placeholder="مثلاً: وام مسکن">
+        <label>مبلغ قسط:</label>
+        <input type="number" id="dVal" placeholder="0">
         <div style="margin-top:20px; display:flex; gap:10px;">
             <button class="btn btn-primary" style="flex:1" onclick="addDebt()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeModal('debtModal')">لغو</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
         </div>
     </div>
 </div>
 
-<!-- Goal Modal -->
-<div id="goalModal" class="modal">
+<!-- Add Budget Modal -->
+<div id="addBudgetModal" class="modal">
     <div class="modal-content">
-        <h3>هدف جدید</h3>
-        <input type="text" id="gName" placeholder="نام هدف">
-        <input type="number" id="gTarget" placeholder="مبلغ هدف">
+        <h3>افزودن ردیف بودجه</h3>
+        <label>عنوان:</label>
+        <input type="text" id="bName" placeholder="مثلاً: پوشاک">
+        <label>درصد سهم:</label>
+        <input type="number" id="bPercent" placeholder="مثلاً: 10">
         <div style="margin-top:20px; display:flex; gap:10px;">
-            <button class="btn btn-primary" style="flex:1" onclick="addGoal()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeModal('goalModal')">لغو</button>
-        </div>
-    </div>
-</div>
-
-<!-- Shop Modal -->
-<div id="shopModal" class="modal">
-    <div class="modal-content">
-        <h3>کالای جدید</h3>
-        <input type="text" id="sName" placeholder="نام کالا">
-        <input type="number" id="sCost" placeholder="قیمت تقریبی">
-        <div style="margin-top:20px; display:flex; gap:10px;">
-            <button class="btn btn-primary" style="flex:1" onclick="addShop()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeModal('shopModal')">لغو</button>
-        </div>
-    </div>
-</div>
-
-<!-- Lend Modal -->
-<div id="lendModal" class="modal">
-    <div class="modal-content">
-        <h3>ثبت قرض/طلب</h3>
-        <input type="text" id="lName" placeholder="نام شخص">
-        <input type="number" id="lAmt" placeholder="مبلغ">
-        <select id="lType">
-            <option value="give">من پول دادم (طلبکارم)</option>
-            <option value="get">من پول گرفتم (بدهکارم)</option>
-        </select>
-        <div style="margin-top:20px; display:flex; gap:10px;">
-            <button class="btn btn-primary" style="flex:1" onclick="addLend()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeModal('lendModal')">لغو</button>
+            <button class="btn btn-primary" style="flex:1" onclick="addNewBudget()">ثبت</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
         </div>
     </div>
 </div>
@@ -536,15 +547,43 @@
 <!-- Expense Modal -->
 <div id="expModal" class="modal">
     <div class="modal-content">
-        <h3>ثبت هزینه</h3>
-        <input type="hidden" id="expIdx">
-        <label>مبلغ:</label>
+        <h3>ثبت هزینه جدید</h3>
+        <input type="hidden" id="expBudgetId">
+        <label>مبلغ هزینه:</label>
         <input type="number" id="expAmt" placeholder="0">
-        <label>بابت:</label>
-        <input type="text" id="expReason" placeholder="توضیحات">
+        <label>بابت (توضیح):</label>
+        <input type="text" id="expReason" placeholder="...">
         <div style="margin-top:20px; display:flex; gap:10px;">
             <button class="btn btn-primary" style="flex:1" onclick="submitExp()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeModal('expModal')">لغو</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+        </div>
+    </div>
+</div>
+
+<!-- Goal Modal -->
+<div id="goalModal" class="modal">
+    <div class="modal-content">
+        <h3>هدف پس‌انداز جدید</h3>
+        <label>نام هدف:</label>
+        <input type="text" id="gName" placeholder="مثلاً: لپ‌تاپ">
+        <label>مبلغ هدف:</label>
+        <input type="number" id="gTarget" placeholder="0">
+        <div style="margin-top:20px; display:flex; gap:10px;">
+            <button class="btn btn-primary" style="flex:1" onclick="addGoal()">ثبت</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+        </div>
+    </div>
+</div>
+
+<!-- Shop Modal -->
+<div id="shopModal" class="modal">
+    <div class="modal-content">
+        <h3>افزودن به لیست خرید</h3>
+        <label>نام کالا:</label>
+        <input type="text" id="sName" placeholder="مثلاً: روغن زیتون">
+        <div style="margin-top:20px; display:flex; gap:10px;">
+            <button class="btn btn-primary" style="flex:1" onclick="addShop()">ثبت</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
         </div>
     </div>
 </div>
@@ -552,155 +591,174 @@
 <!-- History Modal -->
 <div id="histModal" class="modal">
     <div class="modal-content">
-        <h3>تاریخچه</h3>
-        <div id="histList" style="max-height:300px; overflow-y:auto; margin-top:10px;"></div>
-        <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="closeModal('histModal')">بستن</button>
+        <h3>تاریخچه بکاپ‌ها</h3>
+        <div id="histList" style="max-height:300px; overflow-y:auto; margin-top:10px; font-size:0.9rem;"></div>
+        <button class="btn btn-outline" style="width:100%; margin-top:15px;" onclick="closeAllModals()">بستن</button>
     </div>
 </div>
 
-<!-- Report Area (Hidden) -->
-<div id="printArea" style="position:fixed; top:-9999px; left:-9999px; background:white; color:black; padding:40px; width:800px; border:2px solid #000;">
-    <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:10px; margin-bottom:20px;">
-        <h1>گزارش وضعیت مالی</h1>
-        <p id="printDate"></p>
+<!-- REPORT TEMPLATE (Hidden) -->
+<div id="printArea">
+    <div class="print-header">
+        <h1>فاکتور وضعیت مالی</h1>
+        <p id="printDate">تاریخ: ---</p>
+        <p>کاربر: <span id="printUser">---</span></p>
     </div>
-    <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-weight:bold;">
-        <span>درآمد: <span id="pInc"></span></span>
-        <span>بدهی: <span id="pDebt"></span></span>
-        <span>خالص: <span id="pNet"></span></span>
+    <div class="print-summary">
+        <div>درآمد: <b id="printInc">0</b></div>
+        <div>بدهی: <b id="printDebt">0</b></div>
+        <div>قابل خرج: <b id="printNet">0</b></div>
     </div>
-    <table style="width:100%; border-collapse:collapse; text-align:center;">
+    <table class="print-table">
         <thead>
-            <tr style="background:#eee;">
-                <th style="border:1px solid #000; padding:8px;">عنوان</th>
-                <th style="border:1px solid #000; padding:8px;">درصد</th>
-                <th style="border:1px solid #000; padding:8px;">بودجه</th>
-                <th style="border:1px solid #000; padding:8px;">خرج</th>
-                <th style="border:1px solid #000; padding:8px;">مانده</th>
+            <tr>
+                <th>عنوان</th>
+                <th>درصد</th>
+                <th>سهم</th>
+                <th>خرج</th>
+                <th>مانده</th>
             </tr>
         </thead>
         <tbody id="printBody"></tbody>
     </table>
+    <div style="margin-top:30px; text-align:center; font-size:12px; color:#666; border-top:1px solid #000; padding-top:10px;">
+        تولید شده توسط سامانه مدیریت مالی شخصی V10
+    </div>
 </div>
 
 <script>
-    // --- Data Model ---
-    const defaultData = {
-        security: { pin: "", hasPin: false },
-        user: { currency: "toman", theme: "light" },
+    // --- STATE & DATA ---
+    const defaultState = {
+        security: { hasPin: false, pin: "" },
+        user: { name: "امیرحسین", theme: "light", currency: "toman" },
         wallets: [],
         debts: [],
         budgets: [
-            {name:"کرایه و رفت‌وآمد", percent:27, spent:0},
-            {name:"خورد و خوراک", percent:12, spent:0},
-            {name:"پس‌انداز هدفمند", percent:25, spent:0},
-            {name:"تفریح", percent:5, spent:0},
-            {name:"شارژ و نت", percent:10, spent:0},
-            {name:"پوشاک", percent:5, spent:0},
-            {name:"درمان", percent:5, spent:0},
-            {name:"ضروری", percent:5, spent:0},
-            {name:"خیریه", percent:3, spent:0},
-            {name:"سایر", percent:3, spent:0}
+            {id: 1, name: "کرایه و رفت‌وآمد", percent: 27, spent: 0},
+            {id: 2, name: "خورد و خوراک", percent: 12, spent: 0},
+            {id: 3, name: "پس‌انداز مشهد", percent: 25, spent: 0},
+            {id: 4, name: "درمان", percent: 3, spent: 0},
+            {id: 5, name: "شارژ و نت", percent: 10, spent: 0},
+            {id: 6, name: "زیبایی و مکمل", percent: 7, spent: 0},
+            {id: 7, name: "لباس", percent: 5, spent: 0},
+            {id: 8, name: "ضروری", percent: 5, spent: 0},
+            {id: 9, name: "تفریح", percent: 3, spent: 0},
+            {id: 10, name: "پس‌انداز کل", percent: 3, spent: 0}
         ],
         goals: [],
         shopping: [],
-        lending: [],
         history: []
     };
 
-    let app = JSON.parse(JSON.stringify(defaultData));
+    let app = JSON.parse(JSON.stringify(defaultState));
     let pinBuffer = "";
-    let rate = 1;
+    let rate = 1; // 1=Toman, 10=Rial
 
-    // --- Init ---
+    // --- STARTUP ---
     window.onload = () => {
         loadData();
         checkAuth();
         updateDate();
     };
 
-    // --- Auth ---
+    // --- AUTH ---
     function checkAuth() {
-        document.getElementById('pinScreen').style.display = 'flex';
-        const title = document.getElementById('pinTitle');
-        const sub = document.getElementById('pinSub');
+        const modal = document.getElementById('authModal');
+        const title = document.getElementById('authTitle');
+        const sub = document.getElementById('authSub');
         
-        if(!app.security.hasPin) {
-            title.innerText = "تعیین رمز عبور جدید";
-            sub.innerText = "یک رمز ۴ رقمی انتخاب کنید";
-        } else {
-            title.innerText = "خوش آمدید";
-            sub.innerText = "رمز عبور را وارد کنید";
-        }
+        modal.style.display = 'flex';
         pinBuffer = "";
-        updateDots();
-    }
+        updatePinDots();
 
-    function pressKey(k) {
-        if(k === 'del') pinBuffer = pinBuffer.slice(0, -1);
-        else if(pinBuffer.length < 4) pinBuffer += k;
-        updateDots();
-        if(pinBuffer.length === 4) setTimeout(validatePin, 200);
-    }
-
-    function updateDots() {
-        for(let i=1; i<=4; i++) {
-            const d = document.getElementById(`pd${i}`);
-            if(i <= pinBuffer.length) d.classList.add('filled');
-            else d.classList.remove('filled');
-        }
-    }
-
-    function validatePin() {
-        if(!app.security.hasPin) {
-            app.security.pin = pinBuffer;
-            app.security.hasPin = true;
-            save();
-            alert("رمز ذخیره شد.");
-            showApp();
+        if (!app.security.hasPin) {
+            title.innerText = "تعیین رمز عبور جدید";
+            sub.innerText = "برای شروع یک رمز ۴ رقمی انتخاب کنید";
         } else {
-            if(pinBuffer === app.security.pin) showApp();
-            else { alert("رمز اشتباه است"); pinBuffer=""; updateDots(); }
+            title.innerText = "ورود به سامانه";
+            sub.innerText = "رمز عبور خود را وارد کنید";
         }
     }
 
-    function showApp() {
-        document.getElementById('pinScreen').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'block';
-        renderUI();
+    function pressKey(key) {
+        if (key === 'del') pinBuffer = pinBuffer.slice(0, -1);
+        else if (pinBuffer.length < 4) pinBuffer += key;
+        
+        updatePinDots();
+        if (pinBuffer.length === 4) setTimeout(processPin, 100);
     }
 
-    // --- Renders ---
+    function updatePinDots() {
+        for(let i=1; i<=4; i++) {
+            const dot = document.getElementById(`pd${i}`);
+            if (i <= pinBuffer.length) dot.classList.add('filled');
+            else dot.classList.remove('filled');
+        }
+    }
+
+    function processPin() {
+        if (!app.security.hasPin) {
+            if(confirm("رمز شما: " + pinBuffer + "\nآیا مطمئن هستید؟")) {
+                app.security.pin = pinBuffer;
+                app.security.hasPin = true;
+                saveData();
+                document.getElementById('authModal').style.display = 'none';
+                document.getElementById('appContent').style.display = 'block';
+                renderUI();
+            } else {
+                pinBuffer = ""; updatePinDots();
+            }
+        } else {
+            if (pinBuffer === app.security.pin) {
+                document.getElementById('authModal').style.display = 'none';
+                document.getElementById('appContent').style.display = 'block';
+                renderUI();
+            } else {
+                alert("رمز اشتباه است!");
+                pinBuffer = ""; updatePinDots();
+            }
+        }
+    }
+
+    function changePin() {
+        if(confirm("آیا می‌خواهید رمز را تغییر دهید؟")) {
+            app.security.hasPin = false;
+            app.security.pin = "";
+            saveData();
+            location.reload();
+        }
+    }
+
+    // --- CORE LOGIC ---
     function renderUI() {
         applyTheme();
+        rate = app.user.currency === 'rial' ? 10 : 1;
+        document.getElementById('currBadge').innerText = app.user.currency === 'toman' ? 'تومان' : 'ریال';
+        document.getElementById('cardCurrency').innerText = app.user.currency === 'toman' ? 'تومان' : 'ریال';
+
+        const income = app.wallets.reduce((a,b)=>a+b.value,0);
+        const debt = app.debts.reduce((a,b)=>a+b.value,0);
+        const net = income - debt;
+
+        document.getElementById('totalBalance').innerText = format(net);
+        document.getElementById('totalDebtDisplay').innerText = format(debt);
+        document.getElementById('distributable').innerText = format(net);
+        document.getElementById('userNameDisplay').innerText = app.user.name;
+
+        // Render Lists
         renderWallets();
         renderDebts();
-        renderHero();
-        renderBudget();
+        renderBudgets(net);
         renderGoals();
-        renderShopping();
-        renderLending();
-    }
-
-    function renderHero() {
-        const inc = getIncome();
-        const debt = getDebt();
-        const net = inc - debt;
-        document.getElementById('totalNet').innerText = fmt(net);
-        document.getElementById('totalDebt').innerText = fmt(debt);
-        document.getElementById('budgetTotalDisplay').innerText = fmt(net);
-        document.getElementById('currLabel').innerText = app.user.currency==='toman'?'تومان':'ریال';
+        renderShop();
     }
 
     function renderWallets() {
         const div = document.getElementById('walletList');
         div.innerHTML = app.wallets.map((w, i) => `
-            <div class="list-row">
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #ddd; padding:10px;">
                 <span>${w.name}</span>
-                <span>
-                    <b>${fmt(w.value)}</b>
-                    <i class="fas fa-trash text-sec" style="cursor:pointer; margin-right:10px;" onclick="delWallet(${i})"></i>
-                </span>
+                <span><b>${format(w.value)}</b> <i class="fas fa-trash text-danger" style="cursor:pointer; margin-right:5px;" onclick="delWallet(${i})"></i></span>
             </div>
         `).join('');
     }
@@ -708,44 +766,42 @@
     function renderDebts() {
         const div = document.getElementById('debtList');
         div.innerHTML = app.debts.map((d, i) => `
-            <div class="list-row" style="color:var(--danger)">
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #ddd; padding:10px; color:var(--danger);">
                 <span>${d.name}</span>
-                <span>
-                    <b>${fmt(d.value)}</b>
-                    <i class="fas fa-trash" style="cursor:pointer; margin-right:10px;" onclick="delDebt(${i})"></i>
-                </span>
+                <span><b>${format(d.value)}</b> <i class="fas fa-trash" style="cursor:pointer; margin-right:5px;" onclick="delDebt(${i})"></i></span>
             </div>
         `).join('');
     }
 
-    function renderBudget() {
-        const net = getIncome() - getDebt();
+    function renderBudgets(net) {
         const div = document.getElementById('budgetGrid');
         div.innerHTML = '';
-        
         app.budgets.forEach((b, i) => {
-            const budget = Math.round((net * b.percent) / 100);
-            const remain = budget - b.spent;
-            const percent = budget > 0 ? (b.spent / budget) * 100 : 0;
+            const share = Math.round((net * b.percent) / 100);
+            const remain = share - b.spent;
+            const percent = share > 0 ? (b.spent / share) * 100 : 0;
             
-            let st = 'stat-green';
-            if(percent > 50) st = 'stat-yellow';
-            if(percent > 90) st = 'stat-red';
+            let status = 'stat-green';
+            if(percent > 50) status = 'stat-yellow';
+            if(percent > 90) status = 'stat-red';
 
             div.innerHTML += `
-                <div class="bento-item ${st}">
+                <div class="bento-item ${status}">
                     <div class="bento-header">
                         <span>${b.name} (${b.percent}%)</span>
+                        <i class="fas fa-trash" style="opacity:0.3; cursor:pointer;" onclick="delBudget(${i})"></i>
                     </div>
-                    <div style="font-size:0.9rem; display:flex; justify-content:space-between;">
-                        <span style="color:var(--text-sec)">بودجه: ${fmt(budget)}</span>
-                        <span style="color:var(--danger)">خرج: ${fmt(b.spent)}</span>
+                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-top:5px; color:var(--text-sec);">
+                        <span>سهم: ${format(share)}</span>
+                        <span style="color:var(--danger)">خرج: ${format(b.spent)}</span>
                     </div>
                     <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(percent,100)}%"></div></div>
-                    <div style="font-weight:bold; color:var(--primary); font-size:1.1rem;">مانده: ${fmt(remain)}</div>
+                    <div style="text-align:left; font-weight:bold; font-size:1.1rem; color:var(--primary); direction:ltr;">
+                        ${format(remain)}
+                    </div>
                     <div class="bento-actions">
-                        <button class="action-btn" onclick="openExp(${i})">ثبت هزینه</button>
-                        <button class="action-btn" onclick="copyTxt(${remain})">کپی مانده</button>
+                        <button class="action-chip" onclick="openExp(${i})">➖ ثبت هزینه</button>
+                        <button class="action-chip" onclick="copyTxt(${remain})">📋 کپی</button>
                     </div>
                 </div>
             `;
@@ -755,206 +811,184 @@
     function renderGoals() {
         const div = document.getElementById('goalList');
         div.innerHTML = app.goals.map((g, i) => {
-            const p = Math.min(100, Math.round((g.current/g.target)*100));
+            const p = Math.min(100, Math.round((g.curr / g.target)*100));
             return `
-            <div class="list-row">
-                <div style="width:100%">
-                    <div style="display:flex; justify-content:space-between;">
-                        <b>${g.name}</b>
-                        <small>${fmt(g.current)} / ${fmt(g.target)}</small>
-                    </div>
-                    <div class="progress-bar"><div class="progress-fill" style="width:${p}%; background:var(--warning)"></div></div>
+                <div style="padding:10px; border-bottom:1px solid #ddd;">
+                    <div style="display:flex; justify-content:space-between;"><b>${g.name}</b> <span>${format(g.curr)} / ${format(g.target)}</span></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:${p}%; background:var(--warning);"></div></div>
+                    <button class="btn btn-outline" style="font-size:0.8rem; padding:2px 8px;" onclick="addGoalMoney(${i})">+ واریز</button>
+                    <button class="btn btn-danger" style="font-size:0.8rem; padding:2px 8px;" onclick="delGoal(${i})">×</button>
                 </div>
-                <div style="min-width:60px; text-align:left;">
-                    <i class="fas fa-plus-circle text-primary" style="cursor:pointer; font-size:1.2rem;" onclick="depGoal(${i})"></i>
-                    <i class="fas fa-trash text-danger" style="cursor:pointer; margin-right:5px;" onclick="delGoal(${i})"></i>
-                </div>
-            </div>`;
+            `;
         }).join('');
     }
 
-    function renderShopping() {
+    function renderShop() {
         const div = document.getElementById('shopList');
         div.innerHTML = app.shopping.map((s, i) => `
-            <div class="list-row">
-                <span>${s.name} (${fmt(s.cost)})</span>
-                <div>
-                    <i class="fas fa-check text-success" style="cursor:pointer;" onclick="delShop(${i})"></i>
-                    <i class="fas fa-trash text-danger" style="cursor:pointer; margin-right:10px;" onclick="delShop(${i})"></i>
-                </div>
+            <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #ddd; align-items:center;">
+                <span>${s.name}</span>
+                <i class="fas fa-check-circle text-success" style="cursor:pointer; font-size:1.2rem;" onclick="delShop(${i})"></i>
             </div>
         `).join('');
     }
 
-    function renderLending() {
-        const div = document.getElementById('lendList');
-        div.innerHTML = app.lending.map((l, i) => `
-            <div class="list-row" style="border-right:4px solid ${l.type==='give'?'var(--warning)':'var(--danger)'}; padding-right:10px;">
-                <span>${l.name}</span>
-                <span>
-                    <b>${fmt(l.amount)}</b>
-                    <button class="btn-outline" style="padding:2px 5px; font-size:0.7rem; margin-right:5px;" onclick="delLend(${i})">تسویه</button>
-                </span>
-            </div>
-        `).join('');
-    }
-
-    // --- LOGIC ---
-    function getIncome() { return app.wallets.reduce((a,b)=>a+b.value,0); }
-    function getDebt() { return app.debts.reduce((a,b)=>a+b.value,0); }
-
+    // --- ACTIONS ---
     function addWallet() {
-        const n=val('wName'), v=val('wVal');
-        if(n&&v) { app.wallets.push({name:n, value:parseInt(v)}); save(); renderUI(); closeModal('walletModal'); }
+        const n = document.getElementById('wName').value;
+        const v = document.getElementById('wVal').value;
+        if(n && v) { app.wallets.push({name:n, value:parseInt(v)}); saveData(); renderUI(); closeAllModals(); }
     }
-    function delWallet(i) { app.wallets.splice(i,1); save(); renderUI(); }
+    function delWallet(i) { if(confirm('حذف؟')) { app.wallets.splice(i,1); saveData(); renderUI(); } }
 
     function addDebt() {
-        const n=val('dName'), v=val('dVal');
-        if(n&&v) { app.debts.push({name:n, value:parseInt(v)}); save(); renderUI(); closeModal('debtModal'); }
+        const n = document.getElementById('dName').value;
+        const v = document.getElementById('dVal').value;
+        if(n && v) { app.debts.push({name:n, value:parseInt(v)}); saveData(); renderUI(); closeAllModals(); }
     }
-    function delDebt(i) { app.debts.splice(i,1); save(); renderUI(); }
+    function delDebt(i) { if(confirm('حذف؟')) { app.debts.splice(i,1); saveData(); renderUI(); } }
 
-    let expIdx = -1;
-    function openExp(i) { expIdx=i; document.getElementById('expAmt').value=''; openModal('expModal'); }
+    function addNewBudget() {
+        const n = document.getElementById('bName').value;
+        const p = document.getElementById('bPercent').value;
+        if(n && p) { app.budgets.push({id:Date.now(), name:n, percent:parseInt(p), spent:0}); saveData(); renderUI(); closeAllModals(); }
+    }
+    function delBudget(i) { if(confirm('حذف ردیف؟')) { app.budgets.splice(i,1); saveData(); renderUI(); } }
+
+    let activeIdx = -1;
+    function openExp(i) { activeIdx = i; openModal('expModal'); }
     function submitExp() {
-        const amt = document.getElementById('expAmt').value;
-        if(amt && expIdx > -1) { app.budgets[expIdx].spent += parseInt(amt); save(); renderUI(); closeModal('expModal'); }
+        const v = document.getElementById('expAmt').value;
+        if(v && activeIdx > -1) { app.budgets[activeIdx].spent += parseInt(v); saveData(); renderUI(); closeAllModals(); }
     }
 
     function addGoal() {
-        const n=val('gName'), v=val('gTarget');
-        if(n&&v) { app.goals.push({name:n, target:parseInt(v), current:0}); save(); renderUI(); closeModal('goalModal'); }
+        const n = document.getElementById('gName').value;
+        const t = document.getElementById('gTarget').value;
+        if(n && t) { app.goals.push({name:n, target:parseInt(t), curr:0}); saveData(); renderUI(); closeAllModals(); }
     }
-    function depGoal(i) {
-        const v = prompt("مبلغ واریز:");
-        if(v) { app.goals[i].current += parseInt(v); save(); renderUI(); }
+    function addGoalMoney(i) {
+        const v = prompt("مبلغ واریزی:");
+        if(v) { app.goals[i].curr += parseInt(v); saveData(); renderUI(); }
     }
-    function delGoal(i) { app.goals.splice(i,1); save(); renderUI(); }
+    function delGoal(i) { app.goals.splice(i,1); saveData(); renderUI(); }
 
     function addShop() {
-        const n=val('sName'), v=val('sCost');
-        if(n) { app.shopping.push({name:n, cost:v?parseInt(v):0}); save(); renderUI(); closeModal('shopModal'); }
+        const n = document.getElementById('sName').value;
+        if(n) { app.shopping.push({name:n}); saveData(); renderUI(); closeAllModals(); }
     }
-    function delShop(i) { app.shopping.splice(i,1); save(); renderUI(); }
+    function delShop(i) { app.shopping.splice(i,1); saveData(); renderUI(); }
 
-    function addLend() {
-        const n=val('lName'), v=val('lAmt'), t=document.getElementById('lType').value;
-        if(n&&v) { app.lending.push({name:n, amount:parseInt(v), type:t}); save(); renderUI(); closeModal('lendModal'); }
-    }
-    function delLend(i) { app.lending.splice(i,1); save(); renderUI(); }
-
-    // --- UTILS ---
-    function val(id) { return document.getElementById(id).value; }
-    function openModal(id) { document.getElementById(id).classList.add('active'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-    function switchTab(id) {
-        document.querySelectorAll('.tab-pane').forEach(e=>e.classList.remove('active'));
-        document.getElementById('view-'+id).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
-        event.currentTarget.classList.add('active');
-    }
-
+    // --- TOOLS ---
     function toggleCurrency() {
-        if(app.user.currency === 'toman') { app.user.currency = 'rial'; rate = 10; }
-        else { app.user.currency = 'toman'; rate = 1; }
-        save(); renderUI();
+        app.user.currency = app.user.currency === 'toman' ? 'rial' : 'toman';
+        saveData(); renderUI();
     }
-
-    function fmt(n) { return (n*rate).toLocaleString('en-US'); }
     
-    function copyTxt(n) {
-        const raw = document.getElementById('rawCopyCheck').checked;
-        const txt = raw ? (n*rate).toString() : fmt(n);
-        navigator.clipboard.writeText(txt);
-        alert("کپی شد: " + txt);
+    function toggleTheme() {
+        if(document.body.getAttribute('data-theme') === 'dark') {
+            document.body.removeAttribute('data-theme'); app.user.theme = 'light';
+        } else {
+            document.body.setAttribute('data-theme', 'dark'); app.user.theme = 'dark';
+        }
+        saveData();
+    }
+    function applyTheme() {
+        if(app.user.theme === 'dark') document.body.setAttribute('data-theme', 'dark');
     }
 
-    function generateImage() {
-        const net = getIncome() - getDebt();
+    function generateReportImage() {
+        const net = getNetTotal();
+        const debt = getDebtTotal();
         document.getElementById('printDate').innerText = new Date().toLocaleDateString('fa-IR');
-        document.getElementById('pInc').innerText = fmt(getIncome());
-        document.getElementById('pDebt').innerText = fmt(getDebt());
-        document.getElementById('pNet').innerText = fmt(net);
-        
-        const b = document.getElementById('printBody');
-        b.innerHTML = '';
-        app.budgets.forEach(i => {
-            const bud = Math.round((net*i.percent)/100);
-            b.innerHTML += `<tr><td>${i.name}</td><td>${i.percent}%</td><td>${fmt(bud)}</td><td>${fmt(i.spent)}</td><td>${fmt(bud-i.spent)}</td></tr>`;
+        document.getElementById('printUser').innerText = app.user.name;
+        document.getElementById('printInc').innerText = format(net + debt);
+        document.getElementById('printDebt').innerText = format(debt);
+        document.getElementById('printNet').innerText = format(net);
+
+        const tb = document.getElementById('printBody');
+        tb.innerHTML = '';
+        app.budgets.forEach(b => {
+            const s = Math.round((net*b.percent)/100);
+            tb.innerHTML += `<tr><td>${b.name}</td><td>${b.percent}%</td><td>${format(s)}</td><td>${format(b.spent)}</td><td>${format(s-b.spent)}</td></tr>`;
         });
 
         const el = document.getElementById('printArea');
         el.style.top = "0";
         html2canvas(el).then(c => {
             const a = document.createElement('a');
-            a.download = 'Report.png'; a.href = c.toDataURL(); a.click();
+            a.download = 'Factor.png'; a.href = c.toDataURL(); a.click();
             el.style.top = "-9999px";
         });
     }
 
     function downloadBackup() {
-        const s = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(app));
+        const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(app));
         const a = document.createElement('a');
-        a.href = s; a.download = "Backup.json"; a.click();
+        a.href = str; a.download = "backup.json"; a.click();
+        
+        // Add to history
+        app.history.unshift({date: Date.now(), name: "بکاپ دستی"});
+        if(app.history.length > 5) app.history.pop();
+        saveData();
     }
 
     function restoreBackup(input) {
-        const f = input.files[0];
-        const r = new FileReader();
-        r.onload = (e) => {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
             try {
                 app = JSON.parse(e.target.result);
-                save(); location.reload();
-            } catch(x) { alert("فایل نامعتبر"); }
+                saveData();
+                location.reload();
+            } catch(err) { alert("فایل نامعتبر"); }
         };
-        r.readAsText(f);
+        reader.readAsText(file);
     }
 
     function showHistory() {
         const d = document.getElementById('histList');
-        d.innerHTML = app.history.length ? '' : 'خالی';
-        app.history.forEach(h => {
-            d.innerHTML += `<div style="padding:5px; border-bottom:1px solid #ccc;">${new Date(h.date).toLocaleDateString('fa-IR')}</div>`;
-        });
+        d.innerHTML = app.history.map(h => 
+            `<div style="padding:5px; border-bottom:1px solid #eee;">${h.name} - ${new Date(h.date).toLocaleDateString('fa-IR')}</div>`
+        ).join('');
         openModal('histModal');
     }
 
-    function resetApp() {
+    function resetAll() {
         if(confirm("همه چیز پاک شود؟")) { localStorage.removeItem('amir_fin_v9'); location.reload(); }
     }
 
-    function save() {
-        localStorage.setItem('amir_fin_v9', JSON.stringify(app));
-        if(!app.history.length || (Date.now()-app.history[0].date > 86400000)) {
-            app.history.unshift({date:Date.now()});
-            if(app.history.length>10) app.history.pop();
-        }
-    }
-
-    function loadData() {
-        const d = localStorage.getItem('amir_fin_v9');
-        if(d) {
-            app = JSON.parse(d);
-            rate = app.user.currency === 'rial' ? 10 : 1;
-        }
-    }
-
-    function updateDate() {
-        document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString('fa-IR');
+    // --- HELPERS ---
+    function getDebtTotal() { return app.debts.reduce((a,b)=>a+b.value,0); }
+    function getNetTotal() { return app.wallets.reduce((a,b)=>a+b.value,0) - getDebtTotal(); }
+    function format(n) { return (n * rate).toLocaleString('en-US'); }
+    function copyTxt(n) {
+        const raw = document.getElementById('rawCopyCheck').checked;
+        const txt = raw ? (n*rate).toString() : format(n);
+        navigator.clipboard.writeText(txt);
+        alert("کپی شد: " + txt);
     }
     
-    function toggleTheme() {
-        if(document.body.getAttribute('data-theme')==='dark') {
-            document.body.removeAttribute('data-theme'); app.user.theme='light';
-        } else {
-            document.body.setAttribute('data-theme','dark'); app.user.theme='dark';
-        }
-        save();
+    function loadData() {
+        const d = localStorage.getItem('amir_fin_v9');
+        if(d) app = JSON.parse(d);
     }
-    function applyTheme() {
-        if(app.user.theme==='dark') document.body.setAttribute('data-theme','dark');
+    function saveData() {
+        localStorage.setItem('amir_fin_v9', JSON.stringify(app));
     }
+    function updateDate() {
+        document.getElementById('headerDate').innerText = new Date().toLocaleDateString('fa-IR');
+    }
+
+    // --- UI NAVIGATION ---
+    function switchTab(id) {
+        document.querySelectorAll('.tab-pane').forEach(e => e.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(e => e.classList.remove('active'));
+        document.getElementById('view-'+id).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeAllModals() { document.querySelectorAll('.modal').forEach(e => e.classList.remove('active')); }
 
 </script>
 </body>
