@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -18,25 +18,25 @@
         :root {
             /* تم روز (پیش‌فرض) */
             --bg-body: #f3f4f6;
-            --glass-bg: rgba(255, 255, 255, 0.95); /* شفافیت کمتر برای خوانایی بیشتر */
-            --glass-border: 1px solid rgba(203, 213, 225, 0.6);
+            --glass-bg: #ffffff;
+            --glass-border: 1px solid #e2e8f0;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             
-            --primary: #3b82f6;
+            --primary: #2563eb;
             --primary-dark: #1d4ed8;
             --text-main: #0f172a;
             --text-sec: #475569;
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
-            --card-radius: 16px;
+            --card-radius: 12px;
             --nav-height: 70px;
         }
 
         [data-theme="dark"] {
             --bg-body: #0f172a;
-            --glass-bg: rgba(30, 41, 59, 0.95);
-            --glass-border: 1px solid rgba(71, 85, 105, 0.6);
+            --glass-bg: #1e293b;
+            --glass-border: 1px solid #334155;
             --text-main: #f8fafc;
             --text-sec: #94a3b8;
             --primary: #60a5fa;
@@ -65,10 +65,10 @@
         .container {
             max-width: 800px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 15px;
         }
 
-        .glass-panel {
+        .panel {
             background: var(--glass-bg);
             border: var(--glass-border);
             border-radius: var(--card-radius);
@@ -83,12 +83,12 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
-            border-bottom: 1px solid var(--text-sec);
             padding-bottom: 10px;
-            opacity: 0.8;
+            border-bottom: 1px solid var(--text-sec);
+            opacity: 0.9;
         }
 
-        .header-row h3 { margin: 0; font-size: 1.1rem; color: var(--primary); }
+        .header-row h3 { margin: 0; font-size: 1.1rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
 
         /* دکمه‌های واضح و مشخص */
         .btn {
@@ -109,7 +109,7 @@
             background: var(--primary);
             color: white;
             border: 1px solid var(--primary-dark);
-            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         .btn-primary:active { transform: scale(0.96); }
 
@@ -118,7 +118,7 @@
             color: var(--text-main);
             border: 1px solid var(--text-sec);
         }
-        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-outline:hover { border-color: var(--primary); color: var(--primary); background: rgba(37, 99, 235, 0.05); }
 
         .btn-icon {
             width: 36px; height: 36px;
@@ -128,6 +128,7 @@
             border: 1px solid transparent;
             color: var(--text-sec);
             cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
         }
         .btn-icon:hover { background: rgba(0,0,0,0.05); color: var(--primary); }
 
@@ -136,12 +137,31 @@
             background: var(--bg-body);
             border: 1px solid var(--text-sec);
             color: var(--text-main);
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
             font-size: 1rem;
             width: 100%;
+            margin-bottom: 10px;
         }
-        input:focus { border-color: var(--primary); }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2); }
+
+        /* --- هدر اصلی --- */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            margin-bottom: 10px;
+        }
+        .app-header h2 { margin: 0; font-size: 1.3rem; }
+        .currency-toggle {
+            font-size: 0.8rem;
+            background: var(--primary);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
 
         /* --- کارت اعتباری (HERO) --- */
         .hero-card {
@@ -180,7 +200,7 @@
             align-items: center; justify-content: center;
         }
 
-        .balance-title { font-size: 0.9rem; opacity: 0.8; }
+        .balance-title { font-size: 0.9rem; opacity: 0.9; }
         .balance-value { font-size: 2.2rem; font-weight: 800; margin: 5px 0; direction: ltr; }
         .currency-tag { font-size: 1rem; vertical-align: middle; }
 
@@ -198,7 +218,8 @@
             border-radius: 12px;
             padding: 15px;
             position: relative;
-            display: flex; flex-direction: column; gap: 8px;
+            display: flex; flex-direction: column; gap: 10px;
+            box-shadow: var(--shadow);
         }
         
         .bento-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
@@ -212,28 +233,30 @@
         .stat-green .progress-fill { background: var(--success); }
         .stat-yellow .progress-fill { background: var(--warning); }
         .stat-red .progress-fill { background: var(--danger); }
-        .stat-red { border-color: var(--danger); }
+        
+        .bento-info { display: flex; justify-content: space-between; font-size: 0.9rem; }
+        .bento-remain { font-weight: bold; color: var(--primary); font-size: 1.1rem; }
 
         .bento-actions {
-            margin-top: 10px;
-            display: flex; gap: 5px;
+            margin-top: 5px;
+            display: flex; gap: 10px;
         }
         .btn-small {
-            flex: 1; padding: 5px; font-size: 0.8rem; border-radius: 6px;
+            flex: 1; padding: 6px; font-size: 0.85rem; border-radius: 6px;
             border: 1px solid var(--text-sec); background: transparent; color: var(--text-main);
-            cursor: pointer;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;
         }
-        .btn-small:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .btn-small:hover { background: var(--bg-body); border-color: var(--primary); color: var(--primary); }
 
         /* --- BOTTOM NAV --- */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; width: 100%;
             height: var(--nav-height);
             background: var(--glass-bg);
-            backdrop-filter: blur(10px);
             border-top: var(--glass-border);
             display: flex; justify-content: space-around; align-items: center;
             z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
         }
         .nav-btn {
             background: none; border: none;
@@ -254,13 +277,14 @@
         }
         .modal.active { display: flex; }
         .modal-content {
-            background: var(--bg-body);
+            background: var(--glass-bg);
             width: 90%; max-width: 400px;
             padding: 25px;
             border-radius: 20px;
             border: 1px solid var(--text-sec);
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             max-height: 90vh; overflow-y: auto;
+            color: var(--text-main);
         }
 
         /* --- PIN PAD --- */
@@ -276,12 +300,13 @@
         }
         .num-key {
             width: 65px; height: 65px; border-radius: 50%;
-            background: var(--glass-bg); border: 1px solid var(--text-sec);
+            background: var(--bg-body); border: 1px solid var(--text-sec);
             font-size: 1.5rem; font-weight: bold; color: var(--text-main);
             cursor: pointer; display: flex; align-items: center; justify-content: center;
             margin: 0 auto;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .num-key:active { background: var(--primary); color: white; }
+        .num-key:active { background: var(--primary); color: white; transform: scale(0.95); }
 
         /* --- TAB CONTENT --- */
         .tab-pane { display: none; padding-bottom: 20px; }
@@ -296,8 +321,15 @@
         }
         .print-header { text-align: center; border-bottom: 2px solid #000; margin-bottom: 20px; padding-bottom: 10px; }
         .print-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .print-table th, .print-table td { border: 1px solid #000; padding: 8px; text-align: center; font-size: 14px; }
+        .print-table th, .print-table td { border: 1px solid #000; padding: 10px; text-align: center; font-size: 14px; }
         .print-row-total { background: #eee; font-weight: bold; }
+
+        /* استایل‌های لیست ساده */
+        .list-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 0; border-bottom: 1px solid var(--glass-border);
+        }
+        .list-item:last-child { border-bottom: none; }
 
     </style>
 </head>
@@ -318,7 +350,7 @@
         </div>
 
         <div class="numpad">
-            <!-- چیدمان استاندارد تلفن: ۱ ۲ ۳ در بالا -->
+            <!-- چیدمان استاندارد: ۱ ۲ ۳ در بالا -->
             <button class="num-key" onclick="pressKey(1)">1</button>
             <button class="num-key" onclick="pressKey(2)">2</button>
             <button class="num-key" onclick="pressKey(3)">3</button>
@@ -338,13 +370,14 @@
 <!-- 2. MAIN APP -->
 <div class="container" id="appContent" style="display:none;">
     
-    <!-- Header Controls -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <h2 style="margin:0;">داشبورد مالی</h2>
-        <div style="display:flex; gap:10px;">
-            <button class="btn-icon" onclick="toggleCurrency()" title="تغییر واحد پول (ریال/تومان)">
-                <span id="currBadge" style="font-size:0.8rem; font-weight:bold;">T</span>
-            </button>
+    <!-- Header -->
+    <div class="app-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <i class="fas fa-wallet" style="font-size:1.5rem; color:var(--primary)"></i>
+            <h2>داشبورد مالی</h2>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <span class="currency-toggle" onclick="toggleCurrency()" id="currBadge">تومان</span>
             <button class="btn-icon" onclick="toggleTheme()" title="حالت شب/روز"><i class="fas fa-adjust"></i></button>
         </div>
     </div>
@@ -359,37 +392,37 @@
                         <i class="fas fa-wifi"></i>
                         <span id="dateDisplay" style="font-size:0.9rem;">----/--/--</span>
                     </div>
-                    <div>
+                    <div style="text-align:center;">
                         <div class="balance-title">موجودی کل (خالص)</div>
-                        <div class="balance-value"><span id="totalBalance">0</span> <span class="currency-tag">تومان</span></div>
+                        <div class="balance-value"><span id="totalBalance">0</span></div>
                     </div>
                     <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
                         <span id="userNameDisplay">کاربر</span>
-                        <span>V9.0</span>
+                        <span>V9 Ultimate</span>
                     </div>
                 </div>
                 <div class="card-back">
-                    <h3>وضعیت بدهی</h3>
-                    <div style="font-size:1.5rem; color:var(--danger);" id="totalDebtDisplay">0</div>
-                    <p>این مبلغ از موجودی کسر شده است</p>
+                    <h3>وضعیت بدهی‌ها</h3>
+                    <div style="font-size:1.8rem; color:var(--danger);" id="totalDebtDisplay">0</div>
+                    <p style="margin-top:10px; opacity:0.8">این مبلغ از ورودی‌ها کسر شده است.</p>
                 </div>
             </div>
         </div>
 
         <!-- Wallets Section -->
-        <div class="glass-panel">
+        <div class="panel">
             <div class="header-row">
-                <h3><i class="fas fa-wallet"></i> کیف پول‌ها</h3>
-                <button class="btn btn-primary" onclick="openModal('walletModal')"><i class="fas fa-plus"></i> افزودن</button>
+                <h3><i class="fas fa-wallet"></i> منابع پول</h3>
+                <button class="btn btn-primary" onclick="openModal('walletModal')"><i class="fas fa-plus"></i></button>
             </div>
             <div id="walletList"></div>
         </div>
 
         <!-- Debts Section -->
-        <div class="glass-panel">
+        <div class="panel">
             <div class="header-row">
                 <h3><i class="fas fa-file-invoice-dollar"></i> اقساط و بدهی‌ها</h3>
-                <button class="btn btn-outline" onclick="openModal('debtModal')"><i class="fas fa-plus"></i> افزودن</button>
+                <button class="btn btn-outline" onclick="openModal('debtModal')"><i class="fas fa-plus"></i></button>
             </div>
             <div id="debtList"></div>
         </div>
@@ -397,17 +430,17 @@
 
     <!-- TAB 2: BUDGET -->
     <div id="view-budget" class="tab-pane">
-        <div class="glass-panel" style="text-align:center;">
+        <div class="panel" style="text-align:center;">
             <label style="color:var(--text-sec); font-size:0.9rem;">بودجه قابل تقسیم:</label>
             <div id="distributable" style="font-size:1.8rem; font-weight:bold; color:var(--primary);">0</div>
             <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="reCalc()">
-                <i class="fas fa-calculator"></i> محاسبه مجدد
+                <i class="fas fa-calculator"></i> محاسبه و توزیع مجدد
             </button>
         </div>
 
-        <div class="header-row">
+        <div class="header-row" style="margin-top:20px;">
             <h3>ردیف‌های بودجه</h3>
-            <button class="btn btn-outline" onclick="openModal('addBudgetModal')"><i class="fas fa-plus"></i> جدید</button>
+            <button class="btn btn-outline" onclick="openModal('addBudgetModal')"><i class="fas fa-plus"></i></button>
         </div>
 
         <div id="budgetGrid" class="budget-grid">
@@ -418,31 +451,42 @@
     <!-- TAB 3: TOOLS -->
     <div id="view-tools" class="tab-pane">
         <!-- Goals -->
-        <div class="glass-panel">
+        <div class="panel">
             <div class="header-row">
                 <h3><i class="fas fa-bullseye"></i> اهداف پس‌انداز</h3>
-                <button class="btn btn-primary" onclick="openModal('goalModal')"><i class="fas fa-plus"></i> هدف</button>
+                <button class="btn btn-primary" onclick="openModal('goalModal')"><i class="fas fa-plus"></i></button>
             </div>
             <div id="goalList"></div>
         </div>
 
         <!-- Shopping -->
-        <div class="glass-panel">
+        <div class="panel">
             <div class="header-row">
                 <h3><i class="fas fa-shopping-cart"></i> لیست خرید</h3>
-                <button class="btn btn-primary" onclick="openModal('shopModal')"><i class="fas fa-plus"></i> کالا</button>
+                <button class="btn btn-primary" onclick="openModal('shopModal')"><i class="fas fa-plus"></i></button>
             </div>
             <div id="shopList"></div>
+        </div>
+        
+        <!-- Lending -->
+        <div class="panel">
+            <div class="header-row">
+                <h3><i class="fas fa-handshake"></i> دفترچه قرض</h3>
+                <button class="btn btn-primary" onclick="openModal('lendModal')"><i class="fas fa-plus"></i></button>
+            </div>
+            <div id="lendList"></div>
         </div>
     </div>
 
     <!-- TAB 4: SETTINGS -->
     <div id="view-settings" class="tab-pane">
-        <div class="glass-panel">
-            <h3>تنظیمات و پشتیبان‌گیری</h3>
+        <div class="panel">
+            <div class="header-row">
+                <h3>تنظیمات و پشتیبان‌گیری</h3>
+            </div>
             <div style="display:flex; flex-direction:column; gap:15px; margin-top:15px;">
                 
-                <div style="display:flex; align-items:center; justify-content:space-between;">
+                <div style="display:flex; align-items:center; justify-content:space-between; background:var(--bg-body); padding:10px; border-radius:8px;">
                     <span>حالت کپی (خام/جداکننده):</span>
                     <input type="checkbox" id="rawCopyCheck" style="width:20px; height:20px;">
                 </div>
@@ -489,17 +533,17 @@
     </button>
 </nav>
 
-<!-- MODALS AREA -->
+<!-- MODALS -->
 
 <!-- Wallet Modal -->
 <div id="walletModal" class="modal">
     <div class="modal-content">
         <h3>افزودن کیف پول</h3>
-        <input type="text" id="wName" placeholder="نام (مثلاً: کارت سپه)" class="mb-2"><br><br>
-        <input type="number" id="wVal" placeholder="مبلغ موجودی" class="mb-2">
-        <div style="margin-top:20px; text-align:left;">
-            <button class="btn btn-primary" onclick="addWallet()">ثبت</button>
-            <button class="btn btn-outline" onclick="closeAllModals()">لغو</button>
+        <input type="text" id="wName" placeholder="نام (مثلاً: کارت سپه)"><br>
+        <input type="text" id="wVal" placeholder="مبلغ موجودی" inputmode="numeric" onkeyup="formatInput(this)">
+        <div style="margin-top:20px; display:flex; gap:10px;">
+            <button class="btn btn-primary" style="flex:1" onclick="addWallet()">ثبت</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
         </div>
     </div>
 </div>
@@ -508,11 +552,11 @@
 <div id="debtModal" class="modal">
     <div class="modal-content">
         <h3>افزودن قسط/بدهی ثابت</h3>
-        <input type="text" id="dName" placeholder="عنوان (مثلاً: وام ازدواج)"><br><br>
-        <input type="number" id="dVal" placeholder="مبلغ قسط">
-        <div style="margin-top:20px; text-align:left;">
-            <button class="btn btn-primary" onclick="addDebt()">ثبت</button>
-            <button class="btn btn-outline" onclick="closeAllModals()">لغو</button>
+        <input type="text" id="dName" placeholder="عنوان (مثلاً: وام ازدواج)"><br>
+        <input type="text" id="dVal" placeholder="مبلغ قسط" inputmode="numeric" onkeyup="formatInput(this)">
+        <div style="margin-top:20px; display:flex; gap:10px;">
+            <button class="btn btn-primary" style="flex:1" onclick="addDebt()">ثبت</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
         </div>
     </div>
 </div>
@@ -523,12 +567,55 @@
         <h3>ثبت هزینه جدید</h3>
         <input type="hidden" id="expBudgetId">
         <label>مبلغ:</label>
-        <input type="number" id="expAmt" placeholder="0"><br><br>
+        <input type="text" id="expAmt" placeholder="0" inputmode="numeric" onkeyup="formatInput(this)"><br>
         <label>بابت:</label>
         <input type="text" id="expReason" placeholder="توضیحات">
-        <div style="margin-top:20px; text-align:left;">
-            <button class="btn btn-primary" onclick="submitExp()">ثبت</button>
-            <button class="btn btn-outline" onclick="closeAllModals()">لغو</button>
+        <div style="margin-top:20px; display:flex; gap:10px;">
+            <button class="btn btn-primary" style="flex:1" onclick="submitExp()">ثبت</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+        </div>
+    </div>
+</div>
+
+<!-- Goal Modal -->
+<div id="goalModal" class="modal">
+    <div class="modal-content">
+        <h3>هدف پس‌انداز جدید</h3>
+        <input type="text" id="gName" placeholder="نام هدف"><br>
+        <input type="text" id="gVal" placeholder="مبلغ هدف" inputmode="numeric" onkeyup="formatInput(this)">
+        <div style="margin-top:20px; display:flex; gap:10px;">
+            <button class="btn btn-primary" style="flex:1" onclick="addGoal()">ثبت</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+        </div>
+    </div>
+</div>
+
+<!-- Shop Modal -->
+<div id="shopModal" class="modal">
+    <div class="modal-content">
+        <h3>آیتم خرید جدید</h3>
+        <input type="text" id="sName" placeholder="نام کالا"><br>
+        <input type="text" id="sCost" placeholder="قیمت تقریبی" inputmode="numeric" onkeyup="formatInput(this)">
+        <div style="margin-top:20px; display:flex; gap:10px;">
+            <button class="btn btn-primary" style="flex:1" onclick="addShop()">ثبت</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+        </div>
+    </div>
+</div>
+
+<!-- Lend Modal -->
+<div id="lendModal" class="modal">
+    <div class="modal-content">
+        <h3>قرض و طلب</h3>
+        <input type="text" id="lName" placeholder="نام شخص"><br>
+        <input type="text" id="lAmt" placeholder="مبلغ" inputmode="numeric" onkeyup="formatInput(this)">
+        <select id="lType" style="margin-top:10px;">
+            <option value="give">من پول دادم (طلبکارم)</option>
+            <option value="get">من پول گرفتم (بدهکارم)</option>
+        </select>
+        <div style="margin-top:20px; display:flex; gap:10px;">
+            <button class="btn btn-primary" style="flex:1" onclick="addLend()">ثبت</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
         </div>
     </div>
 </div>
@@ -549,7 +636,7 @@
         <p id="printDate">تاریخ: ---</p>
         <p>نام کاربر: <span id="printUser"></span></p>
     </div>
-    <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+    <div style="display:flex; justify-content:space-between; margin-bottom:20px; background:#f0f0f0; padding:10px;">
         <div>درآمد کل: <b id="printInc">0</b></div>
         <div>بدهی کل: <b id="printDebt">0</b></div>
         <div>قابل تقسیم: <b id="printNet">0</b></div>
@@ -567,7 +654,7 @@
         <tbody id="printBody"></tbody>
     </table>
     <div style="margin-top:30px; text-align:center; font-size:12px; color:#666;">
-        تهیه شده توسط سیستم مدیریت مالی V9.0
+        تهیه شده توسط سیستم مدیریت مالی V9.0 Ultimate
     </div>
 </div>
 
@@ -583,10 +670,16 @@
             {id: 2, name: "خورد و خوراک", percent: 12, spent: 0},
             {id: 3, name: "پس‌انداز هدفمند", percent: 25, spent: 0},
             {id: 4, name: "تفریح و سرگرمی", percent: 5, spent: 0},
-            {id: 5, name: "شارژ و اینترنت", percent: 10, spent: 0}
+            {id: 5, name: "شارژ و اینترنت", percent: 10, spent: 0},
+            {id: 6, name: "پوشاک", percent: 5, spent: 0},
+            {id: 7, name: "درمان", percent: 5, spent: 0},
+            {id: 8, name: "آموزش", percent: 5, spent: 0},
+            {id: 9, name: "خیریه", percent: 3, spent: 0},
+            {id: 10, name: "سایر", percent: 3, spent: 0}
         ],
         goals: [],
         shopping: [],
+        lending: [],
         history: []
     };
 
@@ -612,8 +705,8 @@
         updatePinDots();
 
         if (!app.security.hasPin) {
-            title.innerText = "تعیین رمز عبور";
-            sub.innerText = "برای امنیت بیشتر، یک رمز ۴ رقمی تعیین کنید";
+            title.innerText = "تعیین رمز عبور جدید";
+            sub.innerText = "یک رمز ۴ رقمی برای ورود انتخاب کنید";
         } else {
             title.innerText = "خوش آمدید";
             sub.innerText = "رمز عبور خود را وارد کنید";
@@ -673,6 +766,7 @@
         renderHero();
         renderGoals();
         renderShopping();
+        renderLending();
     }
 
     function renderHero() {
@@ -682,7 +776,6 @@
         document.getElementById('totalDebtDisplay').innerText = format(debt);
         document.getElementById('userNameDisplay').innerText = app.user.name;
         
-        // Currency Badge Update
         const badge = document.getElementById('currBadge');
         badge.innerText = app.user.currency === 'toman' ? 'تومان' : 'ریال';
     }
@@ -690,11 +783,11 @@
     function renderWallets() {
         const div = document.getElementById('walletList');
         div.innerHTML = app.wallets.map((w, i) => `
-            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #ddd; padding:10px;">
+            <div class="list-item">
                 <span>${w.name}</span>
                 <span>
                     <b>${format(w.value)}</b>
-                    <i class="fas fa-trash text-danger" style="margin-right:10px; cursor:pointer;" onclick="delWallet(${i})"></i>
+                    <i class="fas fa-trash" style="margin-right:10px; color:var(--danger); cursor:pointer;" onclick="delWallet(${i})"></i>
                 </span>
             </div>
         `).join('');
@@ -703,7 +796,7 @@
     function renderDebts() {
         const div = document.getElementById('debtList');
         div.innerHTML = app.debts.map((d, i) => `
-            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #ddd; padding:10px; color:var(--danger);">
+            <div class="list-item" style="color:var(--danger);">
                 <span>${d.name}</span>
                 <span>
                     <b>${format(d.value)}</b>
@@ -736,7 +829,7 @@
                         <i class="fas fa-ellipsis-v" style="cursor:pointer; opacity:0.5;"></i>
                     </div>
                     
-                    <div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-top:5px;">
+                    <div class="bento-info">
                         <span class="text-sec">بودجه: ${format(share)}</span>
                         <span class="text-danger">خرج: ${format(b.spent)}</span>
                     </div>
@@ -745,7 +838,7 @@
                         <div class="progress-fill" style="width: ${Math.min(percent, 100)}%"></div>
                     </div>
 
-                    <div style="text-align:left; font-weight:bold; font-size:1.1rem; color:var(--primary);">
+                    <div class="bento-remain">
                         مانده: ${format(remain)}
                     </div>
 
@@ -754,7 +847,7 @@
                             <i class="fas fa-minus"></i> ثبت هزینه
                         </button>
                         <button class="btn-small" onclick="copyNum(${remain})">
-                            <i class="fas fa-copy"></i> کپی مانده
+                            <i class="fas fa-copy"></i> کپی
                         </button>
                     </div>
                 </div>
@@ -762,12 +855,57 @@
         });
     }
 
+    function renderGoals() {
+        const div = document.getElementById('goalList');
+        div.innerHTML = app.goals.map((g, i) => {
+            const percent = Math.min(100, Math.round((g.current / g.target) * 100));
+            return `
+            <div class="list-item" style="display:block;">
+                <div style="display:flex; justify-content:space-between;">
+                    <strong>${g.name}</strong>
+                    <span>${format(g.current)} / ${format(g.target)}</span>
+                </div>
+                <div class="progress-bar" style="margin-top:5px;"><div class="progress-fill" style="width:${percent}%; background:var(--accent);"></div></div>
+                <div style="text-align:left; margin-top:5px;">
+                    <button class="btn-outline" style="padding:2px 8px; font-size:0.8rem;" onclick="goalDep(${i})">+ واریز</button>
+                    <i class="fas fa-trash" style="margin-right:5px; cursor:pointer; color:var(--danger);" onclick="delGoal(${i})"></i>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function renderShopping() {
+        const div = document.getElementById('shopList');
+        div.innerHTML = app.shopping.map((s, i) => `
+            <div class="list-item">
+                <span>${s.name} (${format(s.cost)})</span>
+                <div>
+                    <i class="fas fa-check" style="color:var(--success); cursor:pointer; margin-left:10px;" onclick="delShop(${i})"></i>
+                    <i class="fas fa-trash" style="color:var(--danger); cursor:pointer;" onclick="delShop(${i})"></i>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderLending() {
+        const div = document.getElementById('lendList');
+        div.innerHTML = app.lending.map((l, i) => `
+            <div class="list-item">
+                <span>${l.name} (${l.type === 'give' ? 'طلب' : 'بدهی'})</span>
+                <span>
+                    <b>${format(l.amount)}</b>
+                    <button class="btn-outline" style="margin-right:5px; padding:2px 5px;" onclick="delLend(${i})">تسویه</button>
+                </span>
+            </div>
+        `).join('');
+    }
+
     // --- LOGIC FUNCTIONS ---
     function addWallet() {
         const name = document.getElementById('wName').value;
         const val = document.getElementById('wVal').value;
         if(name && val) {
-            app.wallets.push({ name, value: parseInt(val) });
+            app.wallets.push({ name, value: parseInt(toEnglish(val).replace(/,/g,'')) });
             saveData(); renderUI(); closeAllModals();
         }
     }
@@ -777,7 +915,7 @@
         const name = document.getElementById('dName').value;
         const val = document.getElementById('dVal').value;
         if(name && val) {
-            app.debts.push({ name, value: parseInt(val) });
+            app.debts.push({ name, value: parseInt(toEnglish(val).replace(/,/g,'')) });
             saveData(); renderUI(); closeAllModals();
         }
     }
@@ -794,10 +932,45 @@
     function submitExp() {
         const amt = document.getElementById('expAmt').value;
         if(amt && activeBudgetIdx > -1) {
-            app.budgets[activeBudgetIdx].spent += parseInt(amt);
+            app.budgets[activeBudgetIdx].spent += parseInt(toEnglish(amt).replace(/,/g,''));
             saveData(); renderUI(); closeAllModals();
         }
     }
+
+    function addGoal() {
+        const name = document.getElementById('gName').value;
+        const val = document.getElementById('gVal').value;
+        if(name && val) {
+            app.goals.push({name, target:parseInt(toEnglish(val).replace(/,/g,'')), current:0});
+            saveData(); renderUI(); closeAllModals();
+        }
+    }
+    function goalDep(i) {
+        const v = prompt("مبلغ واریزی:");
+        if(v) { app.goals[i].current += parseInt(toEnglish(v).replace(/,/g,'')); saveData(); renderUI(); }
+    }
+    function delGoal(i) { app.goals.splice(i,1); saveData(); renderUI(); }
+
+    function addShop() {
+        const name = document.getElementById('sName').value;
+        const val = document.getElementById('sCost').value;
+        if(name) {
+            app.shopping.push({name, cost: val ? parseInt(toEnglish(val).replace(/,/g,'')) : 0});
+            saveData(); renderUI(); closeAllModals();
+        }
+    }
+    function delShop(i) { app.shopping.splice(i,1); saveData(); renderUI(); }
+
+    function addLend() {
+        const name = document.getElementById('lName').value;
+        const val = document.getElementById('lAmt').value;
+        const type = document.getElementById('lType').value;
+        if(name && val) {
+            app.lending.push({name, amount:parseInt(toEnglish(val).replace(/,/g,'')), type});
+            saveData(); renderUI(); closeAllModals();
+        }
+    }
+    function delLend(i) { app.lending.splice(i,1); saveData(); renderUI(); }
 
     // --- CURRENCY TOGGLE ---
     function toggleCurrency() {
@@ -814,7 +987,6 @@
 
     // --- EXPORT & BACKUP ---
     function generateReportImage() {
-        // Fill Report
         const net = getNetTotal();
         const debt = getDebtTotal();
         document.getElementById('printDate').innerText = new Date().toLocaleDateString('fa-IR');
@@ -837,14 +1009,14 @@
         });
 
         const element = document.getElementById('printArea');
-        element.style.top = "0"; // Temporarily visible
+        element.style.top = "0"; 
         
         html2canvas(element).then(canvas => {
             const link = document.createElement('a');
             link.download = 'Financial_Report.png';
             link.href = canvas.toDataURL();
             link.click();
-            element.style.top = "-9999px"; // Hide again
+            element.style.top = "-9999px"; 
         });
     }
 
@@ -862,11 +1034,10 @@
         reader.onload = function(e) {
             try {
                 const data = JSON.parse(e.target.result);
-                // Simple validation
                 if(data.wallets && data.budgets) {
                     app = data;
                     saveData();
-                    alert("بازیابی موفق بود! صفحه رفرش می‌شود.");
+                    alert("بازیابی موفق بود!");
                     location.reload();
                 } else {
                     alert("فایل نامعتبر است.");
@@ -878,6 +1049,17 @@
         reader.readAsText(file);
     }
 
+    function showHistory() {
+        const div = document.getElementById('histList');
+        div.innerHTML = app.history.length ? '' : 'سابقه ای موجود نیست';
+        app.history.forEach(h => {
+            div.innerHTML += `<div style="border-bottom:1px solid #eee; padding:5px;">
+                <b>${new Date(h.date).toLocaleDateString('fa-IR')}</b> - موجودی: ${format(h.total)}
+            </div>`;
+        });
+        openModal('histModal');
+    }
+
     // --- HELPERS ---
     function getDebtTotal() { return app.debts.reduce((a,b) => a+b.value, 0); }
     function getWalletTotal() { return app.wallets.reduce((a,b) => a+b.value, 0); }
@@ -885,9 +1067,15 @@
 
     function format(n) {
         if(!n) return '0';
-        // Apply currency rate (1 or 10)
         let val = n * currencyRate;
         return val.toLocaleString('en-US');
+    }
+
+    function toEnglish(str) { return str.toString().replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)); }
+    
+    function formatInput(el) { 
+        let v = toEnglish(el.value).replace(/[^0-9]/g, '');
+        el.value = v ? parseInt(v).toLocaleString('en-US') : ''; 
     }
 
     function copyNum(n) {
@@ -901,18 +1089,19 @@
         const d = localStorage.getItem('amir_fin_v9');
         if(d) {
             app = JSON.parse(d);
-            // Restore currency rate state
             currencyRate = app.user.currency === 'rial' ? 10 : 1;
         }
     }
+    
     function saveData() {
-        // Save current state to main storage
         localStorage.setItem('amir_fin_v9', JSON.stringify(app));
-        
-        // Also add to history (simple version for now)
+        // Add snapshot to history
         const snap = { date: Date.now(), total: getNetTotal() };
-        app.history.unshift(snap);
-        if(app.history.length > 10) app.history.pop();
+        // Limit history to 20 items to prevent bloat
+        if(app.history.length === 0 || (Date.now() - app.history[0].date > 86400000)) { // Save once a day roughly
+             app.history.unshift(snap);
+             if(app.history.length > 20) app.history.pop();
+        }
     }
 
     function switchTab(tabId) {
@@ -953,10 +1142,6 @@
     }
     
     function reCalc() { renderUI(); }
-
-    // Placeholder functions for Tools
-    function renderGoals() {}
-    function renderShopping() {}
 
 </script>
 </body>
