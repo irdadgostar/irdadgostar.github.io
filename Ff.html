@@ -2,661 +2,731 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مدیریت بودجه هوشمند</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مدیریت مالی حرفه‌ای | نسخه V4.0</title>
+    <!-- فونت و آیکون -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <!-- کتابخانه نمودار -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #334155 100%);
-            --card-bg: #ffffff;
-            --primary: #2563eb;
+            --bg-body: #f1f5f9;
+            --primary: #2563eb;         /* آبی */
             --primary-dark: #1e40af;
-            --secondary: #64748b;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --text-dark: #1e293b;
+            --success: #10b981;         /* سبز */
+            --warning: #f59e0b;         /* زرد */
+            --danger: #ef4444;          /* قرمز */
+            --text-main: #0f172a;
+            --text-light: #64748b;
+            --card-bg: #ffffff;
             --border: #e2e8f0;
-            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
         * {
             box-sizing: border-box;
             font-family: 'Vazirmatn', sans-serif;
             outline: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background: var(--bg-gradient);
+            background-color: var(--bg-body);
+            color: var(--text-main);
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            color: var(--text-dark);
         }
 
-        .dashboard {
-            background: var(--card-bg);
+        .app-container {
             width: 100%;
-            max-width: 900px;
-            border-radius: 20px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            overflow: hidden;
+            max-width: 1000px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            overflow: hidden; /* جلوگیری از بیرون زدگی */
             display: flex;
             flex-direction: column;
-            position: relative;
         }
 
         /* --- HEADER --- */
-        .header {
-            background: #f8fafc;
-            padding: 20px 30px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 1.4rem;
-            color: var(--primary-dark);
-            font-weight: 900;
-        }
-
-        .btn-reset {
-            background: #fee2e2;
-            color: var(--danger);
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.1rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-reset:hover {
-            background: var(--danger);
+        header {
+            background: #1e293b;
             color: white;
-            transform: rotate(180deg);
-        }
-
-        /* --- SETTINGS BAR --- */
-        .settings-bar {
-            padding: 15px 30px;
-            background: #fff;
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 15px;
-            border-bottom: 1px solid var(--border);
-            font-size: 0.9rem;
+            gap: 10px;
         }
 
-        .toggle-wrapper {
+        header h1 {
+            margin: 0;
+            font-size: 1.2rem;
             display: flex;
             align-items: center;
             gap: 10px;
-            background: #f1f5f9;
-            padding: 8px 12px;
-            border-radius: 8px;
         }
 
-        .toggle-switch {
-            position: relative;
-            width: 40px;
-            height: 20px;
-            background: #cbd5e1;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .toggle-switch::after {
-            content: '';
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 16px;
-            height: 16px;
-            background: white;
-            border-radius: 50%;
-            transition: 0.3s;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        }
-
-        input[type="checkbox"]:checked + .toggle-switch {
-            background: var(--primary);
-        }
-
-        input[type="checkbox"]:checked + .toggle-switch::after {
-            transform: translateX(20px);
-        }
-
-        /* --- INPUT SECTION --- */
-        .input-hero {
-            padding: 30px;
-            text-align: center;
-            background: linear-gradient(to bottom, #eff6ff, #fff);
-        }
-
-        .main-input {
-            width: 100%;
-            max-width: 400px;
-            padding: 15px;
-            font-size: 1.8rem;
-            border: 2px solid #bfdbfe;
-            border-radius: 16px;
-            text-align: center;
-            font-weight: 800;
-            color: var(--primary);
-            direction: ltr;
-            transition: 0.3s;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-
-        .main-input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
-        }
-
-        /* --- PERCENT BAR --- */
-        .progress-wrapper {
-            max-width: 500px;
-            margin: 20px auto 0;
-        }
-        .progress-track {
-            background: #e2e8f0;
-            height: 12px;
-            border-radius: 6px;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            background: var(--success);
-            width: 0%;
-            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .progress-status {
+        .header-actions {
             display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-            font-size: 0.85rem;
-            font-weight: bold;
-        }
-
-        /* --- LIST --- */
-        .items-list {
-            padding: 0 30px 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .row-item {
-            display: grid;
-            grid-template-columns: 2fr 1fr 2fr 40px 40px;
             gap: 10px;
-            align-items: center;
-            background: #fff;
-            padding: 12px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            transition: 0.2s;
-        }
-
-        .row-item:hover {
-            border-color: var(--primary);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-            transform: translateY(-2px);
-            z-index: 2;
-        }
-
-        .row-item input {
-            padding: 10px;
-            border: 1px solid transparent;
-            background: transparent;
-            font-weight: bold;
-            font-size: 1rem;
-            border-radius: 8px;
-            transition: 0.2s;
-        }
-        
-        .row-item input:focus {
-            background: #f8fafc;
-            border-color: var(--primary);
-        }
-
-        .row-item input[type="text"] { width: 100%; }
-        .row-item input[type="tel"] { text-align: center; direction: ltr; background: #f1f5f9; }
-
-        .amount-box {
-            background: #ecfdf5;
-            color: #047857;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 800;
-            font-size: 1.1rem;
-            cursor: pointer;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 5px;
         }
 
         .btn-icon {
-            background: none;
+            background: rgba(255,255,255,0.1);
             border: none;
-            cursor: pointer;
-            color: var(--secondary);
-            font-size: 1.1rem;
-            padding: 8px;
+            color: white;
+            width: 35px;
+            height: 35px;
             border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: 0.2s;
         }
+        .btn-icon:hover { background: rgba(255,255,255,0.2); }
 
-        .btn-icon.copy:hover { background: #dbeafe; color: var(--primary); }
-        .btn-icon.delete:hover { background: #fee2e2; color: var(--danger); }
+        /* --- DASHBOARD CONTROL --- */
+        .controls-panel {
+            padding: 15px 20px;
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            align-items: center;
+        }
 
-        /* --- FOOTER --- */
-        .footer {
-            padding: 20px 30px;
-            border-top: 1px solid var(--border);
-            background: #f8fafc;
+        .control-group {
             display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .control-group label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            font-weight: bold;
+        }
+
+        select, .btn-scenario {
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #f8fafc;
+            font-size: 0.9rem;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .scenarios {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .btn-scenario {
+            background: #eff6ff;
+            color: var(--primary);
+            border: 1px solid #bfdbfe;
+            text-align: center;
+            transition: 0.2s;
+        }
+        .btn-scenario:hover { background: var(--primary); color: white; }
+
+        /* --- MAIN INPUT --- */
+        .income-section {
+            background: linear-gradient(to right, #eff6ff, #fff);
+            padding: 25px 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .big-input-wrapper {
+            position: relative;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .big-input {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 1.5rem;
+            text-align: center;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            direction: ltr; /* عدد انگلیسی */
+        }
+
+        .percent-status {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
             gap: 15px;
         }
 
-        .btn-main {
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
+        /* --- CHART SECTION --- */
+        .chart-container {
+            padding: 20px;
             display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.2s;
+            justify-content: center;
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            max-height: 300px;
+        }
+        
+        canvas {
+            max-width: 100%;
+            max-height: 250px;
         }
 
-        .btn-primary { background: var(--primary); color: white; flex: 1; justify-content: center; }
-        .btn-primary:hover { background: var(--primary-dark); }
-        .btn-outline { background: white; border: 1px solid var(--border); color: var(--text-dark); }
-        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+        /* --- BUDGET ITEMS (Cards) --- */
+        .items-container {
+            padding: 20px;
+            background: #f8fafc;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
 
-        /* --- TOAST NOTIFICATION --- */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #1e293b;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 50px;
-            font-weight: bold;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
-            opacity: 0;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 1000;
+        /* طراحی کارت برای هر ردیف */
+        .budget-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: var(--shadow);
             display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: transform 0.2s;
+        }
+
+        .budget-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+
+        /* ردیف اول کارت: نام و درصد */
+        .card-header {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
             gap: 10px;
         }
+
+        .item-name-input {
+            border: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            width: 100%;
+            background: transparent;
+            border-bottom: 1px dashed transparent;
+        }
+        .item-name-input:focus { border-bottom-color: var(--primary); }
+
+        .percent-input-wrapper {
+            position: relative;
+            width: 70px;
+            flex-shrink: 0;
+        }
+        .percent-input {
+            width: 100%;
+            padding: 5px;
+            text-align: center;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-weight: bold;
+            background: #f1f5f9;
+            direction: ltr;
+        }
+        .percent-symbol {
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+
+        /* ردیف دوم: اعداد (بودجه، خرج شده، مانده) */
+        .card-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 8px;
+            align-items: center;
+        }
+
+        .stat-box {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-label { font-size: 0.75rem; color: var(--text-light); }
+        
+        .stat-value { 
+            font-weight: 800; 
+            font-size: 0.95rem; 
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        /* اینپوت خرج کرد */
+        .expense-input {
+            width: 100%;
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: var(--danger);
+            direction: ltr;
+        }
+
+        .remaining-value { color: var(--success); }
+        .remaining-value.negative { color: var(--danger); }
+
+        /* ردیف سوم: دکمه‌ها */
+        .card-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 10px;
+        }
+
+        .btn-mini {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-copy { background: #dbeafe; color: var(--primary); }
+        .btn-delete { background: #fee2e2; color: var(--danger); }
+
+        /* --- FOOTER ACTION --- */
+        .fab-container {
+            position: sticky;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: center;
+            pointer-events: none; /* تا روی محتوا را نگیرد */
+        }
+        
+        .add-btn-float {
+            pointer-events: auto;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+        }
+        .add-btn-float:active { transform: scale(0.95); }
+
+        /* --- TOAST --- */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: #1e293b;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: 0.3s;
+            z-index: 100;
+        }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-        /* --- RESPONSIVE --- */
-        @media (max-width: 700px) {
-            .row-item {
-                grid-template-columns: 1fr 1fr 40px;
-                grid-template-areas: 
-                    "name name del"
-                    "percent amount copy";
-                gap: 8px;
-                padding: 15px;
-            }
-            .row-item input[type="text"] { grid-area: name; font-size: 1.1rem; }
-            .btn-icon.delete { grid-area: del; justify-self: end; }
-            .percent-input-group { grid-area: percent; }
-            .amount-box { grid-area: amount; }
-            .btn-icon.copy { grid-area: copy; }
-            
-            .header { justify-content: space-between; }
-            .settings-bar { justify-content: center; flex-direction: column; align-items: stretch; }
-            .toggle-wrapper { justify-content: space-between; }
+        @media (min-width: 768px) {
+            .items-container { grid-template-columns: 1fr 1fr; } /* دو ستونه در تبلت/PC */
         }
     </style>
 </head>
 <body>
 
-<div class="dashboard">
-    <!-- Header -->
-    <div class="header">
-        <div class="header-left">
-            <h1>مدیریت بودجه</h1>
-            <button class="btn-reset" onclick="resetApp()" title="تازه سازی و بازگشت به تنظیمات اولیه">
-                <i class="fas fa-rotate-right"></i>
-            </button>
+<div class="app-container">
+    
+    <!-- هدر -->
+    <header>
+        <h1><i class="fas fa-chart-pie"></i> مدیریت مالی امیرحسین</h1>
+        <div class="header-actions">
+            <button class="btn-icon" onclick="exportData()" title="خروجی فایل"><i class="fas fa-download"></i></button>
+            <button class="btn-icon" style="background:#ef4444;" onclick="resetApp()" title="ریست کامل"><i class="fas fa-trash"></i></button>
         </div>
-        <div style="color: var(--secondary); font-size: 0.9rem;">
-            <i class="fas fa-save"></i> ذخیره خودکار فعال است
-        </div>
-    </div>
+    </header>
 
-    <!-- Settings -->
-    <div class="settings-bar">
-        <div class="toggle-wrapper">
-            <span>واحد پول:</span>
-            <select id="currencySelector" style="border:none; background:transparent; font-weight:bold; color:var(--primary);" onchange="updateCalculations()">
-                <option value="تومان">تومان</option>
-                <option value="ریال">ریال</option>
+    <!-- کنترل‌ها و سناریو -->
+    <div class="controls-panel">
+        <div class="control-group">
+            <label>حالت کپی:</label>
+            <select id="copyModeSelector">
+                <option value="formatted">با جداکننده (۱,۰۰۰)</option>
+                <option value="raw">خام (1000)</option>
             </select>
         </div>
-
-        <div class="toggle-wrapper">
-            <label for="copyRawToggle" style="cursor:pointer">حالت کپی: با جداکننده (۱۲۳,۰۰۰)</label>
-            <input type="checkbox" id="copyRawToggle" style="display:none" onchange="toggleCopyMode()">
-            <label for="copyRawToggle" class="toggle-switch"></label>
-            <span id="copyModeText" style="font-size:0.85rem; color:var(--secondary)">خیر (نمایشی)</span>
-        </div>
-    </div>
-
-    <!-- Input Section -->
-    <div class="input-hero">
-        <label>مبلغ ورودی جدید را وارد کنید:</label>
-        <div style="position:relative; max-width:400px; margin:10px auto;">
-            <input type="text" id="totalAmount" class="main-input" placeholder="0" onkeyup="handleTotalInput(this)">
-        </div>
-
-        <div class="progress-wrapper">
-            <div class="progress-track">
-                <div id="progressBar" class="progress-fill"></div>
-            </div>
-            <div id="progressStatus" class="progress-status">
-                <span>جمع: ۰٪</span>
-                <span>وضعیت: نرمال</span>
+        <div class="control-group">
+            <label>سناریوها:</label>
+            <div class="scenarios">
+                <button class="btn-scenario" onclick="applyScenario('default')">عادی</button>
+                <button class="btn-scenario" onclick="applyScenario('survival')">بقا ⚠️</button>
+                <button class="btn-scenario" onclick="applyScenario('travel')">سفر ✈️</button>
             </div>
         </div>
     </div>
 
-    <!-- Items List -->
-    <div id="itemsContainer" class="items-list">
-        <!-- JS generates rows here -->
+    <!-- ورودی اصلی -->
+    <div class="income-section">
+        <label style="display:block; margin-bottom:10px; font-weight:bold;">💰 کل پول دریافتی (تومان):</label>
+        <div class="big-input-wrapper">
+            <!-- pattern و inputmode برای موبایل تا کیبورد عددی باز شود -->
+            <input type="text" id="totalInput" class="big-input" placeholder="0" inputmode="numeric" oninput="handleTotalChange(this)">
+        </div>
+        <div class="percent-status">
+            <span id="totalPercentTxt">جمع: ۰٪</span>
+            <span id="statusMessage">...</span>
+        </div>
     </div>
 
-    <!-- Footer -->
-    <div class="footer">
-        <button class="btn-main btn-outline" onclick="addNewItem()"><i class="fas fa-plus"></i> ردیف جدید</button>
-        <button class="btn-main btn-primary" onclick="calculateAll()"><i class="fas fa-calculator"></i> محاسبه کن</button>
+    <!-- نمودار -->
+    <div class="chart-container">
+        <canvas id="budgetChart"></canvas>
     </div>
+
+    <!-- لیست کارت‌ها -->
+    <div id="itemsList" class="items-container">
+        <!-- JS fills this -->
+    </div>
+
+    <!-- دکمه شناور افزودن -->
+    <div style="height: 80px;"></div> <!-- فضا برای اسکرول -->
+    <div class="fab-container">
+        <button class="add-btn-float" onclick="addNewItem()">
+            <i class="fas fa-plus"></i> ردیف جدید
+        </button>
+    </div>
+
 </div>
 
-<!-- Toast -->
-<div id="toast" class="toast">
-    <i class="fas fa-check-circle" style="color: #4ade80;"></i>
-    <span id="toastMsg">مبلغ کپی شد!</span>
-</div>
+<!-- پیام کپی -->
+<div id="toast" class="toast">کپی شد!</div>
 
 <script>
-    // داده‌های پیش‌فرض همیشگی
-    const defaultData = [
-        { name: "۱. کرایه شهری", percent: 27 },
-        { name: "۲. خورد و خوراک", percent: 12 },
-        { name: "۳. سفر (مشهد)", percent: 25 },
-        { name: "۴. دوا و درمان", percent: 3 },
-        { name: "۵. شارژ و اینترنت", percent: 10 },
-        { name: "۶. زیبایی و مکمل", percent: 7 },
-        { name: "۷. لباس", percent: 5 },
-        { name: "۸. ضروری و اضطراری", percent: 5 },
-        { name: "۹. هدیه و تفریح", percent: 3 },
-        { name: "۱۰. پس‌انداز کل", percent: 3 }
+    // --- داده‌های پایه ---
+    const defaultItems = [
+        { id: 1, name: "۱. کرایه شهری", percent: 27, spent: 0 },
+        { id: 2, name: "۲. خوراک و نان", percent: 12, spent: 0 },
+        { id: 3, name: "۳. سفر (مشهد)", percent: 25, spent: 0 },
+        { id: 4, name: "۴. دوا و درمان", percent: 3, spent: 0 },
+        { id: 5, name: "۵. شارژ و نت", percent: 10, spent: 0 },
+        { id: 6, name: "۶. زیبایی و مکمل", percent: 7, spent: 0 },
+        { id: 7, name: "۷. لباس", percent: 5, spent: 0 },
+        { id: 8, name: "۸. ضروری", percent: 5, spent: 0 },
+        { id: 9, name: "۹. تفریح", percent: 3, spent: 0 },
+        { id: 10, name: "۱۰. پس‌انداز", percent: 3, spent: 0 }
     ];
 
-    let budgetItems = [];
-    let isRawCopy = false; // false = formatted (123,456), true = raw (123456)
+    // سناریوها
+    const scenarios = {
+        default: defaultItems,
+        survival: [ // حالت بقا: فقط غذا و کرایه
+            { name: "۱. کرایه شهری", percent: 40, spent: 0 },
+            { name: "۲. خوراک حیاتی", percent: 40, spent: 0 },
+            { name: "۳. شارژ و نت", percent: 10, spent: 0 },
+            { name: "۴. درمان", percent: 10, spent: 0 },
+            { name: "۵. متفرقه", percent: 0, spent: 0 }
+        ],
+        travel: [ // حالت سفر: تمرکز روی ذخیره
+            { name: "۱. کرایه شهری", percent: 25, spent: 0 },
+            { name: "۲. خوراک", percent: 10, spent: 0 },
+            { name: "۳. سفر (فوری)", percent: 50, spent: 0 }, // ۵۰ درصد!
+            { name: "۴. شارژ و نت", percent: 10, spent: 0 },
+            { name: "۵. سایر", percent: 5, spent: 0 }
+        ]
+    };
 
-    // --- Core Functions ---
+    let appData = {
+        totalIncome: 0,
+        items: JSON.parse(JSON.stringify(defaultItems))
+    };
+
+    let chartInstance = null;
+
+    // --- توابع اصلی ---
 
     function init() {
-        loadState();
-        renderRows();
+        loadData();
+        renderItems();
+        updateChart();
+    }
+
+    function loadData() {
+        const saved = localStorage.getItem('amir_budget_v4');
+        if (saved) {
+            appData = JSON.parse(saved);
+            // بازگرداندن عدد فرمت شده به اینپوت
+            document.getElementById('totalInput').value = formatNumber(appData.totalIncome);
+        }
+    }
+
+    function saveData() {
+        localStorage.setItem('amir_budget_v4', JSON.stringify(appData));
+        updateUIStats();
+        updateChart();
+    }
+
+    function handleTotalChange(el) {
+        // فقط عدد قبول کن (انگلیسی)
+        let raw = toEnglishDigits(el.value).replace(/[^0-9]/g, '');
         
-        // اگر مبلغی ذخیره شده بود، دوباره محاسبه کن و نمایش بده
-        const savedTotal = localStorage.getItem('budget_total');
-        if(savedTotal) {
-            document.getElementById('totalAmount').value = savedTotal;
-            calculateAll();
+        if (raw === '') {
+            appData.totalIncome = 0;
+            el.value = '';
         } else {
-            updateProgressBar(); // فقط درصدها رو نشون بده
+            appData.totalIncome = parseInt(raw);
+            el.value = parseInt(raw).toLocaleString('en-US');
         }
+        saveData();
+        renderItems(); // بازسازی مقادیر
     }
 
-    // بارگذاری داده‌ها از حافظه یا پیش‌فرض
-    function loadState() {
-        const savedItems = localStorage.getItem('budget_items');
-        if (savedItems) {
-            budgetItems = JSON.parse(savedItems);
-        } else {
-            budgetItems = JSON.parse(JSON.stringify(defaultData)); // Deep copy
+    function updateItem(index, key, value) {
+        if (key === 'percent') {
+            appData.items[index].percent = parseFloat(toEnglishDigits(value)) || 0;
+        } else if (key === 'name') {
+            appData.items[index].name = value;
+        } else if (key === 'spent') {
+            let clean = toEnglishDigits(value).replace(/[^0-9]/g, '');
+            appData.items[index].spent = parseInt(clean) || 0;
         }
-    }
-
-    // ذخیره وضعیت در حافظه
-    function saveState() {
-        localStorage.setItem('budget_items', JSON.stringify(budgetItems));
-        localStorage.setItem('budget_total', document.getElementById('totalAmount').value);
-    }
-
-    // ریست کردن کل برنامه
-    function resetApp() {
-        if(confirm("آیا مطمئن هستید؟ تمام تغییرات و مبالغ پاک شده و به حالت اولیه برمی‌گردد.")) {
-            localStorage.clear();
-            document.getElementById('totalAmount').value = "";
-            loadState(); // بارگذاری مجدد دیفالت‌ها
-            renderRows();
-            updateProgressBar();
-            showToast("تنظیمات به حالت کارخانه برگشت");
+        saveData();
+        // فقط اگر درصد عوض شد رندر کن، اگر خرج کرد عوض شد فقط عدد مانده آپدیت شه (برای پرش نکردن فوکوس)
+        if (key !== 'spent') renderItems(); 
+        else {
+            // آپدیت تکی برای جلوگیری از پرش فوکوس
+            const budget = (appData.totalIncome * appData.items[index].percent) / 100;
+            const remaining = budget - appData.items[index].spent;
+            const row = document.querySelectorAll('.budget-card')[index];
+            const remEl = row.querySelector('.remaining-value');
+            remEl.innerText = formatNumber(remaining);
+            remEl.className = remaining < 0 ? 'stat-value remaining-value negative' : 'stat-value remaining-value';
+            updateChart();
         }
-    }
-
-    // --- Rendering ---
-
-    function renderRows() {
-        const container = document.getElementById('itemsContainer');
-        container.innerHTML = '';
-
-        budgetItems.forEach((item, index) => {
-            const div = document.createElement('div');
-            div.className = 'row-item';
-            div.innerHTML = `
-                <input type="text" value="${item.name}" oninput="updateItemName(${index}, this.value)">
-                <input type="tel" value="${item.percent}" oninput="updateItemPercent(${index}, this.value)" placeholder="درصد">
-                <div class="amount-box" id="result-${index}" onclick="copyAmount(${index})">
-                    ۰
-                </div>
-                <button class="btn-icon copy" onclick="copyAmount(${index})" title="کپی مبلغ"><i class="far fa-copy"></i></button>
-                <button class="btn-icon delete" onclick="deleteItem(${index})" title="حذف"><i class="fas fa-times"></i></button>
-            `;
-            container.appendChild(div);
-        });
-    }
-
-    // --- Inputs Handling ---
-
-    function handleTotalInput(el) {
-        // تبدیل به انگلیسی و حذف کاما
-        let val = toEnglishDigits(el.value).replace(/,/g, '');
-        if (isNaN(val) || val === '') {
-            saveState();
-            calculateAll(); // ریست کردن صفر
-            return;
-        }
-        // فرمت کردن ورودی اصلی (نمایشی)
-        el.value = parseInt(val).toLocaleString('en-US');
-        saveState();
-        calculateAll();
-    }
-
-    function updateItemName(index, val) {
-        budgetItems[index].name = val;
-        saveState();
-    }
-
-    function updateItemPercent(index, val) {
-        let cleanVal = toEnglishDigits(val);
-        // اجازه تایپ بده اما ذخیره عدد کن
-        budgetItems[index].percent = cleanVal; 
-        saveState();
-        updateProgressBar();
-        calculateAll();
     }
 
     function addNewItem() {
-        budgetItems.push({ name: "آیتم جدید", percent: 0 });
-        saveState();
-        renderRows();
-        updateProgressBar();
+        appData.items.push({ name: 'جدید', percent: 0, spent: 0 });
+        saveData();
+        renderItems();
     }
 
     function deleteItem(index) {
-        budgetItems.splice(index, 1);
-        saveState();
-        renderRows();
-        updateProgressBar();
-        calculateAll();
+        if(confirm("حذف شود؟")) {
+            appData.items.splice(index, 1);
+            saveData();
+            renderItems();
+        }
     }
 
-    // --- Calculation Logic ---
+    function applyScenario(type) {
+        if(confirm("آیا مطمئن هستید؟ آیتم‌های فعلی جایگزین می‌شوند.")) {
+            if (scenarios[type]) {
+                // کپی عمیق
+                appData.items = JSON.parse(JSON.stringify(scenarios[type]));
+                saveData();
+                renderItems();
+            }
+        }
+    }
 
-    function calculateAll() {
-        const totalStr = document.getElementById('totalAmount').value;
-        const total = parseFloat(toEnglishDigits(totalStr).replace(/,/g, '')) || 0;
-        const currency = document.getElementById('currencySelector').value;
+    function resetApp() {
+        if(confirm("همه چیز پاک شود؟")) {
+            localStorage.removeItem('amir_budget_v4');
+            location.reload();
+        }
+    }
 
-        budgetItems.forEach((item, index) => {
-            const p = parseFloat(item.percent) || 0;
-            const share = (total * p) / 100;
-            const el = document.getElementById(`result-${index}`);
-            
-            // ذخیره مقدار خام برای کپی
-            el.dataset.raw = Math.round(share);
-            
-            // نمایش فرمت شده (فارسی)
-            el.innerHTML = toPersianDigits(Math.round(share).toLocaleString('en-US')) + ` <span style="font-size:0.7em; opacity:0.7">${currency}</span>`;
+    function exportData() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "budget_backup.json");
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    }
+
+    // --- رندر کردن ---
+
+    function renderItems() {
+        const container = document.getElementById('itemsList');
+        container.innerHTML = '';
+
+        let totalPercent = 0;
+
+        appData.items.forEach((item, index) => {
+            totalPercent += item.percent;
+            const budgetAmount = Math.round((appData.totalIncome * item.percent) / 100);
+            const remaining = budgetAmount - item.spent;
+            const spentFormatted = item.spent === 0 ? '' : item.spent.toLocaleString('en-US');
+
+            const card = document.createElement('div');
+            card.className = 'budget-card';
+            card.innerHTML = `
+                <div class="card-header">
+                    <input type="text" class="item-name-input" value="${item.name}" onchange="updateItem(${index}, 'name', this.value)">
+                    <div class="percent-input-wrapper">
+                        <span class="percent-symbol">%</span>
+                        <input type="tel" class="percent-input" value="${item.percent}" onchange="updateItem(${index}, 'percent', this.value)">
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="stat-box" onclick="copyToClip(${budgetAmount})" title="کپی بودجه">
+                        <span class="stat-label">بودجه</span>
+                        <span class="stat-value" style="color:var(--primary)">${formatNumber(budgetAmount)}</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">خرج شده</span>
+                        <input type="tel" class="expense-input" placeholder="0" value="${spentFormatted}" oninput="formatInput(this); updateItem(${index}, 'spent', this.value)">
+                    </div>
+                    <div class="stat-box" onclick="copyToClip(${remaining})" title="کپی مانده">
+                        <span class="stat-label">مانده</span>
+                        <span class="stat-value remaining-value ${remaining < 0 ? 'negative' : ''}">${formatNumber(remaining)}</span>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <button class="btn-mini btn-copy" onclick="copyToClip(${budgetAmount})"><i class="far fa-copy"></i> کپی</button>
+                    <button class="btn-mini btn-delete" onclick="deleteItem(${index})"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+        // آپدیت وضعیت درصد
+        const statusEl = document.getElementById('statusMessage');
+        const totalPerEl = document.getElementById('totalPercentTxt');
+        totalPerEl.innerText = `جمع درصد: ${totalPercent}%`;
+        
+        if(totalPercent === 100) {
+            statusEl.innerText = "✅ عالی (تکمیل)";
+            statusEl.style.color = "var(--success)";
+        } else if (totalPercent > 100) {
+            statusEl.innerText = `⚠️ ${totalPercent - 100}% اضافه!`;
+            statusEl.style.color = "var(--danger)";
+        } else {
+            statusEl.innerText = `🔵 ${100 - totalPercent}% مانده`;
+            statusEl.style.color = "var(--warning)";
+        }
+    }
+
+    // --- نمودار ---
+    function updateChart() {
+        const ctx = document.getElementById('budgetChart').getContext('2d');
+        
+        // داده‌ها برای نمودار
+        const labels = appData.items.map(i => i.name.split('.')[1] || i.name); // اسم کوتاه
+        const data = appData.items.map(i => (appData.totalIncome * i.percent) / 100);
+        const bgColors = [
+            '#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
+            '#ec4899', '#06b6d4', '#84cc16', '#64748b', '#14b8a6'
+        ];
+
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+
+        chartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: bgColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { font: { family: 'Vazirmatn' } } }
+                }
+            }
         });
     }
 
-    function updateProgressBar() {
-        let totalP = 0;
-        budgetItems.forEach(i => totalP += (parseFloat(i.percent) || 0));
-        
-        const bar = document.getElementById('progressBar');
-        const status = document.getElementById('progressStatus');
-        
-        let displayP = totalP > 100 ? 100 : totalP;
-        bar.style.width = displayP + '%';
-        
-        let msg = "";
-        let color = "";
-
-        if(totalP === 100) {
-            color = "var(--success)";
-            msg = "✅ عالی! دقیقاً ۱۰۰٪ شد.";
-        } else if (totalP > 100) {
-            color = "var(--danger)";
-            msg = `⚠️ خطا: ${toPersianDigits(totalP - 100)}٪ اضافه است!`;
-        } else {
-            color = "var(--warning)";
-            msg = `🔵 ${toPersianDigits(100 - totalP)}٪ باقی‌مانده است.`;
-        }
-
-        bar.style.backgroundColor = color;
-        status.innerHTML = `<span>جمع درصد: ${toPersianDigits(totalP)}٪</span><span style="color:${color}">${msg}</span>`;
-    }
-
-    // --- Copy System ---
-
-    function toggleCopyMode() {
-        const checkbox = document.getElementById('copyRawToggle');
-        const label = document.querySelector('label[for="copyRawToggle"]');
-        const statusText = document.getElementById('copyModeText');
-        
-        isRawCopy = checkbox.checked;
-        
-        if (isRawCopy) {
-            label.innerText = "حالت کپی: بدون جداکننده (۱۲۳۴۵۶)";
-            statusText.innerText = "بله (مخصوص بانک - انگلیسی)";
-            statusText.style.color = "var(--primary)";
-        } else {
-            label.innerText = "حالت کپی: با جداکننده (۱۲۳,۰۰۰)";
-            statusText.innerText = "خیر (نمایشی - فارسی)";
-            statusText.style.color = "var(--secondary)";
-        }
-    }
-
-    function copyAmount(index) {
-        const el = document.getElementById(`result-${index}`);
-        const rawValue = el.dataset.raw || 0;
-        
-        let textToCopy = "";
-
-        if (isRawCopy) {
-            // حالت خام: عدد انگلیسی بدون کاما
-            textToCopy = rawValue.toString();
-        } else {
-            // حالت فرمت شده: عدد فارسی با کاما
-            textToCopy = toPersianDigits(parseInt(rawValue).toLocaleString('en-US'));
-        }
-
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            showToast(`مبلغ کپی شد: ${textToCopy}`);
-        });
-    }
-
-    // --- Helpers ---
+    // --- ابزارهای کمکی ---
 
     function toEnglishDigits(str) {
         if(!str) return "";
         return str.toString().replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
     }
 
-    function toPersianDigits(str) {
-        if(!str) return "";
-        return str.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+    function formatNumber(num) {
+        return Math.round(num).toLocaleString('en-US');
     }
 
-    function showToast(msg) {
-        const t = document.getElementById('toast');
-        const tMsg = document.getElementById('toastMsg');
-        tMsg.innerText = msg;
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 3000);
+    // فرمت کردن ورودی هنگام تایپ (برای فیلد خرج شده)
+    function formatInput(el) {
+        let raw = toEnglishDigits(el.value).replace(/[^0-9]/g, '');
+        if(raw) el.value = parseInt(raw).toLocaleString('en-US');
+        else el.value = '';
     }
 
-    // فراخوانی اولیه
+    function copyToClip(amount) {
+        const mode = document.getElementById('copyModeSelector').value;
+        let txt = "";
+        
+        if (mode === 'raw') {
+            txt = Math.round(amount).toString();
+        } else {
+            txt = Math.round(amount).toLocaleString('en-US'); // فقط عدد با کاما
+        }
+
+        navigator.clipboard.writeText(txt).then(() => {
+            const t = document.getElementById('toast');
+            t.innerText = `کپی شد: ${txt}`;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        });
+    }
+
+    // اجرا
     init();
 
 </script>
-
 </body>
 </html>
