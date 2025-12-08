@@ -3,21 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مدیریت بودجه حرفه‌ای | نسخه پیشرفته</title>
+    <title>مدیریت بودجه هوشمند</title>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --primary: #3b82f6;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+            --card-bg: #ffffff;
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
             --secondary: #64748b;
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
             --text-dark: #1e293b;
-            --border-radius: 16px;
+            --border: #e2e8f0;
+            --radius: 12px;
         }
 
         * {
@@ -41,18 +43,19 @@
             background: var(--card-bg);
             width: 100%;
             max-width: 900px;
-            border-radius: var(--border-radius);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
-        /* هدر و تنظیمات */
+        /* --- HEADER --- */
         .header {
-            background: #fff;
-            padding: 25px;
-            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -60,279 +63,363 @@
             gap: 15px;
         }
 
-        .title-box h1 {
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header h1 {
             margin: 0;
-            font-size: 1.5rem;
-            color: var(--primary);
+            font-size: 1.4rem;
+            color: var(--primary-dark);
+            font-weight: 900;
+        }
+
+        .btn-reset {
+            background: #fee2e2;
+            color: var(--danger);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-reset:hover {
+            background: var(--danger);
+            color: white;
+            transform: rotate(180deg);
+        }
+
+        /* --- SETTINGS BAR --- */
+        .settings-bar {
+            padding: 15px 30px;
+            background: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        .toggle-wrapper {
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-
-        .settings-box select {
-            padding: 8px 15px;
+            background: #f1f5f9;
+            padding: 8px 12px;
             border-radius: 8px;
-            border: 1px solid #cbd5e1;
-            font-size: 0.9rem;
-            background: #f8fafc;
-            cursor: pointer;
         }
 
-        /* ورودی اصلی پول */
+        .toggle-switch {
+            position: relative;
+            width: 40px;
+            height: 20px;
+            background: #cbd5e1;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        input[type="checkbox"]:checked + .toggle-switch {
+            background: var(--primary);
+        }
+
+        input[type="checkbox"]:checked + .toggle-switch::after {
+            transform: translateX(20px);
+        }
+
+        /* --- INPUT SECTION --- */
         .input-hero {
-            background: #eff6ff;
             padding: 30px;
             text-align: center;
-            position: relative;
-        }
-
-        .input-group {
-            position: relative;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .input-group i {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--secondary);
-            font-size: 1.2rem;
+            background: linear-gradient(to bottom, #eff6ff, #fff);
         }
 
         .main-input {
             width: 100%;
-            padding: 15px 50px 15px 15px;
-            font-size: 1.5rem;
+            max-width: 400px;
+            padding: 15px;
+            font-size: 1.8rem;
             border: 2px solid #bfdbfe;
-            border-radius: 12px;
+            border-radius: 16px;
             text-align: center;
-            font-weight: bold;
+            font-weight: 800;
             color: var(--primary);
-            transition: 0.3s;
             direction: ltr;
+            transition: 0.3s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
         .main-input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
         }
 
-        /* نوار پیشرفت درصد */
-        .progress-container {
-            margin-top: 15px;
+        /* --- PERCENT BAR --- */
+        .progress-wrapper {
+            max-width: 500px;
+            margin: 20px auto 0;
+        }
+        .progress-track {
             background: #e2e8f0;
-            height: 10px;
-            border-radius: 5px;
+            height: 12px;
+            border-radius: 6px;
             overflow: hidden;
-            position: relative;
         }
-
-        .progress-bar {
+        .progress-fill {
             height: 100%;
             background: var(--success);
             width: 0%;
-            transition: width 0.3s ease, background 0.3s;
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        .progress-info {
+        .progress-status {
             display: flex;
             justify-content: space-between;
-            margin-top: 5px;
+            margin-top: 8px;
             font-size: 0.85rem;
             font-weight: bold;
         }
 
-        /* لیست آیتم‌ها */
+        /* --- LIST --- */
         .items-list {
-            padding: 20px;
-            background: #f8fafc;
-            flex-grow: 1;
+            padding: 0 30px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
-        .budget-item {
+        .row-item {
             display: grid;
-            grid-template-columns: 3fr 1.5fr 3fr 40px;
-            gap: 15px;
-            background: #fff;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            border: 1px solid #e2e8f0;
+            grid-template-columns: 2fr 1fr 2fr 40px 40px;
+            gap: 10px;
             align-items: center;
-            transition: transform 0.2s, box-shadow 0.2s;
+            background: #fff;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: 0.2s;
         }
 
-        .budget-item:hover {
+        .row-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            z-index: 2;
+        }
+
+        .row-item input {
+            padding: 10px;
+            border: 1px solid transparent;
+            background: transparent;
+            font-weight: bold;
+            font-size: 1rem;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+        
+        .row-item input:focus {
+            background: #f8fafc;
             border-color: var(--primary);
         }
 
-        .item-name {
-            font-weight: bold;
-            border: none;
-            background: transparent;
-            font-size: 1rem;
-            width: 100%;
-        }
+        .row-item input[type="text"] { width: 100%; }
+        .row-item input[type="tel"] { text-align: center; direction: ltr; background: #f1f5f9; }
 
-        .percent-input-group {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .percent-input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: bold;
-            direction: ltr;
-        }
-
-        .percent-symbol {
-            position: absolute;
-            left: 10px;
-            color: #94a3b8;
-            font-size: 0.8rem;
-        }
-
-        .amount-display {
-            background: #f1f5f9;
+        .amount-box {
+            background: #ecfdf5;
+            color: #047857;
             padding: 10px;
             border-radius: 8px;
             text-align: center;
             font-weight: 800;
-            color: var(--text-dark);
             font-size: 1.1rem;
-            border-right: 4px solid var(--primary);
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
         }
 
-        .btn-remove {
-            color: #94a3b8;
+        .btn-icon {
             background: none;
             border: none;
-            font-size: 1.2rem;
             cursor: pointer;
+            color: var(--secondary);
+            font-size: 1.1rem;
+            padding: 8px;
+            border-radius: 8px;
             transition: 0.2s;
         }
 
-        .btn-remove:hover { color: var(--danger); }
+        .btn-icon.copy:hover { background: #dbeafe; color: var(--primary); }
+        .btn-icon.delete:hover { background: #fee2e2; color: var(--danger); }
 
-        /* دکمه‌ها و اکشن‌ها */
-        .actions {
-            padding: 20px;
-            background: #fff;
-            border-top: 1px solid #e2e8f0;
+        /* --- FOOTER --- */
+        .footer {
+            padding: 20px 30px;
+            border-top: 1px solid var(--border);
+            background: #f8fafc;
             display: flex;
-            gap: 10px;
-            justify-content: space-between;
-            position: sticky;
-            bottom: 0;
-            z-index: 10;
+            gap: 15px;
         }
 
-        .btn {
-            padding: 12px 24px;
+        .btn-main {
+            padding: 12px 20px;
             border-radius: 10px;
-            border: none;
             font-weight: bold;
+            border: none;
             cursor: pointer;
+            font-size: 1rem;
             display: flex;
             align-items: center;
             gap: 8px;
             transition: 0.2s;
-            font-size: 1rem;
         }
 
-        .btn-calc {
-            background: var(--primary);
+        .btn-primary { background: var(--primary); color: white; flex: 1; justify-content: center; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-outline { background: white; border: 1px solid var(--border); color: var(--text-dark); }
+        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+
+        /* --- TOAST NOTIFICATION --- */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1e293b;
             color: white;
-            flex-grow: 2;
-            justify-content: center;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: bold;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .btn-calc:hover { background: #1d4ed8; transform: translateY(-1px); }
-        .btn-calc:active { transform: translateY(1px); }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-        .btn-add {
-            background: #eff6ff;
-            color: var(--primary);
-            border: 1px solid #bfdbfe;
-        }
-        .btn-add:hover { background: #dbeafe; }
-
-        /* رسپانسیو */
-        @media (max-width: 650px) {
-            .budget-item {
-                grid-template-columns: 1fr 1fr;
-                gap: 10px;
+        /* --- RESPONSIVE --- */
+        @media (max-width: 700px) {
+            .row-item {
+                grid-template-columns: 1fr 1fr 40px;
+                grid-template-areas: 
+                    "name name del"
+                    "percent amount copy";
+                gap: 8px;
+                padding: 15px;
             }
-            .item-name { grid-column: 1 / -1; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 5px;}
-            .btn-remove { grid-column: 2 / 3; justify-self: end; grid-row: 1; }
-            .percent-input-group { grid-column: 1 / 2; }
-            .amount-display { grid-column: 2 / 3; }
-            .header { justify-content: center; }
-            .actions { flex-direction: column-reverse; }
-            .btn { width: 100%; justify-content: center; }
+            .row-item input[type="text"] { grid-area: name; font-size: 1.1rem; }
+            .btn-icon.delete { grid-area: del; justify-self: end; }
+            .percent-input-group { grid-area: percent; }
+            .amount-box { grid-area: amount; }
+            .btn-icon.copy { grid-area: copy; }
+            
+            .header { justify-content: space-between; }
+            .settings-bar { justify-content: center; flex-direction: column; align-items: stretch; }
+            .toggle-wrapper { justify-content: space-between; }
         }
     </style>
 </head>
 <body>
 
 <div class="dashboard">
-    <!-- هدر -->
+    <!-- Header -->
     <div class="header">
-        <div class="title-box">
-            <h1><i class="fas fa-wallet"></i> ماشین حساب بودجه</h1>
+        <div class="header-left">
+            <h1>مدیریت بودجه</h1>
+            <button class="btn-reset" onclick="resetApp()" title="تازه سازی و بازگشت به تنظیمات اولیه">
+                <i class="fas fa-rotate-right"></i>
+            </button>
         </div>
-        <div class="settings-box">
-            <select id="currencySelector" onchange="reCalculate()">
-                <option value="تومان">نمایش به تومان</option>
-                <option value="ریال">نمایش به ریال</option>
+        <div style="color: var(--secondary); font-size: 0.9rem;">
+            <i class="fas fa-save"></i> ذخیره خودکار فعال است
+        </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="settings-bar">
+        <div class="toggle-wrapper">
+            <span>واحد پول:</span>
+            <select id="currencySelector" style="border:none; background:transparent; font-weight:bold; color:var(--primary);" onchange="updateCalculations()">
+                <option value="تومان">تومان</option>
+                <option value="ریال">ریال</option>
             </select>
         </div>
+
+        <div class="toggle-wrapper">
+            <label for="copyRawToggle" style="cursor:pointer">حالت کپی: با جداکننده (۱۲۳,۰۰۰)</label>
+            <input type="checkbox" id="copyRawToggle" style="display:none" onchange="toggleCopyMode()">
+            <label for="copyRawToggle" class="toggle-switch"></label>
+            <span id="copyModeText" style="font-size:0.85rem; color:var(--secondary)">خیر (نمایشی)</span>
+        </div>
     </div>
 
-    <!-- ورودی پول -->
+    <!-- Input Section -->
     <div class="input-hero">
-        <label style="display:block; margin-bottom:10px; color:#64748b;">مبلغ ورودی را وارد کنید:</label>
-        <div class="input-group">
-            <i class="fas fa-coins"></i>
-            <input type="text" id="totalAmount" class="main-input" placeholder="0" onkeyup="handleMainInput(this)">
+        <label>مبلغ ورودی جدید را وارد کنید:</label>
+        <div style="position:relative; max-width:400px; margin:10px auto;">
+            <input type="text" id="totalAmount" class="main-input" placeholder="0" onkeyup="handleTotalInput(this)">
         </div>
-        
-        <!-- نوار وضعیت درصد -->
-        <div style="max-width: 400px; margin: 20px auto 0;">
-            <div class="progress-container">
-                <div id="progressBar" class="progress-bar"></div>
+
+        <div class="progress-wrapper">
+            <div class="progress-track">
+                <div id="progressBar" class="progress-fill"></div>
             </div>
-            <div class="progress-info">
-                <span id="percentText">جمع درصد: ۰٪</span>
-                <span id="statusMessage" style="color: var(--success)">همه چی مرتبه</span>
+            <div id="progressStatus" class="progress-status">
+                <span>جمع: ۰٪</span>
+                <span>وضعیت: نرمال</span>
             </div>
         </div>
     </div>
 
-    <!-- لیست ردیف‌ها -->
-    <div id="itemsList" class="items-list">
-        <!-- ردیف‌ها توسط جاوااسکریپت پر می‌شوند -->
+    <!-- Items List -->
+    <div id="itemsContainer" class="items-list">
+        <!-- JS generates rows here -->
     </div>
 
-    <!-- دکمه‌ها -->
-    <div class="actions">
-        <button class="btn btn-add" onclick="addRow()"><i class="fas fa-plus"></i> آیتم جدید</button>
-        <button class="btn btn-calc" onclick="calculateAll()"><i class="fas fa-calculator"></i> محاسبه کن</button>
+    <!-- Footer -->
+    <div class="footer">
+        <button class="btn-main btn-outline" onclick="addNewItem()"><i class="fas fa-plus"></i> ردیف جدید</button>
+        <button class="btn-main btn-primary" onclick="calculateAll()"><i class="fas fa-calculator"></i> محاسبه کن</button>
     </div>
 </div>
 
+<!-- Toast -->
+<div id="toast" class="toast">
+    <i class="fas fa-check-circle" style="color: #4ade80;"></i>
+    <span id="toastMsg">مبلغ کپی شد!</span>
+</div>
+
 <script>
-    // تنظیمات اولیه و داده‌های پیش‌فرض امیرحسین
-    const defaultBudgets = [
+    // داده‌های پیش‌فرض همیشگی
+    const defaultData = [
         { name: "۱. کرایه شهری", percent: 27 },
         { name: "۲. خورد و خوراک", percent: 12 },
         { name: "۳. سفر (مشهد)", percent: 25 },
@@ -345,157 +432,228 @@
         { name: "۱۰. پس‌انداز کل", percent: 3 }
     ];
 
-    const itemsContainer = document.getElementById('itemsList');
-    const currencySelector = document.getElementById('currencySelector');
-    let currentCurrency = "تومان";
+    let budgetItems = [];
+    let isRawCopy = false; // false = formatted (123,456), true = raw (123456)
 
-    // تبدیل اعداد فارسی به انگلیسی (قلب تپنده برنامه)
+    // --- Core Functions ---
+
+    function init() {
+        loadState();
+        renderRows();
+        
+        // اگر مبلغی ذخیره شده بود، دوباره محاسبه کن و نمایش بده
+        const savedTotal = localStorage.getItem('budget_total');
+        if(savedTotal) {
+            document.getElementById('totalAmount').value = savedTotal;
+            calculateAll();
+        } else {
+            updateProgressBar(); // فقط درصدها رو نشون بده
+        }
+    }
+
+    // بارگذاری داده‌ها از حافظه یا پیش‌فرض
+    function loadState() {
+        const savedItems = localStorage.getItem('budget_items');
+        if (savedItems) {
+            budgetItems = JSON.parse(savedItems);
+        } else {
+            budgetItems = JSON.parse(JSON.stringify(defaultData)); // Deep copy
+        }
+    }
+
+    // ذخیره وضعیت در حافظه
+    function saveState() {
+        localStorage.setItem('budget_items', JSON.stringify(budgetItems));
+        localStorage.setItem('budget_total', document.getElementById('totalAmount').value);
+    }
+
+    // ریست کردن کل برنامه
+    function resetApp() {
+        if(confirm("آیا مطمئن هستید؟ تمام تغییرات و مبالغ پاک شده و به حالت اولیه برمی‌گردد.")) {
+            localStorage.clear();
+            document.getElementById('totalAmount').value = "";
+            loadState(); // بارگذاری مجدد دیفالت‌ها
+            renderRows();
+            updateProgressBar();
+            showToast("تنظیمات به حالت کارخانه برگشت");
+        }
+    }
+
+    // --- Rendering ---
+
+    function renderRows() {
+        const container = document.getElementById('itemsContainer');
+        container.innerHTML = '';
+
+        budgetItems.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'row-item';
+            div.innerHTML = `
+                <input type="text" value="${item.name}" oninput="updateItemName(${index}, this.value)">
+                <input type="tel" value="${item.percent}" oninput="updateItemPercent(${index}, this.value)" placeholder="درصد">
+                <div class="amount-box" id="result-${index}" onclick="copyAmount(${index})">
+                    ۰
+                </div>
+                <button class="btn-icon copy" onclick="copyAmount(${index})" title="کپی مبلغ"><i class="far fa-copy"></i></button>
+                <button class="btn-icon delete" onclick="deleteItem(${index})" title="حذف"><i class="fas fa-times"></i></button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    // --- Inputs Handling ---
+
+    function handleTotalInput(el) {
+        // تبدیل به انگلیسی و حذف کاما
+        let val = toEnglishDigits(el.value).replace(/,/g, '');
+        if (isNaN(val) || val === '') {
+            saveState();
+            calculateAll(); // ریست کردن صفر
+            return;
+        }
+        // فرمت کردن ورودی اصلی (نمایشی)
+        el.value = parseInt(val).toLocaleString('en-US');
+        saveState();
+        calculateAll();
+    }
+
+    function updateItemName(index, val) {
+        budgetItems[index].name = val;
+        saveState();
+    }
+
+    function updateItemPercent(index, val) {
+        let cleanVal = toEnglishDigits(val);
+        // اجازه تایپ بده اما ذخیره عدد کن
+        budgetItems[index].percent = cleanVal; 
+        saveState();
+        updateProgressBar();
+        calculateAll();
+    }
+
+    function addNewItem() {
+        budgetItems.push({ name: "آیتم جدید", percent: 0 });
+        saveState();
+        renderRows();
+        updateProgressBar();
+    }
+
+    function deleteItem(index) {
+        budgetItems.splice(index, 1);
+        saveState();
+        renderRows();
+        updateProgressBar();
+        calculateAll();
+    }
+
+    // --- Calculation Logic ---
+
+    function calculateAll() {
+        const totalStr = document.getElementById('totalAmount').value;
+        const total = parseFloat(toEnglishDigits(totalStr).replace(/,/g, '')) || 0;
+        const currency = document.getElementById('currencySelector').value;
+
+        budgetItems.forEach((item, index) => {
+            const p = parseFloat(item.percent) || 0;
+            const share = (total * p) / 100;
+            const el = document.getElementById(`result-${index}`);
+            
+            // ذخیره مقدار خام برای کپی
+            el.dataset.raw = Math.round(share);
+            
+            // نمایش فرمت شده (فارسی)
+            el.innerHTML = toPersianDigits(Math.round(share).toLocaleString('en-US')) + ` <span style="font-size:0.7em; opacity:0.7">${currency}</span>`;
+        });
+    }
+
+    function updateProgressBar() {
+        let totalP = 0;
+        budgetItems.forEach(i => totalP += (parseFloat(i.percent) || 0));
+        
+        const bar = document.getElementById('progressBar');
+        const status = document.getElementById('progressStatus');
+        
+        let displayP = totalP > 100 ? 100 : totalP;
+        bar.style.width = displayP + '%';
+        
+        let msg = "";
+        let color = "";
+
+        if(totalP === 100) {
+            color = "var(--success)";
+            msg = "✅ عالی! دقیقاً ۱۰۰٪ شد.";
+        } else if (totalP > 100) {
+            color = "var(--danger)";
+            msg = `⚠️ خطا: ${toPersianDigits(totalP - 100)}٪ اضافه است!`;
+        } else {
+            color = "var(--warning)";
+            msg = `🔵 ${toPersianDigits(100 - totalP)}٪ باقی‌مانده است.`;
+        }
+
+        bar.style.backgroundColor = color;
+        status.innerHTML = `<span>جمع درصد: ${toPersianDigits(totalP)}٪</span><span style="color:${color}">${msg}</span>`;
+    }
+
+    // --- Copy System ---
+
+    function toggleCopyMode() {
+        const checkbox = document.getElementById('copyRawToggle');
+        const label = document.querySelector('label[for="copyRawToggle"]');
+        const statusText = document.getElementById('copyModeText');
+        
+        isRawCopy = checkbox.checked;
+        
+        if (isRawCopy) {
+            label.innerText = "حالت کپی: بدون جداکننده (۱۲۳۴۵۶)";
+            statusText.innerText = "بله (مخصوص بانک - انگلیسی)";
+            statusText.style.color = "var(--primary)";
+        } else {
+            label.innerText = "حالت کپی: با جداکننده (۱۲۳,۰۰۰)";
+            statusText.innerText = "خیر (نمایشی - فارسی)";
+            statusText.style.color = "var(--secondary)";
+        }
+    }
+
+    function copyAmount(index) {
+        const el = document.getElementById(`result-${index}`);
+        const rawValue = el.dataset.raw || 0;
+        
+        let textToCopy = "";
+
+        if (isRawCopy) {
+            // حالت خام: عدد انگلیسی بدون کاما
+            textToCopy = rawValue.toString();
+        } else {
+            // حالت فرمت شده: عدد فارسی با کاما
+            textToCopy = toPersianDigits(parseInt(rawValue).toLocaleString('en-US'));
+        }
+
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            showToast(`مبلغ کپی شد: ${textToCopy}`);
+        });
+    }
+
+    // --- Helpers ---
+
     function toEnglishDigits(str) {
         if(!str) return "";
         return str.toString().replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
     }
 
-    // تبدیل اعداد انگلیسی به فارسی برای نمایش
-    function toPersianDigits(num) {
-        if(num === null || num === undefined) return "";
-        return num.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+    function toPersianDigits(str) {
+        if(!str) return "";
+        return str.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
     }
 
-    // فرمت کردن پول (سه رقم سه رقم)
-    function formatMoney(amount) {
-        if (isNaN(amount)) return "0";
-        // حذف اعشار اضافی
-        amount = Math.round(amount);
-        return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        const tMsg = document.getElementById('toastMsg');
+        tMsg.innerText = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
     }
 
-    // شروع برنامه
-    function init() {
-        defaultBudgets.forEach(item => {
-            createRowHTML(item.name, item.percent);
-        });
-        updatePercentBar();
-    }
-
-    // ساخت HTML برای هر ردیف
-    function createRowHTML(name, percent) {
-        const div = document.createElement('div');
-        div.className = 'budget-item';
-        div.innerHTML = `
-            <input type="text" class="item-name" value="${name}" placeholder="نام هزینه">
-            <div class="percent-input-group">
-                <input type="tel" class="percent-input" value="${percent}" oninput="handlePercentChange(this)" placeholder="0">
-                <span class="percent-symbol">%</span>
-            </div>
-            <div class="amount-display">0 ${currentCurrency}</div>
-            <button class="btn-remove" onclick="removeRow(this)"><i class="fas fa-trash-alt"></i></button>
-        `;
-        itemsContainer.appendChild(div);
-    }
-
-    // اضافه کردن ردیف جدید
-    function addRow() {
-        createRowHTML("هزینه جدید", 0);
-        updatePercentBar();
-    }
-
-    // حذف ردیف
-    function removeRow(btn) {
-        btn.parentElement.remove();
-        updatePercentBar();
-        calculateAll();
-    }
-
-    // مدیریت ورودی پول اصلی
-    function handleMainInput(input) {
-        // ۱. حذف کاماها و تبدیل به انگلیسی
-        let rawValue = toEnglishDigits(input.value).replace(/,/g, '');
-        
-        // ۲. اگر عدد نیست، پاک کن
-        if (isNaN(rawValue) || rawValue === '') {
-            calculateAll(); // ریست کردن مقادیر
-            return;
-        }
-
-        // ۳. فرمت کردن و نمایش مجدد در اینپوت
-        input.value = parseInt(rawValue).toLocaleString('en-US');
-        
-        // ۴. انجام محاسبات
-        calculateAll();
-    }
-
-    // مدیریت تغییر درصدها
-    function handlePercentChange(input) {
-        let val = toEnglishDigits(input.value);
-        // جلوگیری از ورود حروف
-        if(isNaN(val)) input.value = 0;
-        
-        updatePercentBar();
-        calculateAll();
-    }
-
-    // بروزرسانی نوار وضعیت درصد
-    function updatePercentBar() {
-        let totalPercent = 0;
-        const rows = document.querySelectorAll('.budget-item');
-        
-        rows.forEach(row => {
-            let pVal = row.querySelector('.percent-input').value;
-            totalPercent += parseFloat(toEnglishDigits(pVal)) || 0;
-        });
-
-        const bar = document.getElementById('progressBar');
-        const text = document.getElementById('percentText');
-        const msg = document.getElementById('statusMessage');
-
-        // محدود کردن عرض بار به ۱۰۰ (برای گرافیک)
-        let visualPercent = totalPercent > 100 ? 100 : totalPercent;
-        bar.style.width = visualPercent + '%';
-        text.innerText = `جمع درصد: ${toPersianDigits(totalPercent)}٪`;
-
-        if (totalPercent === 100) {
-            bar.style.backgroundColor = 'var(--success)';
-            msg.innerText = "✅ تکمیل و دقیق";
-            msg.style.color = 'var(--success)';
-        } else if (totalPercent > 100) {
-            bar.style.backgroundColor = 'var(--danger)';
-            msg.innerText = `⚠️ ${toPersianDigits(totalPercent - 100)}٪ اضافه است!`;
-            msg.style.color = 'var(--danger)';
-        } else {
-            bar.style.backgroundColor = 'var(--warning)';
-            msg.innerText = `🔵 ${toPersianDigits(100 - totalPercent)}٪ باقی‌مانده`;
-            msg.style.color = 'var(--text-dark)';
-        }
-    }
-
-    // تابع اصلی محاسبه
-    function calculateAll() {
-        const totalInput = document.getElementById('totalAmount');
-        const rawTotal = parseFloat(toEnglishDigits(totalInput.value).replace(/,/g, '')) || 0;
-        
-        currentCurrency = currencySelector.value;
-        const rows = document.querySelectorAll('.budget-item');
-
-        rows.forEach(row => {
-            const pInput = row.querySelector('.percent-input');
-            const resultBox = row.querySelector('.amount-display');
-            
-            const percent = parseFloat(toEnglishDigits(pInput.value)) || 0;
-            
-            // فرمول محاسبه
-            const share = (rawTotal * percent) / 100;
-            
-            // نمایش عدد فارسی شده
-            resultBox.innerText = toPersianDigits(formatMoney(share)) + " " + currentCurrency;
-        });
-    }
-
-    // بازخوانی واحد پول
-    function reCalculate() {
-        calculateAll();
-    }
-
-    // اجرا
+    // فراخوانی اولیه
     init();
 
 </script>
