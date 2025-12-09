@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مدیریت مالی حرفه‌ای | V13 Ultimate (Full Edit & History)</title>
+    <title>مدیریت مالی حرفه‌ای | V14 Ultimate (Daily Logs & Analysis)</title>
 
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
@@ -167,6 +167,49 @@
             font-size: 0.75rem;
             font-weight: bold;
         }
+
+        /* Currency Toggle Switch (Instruction 3) */
+        .currency-toggle {
+            position: relative;
+            display: inline-flex;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 3px;
+            cursor: pointer;
+            width: 80px;
+            height: 34px;
+            align-items: center;
+            justify-content: space-between;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .currency-toggle span {
+            font-size: 0.7rem;
+            font-weight: bold;
+            z-index: 2;
+            flex: 1;
+            text-align: center;
+            transition: color 0.3s;
+        }
+        .currency-toggle .toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 36px;
+            height: 26px;
+            background: var(--primary);
+            border-radius: 16px;
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            z-index: 1;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .currency-toggle.is-rial .toggle-slider { transform: translateX(38px); background: var(--success); }
+        .currency-toggle.is-rial .curr-toman { color: var(--text-sec); }
+        .currency-toggle.is-rial .curr-rial { color: white; }
+        .currency-toggle:not(.is-rial) .curr-toman { color: white; }
+        .currency-toggle:not(.is-rial) .curr-rial { color: var(--text-sec); }
+
 
         /* ورودی‌ها */
         input, select {
@@ -406,13 +449,13 @@
             transform: translateY(0); /* آمدن به بالا */
         }
 
-        /* --- TAB CONTENT --- */
-        .tab-pane { display: none; padding-bottom: 20px; }
-        .tab-pane.active { display: block; animation: slideUp 0.3s; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
         /* --- REPORT (PRINT) --- */
+        @media print {
+            body * { visibility: hidden; }
+            #printArea, #printArea * { visibility: visible; }
+            #printArea { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+        
         #printArea {
             position: absolute; top: -9999px; left: -9999px;
             width: 800px; background: white; color: black; padding: 40px;
@@ -420,7 +463,7 @@
         }
         .print-header { text-align: center; border-bottom: 2px solid #000; margin-bottom: 20px; padding-bottom: 15px; }
         .print-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .print-table th { background: #eee; border: 1px solid #000; padding: 10px; }
+        .print-table th { background: #eee; border: 1px solid #000; padding: 10px; font-weight: bold; }
         .print-table td { border: 1px solid #000; padding: 8px; text-align: center; }
         .print-summary { display: flex; justify-content: space-between; margin-top: 20px; font-weight: bold; border: 1px solid #000; padding: 10px; background: #f9f9f9; }
         .print-section-title { font-weight: bold; margin-top: 20px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
@@ -437,13 +480,12 @@
 </head>
 <body>
 
-<!-- 1. LOCK SCREEN (PIN & AUTH - Instruction 1) -->
+<!-- 1. LOCK SCREEN (PIN & AUTH) -->
 
 <div id="authModal" class="pin-screen" style="display: flex;">
     <i class="fas fa-fingerprint" style="font-size: 4rem; color: var(--primary);"></i>
     <h2 id="authTitle" style="margin: 15px 0 5px 0;">امنیت</h2>
     
-    <!-- New Welcome or Setup Message -->
     <p id="authSub" style="font-size: 0.9rem; color: var(--text-sec); margin-bottom: 20px;">...</p>
 
     <!-- First Time Setup Input -->
@@ -478,16 +520,20 @@
 
 <div class="container" id="appContent" style="display:none;">
 
-    <!-- Header -->
+    <!-- Header (Modified for Instruction 3) -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 10px;">
         <div>
             <h2 style="margin:0; color:var(--primary);">مدیریت مالی</h2>
             <span style="font-size:0.8rem; color:var(--text-sec);" id="headerDate">---</span>
         </div>
-        <div style="display:flex; gap:10px;">
-            <button class="btn-icon" onclick="toggleCurrency()" title="تبدیل واحد پول">
-                <span id="currBadge" class="badge-currency">T</span>
-            </button>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <!-- New Currency Toggle -->
+            <div class="currency-toggle" id="currToggleBtn" onclick="toggleCurrency()" title="تغییر واحد پول">
+                <span class="curr-toman">تومان</span>
+                <span class="curr-rial">ریال</span>
+                <div class="toggle-slider"></div>
+            </div>
+            
             <button class="btn-icon" onclick="toggleTheme()" title="تم شب/روز">
                 <i class="fas fa-moon"></i>
             </button>
@@ -555,7 +601,7 @@
         </div>
     </div>
 
-    <!-- TAB 2: BUDGET (Instructions 4, 5, 8) -->
+    <!-- TAB 2: BUDGET -->
     <div id="view-budget" class="tab-pane">
         <div class="glass-panel" style="text-align:center;">
             <span style="color:var(--text-sec); font-size:0.9rem;">بودجه کل توزیع شده:</span>
@@ -563,7 +609,6 @@
                 <div id="distributable" style="font-size:1.5rem; font-weight:bold; color:var(--primary); direction:ltr;">0</div>
                 <small id="totalPercentBadge" style="background:var(--text-sec); color:white; padding:2px 6px; border-radius:4px;">0%</small>
             </div>
-            <!-- Instruction 8: Distribute Button -->
             <button id="btnDistribute" class="btn btn-primary" style="margin-top:10px; width:100%; display:none;" onclick="triggerDistribution()">
                 <i class="fas fa-sync-alt"></i> توزیع موجودی جدید
             </button>
@@ -635,12 +680,16 @@
                     <input type="checkbox" id="rawCopyCheck" style="width:20px; height:20px;">
                 </div>
 
-                <!-- Priority Settings (Modified - Instruction 2 & 7) -->
+                <!-- Analysis Button (Instruction 1) -->
+                <button class="btn btn-primary" onclick="openAnalysis()">
+                    <i class="fas fa-chart-line"></i> تحلیل و گزارشات جامع (روزانه)
+                </button>
+
+                <!-- Priority Settings (Instruction 2) -->
                 <button class="btn btn-outline" onclick="openPrioritySettings()">
                     <i class="fas fa-list-ol"></i> مدیریت اولویت‌ها
                 </button>
 
-                <!-- Change Name (Instruction 5) -->
                 <button class="btn btn-outline" onclick="changeUserName()">
                     <i class="fas fa-user-edit"></i> تغییر نام کاربر
                 </button>
@@ -693,7 +742,29 @@
 
 <!-- MODALS -->
 
-<!-- Edit Modal (Instruction 1 & 3 & 6) -->
+<!-- History Analysis Modal (Instruction 1) -->
+<div id="historyAnalysisModal" class="modal">
+    <div class="modal-content">
+        <h3>تحلیل جامع و وقایع روزانه</h3>
+        <div style="text-align:center; margin-bottom:15px; background:var(--glass-bg); padding:10px; border-radius:10px;">
+            <p style="margin:0; font-size:0.9rem; color:var(--text-sec)">مدت زمان عضویت:</p>
+            <h2 style="margin:5px 0; color:var(--primary)" id="daysPassedDisplay">0 روز</h2>
+        </div>
+
+        <button class="btn btn-primary" style="width:100%; margin-bottom:15px;" onclick="printFullReport()">
+            <i class="fas fa-file-pdf"></i> دانلود گزارش PDF (چاپ)
+        </button>
+
+        <h4><i class="fas fa-history"></i> بایگانی روزانه</h4>
+        <div id="dailyLogList" style="max-height:300px; overflow-y:auto; font-size:0.9rem;">
+            <!-- Generated Logs -->
+        </div>
+
+        <button class="btn btn-outline" style="width:100%; margin-top:15px;" onclick="closeAllModals()">بستن</button>
+    </div>
+</div>
+
+<!-- Edit Modal -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h3>ویرایش آیتم</h3>
@@ -713,9 +784,7 @@
 
         <div id="editDateWrapper" style="display:none;">
             <label>تاریخ:</label>
-            <div class="date-picker-row" id="editDateRow">
-                <!-- Populated dynamically -->
-            </div>
+            <div class="date-picker-row" id="editDateRow"></div>
         </div>
 
         <div id="editPercentWrapper" style="display:none;">
@@ -947,13 +1016,12 @@
     </div>
 </div>
 
-<!-- Priority Settings Modal (Fixed Instruction 2 & 7) -->
+<!-- Priority Settings Modal (Fixed Instruction 2) -->
 <div id="prioritySettingsModal" class="modal">
     <div class="modal-content">
         <h3>مدیریت اولویت‌ها</h3>
         <p style="font-size:0.8rem; color:var(--text-sec); margin-bottom:10px;">تعریف بازه درصدها (اختیاری):</p>
         
-        <!-- Instruction 7: Define Ranges -->
         <div style="display:flex; gap:5px; margin-bottom:15px; background:#f9f9f9; padding:10px; border-radius:8px;">
             <div style="flex:1">
                 <small>کم (تا %)</small>
@@ -966,6 +1034,7 @@
         </div>
         <button class="btn btn-outline" style="width:100%; margin-bottom:15px; font-size:0.8rem;" onclick="savePriorityRanges()">ذخیره بازه‌ها</button>
 
+        <!-- Container for list -->
         <div id="priorityList" style="max-height:300px; overflow-y:auto;">
             <!-- Generated via JS safely -->
         </div>
@@ -998,9 +1067,10 @@
 <!-- REPORT TEMPLATE -->
 <div id="printArea">
     <div class="print-header">
-        <h1>گزارش جامع وضعیت مالی</h1>
-        <p id="printDate">تاریخ: ---</p>
+        <h1>گزارش جامع وضعیت مالی (روزانه)</h1>
+        <p id="printDate">تاریخ گزارش: ---</p>
         <p>کاربر: <span id="printUser">---</span></p>
+        <p>مدت زمان عضویت: <span id="printDays">---</span></p>
     </div>
 
     <div class="print-summary">
@@ -1009,7 +1079,7 @@
         <div>خالص قابل خرج: <b id="printNet">0</b></div>
     </div>
 
-    <div class="print-section-title">جزئیات بودجه‌بندی</div>
+    <div class="print-section-title">جزئیات بودجه‌بندی امروز</div>
     <table class="print-table">
         <thead>
             <tr>
@@ -1023,6 +1093,19 @@
         <tbody id="printBody"></tbody>
     </table>
 
+    <div class="print-section-title">تاریخچه و وقایع روزانه (۷ روز اخیر)</div>
+    <table class="print-table">
+        <thead>
+            <tr>
+                <th>تاریخ</th>
+                <th>درآمد کل</th>
+                <th>بدهی</th>
+                <th>هزینه کل</th>
+            </tr>
+        </thead>
+        <tbody id="printDailyLogBody"></tbody>
+    </table>
+
     <div class="print-section-title">وضعیت بدهی‌ها</div>
     <div id="printDebtsList" style="margin-top:5px; font-size:0.9rem;"></div>
 
@@ -1030,7 +1113,7 @@
     <div id="printGoalsList" style="margin-top:5px; font-size:0.9rem;"></div>
 
     <div style="margin-top:30px; text-align:center; font-size:12px; color:#666; border-top:1px solid #000; padding-top:10px;">
-        تولید شده توسط سامانه مدیریت مالی شخصی V13
+        تولید شده توسط سامانه مدیریت مالی شخصی V14
     </div>
 </div>
 
@@ -1039,6 +1122,7 @@
     const defaultState = {
         security: { hasPin: false, pin: "", isSetup: false },
         user: { name: "", theme: "light", currency: "toman" },
+        startDate: Date.now(), // Instruction 1: Start date tracking
         wallets: [],
         debts: [], 
         checks: [], 
@@ -1060,18 +1144,19 @@
             "شارژ و نت": 2, "لباس": 2, "زیبایی و مکمل": 3, "پس‌انداز کل": 3, "پس‌انداز مشهد": 3,
             "تفریح": 4, "سایر": 4
         },
-        priorityRanges: { low: 40, mid: 70 }, // Instruction 7
-        distributedAmount: 0, // Instruction 8
+        priorityRanges: { low: 40, mid: 70 },
+        distributedAmount: 0,
         goals: [],
         shopping: [],
         history: [], // Backup history
+        dailyLogs: [], // Instruction 1: Daily Auto Logs
         sectionHistory: { dashboard: [], budget: [], tools: [] }
     };
 
     let app = JSON.parse(JSON.stringify(defaultState));
     let pinBuffer = "";
     let rate = 1; // 1=Toman, 10=Rial
-    let tempBudget = null; // To hold data during auto-correction
+    let tempBudget = null; 
 
     // --- STARTUP ---
     window.onload = () => {
@@ -1079,13 +1164,90 @@
         checkAuth();
         updateDate();
         setupDatePickers();
+        checkDailyLog(); // Instruction 1: Auto save daily log on load
     };
 
-    // --- DATE PICKER SETUP ---
-    function setupDatePickers() {
-        // Create generic Date Picker content
-        // Used dynamically in modals
+    // --- INSTRUCTION 1: DAILY LOGIC ---
+    function checkDailyLog() {
+        const today = new Date().toLocaleDateString('fa-IR');
+        
+        // Calculate totals for logging
+        const income = app.wallets.reduce((a,b)=>a+b.value,0);
+        const debtTotal = getDebtTotal();
+        const spentTotal = app.budgets.reduce((a,b)=>a+b.spent,0);
+        
+        // Find if we already logged today
+        const existingLogIndex = app.dailyLogs.findIndex(l => l.date === today);
+        
+        const logEntry = {
+            date: today,
+            income: income,
+            debt: debtTotal,
+            totalSpent: spentTotal,
+            net: income - debtTotal - spentTotal,
+            timestamp: Date.now()
+        };
+
+        if(existingLogIndex !== -1) {
+            // Update existing log for today
+            app.dailyLogs[existingLogIndex] = logEntry;
+        } else {
+            // Add new log
+            app.dailyLogs.unshift(logEntry);
+        }
+        
+        // Keep only last 365 days
+        if(app.dailyLogs.length > 365) app.dailyLogs.pop();
+        
+        saveData();
     }
+
+    function openAnalysis() {
+        checkDailyLog(); // Ensure data is up to date
+        const modal = document.getElementById('historyAnalysisModal');
+        
+        // Calculate days passed
+        const msPerDay = 1000 * 60 * 60 * 24;
+        const daysPassed = Math.floor((Date.now() - (app.startDate || Date.now())) / msPerDay);
+        document.getElementById('daysPassedDisplay').innerText = (daysPassed + 1) + " روز";
+
+        // Populate Daily List
+        const list = document.getElementById('dailyLogList');
+        list.innerHTML = '';
+        
+        if(app.dailyLogs.length === 0) {
+            list.innerHTML = '<p style="text-align:center;">هنوز داده‌ای ثبت نشده است.</p>';
+        } else {
+            app.dailyLogs.forEach(log => {
+                const div = document.createElement('div');
+                div.style.cssText = "padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;";
+                div.innerHTML = `
+                    <div>
+                        <strong>${log.date}</strong>
+                        <div style="font-size:0.8rem; color:var(--text-sec)">درآمد: ${format(log.income)}</div>
+                    </div>
+                    <div style="text-align:left;">
+                        <div style="color:var(--danger)">هزینه: ${format(log.totalSpent)}</div>
+                        <div style="font-size:0.8rem;">بدهی: ${format(log.debt)}</div>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+        
+        modal.classList.add('active');
+    }
+
+    function printFullReport() {
+        // Use browser print which allows Save as PDF
+        generateReportImage(true); // Populate print area
+        setTimeout(() => {
+            window.print();
+        }, 500);
+    }
+
+    // --- DATE PICKER SETUP ---
+    function setupDatePickers() {} // Placeholder
 
     function createDatePickerHTML(prefix, defaultD=1, defaultM=1, defaultY=1403) {
         return `
@@ -1115,7 +1277,7 @@
         return `${y}/${m}/${d}`;
     }
 
-    // --- AUTH (Instruction 1) ---
+    // --- AUTH ---
     function checkAuth() {
         const modal = document.getElementById('authModal');
         const title = document.getElementById('authTitle');
@@ -1126,7 +1288,6 @@
         pinBuffer = "";
         updatePinDots();
 
-        // Instruction 1: First time logic
         if (!app.security.hasPin || !app.security.isSetup) {
             title.innerText = "خوش آمدید";
             sub.innerText = "برای شروع، نام خود و یک رمز ۴ رقمی تعیین کنید";
@@ -1134,7 +1295,6 @@
             app.security.isSetup = false;
         } else {
             title.innerText = "ورود به سامانه";
-            // Instruction 1: Show name on subsequent logins
             sub.innerText = `${app.user.name} عزیز، خوش آمدی. رمز را وارد کن`;
             nameDiv.style.display = 'none';
         }
@@ -1159,7 +1319,6 @@
         const nameInput = document.getElementById('setupNameInput');
         
         if (!app.security.hasPin) {
-            // First time setup
             const nameVal = nameInput.value.trim();
             if(!nameVal && !app.security.isSetup) {
                 alert("لطفاً نام خود را وارد کنید");
@@ -1172,6 +1331,7 @@
                 app.security.hasPin = true;
                 if(nameVal) app.user.name = nameVal;
                 app.security.isSetup = true;
+                app.startDate = Date.now(); // Set start date on first setup
                 
                 saveData();
                 document.getElementById('authModal').style.display = 'none';
@@ -1181,7 +1341,6 @@
                 pinBuffer = ""; updatePinDots();
             }
         } else {
-            // Login
             if (pinBuffer === app.security.pin) {
                 document.getElementById('authModal').style.display = 'none';
                 document.getElementById('appContent').style.display = 'block';
@@ -1197,7 +1356,6 @@
         if(confirm("آیا می‌خواهید رمز را تغییر دهید؟")) {
             app.security.hasPin = false;
             app.security.pin = "";
-            // We keep user name, so it's not a full reset, just PIN
             saveData();
             location.reload();
         }
@@ -1295,12 +1453,13 @@
         applyTheme();
         rate = app.user.currency === 'rial' ? 10 : 1;
         const curName = app.user.currency === 'toman' ? 'تومان' : 'ریال';
-        document.getElementById('currBadge').innerText = curName;
-        document.getElementById('cardCurrency').innerText = curName;
         document.querySelectorAll('.currency-text').forEach(el => el.innerText = curName);
+        
+        // Update Currency Toggle UI (Instruction 3)
+        const toggle = document.getElementById('currToggleBtn');
+        if(app.user.currency === 'rial') toggle.classList.add('is-rial');
+        else toggle.classList.remove('is-rial');
 
-        // Instruction 4: Total calculation adjustments
-        // We subtract manualAdd because that money is moved from "Main Wallet" to "Budget Item" directly
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
         const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
         const checkDebt = (app.checks || []).reduce((a,b)=>a+b.value,0);
@@ -1312,6 +1471,7 @@
         document.getElementById('totalBalance').innerText = format(net);
         document.getElementById('totalDebtDisplay').innerText = format(totalDebt);
         document.getElementById('userNameDisplay').innerText = app.user.name;
+        document.getElementById('cardCurrency').innerText = curName;
 
         // Populate Date Pickers for Add Modals
         document.getElementById('dDay').innerHTML = genOpts(1,31,1);
@@ -1395,11 +1555,9 @@
     }
 
     function renderBudgets(net) {
-        // Instruction 8: Logic to only update on click
         const distributeBtn = document.getElementById('btnDistribute');
         const distributableDisplay = document.getElementById('distributable');
         
-        // If calculated net is different from what was last distributed, show button
         if(net !== app.distributedAmount) {
             distributeBtn.style.display = 'flex';
             distributableDisplay.style.color = 'var(--warning)';
@@ -1420,11 +1578,9 @@
         badge.innerText = totalP + '%';
         badge.style.background = totalP > 100 ? 'var(--danger)' : (totalP === 100 ? 'var(--success)' : 'var(--text-sec)');
 
-        // Base calculation on Distributed Amount (Instruction 8)
         const baseAmount = app.distributedAmount;
 
         app.budgets.forEach((b, i) => {
-            // Instruction 4: Add manualAdd to the share calculation
             const shareFromPercent = Math.round((baseAmount * b.percent) / 100);
             const totalShare = shareFromPercent + (b.manualAdd || 0);
             const remain = totalShare - b.spent;
@@ -1434,7 +1590,6 @@
             if(percent > 50) status = 'stat-yellow';
             if(percent > 90) status = 'stat-red';
             
-            // Instruction 5: Paused State Styling
             const pausedClass = b.isPaused ? 'paused' : '';
             const pausedText = b.isPaused ? '(متوقف)' : '';
 
@@ -1458,9 +1613,7 @@
                     <div class="bento-actions">
                         <button class="action-chip" onclick="openExp(${i})" ${b.isPaused ? 'disabled' : ''}>➖ ثبت هزینه</button>
                         <button class="action-chip" onclick="copyTxt(${remain})">📋 کپی</button>
-                        <!-- Instruction 4 -->
                         <button class="action-chip btn-inject" onclick="injectBudget(${i})">➕ واریز</button>
-                        <!-- Instruction 5 -->
                         <button class="action-chip btn-pause" onclick="togglePause(${i})">${b.isPaused ? '▶️' : '⏸'}</button>
                     </div>
                 </div>
@@ -1468,23 +1621,19 @@
         });
     }
 
-    // Instruction 8: Trigger Distribution
     function triggerDistribution() {
-        // Recalculate net to be sure
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
         const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
         const checkDebt = (app.checks || []).reduce((a,b)=>a+b.value,0);
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
-        const net = income - totalDebt - manualDeductions;
         const totalDebt = fixedDebt + checkDebt;
 
-        app.distributedAmount = income - totalDebt - manualDeductions; // Net
+        app.distributedAmount = income - totalDebt - manualDeductions;
         saveData();
         renderUI();
         alert("بودجه با موفقیت بر اساس موجودی جدید توزیع شد.");
     }
 
-    // Instruction 4: Inject Budget (Direct Transfer)
     function injectBudget(index) {
         const amt = prompt("مبلغ واریزی مستقیم به این آیتم (از حساب اصلی کسر می‌شود):");
         if(amt && !isNaN(parseFormatted(amt))) {
@@ -1493,10 +1642,6 @@
             if(!app.budgets[index].manualAdd) app.budgets[index].manualAdd = 0;
             app.budgets[index].manualAdd += val;
             
-            // Deduct from distributed amount so it balances out visually?
-            // Actually, per instruction, it reduces from "Main Pure Balance".
-            // Our calc logic handles this: Net = Income - Debt - ManualDeductions.
-            // But we also need to reduce distributedAmount to reflect the change immediately if we don't want to re-distribute.
             app.distributedAmount -= val;
             
             saveData();
@@ -1504,12 +1649,10 @@
         }
     }
 
-    // Instruction 5: Toggle Pause
     function togglePause(index) {
         saveSectionSnap('budget');
         const b = app.budgets[index];
         if(b.isPaused) {
-            // Unpause
             let restore = confirm(`آیا درصد قبلی (${b.savedPercent}%) اعمال شود؟\nتایید = بله\nلغو = خیر (وارد کردن درصد جدید)`);
             b.isPaused = false;
             if(restore) {
@@ -1518,17 +1661,12 @@
                 const newP = prompt("درصد جدید را وارد کنید:", b.savedPercent);
                 b.percent = parseInt(newP) || 0;
             }
-            // Check overflow
             let total = app.budgets.reduce((a,i)=>a+i.percent,0);
             if(total > 100) {
-                // If overflow, trigger fix logic
-                tempBudget = b; // Treat as new/edited
-                // Actually, simplest is to use existing fix modal logic but we are not in "Add Mode".
-                // Let's force the user to fix it.
+                tempBudget = b; 
                 alert("توجه: مجموع درصدها از ۱۰۰ بیشتر شد. لطفا دستی اصلاح کنید.");
             }
         } else {
-            // Pause
             b.savedPercent = b.percent;
             b.percent = 0;
             b.isPaused = true;
@@ -1579,7 +1717,7 @@
         `).join('');
     }
 
-    // --- EDIT SYSTEM (Instruction 3) ---
+    // --- EDIT SYSTEM ---
     function openEdit(type, index) {
         document.getElementById('editType').value = type;
         document.getElementById('editIndex').value = index;
@@ -1592,8 +1730,6 @@
         if(type === 'wallet') item = app.wallets[index];
         else if(type === 'debt') { 
             item = app.debts[index]; 
-            // Add debt uses generic day, but edit needs to handle it.
-            // Currently debt only stores 'day' (number).
             showDate = true; 
         }
         else if(type === 'check') { item = app.checks[index]; showDate = true; }
@@ -1604,7 +1740,6 @@
 
         document.getElementById('editName').value = item.name;
         
-        // Instruction 3: Populate Data Correctly
         if(showAmount) {
             document.getElementById('editAmountWrapper').style.display = 'block';
             let val = 0;
@@ -1629,7 +1764,6 @@
             if(type === 'debt') {
                 row.innerHTML = `<select id="editDDay" class="date-sel" style="width:100%">${genOpts(1,31, item.day)}</select>`;
             } else {
-                // Check/Loan store date as string yyyy/mm/dd
                 const parts = item.date ? item.date.split('/') : [1403, 1, 1];
                 row.innerHTML = createDatePickerHTML('editD', parseInt(parts[2]), parseInt(parts[1]), parseInt(parts[0]));
             }
@@ -1647,7 +1781,6 @@
         
         if(!newName) return alert("نام نمی‌تواند خالی باشد");
 
-        // Save Snapshot
         if(type.includes('budget')) saveSectionSnap('budget');
         else if(type.includes('goal') || type.includes('shop')) saveSectionSnap('tools');
         else saveSectionSnap('dashboard');
@@ -1668,25 +1801,19 @@
             app.loans[index].value = parseFormatted(document.getElementById('editVal').value);
             app.loans[index].date = getDateString('editD');
         } else if(type === 'budget') {
-            // Instruction 6: Edit Budget Percent Check
             const oldName = app.budgets[index].name;
             const newP = parseInt(document.getElementById('editPercent').value) || 0;
             
-            // Calculate potential total
             let total = 0;
             app.budgets.forEach((b, i) => {
                 if(i !== index) total += b.percent;
             });
             
             if(total + newP > 100) {
-                // Trigger Fix Logic
                 tempBudget = JSON.parse(JSON.stringify(app.budgets[index]));
                 tempBudget.name = newName;
                 tempBudget.percent = newP;
                 
-                // Remove the old item temporarily from calc to use logic? 
-                // Better approach: Set global tempBudget and open Fix Modal
-                // We need to set the slider max correctly.
                 const safeMax = 100 - total;
                 document.getElementById('maxAllowedPercent').innerText = safeMax + '%';
                 const slider = document.getElementById('percentSlider');
@@ -1694,18 +1821,16 @@
                 slider.value = 0;
                 document.getElementById('sliderValDisplay').innerText = 0;
                 
-                // We need to know we are editing, not adding
                 tempBudget.isEdit = true;
                 tempBudget.editIndex = index;
                 
                 openModal('fixPercentModal');
-                return; // Stop here
+                return;
             }
 
             app.budgets[index].name = newName;
             app.budgets[index].percent = newP;
             
-            // Sync Priority Name
             if(oldName !== newName && app.priorities[oldName]) {
                 app.priorities[newName] = app.priorities[oldName];
                 delete app.priorities[oldName];
@@ -1865,11 +1990,9 @@
         if(!tempBudget) return;
         saveSectionSnap('budget');
         
-        // Handle Edit case separately if needed, but for simplicity we calculate overflow globally
-        // Re-calculate overflow with the target percent
         let currentTotal = 0;
         app.budgets.forEach((b,i) => {
-            if(tempBudget.isEdit && i === tempBudget.editIndex) return; // skip self if editing
+            if(tempBudget.isEdit && i === tempBudget.editIndex) return; 
             currentTotal += b.percent;
         });
         
@@ -1879,7 +2002,6 @@
         let overflow = (currentTotal + needed) - 100;
         
         if(overflow <= 0) {
-             // Should not happen here usually, but safe guard
             if(tempBudget.isEdit) {
                  app.budgets[tempBudget.editIndex].name = tempBudget.name;
                  app.budgets[tempBudget.editIndex].percent = needed;
@@ -1890,15 +2012,14 @@
             return;
         }
 
-        // Auto correct logic
         let sortedItems = app.budgets.map((b, index) => {
-            if(tempBudget.isEdit && index === tempBudget.editIndex) return null; // don't cannibalize self
+            if(tempBudget.isEdit && index === tempBudget.editIndex) return null; 
             return {
                 index: index,
                 priority: app.priorities[b.name] || 4, 
                 percent: b.percent
             };
-        }).filter(x => x !== null).sort((a, b) => b.priority - a.priority); // Priority 4 (Low) first
+        }).filter(x => x !== null).sort((a, b) => b.priority - a.priority); 
 
         for (let item of sortedItems) {
             if (overflow <= 0) break;
@@ -1920,7 +2041,6 @@
 
         if(overflow > 0) {
             alert("امکان اصلاح خودکار کامل وجود ندارد. فضا کافی نیست.");
-            // Revert via restore snap manually or just reload logic
              const lastSnap = JSON.parse(app.sectionHistory['budget'][0].data);
              app.budgets = lastSnap.budgets;
              return;
@@ -1938,26 +2058,25 @@
         tempBudget = null;
     }
 
-    // --- PRIORITY SETTINGS (Fixed Crash - Instruction 2) ---
+    // --- PRIORITY SETTINGS (Fixed Instruction 2) ---
     function openPrioritySettings() {
         const list = document.getElementById('priorityList');
         
-        // Fix Crash: Ensure priorities object exists
+        // Prevent crash by initializing if missing
         if(!app.priorities) app.priorities = defaultState.priorities;
         if(!app.priorityRanges) app.priorityRanges = {low: 40, mid: 70};
 
-        // Populate Range Inputs
         document.getElementById('pRangeLow').value = app.priorityRanges.low;
         document.getElementById('pRangeMid').value = app.priorityRanges.mid;
 
-        // Use DocumentFragment for performance and crash prevention
         const frag = document.createDocumentFragment();
         
-        // Get Unique Names Safe Way
         const allNames = new Set();
         app.budgets.forEach(b => allNames.add(b.name));
-        Object.keys(app.priorities).forEach(k => allNames.add(k));
-
+        // Add existing keys in priorities just in case some are orphans but we want to see them or clean them? 
+        // Better to sync with budgets. If it's not in budget, maybe don't show? 
+        // Let's show all budget items.
+        
         allNames.forEach(name => {
             let p = app.priorities[name] || 4;
             const div = document.createElement('div');
@@ -1979,7 +2098,6 @@
         openModal('prioritySettingsModal');
     }
 
-    // Instruction 7: Save Ranges
     function savePriorityRanges() {
         const l = parseInt(document.getElementById('pRangeLow').value);
         const m = parseInt(document.getElementById('pRangeMid').value);
@@ -2074,7 +2192,6 @@
         const sel = document.getElementById('allocBudgetSelect');
         sel.innerHTML = app.budgets.map((b, i) => `<option value="${i}">${b.name}</option>`).join('');
         
-        // Auto fill price if shopping
         if(type === 'shop' && app.shopping[id].price) {
             document.getElementById('allocAmt').value = app.shopping[id].price.toLocaleString();
         } else {
@@ -2131,16 +2248,19 @@
     }
 
     // --- INVOICE ---
-    function generateReportImage() {
+    function generateReportImage(isPrint = false) {
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
         const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
         const checkDebt = (app.checks || []).reduce((a,b)=>a+b.value,0);
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
         const totalDebt = fixedDebt + checkDebt;
         const net = income - totalDebt - manualDeductions;
+        const msPerDay = 1000 * 60 * 60 * 24;
+        const daysPassed = Math.floor((Date.now() - (app.startDate || Date.now())) / msPerDay) + 1;
 
         document.getElementById('printDate').innerText = new Date().toLocaleDateString('fa-IR');
         document.getElementById('printUser').innerText = app.user.name;
+        document.getElementById('printDays').innerText = daysPassed + " روز";
         document.getElementById('printInc').innerText = format(income);
         document.getElementById('printDebt').innerText = format(totalDebt);
         document.getElementById('printNet').innerText = format(net);
@@ -2152,6 +2272,14 @@
             const baseAmount = app.distributedAmount;
             const s = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
             tb.innerHTML += `<tr><td>${b.name}</td><td>${b.percent}%</td><td>${format(s)}</td><td>${format(b.spent)}</td><td>${format(s-b.spent)}</td></tr>`;
+        });
+
+        // Daily Logs Table (Instruction 1)
+        const dLog = document.getElementById('printDailyLogBody');
+        dLog.innerHTML = '';
+        const recentLogs = app.dailyLogs.slice(0, 7); // Show last 7 days
+        recentLogs.forEach(log => {
+            dLog.innerHTML += `<tr><td>${log.date}</td><td>${format(log.income)}</td><td>${format(log.debt)}</td><td>${format(log.totalSpent)}</td></tr>`;
         });
 
         // Debt List
@@ -2168,12 +2296,14 @@
         gList.innerHTML = goalHtml || "ندارد";
 
         const el = document.getElementById('printArea');
-        el.style.top = "0";
-        html2canvas(el).then(c => {
-            const a = document.createElement('a');
-            a.download = 'Financial_Report.png'; a.href = c.toDataURL(); a.click();
-            el.style.top = "-9999px";
-        });
+        if(!isPrint) {
+            el.style.top = "0";
+            html2canvas(el).then(c => {
+                const a = document.createElement('a');
+                a.download = 'Financial_Report.png'; a.href = c.toDataURL(); a.click();
+                el.style.top = "-9999px";
+            });
+        }
     }
 
     function downloadBackup() {
@@ -2181,7 +2311,6 @@
         const a = document.createElement('a');
         a.href = str; a.download = "backup.json"; a.click();
         
-        // Add to history
         app.history.unshift({date: Date.now(), name: "بکاپ دستی"});
         if(app.history.length > 5) app.history.pop();
         saveData();
@@ -2193,10 +2322,11 @@
         reader.onload = (e) => {
             try {
                 app = JSON.parse(e.target.result);
-                // Ensure new structures exist
+                // Backward compatibility ensures
                 if(!app.priorities) app.priorities = defaultState.priorities;
                 if(!app.sectionHistory) app.sectionHistory = { dashboard: [], budget: [], tools: [] };
-                // Ensure new fields exist for budget items
+                if(!app.dailyLogs) app.dailyLogs = [];
+                if(!app.startDate) app.startDate = Date.now();
                 app.budgets.forEach(b => { 
                     if(!b.history) b.history = [];
                     if(b.manualAdd === undefined) b.manualAdd = 0;
@@ -2248,6 +2378,8 @@
             if(!app.priorityRanges) app.priorityRanges = { low: 40, mid: 70 };
             if(app.distributedAmount === undefined) app.distributedAmount = 0;
             if(app.security.isSetup === undefined) app.security.isSetup = app.security.hasPin;
+            if(!app.dailyLogs) app.dailyLogs = [];
+            if(!app.startDate) app.startDate = Date.now();
 
             app.budgets.forEach(b => { 
                 if(!b.history) b.history = []; 
@@ -2269,7 +2401,6 @@
         document.querySelectorAll('.tab-pane').forEach(e => e.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(e => e.classList.remove('active'));
         document.getElementById('view-'+id).classList.add('active');
-        // Fix for event.currentTarget issue in some contexts
         const btns = document.querySelectorAll('.nav-btn');
         btns.forEach(b => {
             if(b.getAttribute('onclick').includes(id)) b.classList.add('active');
@@ -2280,7 +2411,6 @@
             openPrioritySettings(); 
         }
         
-        // Clear inputs (except slider range and range thresholds)
         const m = document.getElementById(id);
         const inputs = m.querySelectorAll('input');
         inputs.forEach(i => {
@@ -2293,4 +2423,4 @@
 </script>
 
 </body>
-</html>
+</html
