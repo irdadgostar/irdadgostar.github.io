@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مدیریت مالی حرفه‌ای | V13 Ultimate (Edited)</title>
+    <title>مدیریت مالی</title>
 
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
@@ -306,13 +306,12 @@
             box-shadow: var(--shadow);
             transition: opacity 0.3s;
         }
-        
         .bento-item.paused {
             opacity: 0.6;
             filter: grayscale(0.8);
             border-style: dashed;
         }
-
+        
         .bento-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 1rem; }
         
         .progress-bar {
@@ -333,16 +332,16 @@
 
         .bento-actions {
             margin-top: 5px;
-            display: flex; gap: 5px;
+            display: flex; gap: 5px; flex-wrap: wrap;
         }
         .action-chip {
-            flex: 1; padding: 6px; font-size: 0.8rem; border-radius: 6px;
+            flex: 1; padding: 6px; font-size: 0.75rem; border-radius: 6px; min-width: 45%;
             border: 1px solid var(--text-sec); background: transparent; color: var(--text-main);
             cursor: pointer; text-align: center; font-weight: bold;
         }
         .action-chip:hover { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* --- Template Chips --- */
+        /* --- Template Chips (New) --- */
         .template-row {
             display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px;
         }
@@ -430,682 +429,632 @@
         }
         .history-btn:hover { background: var(--primary); color: white; }
 
-        /* First Login Name Input */
-        #authNameInput {
-            width: 100%;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
     </style>
 </head>
 <body>
 
-<!-- 1. LOCK SCREEN (PIN) -->
+    <!-- 1. LOCK SCREEN (PIN) -->
 
-<div id="authModal" class="pin-screen" style="display: flex;">
-    <i class="fas fa-fingerprint" style="font-size: 4rem; color: var(--primary);"></i>
-    <h2 id="authTitle" style="margin: 15px 0 5px 0;">امنیت</h2>
-    <p id="authSub" style="font-size: 0.9rem; color: var(--text-sec); margin-bottom: 20px;">...</p>
-    
-    <!-- دستور اول: فیلد نام برای اولین ورود -->
-    <div id="authNameInput" style="display:none; max-width:250px;">
-        <label>لطفا نام و نام خانوادگی خود را وارد کنید:</label>
-        <input type="text" id="firstLoginName" placeholder="مثلاً: امیر حسینی" style="margin-top:10px; text-align:center;">
-    </div>
-
-    <div class="pin-dots">
-        <div class="pin-dot" id="pd1"></div>
-        <div class="pin-dot" id="pd2"></div>
-        <div class="pin-dot" id="pd3"></div>
-        <div class="pin-dot" id="pd4"></div>
-    </div>
-
-    <div class="numpad">
-        <button class="num-key" onclick="pressKey(1)">1</button>
-        <button class="num-key" onclick="pressKey(2)">2</button>
-        <button class="num-key" onclick="pressKey(3)">3</button>
-        <button class="num-key" onclick="pressKey(4)">4</button>
-        <button class="num-key" onclick="pressKey(5)">5</button>
-        <button class="num-key" onclick="pressKey(6)">6</button>
-        <button class="num-key" onclick="pressKey(7)">7</button>
-        <button class="num-key" onclick="pressKey(8)">8</button>
-        <button class="num-key" onclick="pressKey(9)">9</button>
-        <div class="num-key" style="visibility: hidden;"></div>
-        <button class="num-key" onclick="pressKey(0)">0</button>
-        <button class="num-key" onclick="pressKey('del')" style="color:var(--danger)"><i class="fas fa-backspace"></i></button>
-    </div>
-</div>
-
-<!-- 2. MAIN APP -->
-
-<div class="container" id="appContent" style="display:none;">
-
-    <!-- Header -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 10px;">
-        <div>
-            <h2 style="margin:0; color:var(--primary);">مدیریت مالی</h2>
-            <span style="font-size:0.8rem; color:var(--text-sec);" id="headerDate">---</span>
+    <div id="authModal" class="pin-screen" style="display: flex;">
+        <i class="fas fa-fingerprint" style="font-size: 4rem; color: var(--primary);"></i>
+        <h2 id="authTitle" style="margin: 15px 0 5px 0;">امنیت</h2>
+        <p id="authSub" style="font-size: 0.9rem; color: var(--text-sec); margin-bottom: 20px;">...</p>
+        
+        <!-- Instruction 1: Name Input -->
+        <div id="setupNameDiv" style="display:none; width:80%; margin-bottom:20px;">
+            <input type="text" id="setupNameInput" placeholder="نام و نام خانوادگی خود را وارد کنید" style="text-align:center;">
         </div>
-        <div style="display:flex; gap:10px;">
-            <button class="btn-icon" onclick="toggleCurrency()" title="تبدیل واحد پول">
-                <span id="currBadge" class="badge-currency">T</span>
-            </button>
-            <button class="btn-icon" onclick="toggleTheme()" title="تم شب/روز">
-                <i class="fas fa-moon"></i>
-            </button>
+
+        <div class="pin-dots">
+            <div class="pin-dot" id="pd1"></div>
+            <div class="pin-dot" id="pd2"></div>
+            <div class="pin-dot" id="pd3"></div>
+            <div class="pin-dot" id="pd4"></div>
+        </div>
+
+        <div class="numpad">
+            <button class="num-key" onclick="pressKey(1)">1</button>
+            <button class="num-key" onclick="pressKey(2)">2</button>
+            <button class="num-key" onclick="pressKey(3)">3</button>
+            <button class="num-key" onclick="pressKey(4)">4</button>
+            <button class="num-key" onclick="pressKey(5)">5</button>
+            <button class="num-key" onclick="pressKey(6)">6</button>
+            <button class="num-key" onclick="pressKey(7)">7</button>
+            <button class="num-key" onclick="pressKey(8)">8</button>
+            <button class="num-key" onclick="pressKey(9)">9</button>
+            <div class="num-key" style="visibility: hidden;"></div>
+            <button class="num-key" onclick="pressKey(0)">0</button>
+            <button class="num-key" onclick="pressKey('del')" style="color:var(--danger)"><i class="fas fa-backspace"></i></button>
         </div>
     </div>
 
-    <!-- TAB 1: DASHBOARD -->
-    <div id="view-dashboard" class="tab-pane active">
-        <!-- Hero Card -->
-        <div class="hero-card" onclick="this.classList.toggle('flipped')">
-            <div class="card-inner">
-                <div class="card-front">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <i class="fas fa-wifi" style="opacity:0.7"></i>
-                        <span style="font-size:0.9rem; opacity:0.8">کارت هوشمند</span>
+    <!-- 2. MAIN APP -->
+
+    <div class="container" id="appContent" style="display:none;">
+
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 10px;">
+            <div>
+                <h2 style="margin:0; color:var(--primary);">مدیریت مالی</h2>
+                <span style="font-size:0.8rem; color:var(--text-sec);" id="headerDate">---</span>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-icon" onclick="toggleCurrency()" title="تبدیل واحد پول">
+                    <span id="currBadge" class="badge-currency">T</span>
+                </button>
+                <button class="btn-icon" onclick="toggleTheme()" title="تم شب/روز">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- TAB 1: DASHBOARD -->
+        <div id="view-dashboard" class="tab-pane active">
+            <!-- Hero Card -->
+            <div class="hero-card" onclick="this.classList.toggle('flipped')">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <i class="fas fa-wifi" style="opacity:0.7"></i>
+                            <span style="font-size:0.9rem; opacity:0.8">کارت هوشمند</span>
+                        </div>
+                        <div>
+                            <span class="balance-label">موجودی خالص (قابل تقسیم)</span>
+                            <div class="balance-value" id="totalBalance">0</div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.9rem; opacity:0.9;">
+                            <span id="userNameDisplay">کاربر</span>
+                            <span id="cardCurrency">تومان</span>
+                        </div>
                     </div>
-                    <div>
-                        <span class="balance-label">موجودی خالص (قابل تقسیم)</span>
-                        <div class="balance-value" id="totalBalance">0</div>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.9rem; opacity:0.9;">
-                        <span id="userNameDisplay">کاربر</span>
-                        <span id="cardCurrency">تومان</span>
+                    <div class="card-back">
+                        <h3 style="margin:0;">خلاصه وضعیت</h3>
+                        <p style="margin:5px 0;">مجموع بدهی‌های ثابت و چک:</p>
+                        <div style="font-size:1.8rem; color:var(--danger); font-weight:bold; direction:ltr;" id="totalDebtDisplay">0</div>
+                        <p style="font-size:0.8rem; margin-top:10px; opacity:0.7;">این مبلغ کسر شده است.</p>
                     </div>
                 </div>
-                <div class="card-back">
-                    <h3 style="margin:0;">خلاصه وضعیت</h3>
-                    <p style="margin:5px 0;">مجموع بدهی‌های ثابت و چک:</p>
-                    <div style="font-size:1.8rem; color:var(--danger); font-weight:bold; direction:ltr;" id="totalDebtDisplay">0</div>
-                    <p style="font-size:0.8rem; margin-top:10px; opacity:0.7;">این مبلغ کسر شده است.</p>
+            </div>
+
+            <!-- Dashboard Header with History -->
+            <div class="header-row">
+                <h3>داشبورد <span class="history-btn" onclick="showSectionHistory('dashboard')"><i class="fas fa-history"></i> سابقه</span></h3>
+            </div>
+
+            <!-- Wallets -->
+            <div class="glass-panel">
+                <div class="header-row">
+                    <h3><i class="fas fa-wallet"></i> منابع مالی (کیف پول)</h3>
+                    <button class="btn btn-primary" onclick="openModal('walletModal')"><i class="fas fa-plus"></i> افزودن</button>
+                </div>
+                <div id="walletList"></div>
+            </div>
+
+            <!-- Fixed Debts -->
+            <div class="glass-panel">
+                <div class="header-row">
+                    <h3><i class="fas fa-file-invoice-dollar"></i> اقساط ثابت</h3>
+                    <button class="btn btn-primary" onclick="openModal('debtModal')"><i class="fas fa-plus"></i> افزودن</button>
+                </div>
+                <div id="debtList"></div>
+            </div>
+
+            <!-- Checks & Debts -->
+            <div class="glass-panel">
+                <div class="header-row">
+                    <h3><i class="fas fa-money-check-alt"></i> چک و بدهی</h3>
+                    <button class="btn btn-primary" onclick="openModal('checkModal')"><i class="fas fa-plus"></i> افزودن</button>
+                </div>
+                <div id="checkList"></div>
+            </div>
+        </div>
+
+        <!-- TAB 2: BUDGET -->
+        <div id="view-budget" class="tab-pane">
+            <div class="glass-panel" style="text-align:center;">
+                <span style="color:var(--text-sec); font-size:0.9rem;">بودجه کل توزیع شده (فعال):</span>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+                    <div id="distributable" style="font-size:1.5rem; font-weight:bold; color:var(--primary); direction:ltr;">0</div>
+                    <small id="totalPercentBadge" style="background:var(--text-sec); color:white; padding:2px 6px; border-radius:4px;">0%</small>
+                </div>
+            </div>
+
+            <div class="header-row" style="margin: 0 10px 15px 10px; flex-direction: column; align-items: flex-start;">
+                <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                    <h3 style="display:flex; align-items:center;">مدیریت ردیف‌ها <span class="history-btn" onclick="showSectionHistory('budget')"><i class="fas fa-history"></i> سابقه</span></h3>
+                    <button class="btn btn-primary" onclick="openModal('addBudgetModal')"><i class="fas fa-plus"></i> جدید</button>
+                </div>
+                <!-- Template Selection -->
+                <div class="template-row" style="width: 100%; margin-top: 10px;">
+                    <span style="font-size:0.8rem; line-height:30px; margin-left:5px;">قالب‌ها:</span>
+                    <div class="template-chip" onclick="applyTemplate('default')">پیش‌فرض</div>
+                    <div class="template-chip" onclick="applyTemplate('student')">دانشجویی</div>
+                    <div class="template-chip" onclick="applyTemplate('married')">متاهلی</div>
+                    <div class="template-chip" onclick="applyTemplate('clear')">پاکسازی</div>
+                </div>
+            </div>
+
+            <div id="budgetGrid" class="budget-grid">
+                <!-- کارت‌های بودجه اینجا ساخته می‌شوند -->
+            </div>
+        </div>
+
+        <!-- TAB 3: TOOLS -->
+        <div id="view-tools" class="tab-pane">
+            <div class="header-row" style="padding:0 10px;">
+                 <h3>ابزارها <span class="history-btn" onclick="showSectionHistory('tools')"><i class="fas fa-history"></i> سابقه</span></h3>
+            </div>
+
+            <!-- Goals -->
+            <div class="glass-panel">
+                <div class="header-row">
+                    <h3><i class="fas fa-bullseye"></i> اهداف پس‌انداز</h3>
+                    <button class="btn btn-primary" onclick="openModal('goalModal')"><i class="fas fa-plus"></i> هدف</button>
+                </div>
+                <div id="goalList"></div>
+            </div>
+
+            <!-- Shopping -->
+            <div class="glass-panel">
+                <div class="header-row">
+                    <h3><i class="fas fa-shopping-cart"></i> لیست خرید</h3>
+                    <button class="btn btn-primary" onclick="openModal('shopModal')"><i class="fas fa-plus"></i> کالا</button>
+                </div>
+                <div id="shopList"></div>
+            </div>
+
+            <!-- Loans Given -->
+            <div class="glass-panel">
+                <div class="header-row">
+                    <h3><i class="fas fa-hand-holding-usd"></i> طلب‌ها (قرض داده شده)</h3>
+                    <button class="btn btn-primary" onclick="openModal('loanModal')"><i class="fas fa-plus"></i> ثبت</button>
+                </div>
+                <div id="loanList"></div>
+            </div>
+        </div>
+
+        <!-- TAB 4: SETTINGS -->
+        <div id="view-settings" class="tab-pane">
+            <div class="glass-panel">
+                <div class="header-row"><h3>تنظیمات سیستم</h3></div>
+                
+                <div style="display:flex; flex-direction:column; gap:15px;">
+                    
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:rgba(0,0,0,0.05); border-radius:8px;">
+                        <span><i class="fas fa-copy"></i> حالت کپی (خام برای بانک)</span>
+                        <input type="checkbox" id="rawCopyCheck" style="width:20px; height:20px;">
+                    </div>
+
+                    <!-- Priority Settings -->
+                    <button class="btn btn-outline" onclick="openPrioritySettings()">
+                        <i class="fas fa-list-ol"></i> مدیریت اولویت‌ها
+                    </button>
+
+                    <button class="btn btn-outline" onclick="changeUserName()">
+                        <i class="fas fa-user-edit"></i> تغییر نام کاربر
+                    </button>
+
+                    <button class="btn btn-outline" onclick="generateReportImage()">
+                        <i class="fas fa-file-image"></i> دانلود فاکتور تصویری (دقیق)
+                    </button>
+                    
+                    <button class="btn btn-outline" onclick="downloadBackup()">
+                        <i class="fas fa-download"></i> دانلود فایل بکاپ (JSON)
+                    </button>
+                    
+                    <label class="btn btn-outline" style="cursor:pointer; text-align:center;">
+                        <i class="fas fa-upload"></i> بازیابی فایل بکاپ
+                        <input type="file" id="restoreFile" style="display:none" onchange="restoreBackup(this)">
+                    </label>
+
+                    <button class="btn btn-outline" onclick="showHistory()">
+                        <i class="fas fa-history"></i> تاریخچه بکاپ‌ها
+                    </button>
+
+                    <button class="btn btn-outline" onclick="changePin()">
+                        <i class="fas fa-lock"></i> تغییر رمز عبور
+                    </button>
+
+                    <button class="btn btn-danger" onclick="resetAll()">
+                        <i class="fas fa-trash"></i> ریست فکتوری
+                    </button>
                 </div>
             </div>
         </div>
-
-        <!-- Dashboard Header with History -->
-        <div class="header-row">
-            <h3>داشبورد <span class="history-btn" onclick="showSectionHistory('dashboard')"><i class="fas fa-history"></i> سابقه</span></h3>
-        </div>
-
-        <!-- Wallets -->
-        <div class="glass-panel">
-            <div class="header-row">
-                <h3><i class="fas fa-wallet"></i> منابع مالی (کیف پول)</h3>
-                <button class="btn btn-primary" onclick="openModal('walletModal')"><i class="fas fa-plus"></i> افزودن</button>
-            </div>
-            <div id="walletList"></div>
-        </div>
-
-        <!-- Fixed Debts -->
-        <div class="glass-panel">
-            <div class="header-row">
-                <h3><i class="fas fa-file-invoice-dollar"></i> اقساط ثابت</h3>
-                <button class="btn btn-primary" onclick="openModal('debtModal')"><i class="fas fa-plus"></i> افزودن</button>
-            </div>
-            <div id="debtList"></div>
-        </div>
-
-        <!-- Checks & Debts -->
-        <div class="glass-panel">
-            <div class="header-row">
-                <h3><i class="fas fa-money-check-alt"></i> چک و بدهی</h3>
-                <button class="btn btn-primary" onclick="openModal('checkModal')"><i class="fas fa-plus"></i> افزودن</button>
-            </div>
-            <div id="checkList"></div>
-        </div>
     </div>
 
-    <!-- TAB 2: BUDGET -->
-    <div id="view-budget" class="tab-pane">
-        <div class="glass-panel" style="text-align:center;">
-            <span style="color:var(--text-sec); font-size:0.9rem;">بودجه کل توزیع شده:</span>
-            <div style="display: flex; justify-content: center; align-items: center; gap: 10px;">
-                <div id="distributable" style="font-size:1.5rem; font-weight:bold; color:var(--primary); direction:ltr;">0</div>
-                <small id="totalPercentBadge" style="background:var(--text-sec); color:white; padding:2px 6px; border-radius:4px;">0%</small>
-            </div>
-        </div>
+    <!-- BOTTOM NAVIGATION -->
 
-        <div class="header-row" style="margin: 0 10px 15px 10px; flex-direction: column; align-items: flex-start;">
-            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
-                <h3 style="display:flex; align-items:center;">مدیریت ردیف‌ها <span class="history-btn" onclick="showSectionHistory('budget')"><i class="fas fa-history"></i> سابقه</span></h3>
-                <button class="btn btn-primary" onclick="openModal('addBudgetModal')"><i class="fas fa-plus"></i> جدید</button>
-            </div>
-            <!-- Template Selection -->
-            <div class="template-row" style="width: 100%; margin-top: 10px;">
-                <span style="font-size:0.8rem; line-height:30px; margin-left:5px;">قالب‌ها:</span>
-                <div class="template-chip" onclick="applyTemplate('default')">پیش‌فرض</div>
-                <div class="template-chip" onclick="applyTemplate('student')">دانشجویی</div>
-                <div class="template-chip" onclick="applyTemplate('married')">متاهلی</div>
-                <div class="template-chip" onclick="applyTemplate('clear')">پاکسازی</div>
-            </div>
-        </div>
+    <nav class="bottom-nav">
+        <button class="nav-btn active" onclick="switchTab('dashboard')">
+            <i class="fas fa-home"></i> داشبورد
+        </button>
+        <button class="nav-btn" onclick="switchTab('budget')">
+            <i class="fas fa-chart-pie"></i> بودجه
+        </button>
+        <button class="nav-btn" onclick="switchTab('tools')">
+            <i class="fas fa-tools"></i> ابزارها
+        </button>
+        <button class="nav-btn" onclick="switchTab('settings')">
+            <i class="fas fa-cog"></i> تنظیمات
+        </button>
+    </nav>
 
-        <div id="budgetGrid" class="budget-grid">
-            <!-- کارت‌های بودجه اینجا ساخته می‌شوند -->
-        </div>
-    </div>
+    <!-- MODALS -->
 
-    <!-- TAB 3: TOOLS -->
-    <div id="view-tools" class="tab-pane">
-        <div class="header-row" style="padding:0 10px;">
-             <h3>ابزارها <span class="history-btn" onclick="showSectionHistory('tools')"><i class="fas fa-history"></i> سابقه</span></h3>
-        </div>
-
-        <!-- Goals -->
-        <div class="glass-panel">
-            <div class="header-row">
-                <h3><i class="fas fa-bullseye"></i> اهداف پس‌انداز</h3>
-                <button class="btn btn-primary" onclick="openModal('goalModal')"><i class="fas fa-plus"></i> هدف</button>
-            </div>
-            <div id="goalList"></div>
-        </div>
-
-        <!-- Shopping -->
-        <div class="glass-panel">
-            <div class="header-row">
-                <h3><i class="fas fa-shopping-cart"></i> لیست خرید</h3>
-                <button class="btn btn-primary" onclick="openModal('shopModal')"><i class="fas fa-plus"></i> کالا</button>
-            </div>
-            <div id="shopList"></div>
-        </div>
-
-        <!-- Loans Given -->
-        <div class="glass-panel">
-            <div class="header-row">
-                <h3><i class="fas fa-hand-holding-usd"></i> طلب‌ها (قرض داده شده)</h3>
-                <button class="btn btn-primary" onclick="openModal('loanModal')"><i class="fas fa-plus"></i> ثبت</button>
-            </div>
-            <div id="loanList"></div>
-        </div>
-    </div>
-
-    <!-- TAB 4: SETTINGS -->
-    <div id="view-settings" class="tab-pane">
-        <div class="glass-panel">
-            <div class="header-row"><h3>تنظیمات سیستم</h3></div>
+    <!-- Edit Modal (Instruction 1 & 3) -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3>ویرایش آیتم</h3>
+            <input type="hidden" id="editType">
+            <input type="hidden" id="editIndex">
             
-            <div style="display:flex; flex-direction:column; gap:15px;">
-                
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:rgba(0,0,0,0.05); border-radius:8px;">
-                    <span><i class="fas fa-copy"></i> حالت کپی (خام برای بانک)</span>
-                    <input type="checkbox" id="rawCopyCheck" style="width:20px; height:20px;">
+            <label>عنوان:</label>
+            <input type="text" id="editName">
+            
+            <div id="editAmountWrapper">
+                <label>مبلغ / ارزش:</label>
+                <div class="money-input-wrapper">
+                    <input type="text" id="editVal" onkeyup="formatCurrency(this)" inputmode="numeric">
+                    <span class="money-unit currency-text">تومان</span>
                 </div>
+            </div>
 
-                <!-- Priority Settings -->
-                <button class="btn btn-outline" onclick="openModal('prioritySettingsModal')">
-                    <i class="fas fa-list-ol"></i> مدیریت اولویت‌ها
-                </button>
+            <div id="editPercentWrapper" style="display:none;">
+                <label>درصد:</label>
+                <input type="number" id="editPercent">
+            </div>
 
-                <!-- Change Name -->
-                <button class="btn btn-outline" onclick="changeUserName()">
-                    <i class="fas fa-user-edit"></i> تغییر نام کاربر
-                </button>
+            <div id="editDateWrapper" style="display:none;">
+                <label>تاریخ:</label>
+                <div class="date-picker-row" id="editDateRow">
+                     <select id="eDay" class="date-sel"></select>
+                     <select id="eMonth" class="date-sel"></select>
+                     <select id="eYear" class="date-sel"></select>
+                </div>
+            </div>
 
-                <button class="btn btn-outline" onclick="generateReportImage()">
-                    <i class="fas fa-file-image"></i> دانلود فاکتور تصویری (دقیق)
-                </button>
-                
-                <button class="btn btn-outline" onclick="downloadBackup()">
-                    <i class="fas fa-download"></i> دانلود فایل بکاپ (JSON)
-                </button>
-                
-                <label class="btn btn-outline" style="cursor:pointer; text-align:center;">
-                    <i class="fas fa-upload"></i> بازیابی فایل بکاپ
-                    <input type="file" id="restoreFile" style="display:none" onchange="restoreBackup(this)">
-                </label>
-
-                <button class="btn btn-outline" onclick="showHistory()">
-                    <i class="fas fa-history"></i> تاریخچه بکاپ‌ها
-                </button>
-
-                <button class="btn btn-outline" onclick="changePin()">
-                    <i class="fas fa-lock"></i> تغییر رمز عبور
-                </button>
-
-                <button class="btn btn-danger" onclick="resetAll()">
-                    <i class="fas fa-trash"></i> ریست فکتوری
-                </button>
+            <div style="margin-top:20px; display:flex; gap:10px;">
+                <button class="btn btn-primary" style="flex:1" onclick="performEdit()">ذخیره تغییرات</button>
+                <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
             </div>
         </div>
     </div>
-</div>
 
-<!-- BOTTOM NAVIGATION -->
+    <!-- Section History Modal -->
+    <div id="sectionHistoryModal" class="modal">
+        <div class="modal-content">
+            <h3>تاریخچه تغییرات (۱۰ مورد آخر)</h3>
+            <p style="font-size:0.8rem; color:var(--text-sec)">با کلیک روی هر مورد، وضعیت به آن زمان باز می‌گردد.</p>
+            <div id="sectionHistoryList" style="max-height:300px; overflow-y:auto; margin-top:10px;"></div>
+            <button class="btn btn-outline" style="width:100%; margin-top:15px;" onclick="closeAllModals()">بستن</button>
+        </div>
+    </div>
 
-<nav class="bottom-nav">
-    <button class="nav-btn active" onclick="switchTab('dashboard')">
-        <i class="fas fa-home"></i> داشبورد
-    </button>
-    <button class="nav-btn" onclick="switchTab('budget')">
-        <i class="fas fa-chart-pie"></i> بودجه
-    </button>
-    <button class="nav-btn" onclick="switchTab('tools')">
-        <i class="fas fa-tools"></i> ابزارها
-    </button>
-    <button class="nav-btn" onclick="switchTab('settings')">
-        <i class="fas fa-cog"></i> تنظیمات
-    </button>
-</nav>
-
-<!-- MODALS -->
-
-<!-- Edit Modal (With Data Loading - Instruction 3) -->
-
-<div id="editModal" class="modal">
-    <div class="modal-content">
-        <h3>ویرایش آیتم</h3>
-        <input type="hidden" id="editType">
-        <input type="hidden" id="editIndex">
-        
-        <label>عنوان:</label>
-        <input type="text" id="editName">
-        
-        <div id="editAmountWrapper">
-            <label>مبلغ / ارزش:</label>
+    <!-- Wallet Modal -->
+    <div id="walletModal" class="modal">
+        <div class="modal-content">
+            <h3>افزودن کیف پول</h3>
+            <label>نام کیف پول:</label>
+            <input type="text" id="wName" placeholder="مثلاً: کارت ملی">
+            <label>مبلغ موجودی:</label>
             <div class="money-input-wrapper">
-                <input type="text" id="editVal" onkeyup="formatCurrency(this)" inputmode="numeric">
+                <input type="text" id="wVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
                 <span class="money-unit currency-text">تومان</span>
             </div>
-        </div>
-
-        <div id="editPercentWrapper" style="display:none;">
-            <label>درصد:</label>
-            <input type="number" id="editPercent">
-        </div>
-
-        <!-- Date Picker for Editing -->
-        <div id="editDateWrapper" style="display:none; margin-bottom:10px;">
-            <label>تاریخ / سررسید:</label>
-            <div class="date-picker-row" id="editDateRow"></div>
-        </div>
-
-        <div style="margin-top:20px; display:flex; gap:10px;">
-            <button class="btn btn-primary" style="flex:1" onclick="performEdit()">ذخیره تغییرات</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
-        </div>
-    </div>
-</div>
-
-<!-- Section History Modal -->
-
-<div id="sectionHistoryModal" class="modal">
-    <div class="modal-content">
-        <h3>تاریخچه تغییرات (۱۰ مورد آخر)</h3>
-        <p style="font-size:0.8rem; color:var(--text-sec)">با کلیک روی هر مورد، وضعیت به آن زمان باز می‌گردد.</p>
-        <div id="sectionHistoryList" style="max-height:300px; overflow-y:auto; margin-top:10px;"></div>
-        <button class="btn btn-outline" style="width:100%; margin-top:15px;" onclick="closeAllModals()">بستن</button>
-    </div>
-</div>
-
-<!-- Wallet Modal -->
-
-<div id="walletModal" class="modal">
-    <div class="modal-content">
-        <h3>افزودن کیف پول</h3>
-        <label>نام کیف پول:</label>
-        <input type="text" id="wName" placeholder="مثلاً: کارت ملی">
-        <label>مبلغ موجودی:</label>
-        <div class="money-input-wrapper">
-            <input type="text" id="wVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
-            <span class="money-unit currency-text">تومان</span>
-        </div>
-        <div style="margin-top:20px; display:flex; gap:10px;">
-            <button class="btn btn-primary" style="flex:1" onclick="addWallet()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
-        </div>
-    </div>
-</div>
-
-<!-- Fixed Debt Modal -->
-
-<div id="debtModal" class="modal">
-    <div class="modal-content">
-        <h3>افزودن قسط ثابت</h3>
-        <label>عنوان قسط:</label>
-        <input type="text" id="dName" placeholder="مثلاً: وام مسکن">
-        <label>مبلغ قسط:</label>
-        <div class="money-input-wrapper">
-            <input type="text" id="dVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
-            <span class="money-unit currency-text">تومان</span>
-        </div>
-        <label>تاریخ پرداخت (روز):</label>
-        <div class="date-picker-row">
-            <select id="dDay" style="direction: rtl;"></select>
-        </div>
-        <div style="margin-top:20px; display:flex; gap:10px;">
-            <button class="btn btn-primary" style="flex:1" onclick="addDebt()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
-        </div>
-    </div>
-</div>
-
-<!-- Check/Debt Modal -->
-
-<div id="checkModal" class="modal">
-    <div class="modal-content">
-        <h3>افزودن چک / بدهی</h3>
-        <label>عنوان:</label>
-        <input type="text" id="cName" placeholder="مثلاً: چک صیادی">
-        <label>مبلغ:</label>
-        <div class="money-input-wrapper">
-            <input type="text" id="cVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
-            <span class="money-unit currency-text">تومان</span>
-        </div>
-        <label>تاریخ سررسید:</label>
-        <div class="date-picker-row" id="checkDateRow"></div>
-        <div style="margin-top:20px; display:flex; gap:10px;">
-            <button class="btn btn-primary" style="flex:1" onclick="addCheck()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
-        </div>
-    </div>
-</div>
-
-<!-- Loan Given Modal -->
-
-<div id="loanModal" class="modal">
-    <div class="modal-content">
-        <h3>ثبت طلب (قرض داده شده)</h3>
-        <label>نام شخص/عنوان:</label>
-        <input type="text" id="lName" placeholder="مثلاً: علی رضایی">
-        <label>مبلغ قرض:</label>
-        <div class="money-input-wrapper">
-            <input type="text" id="lVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
-            <span class="money-unit currency-text">تومان</span>
-        </div>
-        <label>تاریخ وصول:</label>
-        <div class="date-picker-row" id="loanDateRow"></div>
-        <div style="margin-top:20px; display:flex; gap:10px;">
-            <button class="btn btn-primary" style="flex:1" onclick="addLoan()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
-        </div>
-    </div>
-</div>
-
-<!-- Add Budget Modal -->
-
-<div id="addBudgetModal" class="modal">
-    <div class="modal-content">
-        <h3>افزودن ردیف بودجه</h3>
-        <label>عنوان:</label>
-        <input type="text" id="bName" placeholder="مثلاً: پوشاک">
-        <label>درصد سهم:</label>
-        <input type="number" id="bPercent" placeholder="مثلاً: 10">
-        <div style="margin-top:20px; display:flex; gap:10px;">
-            <button class="btn btn-primary" style="flex:1" onclick="addNewBudget()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
-        </div>
-    </div>
-</div>
-
-<!-- Expense Modal -->
-
-<div id="expModal" class="modal">
-    <div class="modal-content">
-        <h3>ثبت هزینه جدید</h3>
-        <input type="hidden" id="expBudgetId">
-        <label>مبلغ هزینه:</label>
-        <div class="money-input-wrapper">
-            <input type="text" id="expAmt" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
-            <span class="money-unit currency-text">تومان</span>
-        </div>
-        <label>بابت (توضیح):</label>
-        <input type="text" id="expReason" placeholder="...">
-        <div style="margin-top:20px; display:flex; gap:10px;">
-            <button class="btn btn-primary" style="flex:1" onclick="submitExp()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
-        </div>
-    </div>
-</div>
-
-<!-- Direct Deposit Modal (دستور ۴) -->
-
-<div id="directDepositModal" class="modal">
-    <div class="modal-content">
-        <h3>واریز مستقیم به آیتم</h3>
-        <p style="font-size:0.85rem; color:var(--text-sec); margin-bottom:15px;">این مبلغ مستقیماً به موجودی این ردیف اضافه می‌شود و از محاسبه‌گر اصلی درصدها کسر نمی‌شود.</p>
-        <input type="hidden" id="directBudgetId">
-        
-        <label>مبلغ واریز:</label>
-        <div class="money-input-wrapper">
-            <input type="text" id="directAmt" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
-            <span class="money-unit currency-text">تومان</span>
-        </div>
-        <label>توضیح (اختیاری):</label>
-        <input type="text" id="directReason" placeholder="مثلاً: پاداش">
-        
-        <div style="margin-top:20px; display:flex; gap:10px;">
-            <button class="btn btn-success" style="flex:1; background:var(--success); color:white; border:none;" onclick="submitDirectDeposit()">واریز</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
-        </div>
-    </div>
-</div>
-
-<!-- Goal Modal -->
-
-<div id="goalModal" class="modal">
-    <div class="modal-content">
-        <h3>هدف پس‌انداز جدید</h3>
-        <label>نام هدف:</label>
-        <input type="text" id="gName" placeholder="مثلاً: لپ‌تاپ">
-        <label>مبلغ هدف:</label>
-        <div class="money-input-wrapper">
-            <input type="text" id="gTarget" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
-            <span class="money-unit currency-text">تومان</span>
-        </div>
-        <div style="margin-top:20px; display:flex; gap:10px;">
-            <button class="btn btn-primary" style="flex:1" onclick="addGoal()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
-        </div>
-    </div>
-</div>
-
-<!-- Shop Modal -->
-
-<div id="shopModal" class="modal">
-    <div class="modal-content">
-        <h3>افزودن به لیست خرید</h3>
-        <label>نام کالا:</label>
-        <input type="text" id="sName" placeholder="مثلاً: روغن زیتون">
-        <label>قیمت حدودی (اختیاری):</label>
-        <div class="money-input-wrapper">
-            <input type="text" id="sPrice" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
-            <span class="money-unit currency-text">تومان</span>
-        </div>
-        <div style="margin-top:20px; display:flex; gap:10px;">
-            <button class="btn btn-primary" style="flex:1" onclick="addShop()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
-        </div>
-    </div>
-</div>
-
-<!-- Allocate Modal -->
-
-<div id="allocModal" class="modal">
-    <div class="modal-content">
-        <h3>اختصاص بودجه</h3>
-        <p style="font-size:0.9rem; color:var(--text-sec);">انتخاب کنید هزینه از کدام ردیف بودجه کسر شود:</p>
-        <input type="hidden" id="allocType"> <!-- goal or shop -->
-        <input type="hidden" id="allocId">
-        
-        <label>ردیف بودجه:</label>
-        <select id="allocBudgetSelect"></select>
-        
-        <label>مبلغ اختصاصی:</label>
-        <div class="money-input-wrapper">
-            <input type="text" id="allocAmt" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
-            <span class="money-unit currency-text">تومان</span>
-        </div>
-        
-        <div style="margin-top:20px; display:flex; gap:10px;">
-            <button class="btn btn-primary" style="flex:1" onclick="performAllocation()">ثبت کسری</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
-        </div>
-    </div>
-</div>
-
-<!-- Percentage Correction Modal -->
-
-<div id="fixPercentModal" class="modal">
-    <div class="modal-content">
-        <h3><i class="fas fa-exclamation-triangle" style="color:var(--warning)"></i> خطا در درصد کل</h3>
-        <p>مجموع درصد‌ها از ۱۰۰٪ بیشتر شده است. لطفاً یکی از گزینه‌های زیر را انتخاب کنید:</p>
-        
-        <div style="margin:20px 0; padding:15px; background:rgba(0,0,0,0.05); border-radius:10px;">
-            <p><b>حالت اول:</b> انتخاب دستی تا سقف مجاز</p>
-            <p style="font-size:0.9rem;">حداکثر درصد قابل انتخاب: <b id="maxAllowedPercent" style="color:var(--primary)">0%</b></p>
-            <div style="display:flex; align-items:center; gap:10px;">
-                <span>0</span>
-                <input type="range" id="percentSlider" min="0" value="0" oninput="updateSliderVal()">
-                <span id="sliderValDisplay">0</span>%
+            <div style="margin-top:20px; display:flex; gap:10px;">
+                <button class="btn btn-primary" style="flex:1" onclick="addWallet()">ثبت</button>
+                <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
             </div>
-            <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="useSliderPercent()">ثبت درصد انتخابی</button>
         </div>
+    </div>
 
-        <div style="margin:20px 0; padding:15px; background:rgba(0,0,0,0.05); border-radius:10px;">
-            <p><b>حالت دوم:</b> اصلاح هوشمند سیستم</p>
-            <p style="font-size:0.9rem;">سیستم بر اساس اولویت‌بندی‌ها، درصدهای اولویت پایین‌تر را کاهش می‌دهد.</p>
+    <!-- Fixed Debt Modal -->
+    <div id="debtModal" class="modal">
+        <div class="modal-content">
+            <h3>افزودن قسط ثابت</h3>
+            <label>عنوان قسط:</label>
+            <input type="text" id="dName" placeholder="مثلاً: وام مسکن">
+            <label>مبلغ قسط:</label>
+            <div class="money-input-wrapper">
+                <input type="text" id="dVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
+                <span class="money-unit currency-text">تومان</span>
+            </div>
+            <label>تاریخ پرداخت (روز):</label>
+            <div class="date-picker-row">
+                <select id="dDay" style="direction: rtl;"></select>
+            </div>
+            <div style="margin-top:20px; display:flex; gap:10px;">
+                <button class="btn btn-primary" style="flex:1" onclick="addDebt()">ثبت</button>
+                <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Check/Debt Modal -->
+    <div id="checkModal" class="modal">
+        <div class="modal-content">
+            <h3>افزودن چک / بدهی</h3>
+            <label>عنوان:</label>
+            <input type="text" id="cName" placeholder="مثلاً: چک صیادی">
+            <label>مبلغ:</label>
+            <div class="money-input-wrapper">
+                <input type="text" id="cVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
+                <span class="money-unit currency-text">تومان</span>
+            </div>
+            <label>تاریخ سررسید:</label>
+            <div class="date-picker-row" id="checkDateRow"></div>
+            <div style="margin-top:20px; display:flex; gap:10px;">
+                <button class="btn btn-primary" style="flex:1" onclick="addCheck()">ثبت</button>
+                <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loan Given Modal -->
+    <div id="loanModal" class="modal">
+        <div class="modal-content">
+            <h3>ثبت طلب (قرض داده شده)</h3>
+            <label>نام شخص/عنوان:</label>
+            <input type="text" id="lName" placeholder="مثلاً: علی رضایی">
+            <label>مبلغ قرض:</label>
+            <div class="money-input-wrapper">
+                <input type="text" id="lVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
+                <span class="money-unit currency-text">تومان</span>
+            </div>
+            <label>تاریخ وصول:</label>
+            <div class="date-picker-row" id="loanDateRow"></div>
+            <div style="margin-top:20px; display:flex; gap:10px;">
+                <button class="btn btn-primary" style="flex:1" onclick="addLoan()">ثبت</button>
+                <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Budget Modal -->
+    <div id="addBudgetModal" class="modal">
+        <div class="modal-content">
+            <h3>افزودن ردیف بودجه</h3>
+            <label>عنوان:</label>
+            <input type="text" id="bName" placeholder="مثلاً: پوشاک">
+            <label>درصد سهم:</label>
+            <input type="number" id="bPercent" placeholder="مثلاً: 10">
+            <div style="margin-top:20px; display:flex; gap:10px;">
+                <button class="btn btn-primary" style="flex:1" onclick="addNewBudget()">ثبت</button>
+                <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expense Modal -->
+    <div id="expModal" class="modal">
+        <div class="modal-content">
+            <h3>ثبت هزینه جدید</h3>
+            <input type="hidden" id="expBudgetId">
+            <label>مبلغ هزینه:</label>
+            <div class="money-input-wrapper">
+                <input type="text" id="expAmt" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
+                <span class="money-unit currency-text">تومان</span>
+            </div>
+            <label>بابت (توضیح):</label>
+            <input type="text" id="expReason" placeholder="...">
+            <div style="margin-top:20px; display:flex; gap:10px;">
+                <button class="btn btn-primary" style="flex:1" onclick="submitExp()">ثبت</button>
+                <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Goal Modal -->
+    <div id="goalModal" class="modal">
+        <div class="modal-content">
+            <h3>هدف پس‌انداز جدید</h3>
+            <label>نام هدف:</label>
+            <input type="text" id="gName" placeholder="مثلاً: لپ‌تاپ">
+            <label>مبلغ هدف:</label>
+            <div class="money-input-wrapper">
+                <input type="text" id="gTarget" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
+                <span class="money-unit currency-text">تومان</span>
+            </div>
+            <div style="margin-top:20px; display:flex; gap:10px;">
+                <button class="btn btn-primary" style="flex:1" onclick="addGoal()">ثبت</button>
+                <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shop Modal -->
+    <div id="shopModal" class="modal">
+        <div class="modal-content">
+            <h3>افزودن به لیست خرید</h3>
+            <label>نام کالا:</label>
+            <input type="text" id="sName" placeholder="مثلاً: روغن زیتون">
+            <label>قیمت حدودی (اختیاری):</label>
+            <div class="money-input-wrapper">
+                <input type="text" id="sPrice" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
+                <span class="money-unit currency-text">تومان</span>
+            </div>
+            <div style="margin-top:20px; display:flex; gap:10px;">
+                <button class="btn btn-primary" style="flex:1" onclick="addShop()">ثبت</button>
+                <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Allocate Modal -->
+    <div id="allocModal" class="modal">
+        <div class="modal-content">
+            <h3>اختصاص بودجه</h3>
+            <p style="font-size:0.9rem; color:var(--text-sec);">انتخاب کنید هزینه از کدام ردیف بودجه کسر شود:</p>
+            <input type="hidden" id="allocType"> <!-- goal or shop -->
+            <input type="hidden" id="allocId">
             
-            <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
-                <input type="checkbox" id="allowZeroCheck" style="width:auto; margin:0;">
-                <label for="allowZeroCheck" style="font-size:0.9rem;">اجازه صفر شدن آیتم‌ها (در صورت نیاز)</label>
+            <label>ردیف بودجه:</label>
+            <select id="allocBudgetSelect"></select>
+            
+            <label>مبلغ اختصاصی:</label>
+            <div class="money-input-wrapper">
+                <input type="text" id="allocAmt" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
+                <span class="money-unit currency-text">تومان</span>
             </div>
             
-            <button class="btn btn-primary" style="width:100%" onclick="autoCorrectBudget()">اصلاح خودکار و ثبت</button>
+            <div style="margin-top:20px; display:flex; gap:10px;">
+                <button class="btn btn-primary" style="flex:1" onclick="performAllocation()">ثبت کسری</button>
+                <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+            </div>
         </div>
-
-        <button class="btn btn-danger" style="width:100%" onclick="closeAllModals()">انصراف</button>
     </div>
-</div>
 
-<!-- Priority Settings Modal (Instruction 2 & 6) -->
+    <!-- Percentage Correction Modal (Instruction 2 & 3 & 6) -->
+    <div id="fixPercentModal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-exclamation-triangle" style="color:var(--warning)"></i> خطا در درصد کل</h3>
+            <p>مجموع درصد‌ها از ۱۰۰٪ بیشتر شده است. لطفاً یکی از گزینه‌های زیر را انتخاب کنید:</p>
+            
+            <div style="margin:20px 0; padding:15px; background:rgba(0,0,0,0.05); border-radius:10px;">
+                <p><b>حالت اول:</b> انتخاب دستی تا سقف مجاز</p>
+                <p style="font-size:0.9rem;">حداکثر درصد قابل انتخاب: <b id="maxAllowedPercent" style="color:var(--primary)">0%</b></p>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span>0</span>
+                    <input type="range" id="percentSlider" min="0" value="0" oninput="updateSliderVal()">
+                    <span id="sliderValDisplay">0</span>%
+                </div>
+                <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="useSliderPercent()">ثبت درصد انتخابی</button>
+            </div>
 
-<div id="prioritySettingsModal" class="modal">
-    <div class="modal-content">
-        <h3>مدیریت اولویت‌ها</h3>
-        
-        <!-- تعریف بازه‌ها (دستور ۶) -->
-        <div style="background:rgba(0,0,0,0.03); padding:10px; border-radius:10px; margin-bottom:15px;">
-            <p style="font-size:0.85rem; font-weight:bold; margin-top:0;">تعریف بازه‌های درصد خودکار:</p>
-            <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                <div style="flex:1; min-width:120px;">
-                    <label style="font-size:0.75rem;">شروع اولویت زیاد (%):</label>
-                    <input type="number" id="prioHighThresh" placeholder="مثلاً 50">
+            <div style="margin:20px 0; padding:15px; background:rgba(0,0,0,0.05); border-radius:10px;">
+                <p><b>حالت دوم:</b> اصلاح هوشمند سیستم</p>
+                <p style="font-size:0.9rem;">سیستم بر اساس اولویت‌بندی‌ها، درصدهای اولویت پایین‌تر را کاهش می‌دهد.</p>
+                
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                    <input type="checkbox" id="allowZeroCheck" style="width:auto; margin:0;">
+                    <label for="allowZeroCheck" style="font-size:0.9rem;">اجازه صفر شدن آیتم‌ها (در صورت نیاز)</label>
                 </div>
-                <div style="flex:1; min-width:120px;">
-                    <label style="font-size:0.75rem;">شروع اولویت متوسط (%):</label>
-                    <input type="number" id="prioMidThresh" placeholder="مثلاً 30">
-                </div>
-                <div style="flex:1; min-width:120px;">
-                    <label style="font-size:0.75rem;">شروع اولویت کم (%):</label>
-                    <input type="number" id="prioLowThresh" placeholder="مثلاً 10">
+                
+                <button class="btn btn-primary" style="width:100%" onclick="autoCorrectBudget()">اصلاح خودکار و ثبت</button>
+            </div>
+
+            <button class="btn btn-danger" style="width:100%" onclick="closeAllModals()">انصراف</button>
+        </div>
+    </div>
+
+    <!-- Priority Settings Modal (Instruction 2 & 7) -->
+    <div id="prioritySettingsModal" class="modal">
+        <div class="modal-content">
+            <h3>مدیریت اولویت‌ها</h3>
+            
+            <div style="margin-bottom:15px; padding:10px; background:rgba(0,0,0,0.03); border-radius:10px;">
+                <h4 style="margin:0 0 10px 0; font-size:0.95rem;">تعریف بازه‌های درصد (دستور ۷)</h4>
+                <p style="font-size:0.8rem; color:var(--text-sec); margin-bottom:10px;">مشخص کنید هر اولویت شامل چه درصدهایی است.</p>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div>
+                        <label style="font-size:0.8rem;">شروع زیاد (Priority 1):</label>
+                        <input type="number" id="pRangeHigh" placeholder="مثلا 70">
+                    </div>
+                    <div>
+                        <label style="font-size:0.8rem;">شروع متوسط (Priority 3):</label>
+                        <input type="number" id="pRangeMed" placeholder="مثلا 40">
+                    </div>
                 </div>
             </div>
-            <p style="font-size:0.7rem; color:var(--text-sec); margin-bottom:0;">این اعداد تعیین می‌کنند که وقتی آیتمی را اضافه می‌کنید، سیستم به طور خودکار چه اولویتی به آن بدهد.</p>
-        </div>
 
-        <p style="font-size:0.8rem; color:var(--text-sec); margin-bottom:15px;">اولویت ۱ (بالاترین) تا ۴ (پایین‌ترین). در صورت کمبود درصد، سیستم از اولویت ۴ کم می‌کند.</p>
+            <p style="font-size:0.8rem; color:var(--text-sec); margin-bottom:15px;">اولویت ۱ (بالاترین) تا ۴ (پایین‌ترین).</p>
+            
+            <div id="priorityList" style="max-height:300px; overflow-y:auto;">
+                <!-- Generated via JS -->
+            </div>
+
+            <div style="margin-top:20px; display:flex; gap:10px;">
+                <button class="btn btn-primary" style="flex:1" onclick="savePriorities()">ذخیره تغییرات</button>
+                <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Item History Modal -->
+    <div id="itemHistModal" class="modal">
+        <div class="modal-content">
+            <h3>تاریخچه تراکنش‌ها</h3>
+            <div id="itemHistList" style="max-height:300px; overflow-y:auto; margin-top:10px; font-size:0.85rem;"></div>
+            <button class="btn btn-outline" style="width:100%; margin-top:15px;" onclick="closeAllModals()">بستن</button>
+        </div>
+    </div>
+
+    <!-- Backup History Modal -->
+    <div id="histModal" class="modal">
+        <div class="modal-content">
+            <h3>تاریخچه بکاپ‌ها</h3>
+            <div id="histList" style="max-height:300px; overflow-y:auto; margin-top:10px; font-size:0.9rem;"></div>
+            <button class="btn btn-outline" style="width:100%; margin-top:15px;" onclick="closeAllModals()">بستن</button>
+        </div>
+    </div>
+
+    <!-- REPORT TEMPLATE -->
+    <div id="printArea">
+        <div class="print-header">
+            <h1>گزارش جامع وضعیت مالی</h1>
+            <p id="printDate">تاریخ: ---</p>
+            <p>کاربر: <span id="printUser">---</span></p>
+        </div>
         
-        <div id="priorityList" style="max-height:300px; overflow-y:auto; overflow-x:hidden;">
-            <!-- Generated via JS -->
+        <div class="print-summary">
+            <div>کل دارایی: <b id="printInc">0</b></div>
+            <div>کل بدهی: <b id="printDebt">0</b></div>
+            <div>خالص قابل خرج: <b id="printNet">0</b></div>
         </div>
 
-        <div style="margin-top:20px; display:flex; gap:10px;">
-            <button class="btn btn-primary" style="flex:1" onclick="savePriorities()">ذخیره تغییرات</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+        <div class="print-section-title">جزئیات بودجه‌بندی</div>
+        <table class="print-table">
+            <thead>
+                <tr>
+                    <th>ردیف</th>
+                    <th>درصد</th>
+                    <th>سهم (تومان)</th>
+                    <th>خرج شده</th>
+                    <th>مانده</th>
+                </tr>
+            </thead>
+            <tbody id="printBody"></tbody>
+        </table>
+
+        <div class="print-section-title">وضعیت بدهی‌ها</div>
+        <div id="printDebtsList" style="margin-top:5px; font-size:0.9rem;"></div>
+
+        <div class="print-section-title">وضعیت اهداف مالی</div>
+        <div id="printGoalsList" style="margin-top:5px; font-size:0.9rem;"></div>
+
+        <div style="margin-top:30px; text-align:center; font-size:12px; color:#666; border-top:1px solid #000; padding-top:10px;">
+            تولید شده توسط سامانه مدیریت مالی شخصی V13
         </div>
     </div>
-</div>
-
-<!-- Item History Modal -->
-
-<div id="itemHistModal" class="modal">
-    <div class="modal-content">
-        <h3>تاریخچه تراکنش‌ها</h3>
-        <div id="itemHistList" style="max-height:300px; overflow-y:auto; margin-top:10px; font-size:0.85rem;"></div>
-        <button class="btn btn-outline" style="width:100%; margin-top:15px;" onclick="closeAllModals()">بستن</button>
-    </div>
-</div>
-
-<!-- Backup History Modal -->
-
-<div id="histModal" class="modal">
-    <div class="modal-content">
-        <h3>تاریخچه بکاپ‌ها</h3>
-        <div id="histList" style="max-height:300px; overflow-y:auto; margin-top:10px; font-size:0.9rem;"></div>
-        <button class="btn btn-outline" style="width:100%; margin-top:15px;" onclick="closeAllModals()">بستن</button>
-    </div>
-</div>
-
-<!-- REPORT TEMPLATE -->
-
-<div id="printArea">
-    <div class="print-header">
-        <h1>گزارش جامع وضعیت مالی</h1>
-        <p id="printDate">تاریخ: ---</p>
-        <p>کاربر: <span id="printUser">---</span></p>
-    </div>
-    
-    <div class="print-summary">
-        <div>کل دارایی: <b id="printInc">0</b></div>
-        <div>کل بدهی: <b id="printDebt">0</b></div>
-        <div>خالص قابل خرج: <b id="printNet">0</b></div>
-    </div>
-
-    <div class="print-section-title">جزئیات بودجه‌بندی</div>
-    <table class="print-table">
-        <thead>
-            <tr>
-                <th>ردیف</th>
-                <th>درصد</th>
-                <th>سهم (تومان)</th>
-                <th>خرج شده</th>
-                <th>مانده</th>
-            </tr>
-        </thead>
-        <tbody id="printBody"></tbody>
-    </table>
-
-    <div class="print-section-title">وضعیت بدهی‌ها</div>
-    <div id="printDebtsList" style="margin-top:5px; font-size:0.9rem;"></div>
-
-    <div class="print-section-title">وضعیت اهداف مالی</div>
-    <div id="printGoalsList" style="margin-top:5px; font-size:0.9rem;"></div>
-
-    <div style="margin-top:30px; text-align:center; font-size:12px; color:#666; border-top:1px solid #000; padding-top:10px;">
-        تولید شده توسط سامانه مدیریت مالی شخصی V13
-    </div>
-</div>
 
 <script>
     // --- STATE & DATA ---
     const defaultState = {
         security: { hasPin: false, pin: "" },
-        user: { name: "کاربر جدید", theme: "light", currency: "toman", setupDone: false },
+        user: { name: "کاربر جدید", theme: "light", currency: "toman" },
         wallets: [],
         debts: [], 
         checks: [], 
         loans: [],  
         budgets: [
-            {id: 1, name: "کرایه و رفت‌وآمد", percent: 27, spent: 0, history: [], extra: 0, active: true},
-            {id: 2, name: "خورد و خوراک", percent: 12, spent: 0, history: [], extra: 0, active: true},
-            {id: 3, name: "پس‌انداز مشهد", percent: 25, spent: 0, history: [], extra: 0, active: true},
-            {id: 4, name: "درمان", percent: 3, spent: 0, history: [], extra: 0, active: true},
-            {id: 5, name: "شارژ و نت", percent: 10, spent: 0, history: [], extra: 0, active: true},
-            {id: 6, name: "زیبایی و مکمل", percent: 7, spent: 0, history: [], extra: 0, active: true},
-            {id: 7, name: "لباس", percent: 5, spent: 0, history: [], extra: 0, active: true},
-            {id: 8, name: "ضروری", percent: 5, spent: 0, history: [], extra: 0, active: true},
-            {id: 9, name: "تفریح", percent: 3, spent: 0, history: [], extra: 0, active: true},
-            {id: 10, name: "پس‌انداز کل", percent: 3, spent: 0, history: [], extra: 0, active: true}
+            {id: 1, name: "کرایه و رفت‌وآمد", percent: 27, spent: 0, extra: 0, active: true, history: []},
+            {id: 2, name: "خورد و خوراک", percent: 12, spent: 0, extra: 0, active: true, history: []},
+            {id: 3, name: "پس‌انداز مشهد", percent: 25, spent: 0, extra: 0, active: true, history: []},
+            {id: 4, name: "درمان", percent: 3, spent: 0, extra: 0, active: true, history: []},
+            {id: 5, name: "شارژ و نت", percent: 10, spent: 0, extra: 0, active: true, history: []},
+            {id: 6, name: "زیبایی و مکمل", percent: 7, spent: 0, extra: 0, active: true, history: []},
+            {id: 7, name: "لباس", percent: 5, spent: 0, extra: 0, active: true, history: []},
+            {id: 8, name: "ضروری", percent: 5, spent: 0, extra: 0, active: true, history: []},
+            {id: 9, name: "تفریح", percent: 3, spent: 0, extra: 0, active: true, history: []},
+            {id: 10, name: "پس‌انداز کل", percent: 3, spent: 0, extra: 0, active: true, history: []}
         ],
         priorities: {
             "کرایه و رفت‌وآمد": 1, "خورد و خوراک": 1, "درمان": 1, "ضروری": 1, "اجاره خانه": 1,
             "شارژ و نت": 2, "لباس": 2, "زیبایی و مکمل": 3, "پس‌انداز کل": 3, "پس‌انداز مشهد": 3,
             "تفریح": 4, "سایر": 4
         },
-        priorityThresholds: { high: 50, mid: 30, low: 10 }, // New: Instruction 6
+        priorityRanges: { high: 70, medium: 40 }, // Instruction 7
         goals: [],
         shopping: [],
         history: [], // Backup history
@@ -1127,7 +1076,6 @@
 
     // --- DATE PICKER SETUP ---
     function setupDatePickers() {
-        // ایجاد سلکت‌های تاریخ برای مودال‌های افزودن
         const createSelects = (prefix) => `
             <select id="${prefix}Day" class="date-sel">${genOpts(1,31)}</select>
             <select id="${prefix}Month" class="date-sel">${genOpts(1,12)}</select>
@@ -1135,10 +1083,7 @@
         `;
         document.getElementById('checkDateRow').innerHTML = createSelects('c');
         document.getElementById('loanDateRow').innerHTML = createSelects('l');
-        
-        // ایجاد سلکت تاریخ برای مودال ویرایش (دستور 3)
-        document.getElementById('editDateRow').innerHTML = createSelects('edit');
-        
+        document.getElementById('editDateRow').innerHTML = createSelects('e'); // Added for Edit
         document.getElementById('dDay').innerHTML = genOpts(1,31);
     }
 
@@ -1162,27 +1107,26 @@
         return `${y}/${m}/${d}`;
     }
 
-    // --- AUTH (Instruction 1) ---
+    // --- AUTH & INSTRUCTION 1 ---
     function checkAuth() {
         const modal = document.getElementById('authModal');
         const title = document.getElementById('authTitle');
         const sub = document.getElementById('authSub');
-        const nameInputDiv = document.getElementById('authNameInput');
+        const nameInputDiv = document.getElementById('setupNameDiv');
         
         modal.style.display = 'flex';
         pinBuffer = "";
         updatePinDots();
 
         if (!app.security.hasPin) {
-            // First time setup
-            title.innerText = "خوش‌آمدگویی";
-            sub.innerText = "لطفا اطلاعات اولیه را تکمیل کنید";
-            nameInputDiv.style.display = 'block';
+            title.innerText = "تعیین رمز عبور جدید";
+            sub.innerText = "برای شروع، نام خود و یک رمز ۴ رقمی وارد کنید";
+            nameInputDiv.style.display = 'block'; // Show name input
         } else {
-            // Returning user
-            nameInputDiv.style.display = 'none';
-            title.innerText = `خوش‌آمدی ${app.user.name}`;
+            // Instruction 1: Welcome message
+            title.innerText = `${app.user.name}، خوش آمدید`;
             sub.innerText = "رمز عبور خود را وارد کنید";
+            nameInputDiv.style.display = 'none';
         }
     }
 
@@ -1202,12 +1146,11 @@
     }
 
     function processPin() {
-        const nameInput = document.getElementById('firstLoginName');
-
         if (!app.security.hasPin) {
-            // Validation for name
-            if(nameInput.value.trim().length < 2) {
-                alert("لطفا نام خود را به درستی وارد کنید.");
+            // Instruction 1: Capture Name
+            const nameInp = document.getElementById('setupNameInput').value;
+            if(!nameInp || nameInp.trim() === "") {
+                alert("لطفا نام و نام خانوادگی را وارد کنید.");
                 pinBuffer = ""; updatePinDots();
                 return;
             }
@@ -1215,8 +1158,7 @@
             if(confirm("رمز شما: " + pinBuffer + "\nآیا مطمئن هستید؟")) {
                 app.security.pin = pinBuffer;
                 app.security.hasPin = true;
-                app.user.name = nameInput.value.trim(); // Save Name (Instruction 1)
-                app.user.setupDone = true;
+                app.user.name = nameInp;
                 saveData();
                 document.getElementById('authModal').style.display = 'none';
                 document.getElementById('appContent').style.display = 'block';
@@ -1428,14 +1370,13 @@
         `).join('');
     }
 
-    // --- RENDER BUDGETS (Instructions 4 & 5 Implemented) ---
     function renderBudgets(net) {
         const div = document.getElementById('budgetGrid');
         div.innerHTML = '';
         
         let totalP = 0;
         app.budgets.forEach(b => {
-             // Only count active percentages (Instruction 5)
+             // Instruction 5: Only count active budgets for total percent
              if(b.active !== false) totalP += b.percent;
         });
         
@@ -1444,50 +1385,46 @@
         badge.style.background = totalP > 100 ? 'var(--danger)' : (totalP === 100 ? 'var(--success)' : 'var(--text-sec)');
 
         app.budgets.forEach((b, i) => {
-            // Logic for active/inactive item (Instruction 5)
-            const isActive = (b.active !== false);
-            const currentPercent = isActive ? b.percent : 0;
+            // Instruction 5: If paused, calculate as 0 (but keep saved percent)
+            const isActive = b.active !== false;
+            const effectivePercent = isActive ? b.percent : 0;
             
-            // Logic for Extra Direct Funds (Instruction 4)
+            // Instruction 4: Support extra funds
             const extra = b.extra || 0;
-            
-            const share = Math.round((net * currentPercent) / 100) + extra;
+            const share = Math.round((net * effectivePercent) / 100) + extra;
             const remain = share - b.spent;
-            const percent = share > 0 ? (b.spent / share) * 100 : 0;
+            const percentUsed = share > 0 ? (b.spent / share) * 100 : 0;
             
             let status = 'stat-green';
-            if(percent > 50) status = 'stat-yellow';
-            if(percent > 90) status = 'stat-red';
+            if(percentUsed > 50) status = 'stat-yellow';
+            if(percentUsed > 90) status = 'stat-red';
             
-            const pausedClass = isActive ? '' : 'paused';
-            const pausedText = isActive ? '' : '(متوقف)';
+            const pausedClass = !isActive ? 'paused' : '';
 
             div.innerHTML += `
                 <div class="bento-item ${status} ${pausedClass}">
                     <div class="bento-header">
-                        <span>${b.name} <small>${currentPercent}%</small> ${pausedText} 
-                            <i class="fas fa-edit" style="font-size:0.8rem; cursor:pointer; margin-right:5px; color:var(--text-sec);" onclick="openEdit('budget', ${i})"></i>
-                        </span>
-                        <div style="display:flex; gap:8px; align-items:center;">
-                            <!-- Pause Button (Instruction 5) -->
-                            <i class="fas ${isActive ? 'fa-pause-circle' : 'fa-play-circle'}" style="cursor:pointer; color:var(--primary);" onclick="toggleBudgetActive(${i})" title="${isActive ? 'توقف بودجه‌گیری' : 'فعال‌سازی مجدد'}"></i>
+                        <span>${b.name} (${effectivePercent}%) <i class="fas fa-edit" style="font-size:0.8rem; cursor:pointer; margin-right:5px; color:var(--text-sec);" onclick="openEdit('budget', ${i})"></i></span>
+                        <div style="display:flex; gap:8px;">
+                            <i class="fas ${isActive ? 'fa-pause' : 'fa-play'}" style="opacity:0.5; cursor:pointer;" onclick="toggleBudgetActive(${i})" title="${isActive ? 'توقف' : 'فعال‌سازی'}"></i>
                             <i class="fas fa-list-alt" style="opacity:0.5; cursor:pointer;" onclick="openItemHistory(${i})" title="تاریخچه"></i>
                             <i class="fas fa-trash" style="opacity:0.3; cursor:pointer;" onclick="delBudget(${i})"></i>
                         </div>
                     </div>
-                    
                     <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-top:5px; color:var(--text-sec);">
-                        <span>سهم: ${format(share)} ${extra > 0 ? '<small class="text-success">(+'+format(extra)+')</small>' : ''}</span>
+                        <span>سهم: ${format(share)}</span>
                         <span style="color:var(--danger)">خرج: ${format(b.spent)}</span>
                     </div>
-                    <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(percent,100)}%"></div></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(percentUsed,100)}%"></div></div>
                     <div style="text-align:left; font-weight:bold; font-size:1.1rem; color:var(--primary); direction:ltr;">
-                        ${format(remain)}
+                        ${isActive ? format(remain) : 'متوقف شده'}
                     </div>
+                    
+                    <!-- Instruction 4 buttons -->
                     <div class="bento-actions">
-                        <button class="action-chip" onclick="openExp(${i})">➖ هزینه</button>
-                        <!-- Direct Deposit Button (Instruction 4) -->
-                        <button class="action-chip" style="color:var(--success); border-color:var(--success);" onclick="openDirectDeposit(${i})">➕ واریز</button>
+                        <button class="action-chip" onclick="openExp(${i})">➖ ثبت هزینه</button>
+                        <button class="action-chip" onclick="addExtraFund(${i})">➕ واریز ویژه</button>
+                        <button class="action-chip" onclick="spendNoEffect(${i})">💸 برداشت آزاد</button>
                         <button class="action-chip" onclick="copyTxt(${remain})">📋 کپی</button>
                     </div>
                 </div>
@@ -1536,7 +1473,7 @@
         `).join('');
     }
 
-    // --- EDIT SYSTEM (Instruction 3: Pre-fill Data) ---
+    // --- EDIT SYSTEM (Instruction 1 & 3 & 6) ---
     function openEdit(type, index) {
         document.getElementById('editType').value = type;
         document.getElementById('editIndex').value = index;
@@ -1547,17 +1484,15 @@
         let showDate = false;
 
         if(type === 'wallet') item = app.wallets[index];
-        else if(type === 'debt') { item = app.debts[index]; showDate = false; /* Debts use Day only, handled separately or simple number? Currently simple number in logic, name input handles text. */ } 
+        else if(type === 'debt') item = app.debts[index];
         else if(type === 'check') { item = app.checks[index]; showDate = true; }
         else if(type === 'loan') { item = app.loans[index]; showDate = true; }
         else if(type === 'budget') { item = app.budgets[index]; showPercent = true; showAmount = false; }
         else if(type === 'goal') { item = app.goals[index]; }
         else if(type === 'shop') { item = app.shopping[index]; }
 
-        // Fill Name
         document.getElementById('editName').value = item.name;
         
-        // Fill Amount
         if(showAmount) {
             document.getElementById('editAmountWrapper').style.display = 'block';
             let val = 0;
@@ -1569,7 +1504,6 @@
             document.getElementById('editAmountWrapper').style.display = 'none';
         }
 
-        // Fill Percent
         if(showPercent) {
             document.getElementById('editPercentWrapper').style.display = 'block';
             document.getElementById('editPercent').value = item.percent;
@@ -1577,15 +1511,17 @@
             document.getElementById('editPercentWrapper').style.display = 'none';
         }
 
-        // Fill Date (Instruction 3 Fix)
-        if(showDate && item.date) {
+        // Instruction 3: Pre-fill dates
+        if(showDate) {
             document.getElementById('editDateWrapper').style.display = 'block';
-            // Parse "YYYY/MM/DD"
-            const parts = item.date.split('/');
-            if(parts.length === 3) {
-                document.getElementById('editYear').value = parts[0];
-                document.getElementById('editMonth').value = parts[1];
-                document.getElementById('editDay').value = parts[2];
+            // Parse date (e.g. 1403/9/19)
+            if(item.date) {
+                const parts = item.date.split('/');
+                if(parts.length === 3) {
+                    document.getElementById('eYear').value = parts[0];
+                    document.getElementById('eMonth').value = parts[1];
+                    document.getElementById('eDay').value = parts[2];
+                }
             }
         } else {
             document.getElementById('editDateWrapper').style.display = 'none';
@@ -1615,15 +1551,56 @@
         } else if(type === 'check') {
             app.checks[index].name = newName;
             app.checks[index].value = parseFormatted(document.getElementById('editVal').value);
-            app.checks[index].date = getDateString('edit'); // Get from edit date picker
+            app.checks[index].date = getDateString('e'); // Save Date
         } else if(type === 'loan') {
             app.loans[index].name = newName;
             app.loans[index].value = parseFormatted(document.getElementById('editVal').value);
-            app.loans[index].date = getDateString('edit'); // Get from edit date picker
+            app.loans[index].date = getDateString('e'); // Save Date
         } else if(type === 'budget') {
             const oldName = app.budgets[index].name;
+            const newPercent = parseInt(document.getElementById('editPercent').value) || 0;
+            
+            // Instruction 6: Validate Percent Overflow
+            let currentTotal = 0;
+            app.budgets.forEach((b, i) => {
+                if(b.active !== false && i !== index) currentTotal += b.percent;
+            });
+
+            if (currentTotal + newPercent > 100) {
+                // Trigger Fix Modal
+                tempBudget = JSON.parse(JSON.stringify(app.budgets[index]));
+                tempBudget.name = newName;
+                tempBudget.percent = newPercent;
+                // Since this is edit, we need to handle it differently in fix modal logic?
+                // Actually we can reuse, but we need to know we are editing.
+                // Let's modify app.budgets temporarily in memory or pass a flag.
+                // Simpler: Just delete old budget from calculation temporarily?
+                // For simplicity: We use the existing 'addNewBudget' logic structure.
+                // We will remove the current item from list temporarily to use auto-correct logic properly.
+                
+                // Hack: We can't easily remove. Let's just set tempBudget and set flag "isEdit".
+                // Actually, let's just trigger the modal, and in `useSlider` or `autoCorrect` we update the existing index.
+                // But `autoCorrect` pushes `tempBudget` to array.
+                // So, let's remove the old one first if confirmed? No dangerous.
+                
+                // Let's modify `tempBudget` to carry the index.
+                tempBudget.index = index; 
+                
+                const max = 100 - currentTotal;
+                const safeMax = max > 0 ? max : 0;
+                document.getElementById('maxAllowedPercent').innerText = safeMax + '%';
+                const slider = document.getElementById('percentSlider');
+                slider.max = safeMax;
+                slider.value = 0;
+                document.getElementById('sliderValDisplay').innerText = 0;
+                
+                closeAllModals(); // Close edit
+                setTimeout(() => openModal('fixPercentModal'), 200);
+                return; // Stop execution
+            }
+
             app.budgets[index].name = newName;
-            app.budgets[index].percent = parseInt(document.getElementById('editPercent').value) || 0;
+            app.budgets[index].percent = newPercent;
             
             // Sync Priority Name
             if(oldName !== newName && app.priorities[oldName]) {
@@ -1650,26 +1627,28 @@
         saveSectionSnap('budget');
         
         let newBudgets = [];
+        const base = {spent:0, extra:0, active:true, history:[]};
+        
         if(type === 'default') {
-            newBudgets = JSON.parse(JSON.stringify(defaultState.budgets));
+            newBudgets = defaultState.budgets.map(b => ({...b, ...base}));
         } else if(type === 'student') {
             newBudgets = [
-                {id: 1, name: "رفت‌وآمد", percent: 30, spent: 0, history: [], extra: 0, active: true},
-                {id: 2, name: "غذا (سلف/بیرون)", percent: 25, spent: 0, history: [], extra: 0, active: true},
-                {id: 3, name: "اینترنت و شارژ", percent: 15, spent: 0, history: [], extra: 0, active: true},
-                {id: 4, name: "کتاب و جزوه", percent: 10, spent: 0, history: [], extra: 0, active: true},
-                {id: 5, name: "تفریح دوستانه", percent: 15, spent: 0, history: [], extra: 0, active: true},
-                {id: 6, name: "پس‌انداز اضطراری", percent: 5, spent: 0, history: [], extra: 0, active: true}
+                {id: 1, name: "رفت‌وآمد", percent: 30, ...base},
+                {id: 2, name: "غذا (سلف/بیرون)", percent: 25, ...base},
+                {id: 3, name: "اینترنت و شارژ", percent: 15, ...base},
+                {id: 4, name: "کتاب و جزوه", percent: 10, ...base},
+                {id: 5, name: "تفریح دوستانه", percent: 15, ...base},
+                {id: 6, name: "پس‌انداز اضطراری", percent: 5, ...base}
             ];
         } else if(type === 'married') {
             newBudgets = [
-                {id: 1, name: "اجاره خانه", percent: 35, spent: 0, history: [], extra: 0, active: true},
-                {id: 2, name: "خورد و خوراک منزل", percent: 25, spent: 0, history: [], extra: 0, active: true},
-                {id: 3, name: "قبوض و شارژ", percent: 10, spent: 0, history: [], extra: 0, active: true},
-                {id: 4, name: "درمان و بهداشت", percent: 10, spent: 0, history: [], extra: 0, active: true},
-                {id: 5, name: "پوشاک", percent: 5, spent: 0, history: [], extra: 0, active: true},
-                {id: 6, name: "پس‌انداز آینده", percent: 10, spent: 0, history: [], extra: 0, active: true},
-                {id: 7, name: "تفریح", percent: 5, spent: 0, history: [], extra: 0, active: true}
+                {id: 1, name: "اجاره خانه", percent: 35, ...base},
+                {id: 2, name: "خورد و خوراک منزل", percent: 25, ...base},
+                {id: 3, name: "قبوض و شارژ", percent: 10, ...base},
+                {id: 4, name: "درمان و بهداشت", percent: 10, ...base},
+                {id: 5, name: "پوشاک", percent: 5, ...base},
+                {id: 6, name: "پس‌انداز آینده", percent: 10, ...base},
+                {id: 7, name: "تفریح", percent: 5, ...base}
             ];
         } else if(type === 'clear') {
             newBudgets = [];
@@ -1726,28 +1705,24 @@
     }
     function delLoan(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard'); app.loans.splice(i,1); saveData(); renderUI(); } }
 
-    // --- BUDGET ADDITION & AUTO CORRECTION ---
+    // --- BUDGET ADDITION & AUTO CORRECTION (Instruction 2 & 3 & 6) ---
     function addNewBudget() {
         const n = document.getElementById('bName').value;
         const p = parseInt(document.getElementById('bPercent').value);
         
         if(!n || isNaN(p)) return alert("لطفا مقادیر صحیح وارد کنید");
 
-        // Calculate current total of ACTIVE items
         let currentTotal = 0;
-        app.budgets.forEach(b => {
-            if(b.active !== false) currentTotal += b.percent;
-        });
+        app.budgets.forEach(b => { if(b.active !== false) currentTotal += b.percent; });
 
         if (currentTotal + p > 100) {
-            tempBudget = { name: n, percent: p, id: Date.now(), spent: 0, history: [], extra: 0, active: true };
+            tempBudget = { name: n, percent: p, id: Date.now(), spent: 0, extra: 0, active: true, history: [] };
             
             const max = 100 - currentTotal;
             const safeMax = max > 0 ? max : 0;
             
             document.getElementById('maxAllowedPercent').innerText = safeMax + '%';
             
-            // Setup Slider
             const slider = document.getElementById('percentSlider');
             slider.max = safeMax;
             slider.value = 0;
@@ -1756,25 +1731,11 @@
             openModal('fixPercentModal');
         } else {
             saveSectionSnap('budget');
-            const newB = {id:Date.now(), name:n, percent:p, spent:0, history:[], extra: 0, active: true};
+            const newB = {id:Date.now(), name:n, percent:p, spent:0, extra: 0, active: true, history:[]};
             app.budgets.push(newB);
             assignDefaultPriority(newB);
             saveData(); renderUI(); closeAllModals();
         }
-    }
-
-    // Helper for Instruction 6: Assign priority based on user-defined thresholds
-    function assignDefaultPriority(budgetObj) {
-        // Ensure thresholds exist
-        if(!app.priorityThresholds) app.priorityThresholds = { high: 50, mid: 30, low: 10 };
-        const t = app.priorityThresholds;
-        
-        let p = 4;
-        if(budgetObj.percent >= t.high) p = 1;
-        else if(budgetObj.percent >= t.mid) p = 2;
-        else if(budgetObj.percent >= t.low) p = 3;
-        
-        app.priorities[budgetObj.name] = p;
     }
 
     function updateSliderVal() {
@@ -1784,9 +1745,18 @@
     function useSliderPercent() {
         if(!tempBudget) return;
         saveSectionSnap('budget');
-        tempBudget.percent = parseInt(document.getElementById('percentSlider').value);
-        app.budgets.push(tempBudget);
-        assignDefaultPriority(tempBudget);
+        
+        if(tempBudget.index !== undefined) {
+             // Edit mode (Instruction 6)
+             app.budgets[tempBudget.index].name = tempBudget.name;
+             app.budgets[tempBudget.index].percent = parseInt(document.getElementById('percentSlider').value);
+        } else {
+             // New mode
+             tempBudget.percent = parseInt(document.getElementById('percentSlider').value);
+             app.budgets.push(tempBudget);
+             assignDefaultPriority(tempBudget);
+        }
+        
         saveData(); renderUI(); closeAllModals();
         tempBudget = null;
     }
@@ -1798,18 +1768,23 @@
         const needed = tempBudget.percent;
         const allowZero = document.getElementById('allowZeroCheck').checked;
         
+        // Remove item being edited from calculation if needed (or assume it's new)
+        // If edit mode, we are calculating space for the NEW percent.
         let currentTotal = 0;
-        app.budgets.forEach(b => { if(b.active !== false) currentTotal += b.percent; });
+        app.budgets.forEach((b, i) => { 
+            // If edit mode, exclude the item itself from total
+            if(b.active !== false && (tempBudget.index === undefined || tempBudget.index !== i)) {
+                currentTotal += b.percent;
+            }
+        });
         
         let overflow = (currentTotal + needed) - 100;
         
         if(overflow <= 0) {
-            app.budgets.push(tempBudget);
-            saveData(); renderUI(); closeAllModals();
-            return;
+            // No overflow logic needed? Actually performEdit checks before calling this.
+            // But if we are here, overflow exists.
         }
 
-        // Sort by priority (Instruction 6: Logic uses predefined priorities 1-4)
         let sortedItems = app.budgets.map((b, index) => {
             return {
                 index: index,
@@ -1817,7 +1792,7 @@
                 percent: b.percent,
                 active: b.active
             };
-        }).filter(b => b.active !== false) // Only reduce active items
+        }).filter(b => b.active !== false && (tempBudget.index === undefined || b.index !== tempBudget.index)) // Don't reduce self
           .sort((a, b) => b.priority - a.priority); // Low priority (4) first
 
         for (let item of sortedItems) {
@@ -1826,7 +1801,7 @@
             let currentP = item.percent;
             let deductible = currentP;
             if(!allowZero && currentP > 0) {
-                deductible = currentP - 1; // leave 1%
+                deductible = currentP - 1; 
             }
             
             if (deductible >= overflow) {
@@ -1840,47 +1815,70 @@
 
         if(overflow > 0) {
             alert("امکان کاهش وجود ندارد! بودجه پر شده است.");
+            // Restore?
             const lastSnap = JSON.parse(app.sectionHistory['budget'][0].data);
-            app.budgets = lastSnap.budgets; // Revert
+            app.budgets = lastSnap.budgets;
+            closeAllModals();
             return;
         }
 
-        app.budgets.push(tempBudget);
-        assignDefaultPriority(tempBudget);
+        if(tempBudget.index !== undefined) {
+             app.budgets[tempBudget.index].name = tempBudget.name;
+             app.budgets[tempBudget.index].percent = tempBudget.percent;
+        } else {
+             app.budgets.push(tempBudget);
+             assignDefaultPriority(tempBudget);
+        }
 
         saveData(); renderUI(); closeAllModals();
         tempBudget = null;
     }
 
-    // --- PRIORITY SETTINGS (Instruction 2 & 6 Fix) ---
-    function openPrioritySettings() {
-        // Init thresholds if missing
-        if(!app.priorityThresholds) app.priorityThresholds = { high: 50, mid: 30, low: 10 };
-        document.getElementById('prioHighThresh').value = app.priorityThresholds.high;
-        document.getElementById('prioMidThresh').value = app.priorityThresholds.mid;
-        document.getElementById('prioLowThresh').value = app.priorityThresholds.low;
+    // Instruction 7: Assign Priority based on user ranges
+    function assignDefaultPriority(budget) {
+        if (!app.priorities[budget.name]) {
+            const high = app.priorityRanges?.high || 70;
+            const med = app.priorityRanges?.medium || 40;
+            
+            if(budget.percent >= high) app.priorities[budget.name] = 1;
+            else if(budget.percent >= med) app.priorities[budget.name] = 2; // Actually 2 is between high and med? Prompt says med is range. Let's assume High > 70, Med > 40..70.
+            // Wait, logic: High(1) > 70. Med(3) > 10..40.
+            // Let's stick to simple:
+            else if(budget.percent >= 10) app.priorities[budget.name] = 3;
+            else app.priorities[budget.name] = 4;
+        }
+    }
 
+    // --- PRIORITY SETTINGS (Instruction 2 & 7) ---
+    function openPrioritySettings() {
         const list = document.getElementById('priorityList');
         
-        // Optimizing the list generation to prevent hanging (Instruction 2)
-        // Ensure priorities object is clean
-        const activeNames = new Set(app.budgets.map(b=>b.name));
-        
-        let html = '';
-        app.budgets.forEach(b => {
-             let p = app.priorities[b.name] || 4;
-             html += `
+        // Instruction 2: Prevent Crash - Efficient rendering
+        // Ensure priorities for deleted budgets are cleaned
+        const budgetNames = new Set(app.budgets.map(b=>b.name));
+        Object.keys(app.priorities).forEach(k => {
+            if(!budgetNames.has(k)) delete app.priorities[k];
+        });
+
+        // Instruction 7: Fill ranges
+        document.getElementById('pRangeHigh').value = app.priorityRanges?.high || 70;
+        document.getElementById('pRangeMed').value = app.priorityRanges?.medium || 40;
+
+        // Render List
+        const html = app.budgets.map(b => {
+            let p = app.priorities[b.name] || 4;
+            return `
                 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:10px;">
                     <span>${b.name} (${b.percent}%)</span>
                     <select class="priority-select" data-name="${b.name}" style="width:100px; margin:0; padding:5px;">
-                        <option value="1" ${p==1?'selected':''}>۱ (زیاد)</option>
+                        <option value="1" ${p==1?'selected':''}>۱ (خیلی مهم)</option>
                         <option value="2" ${p==2?'selected':''}>۲ (مهم)</option>
                         <option value="3" ${p==3?'selected':''}>۳ (متوسط)</option>
-                        <option value="4" ${p==4?'selected':''}>۴ (کم)</option>
+                        <option value="4" ${p==4?'selected':''}>۴ (کم اهمیت)</option>
                     </select>
                 </div>
             `;
-        });
+        }).join('');
         
         list.innerHTML = html;
         openModal('prioritySettingsModal');
@@ -1888,27 +1886,109 @@
 
     function savePriorities() {
         saveSectionSnap('budget');
-        
-        // Save Thresholds (Instruction 6)
-        app.priorityThresholds = {
-            high: parseInt(document.getElementById('prioHighThresh').value) || 50,
-            mid: parseInt(document.getElementById('prioMidThresh').value) || 30,
-            low: parseInt(document.getElementById('prioLowThresh').value) || 10
-        };
-
-        // Save Priorities
         const selects = document.querySelectorAll('.priority-select');
         selects.forEach(sel => {
             app.priorities[sel.getAttribute('data-name')] = parseInt(sel.value);
         });
         
+        // Instruction 7: Save ranges
+        const h = parseInt(document.getElementById('pRangeHigh').value);
+        const m = parseInt(document.getElementById('pRangeMed').value);
+        if(!isNaN(h) && !isNaN(m)) {
+            app.priorityRanges = { high: h, medium: m };
+        }
+
         saveData();
         closeAllModals();
-        alert("اولویت‌ها و تنظیمات ذخیره شدند.");
+        alert("اولویت‌ها ذخیره شدند.");
     }
 
-    // --- BUDGET ACTIONS (Instruction 4 & 5) ---
     function delBudget(i) { if(confirm('حذف ردیف؟')) { saveSectionSnap('budget'); app.budgets.splice(i,1); saveData(); renderUI(); } }
+
+    // --- INSTRUCTION 4 & 5 (EXTRA ACTIONS) ---
+    
+    // Instruction 5: Pause/Resume Budget
+    function toggleBudgetActive(i) {
+        saveSectionSnap('budget');
+        const b = app.budgets[i];
+        
+        if (b.active === false) {
+            // Reactivating
+            // Check overflow
+            let currentTotal = 0;
+            app.budgets.forEach((bud, idx) => { if(bud.active !== false) currentTotal += bud.percent; });
+            
+            if(currentTotal + b.percent > 100) {
+                // Restore via fix modal
+                if(confirm("فعال‌سازی این آیتم باعث عبور از ۱۰۰٪ می‌شود. آیا مایل به اصلاح درصدها هستید؟")) {
+                     b.active = true;
+                     tempBudget = JSON.parse(JSON.stringify(b));
+                     tempBudget.index = i;
+                     
+                     // Setup Modal
+                     const max = 100 - currentTotal;
+                     const safeMax = max > 0 ? max : 0;
+                     document.getElementById('maxAllowedPercent').innerText = safeMax + '%';
+                     document.getElementById('percentSlider').max = safeMax;
+                     document.getElementById('percentSlider').value = 0;
+                     document.getElementById('sliderValDisplay').innerText = 0;
+                     
+                     openModal('fixPercentModal');
+                }
+                return;
+            }
+            b.active = true;
+        } else {
+            // Pausing
+            if(confirm("آیا این بودجه متوقف شود؟ درصد آن (0%) در نظر گرفته می‌شود.")) {
+                b.active = false;
+            }
+        }
+        saveData(); renderUI();
+    }
+
+    // Instruction 4: Direct Deposit (Extra Funds)
+    function addExtraFund(i) {
+        const amt = prompt("مبلغ واریزی ویژه به این ردیف (خارج از محاسبات درصدی):");
+        if(amt) {
+            const v = parseFormatted(amt); // Assuming helper or just simple parsing
+            // Re-implement parse logic for prompt string since parseFormatted expects input element
+            const val = parseInt(amt.replace(/[^\d]/g, ''));
+            if(!isNaN(val) && val > 0) {
+                saveSectionSnap('budget');
+                if(!app.budgets[i].extra) app.budgets[i].extra = 0;
+                app.budgets[i].extra += val;
+                addToHistory(i, val, "واریز ویژه (مستقیم)");
+                
+                // Also deduct from wallet? "Directly from main account"
+                if(app.wallets.length > 0) {
+                     if(confirm("آیا این مبلغ از کیف پول اصلی کسر شود؟")) {
+                         app.wallets[0].value -= val;
+                     }
+                }
+                saveData(); renderUI();
+            }
+        }
+    }
+
+    // Instruction 4: Spend No Effect
+    function spendNoEffect(i) {
+        const amt = prompt("مبلغ برداشت آزاد (کسر از حساب اصلی بدون اثر بر بودجه این ردیف):");
+        if(amt) {
+            const val = parseInt(amt.replace(/[^\d]/g, ''));
+            if(!isNaN(val) && val > 0) {
+                saveSectionSnap('dashboard'); // Wallet changes
+                if(app.wallets.length > 0) {
+                     app.wallets[0].value -= val;
+                     addToHistory(i, val, "برداشت آزاد (بدون کسر از بودجه)");
+                     saveData(); renderUI();
+                } else {
+                    alert("کیف پولی وجود ندارد!");
+                }
+            }
+        }
+    }
+
 
     let activeIdx = -1;
     function openExp(i) { activeIdx = i; openModal('expModal'); }
@@ -1918,92 +1998,16 @@
         if(!isNaN(v) && activeIdx > -1) { 
             saveSectionSnap('budget');
             app.budgets[activeIdx].spent += v;
-            addToHistory(activeIdx, v, r, 'expense');
+            addToHistory(activeIdx, v, r);
             saveData(); renderUI(); closeAllModals(); 
         }
     }
 
-    // Instruction 4: Direct Deposit Logic
-    function openDirectDeposit(i) { activeIdx = i; openModal('directDepositModal'); }
-    function submitDirectDeposit() {
-        const v = parseFormatted(document.getElementById('directAmt').value);
-        const r = document.getElementById('directReason').value || 'واریز مستقیم';
-        if(!isNaN(v) && activeIdx > -1) {
-            saveSectionSnap('budget');
-            if(!app.budgets[activeIdx].extra) app.budgets[activeIdx].extra = 0;
-            app.budgets[activeIdx].extra += v;
-            addToHistory(activeIdx, v, r, 'deposit');
-            saveData(); renderUI(); closeAllModals();
-        }
-    }
-
-    // Instruction 5: Toggle Active State
-    function toggleBudgetActive(i) {
-        saveSectionSnap('budget');
-        const b = app.budgets[i];
-        
-        if(b.active !== false) {
-            // Deactivating
-            if(confirm(`آیا می‌خواهید بودجه‌گیری "${b.name}" را متوقف کنید؟\nدرصد آن صفر می‌شود اما در سیستم باقی می‌ماند.`)) {
-                b.savedPercent = b.percent; // Store old percent
-                b.percent = 0; // Set effectively to 0
-                b.active = false;
-                saveData(); renderUI();
-            }
-        } else {
-            // Reactivating
-            b.active = true;
-            if(b.savedPercent && b.savedPercent > 0) {
-                if(confirm(`آیا می‌خواهید درصد قبلی (${b.savedPercent}%) اعمال شود؟`)) {
-                    // Check if space exists
-                    let currentTotal = 0;
-                    app.budgets.forEach(itm => currentTotal += itm.percent);
-                    
-                    if(currentTotal + b.savedPercent > 100) {
-                        alert("درصد قبلی باعث سرریز بودجه می‌شود! لطفاً درصد را دستی تنظیم کنید یا از اصلاح خودکار استفاده کنید.");
-                        // Trigger logic like new budget
-                        tempBudget = b;
-                        tempBudget.percent = b.savedPercent;
-                        // Temporarily remove from array to use add logic logic, or just trigger fix modal
-                         // Easy way: open fix modal logic manually
-                        const max = 100 - currentTotal;
-                        const safeMax = max > 0 ? max : 0;
-                        document.getElementById('maxAllowedPercent').innerText = safeMax + '%';
-                        const slider = document.getElementById('percentSlider');
-                        slider.max = safeMax; slider.value = 0;
-                        document.getElementById('sliderValDisplay').innerText = 0;
-                        // Need to temporarily remove it from rendering logic effectively? It's already in array.
-                        // We set percent to 0 for now.
-                        b.percent = 0;
-                        // We pop it out of array to let correct logic handle re-insertion?
-                        // Better: Just set tempBudget and remove b from array, then let autoCorrect push it back.
-                        app.budgets.splice(i, 1); 
-                        openModal('fixPercentModal');
-                    } else {
-                        b.percent = b.savedPercent;
-                        saveData(); renderUI();
-                    }
-                } else {
-                    // User wants manual entry, percent stays 0 or user edits later
-                    b.percent = 0;
-                    alert("آیتم فعال شد. لطفاً درصد جدید را دستی وارد کنید.");
-                    saveData(); renderUI();
-                    openEdit('budget', i);
-                }
-            } else {
-                b.percent = 0;
-                saveData(); renderUI();
-                openEdit('budget', i);
-            }
-        }
-    }
-
-    function addToHistory(bIdx, amount, reason, type) {
+    function addToHistory(bIdx, amount, reason) {
         if(!app.budgets[bIdx].history) app.budgets[bIdx].history = [];
         app.budgets[bIdx].history.push({
             amount: amount,
             reason: reason,
-            type: type || 'expense',
             date: new Date().toLocaleDateString('fa-IR'),
             time: new Date().toLocaleTimeString('fa-IR')
         });
@@ -2015,20 +2019,17 @@
         if(hist.length === 0) {
             hList.innerHTML = '<p style="text-align:center;">موردی یافت نشد.</p>';
         } else {
-            hList.innerHTML = hist.slice().reverse().map(h => {
-                const color = h.type === 'deposit' ? 'var(--success)' : 'var(--danger)';
-                const sign = h.type === 'deposit' ? '+' : '-';
-                return `
+            hList.innerHTML = hist.slice().reverse().map(h => `
                 <div style="border-bottom:1px solid #eee; padding:8px 0;">
                     <div style="display:flex; justify-content:space-between; font-weight:bold;">
                         <span>${h.reason}</span>
-                        <span style="color:${color}">${sign} ${format(h.amount)}</span>
+                        <span style="color:var(--danger)">${format(h.amount)}</span>
                     </div>
                     <div style="font-size:0.75rem; color:var(--text-sec); margin-top:3px;">
                         ${h.date} - ${h.time}
                     </div>
                 </div>
-            `}).join('');
+            `).join('');
         }
         openModal('itemHistModal');
     }
@@ -2057,7 +2058,10 @@
         document.getElementById('allocId').value = id;
         
         const sel = document.getElementById('allocBudgetSelect');
-        sel.innerHTML = app.budgets.filter(b => b.active !== false).map((b, i) => `<option value="${i}">${b.name}</option>`).join('');
+        sel.innerHTML = app.budgets.map((b, i) => {
+             // Show only active budgets
+             return b.active !== false ? `<option value="${i}">${b.name}</option>` : '';
+        }).join('');
         
         // Auto fill price if shopping
         if(type === 'shop' && app.shopping[id].price) {
@@ -2090,7 +2094,7 @@
             reason = "خرید کالا: " + app.shopping[id].name;
         }
 
-        addToHistory(bIdx, amt, reason, 'expense');
+        addToHistory(bIdx, amt, reason);
         saveData();
         renderUI();
         closeAllModals();
@@ -2131,11 +2135,10 @@
         const tb = document.getElementById('printBody');
         tb.innerHTML = '';
         app.budgets.forEach(b => {
-            const isActive = b.active !== false;
-            if(!isActive && b.spent === 0 && b.extra === 0) return; // Skip inactive empty
-            const share = isActive ? Math.round((net*b.percent)/100) : 0;
-            const totalShare = share + (b.extra || 0);
-            tb.innerHTML += `<tr><td>${b.name} ${isActive?'':'(غیرفعال)'}</td><td>${b.percent}%</td><td>${format(totalShare)}</td><td>${format(b.spent)}</td><td>${format(totalShare-b.spent)}</td></tr>`;
+            if(b.active !== false) {
+                const s = Math.round((net*b.percent)/100) + (b.extra||0);
+                tb.innerHTML += `<tr><td>${b.name}</td><td>${b.percent}%</td><td>${format(s)}</td><td>${format(b.spent)}</td><td>${format(s-b.spent)}</td></tr>`;
+            }
         });
 
         // Debt List
@@ -2215,16 +2218,16 @@
     function loadData() {
         const d = localStorage.getItem('amir_fin_v9');
         if(d) app = JSON.parse(d);
-        // Data Migration / Safety
+        // Ensure new arrays exist in old data
         if(!app.checks) app.checks = [];
         if(!app.loans) app.loans = [];
         if(!app.priorities) app.priorities = defaultState.priorities;
-        if(!app.priorityThresholds) app.priorityThresholds = { high: 50, mid: 30, low: 10 };
         if(!app.sectionHistory) app.sectionHistory = { dashboard: [], budget: [], tools: [] };
-        if(!app.user.name) app.user.name = "کاربر";
+        if(!app.priorityRanges) app.priorityRanges = { high: 70, medium: 40 }; // Default for Instruction 7
         app.budgets.forEach(b => { 
-            if(!b.history) b.history = [];
-            if(b.active === undefined) b.active = true; // For old data compatibility
+            if(!b.history) b.history = []; 
+            if(b.active === undefined) b.active = true; // Instruction 5 support old data
+            if(b.extra === undefined) b.extra = 0; // Instruction 4 support old data
         });
     }
     function saveData() {
@@ -2242,15 +2245,16 @@
         event.currentTarget.classList.add('active');
     }
     function openModal(id) { 
+        // Logic for specific modals that need data prep
         if(id === 'prioritySettingsModal') {
-            openPrioritySettings(); 
+            openPrioritySettings(); // This now uses efficient rendering (Instruction 2)
         }
         
-        // Clear inputs (except slider range)
+        // Clear inputs (except slider range and stored hidden ids)
         const m = document.getElementById(id);
         const inputs = m.querySelectorAll('input');
         inputs.forEach(i => {
-            if(i.type !== 'hidden' && i.type !== 'checkbox' && i.type !== 'range') i.value = '';
+            if(i.type !== 'hidden' && i.type !== 'checkbox' && i.type !== 'range' && i.id !== 'pRangeHigh' && i.id !== 'pRangeMed') i.value = '';
         });
         m.classList.add('active'); 
     }
