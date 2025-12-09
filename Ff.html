@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مدیریت مالی حرفه‌ای | V13 Ultimate (Bug Fixes & Auth)</title>
-    
+    <title>مدیریت مالی حرفه‌ای | V13 Ultimate (Fixed & Enhanced)</title>
+
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <!-- آیکون‌ها -->
@@ -14,426 +14,433 @@
     <!-- تبدیل به عکس -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-    <style>
-        :root {
-            --bg-body: #f3f4f6;
-            --glass-bg: rgba(255, 255, 255, 0.95);
-            --glass-border: 1px solid rgba(203, 213, 225, 0.8);
-            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            
-            --primary: #4338ca;      /* Indigo */
-            --primary-light: #6366f1;
-            --text-main: #1e293b;
-            --text-sec: #64748b;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --card-radius: 16px;
-            --nav-height: 70px;
-        }
-
-        [data-theme="dark"] {
-            --bg-body: #0f172a;
-            --glass-bg: rgba(30, 41, 59, 0.98);
-            --glass-border: 1px solid rgba(71, 85, 105, 0.5);
-            --text-main: #f1f5f9;
-            --text-sec: #94a3b8;
-            --primary: #818cf8;
-            --primary-light: #6366f1;
-            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-        }
-
-        * {
-            box-sizing: border-box;
-            font-family: 'Vazirmatn', sans-serif;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            margin: 0;
-            padding: 0 0 var(--nav-height) 0;
-            min-height: 100vh;
-            overflow-x: hidden;
-            transition: background 0.3s;
-        }
-
-        /* --- کامپوننت‌های عمومی --- */
-        .container {
-            max-width: 600px; /* موبایل فرست */
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .glass-panel {
-            background: var(--glass-bg);
-            border: var(--glass-border);
-            border-radius: var(--card-radius);
-            box-shadow: var(--shadow);
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: transform 0.2s;
-        }
-
-        .header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            border-bottom: 2px solid var(--primary-light);
-            padding-bottom: 10px;
-        }
-
-        .header-row h3 { margin: 0; font-size: 1.1rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
-
-        /* دکمه‌ها */
-        .btn {
-            padding: 10px 16px;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            border: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .btn-primary { 
-            background: linear-gradient(135deg, var(--primary), var(--primary-light)); 
-            color: white; 
-        }
-        .btn-primary:active { transform: scale(0.96); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-
-        .btn-outline { 
-            background: var(--glass-bg); 
-            border: 2px solid var(--text-sec); 
-            color: var(--text-sec); 
-        }
-        .btn-outline:hover { 
-            border-color: var(--primary); 
-            color: var(--primary); 
-            background: rgba(67, 56, 202, 0.05);
-        }
-
-        .btn-danger { 
-            background: rgba(239, 68, 68, 0.1); 
-            color: var(--danger); 
-            border: 2px solid rgba(239, 68, 68, 0.2); 
-            box-shadow: none;
-        }
-        .btn-danger:hover { background: var(--danger); color: white; border-color: var(--danger); }
-
-        .btn-icon {
-            width: 40px; height: 40px;
-            border-radius: 12px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-main);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            transition: all 0.2s;
-        }
-        .btn-icon:hover { 
-            background: var(--primary); 
-            color: white; 
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(67, 56, 202, 0.2);
-        }
+<style>
+    :root {
+        --bg-body: #f3f4f6;
+        --glass-bg: rgba(255, 255, 255, 0.95);
+        --glass-border: 1px solid rgba(203, 213, 225, 0.8);
+        --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         
-        .btn-small-icon {
-            width: 28px; height: 28px;
-            border-radius: 6px;
-            display: inline-flex; align-items: center; justify-content: center;
-            cursor: pointer; margin-right: 3px;
-            font-size: 0.8rem;
-        }
-        .btn-edit { color: var(--warning); border: 1px solid var(--warning); background: transparent; }
-        .btn-del { color: var(--danger); border: 1px solid var(--danger); background: transparent; }
+        --primary: #4338ca;      /* Indigo */
+        --primary-light: #6366f1;
+        --text-main: #1e293b;
+        --text-sec: #64748b;
+        --success: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --card-radius: 16px;
+        --nav-height: 70px;
+    }
 
-        .badge-currency {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            padding: 2px 6px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: bold;
-        }
+    [data-theme="dark"] {
+        --bg-body: #0f172a;
+        --glass-bg: rgba(30, 41, 59, 0.98);
+        --glass-border: 1px solid rgba(71, 85, 105, 0.5);
+        --text-main: #f1f5f9;
+        --text-sec: #94a3b8;
+        --primary: #818cf8;
+        --primary-light: #6366f1;
+        --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    }
 
-        /* ورودی‌ها */
-        input, select {
-            background: var(--bg-body);
-            border: 1px solid var(--text-sec);
-            color: var(--text-main);
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 1rem;
-            width: 100%;
-            margin-bottom: 10px;
-        }
-        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(67, 56, 202, 0.1); }
-        
-        /* Slider Style */
-        input[type=range] {
-            -webkit-appearance: none; width: 100%; margin: 10px 0; background: transparent;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%;
-            background: var(--primary); cursor: pointer; margin-top: -8px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%; height: 6px; cursor: pointer; background: #ddd; border-radius: 3px;
-        }
+    * {
+        box-sizing: border-box;
+        font-family: 'Vazirmatn', sans-serif;
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
+    }
 
-        /* استایل خاص برای فیلدهای تاریخ سفارشی */
-        .date-picker-row {
-            display: flex;
-            gap: 5px;
-            direction: ltr; /* روز سمت راست، سال سمت چپ در چیدمان فلکس */
-        }
-        .date-picker-row select {
-            flex: 1;
-            padding: 8px;
-            font-size: 0.9rem;
-            direction: rtl;
-        }
+    body {
+        background-color: var(--bg-body);
+        color: var(--text-main);
+        margin: 0;
+        padding: 0 0 var(--nav-height) 0;
+        min-height: 100vh;
+        overflow-x: hidden;
+        transition: background 0.3s;
+    }
 
-        /* استایل لیبل پول */
-        .money-input-wrapper {
-            position: relative;
-            margin-bottom: 10px;
-        }
-        .money-input-wrapper input {
-            padding-left: 60px; /* جا برای متن ریال/تومان */
-            margin-bottom: 0;
-            direction: ltr;
-            text-align: right;
-        }
-        .money-unit {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-sec);
-            font-size: 0.8rem;
-            font-weight: bold;
-            pointer-events: none;
-        }
+    /* --- کامپوننت‌های عمومی --- */
+    .container {
+        max-width: 600px; /* موبایل فرست */
+        margin: 0 auto;
+        padding: 20px;
+    }
 
-        /* --- پین کد (PIN Screen) --- */
-        .pin-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-body); z-index: 9999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-        }
-        .pin-dots { display: flex; gap: 15px; margin: 30px 0; }
-        .pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--primary); transition: 0.2s; }
-        .pin-dot.filled { background: var(--primary); transform: scale(1.1); }
-        
-        .numpad {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; direction: ltr; /* چپ به راست */
-        }
-        .num-key {
-            width: 70px; height: 70px; border-radius: 50%;
-            background: var(--glass-bg); border: 1px solid var(--text-sec);
-            font-size: 1.5rem; font-weight: bold; color: var(--text-main);
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            box-shadow: var(--shadow); transition: 0.1s;
-        }
-        .num-key:active { background: var(--primary); color: white; transform: scale(0.9); }
+    .glass-panel {
+        background: var(--glass-bg);
+        border: var(--glass-border);
+        border-radius: var(--card-radius);
+        box-shadow: var(--shadow);
+        padding: 20px;
+        margin-bottom: 20px;
+        transition: transform 0.2s;
+    }
 
-        /* --- کارت اعتباری (HERO) --- */
-        .hero-card {
-            perspective: 1000px;
-            height: 200px;
-            margin-bottom: 25px;
-            cursor: pointer;
-        }
-        .card-inner {
-            position: relative;
-            width: 100%; height: 100%;
-            text-align: center;
-            transition: transform 0.8s;
-            transform-style: preserve-3d;
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-        }
-        .hero-card.flipped .card-inner { transform: rotateY(180deg); }
-        
-        .card-front, .card-back {
-            position: absolute;
-            width: 100%; height: 100%;
-            backface-visibility: hidden;
-            border-radius: 20px;
-            padding: 25px;
-            color: white;
-            display: flex; flex-direction: column; justify-content: space-between;
-        }
-        .card-front {
-            background: linear-gradient(135deg, #4f46e5, #3b82f6);
-        }
-        .card-back {
-            background: #1e293b;
-            transform: rotateY(180deg);
-            align-items: center; justify-content: center;
-        }
+    .header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        border-bottom: 2px solid var(--primary-light);
+        padding-bottom: 10px;
+    }
 
-        .balance-label { font-size: 0.9rem; opacity: 0.8; text-align: right; display: block;}
-        .balance-value { font-size: 2.2rem; font-weight: 800; margin: 5px 0; direction: ltr; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .currency-tag { font-size: 1rem; vertical-align: middle; }
+    .header-row h3 { margin: 0; font-size: 1.1rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
 
-        /* --- BENTO GRID (بودجه) --- */
-        .budget-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
-            gap: 15px;
-        }
-        @media(min-width: 600px) { .budget-grid { grid-template-columns: 1fr 1fr; } }
+    /* دکمه‌ها */
+    .btn {
+        padding: 10px 16px;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        font-weight: bold;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        border: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
 
-        .bento-item {
-            background: var(--glass-bg);
-            border: var(--glass-border);
-            border-radius: 12px;
-            padding: 15px;
-            position: relative;
-            display: flex; flex-direction: column; gap: 8px;
-            box-shadow: var(--shadow);
-        }
-        
-        .bento-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 1rem; }
-        
-        .progress-bar {
-            height: 10px; background: rgba(0,0,0,0.05); border-radius: 5px; overflow: hidden; margin: 5px 0;
-        }
-        .progress-fill { height: 100%; transition: width 0.5s; border-radius: 5px; }
-        
-        /* وضعیت‌های رنگی */
-        .stat-green .progress-fill { background: var(--success); }
-        .stat-green .remain-val { color: var(--success); }
-        
-        .stat-yellow .progress-fill { background: var(--warning); }
-        .stat-yellow .remain-val { color: var(--warning); }
-        
-        .stat-red .progress-fill { background: var(--danger); }
-        .stat-red .remain-val { color: var(--danger); }
-        .stat-red { border: 1px solid var(--danger); }
+    .btn-primary { 
+        background: linear-gradient(135deg, var(--primary), var(--primary-light)); 
+        color: white; 
+    }
+    .btn-primary:active { transform: scale(0.96); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
-        .bento-actions {
-            margin-top: 5px;
-            display: flex; gap: 5px;
-        }
-        .action-chip {
-            flex: 1; padding: 6px; font-size: 0.8rem; border-radius: 6px;
-            border: 1px solid var(--text-sec); background: transparent; color: var(--text-main);
-            cursor: pointer; text-align: center; font-weight: bold;
-        }
-        .action-chip:hover { background: var(--primary); color: white; border-color: var(--primary); }
+    .btn-outline { 
+        background: var(--glass-bg); 
+        border: 2px solid var(--text-sec); 
+        color: var(--text-sec); 
+    }
+    .btn-outline:hover { 
+        border-color: var(--primary); 
+        color: var(--primary); 
+        background: rgba(67, 56, 202, 0.05);
+    }
 
-        /* --- Template Chips --- */
-        .template-row {
-            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px;
-        }
-        .template-chip {
-            white-space: nowrap; padding: 5px 12px; border-radius: 20px;
-            background: var(--glass-bg); border: 1px solid var(--primary); color: var(--primary);
-            font-size: 0.8rem; cursor: pointer; transition: 0.2s;
-        }
-        .template-chip:hover { background: var(--primary); color: white; }
+    .btn-danger { 
+        background: rgba(239, 68, 68, 0.1); 
+        color: var(--danger); 
+        border: 2px solid rgba(239, 68, 68, 0.2); 
+        box-shadow: none;
+    }
+    .btn-danger:hover { background: var(--danger); color: white; border-color: var(--danger); }
 
-        /* --- BOTTOM NAV --- */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            height: var(--nav-height);
-            background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            border-top: var(--glass-border);
-            display: flex; justify-content: space-around; align-items: center;
-            z-index: 1000;
-            box-shadow: 0 -5px 10px rgba(0,0,0,0.05);
-        }
-        .nav-btn {
-            background: none; border: none;
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
-            color: var(--text-sec); font-size: 0.75rem; cursor: pointer;
-            width: 60px; font-weight: bold;
-        }
-        .nav-btn i { font-size: 1.4rem; margin-bottom: 2px; transition: transform 0.2s; }
-        .nav-btn.active { color: var(--primary); }
-        .nav-btn.active i { transform: translateY(-5px); }
+    .btn-icon {
+        width: 40px; height: 40px;
+        border-radius: 12px;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        color: var(--text-main);
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        transition: all 0.2s;
+    }
+    .btn-icon:hover { 
+        background: var(--primary); 
+        color: white; 
+        transform: translateY(-2px);
+        box-shadow: 0 5px 10px rgba(67, 56, 202, 0.2);
+    }
+    
+    .btn-small-icon {
+        width: 28px; height: 28px;
+        border-radius: 6px;
+        display: inline-flex; align-items: center; justify-content: center;
+        cursor: pointer; margin-right: 3px;
+        font-size: 0.8rem;
+    }
+    .btn-edit { color: var(--warning); border: 1px solid var(--warning); background: transparent; }
+    .btn-del { color: var(--danger); border: 1px solid var(--danger); background: transparent; }
 
-        /* --- MODALS --- */
-        .modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 2000;
-            display: none; 
-            justify-content: center; 
-            align-items: flex-end; /* باز شدن از پایین */
-            backdrop-filter: blur(3px);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .modal.active { 
-            display: flex; 
-            opacity: 1;
-        }
-        .modal-content {
-            background: var(--bg-body);
-            width: 100%; max-width: 600px; /* تمام عرض در موبایل */
-            padding: 25px;
-            border-radius: 25px 25px 0 0; /* گرد شدن فقط بالا */
-            border-top: 1px solid var(--text-sec);
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
-            max-height: 90vh; overflow-y: auto;
-            transform: translateY(100%); /* پیش فرض پایین */
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1);
-        }
-        .modal.active .modal-content {
-            transform: translateY(0); /* آمدن به بالا */
-        }
+    .badge-currency {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        padding: 2px 6px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: bold;
+    }
 
-        /* --- REPORT (PRINT) --- */
-        #printArea {
-            position: absolute; top: -9999px; left: -9999px;
-            width: 800px; background: white; color: black; padding: 40px;
-            border: 2px solid #333; font-family: 'Tahoma', sans-serif;
-        }
-        .print-header { text-align: center; border-bottom: 2px solid #000; margin-bottom: 20px; padding-bottom: 15px; }
-        .print-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .print-table th { background: #eee; border: 1px solid #000; padding: 10px; }
-        .print-table td { border: 1px solid #000; padding: 8px; text-align: center; }
-        .print-summary { display: flex; justify-content: space-between; margin-top: 20px; font-weight: bold; border: 1px solid #000; padding: 10px; background: #f9f9f9; }
-        .print-section-title { font-weight: bold; margin-top: 20px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+    /* ورودی‌ها */
+    input, select {
+        background: var(--bg-body);
+        border: 1px solid var(--text-sec);
+        color: var(--text-main);
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 1rem;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(67, 56, 202, 0.1); }
+    
+    /* Slider Style */
+    input[type=range] {
+        -webkit-appearance: none; width: 100%; margin: 10px 0; background: transparent;
+    }
+    input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%;
+        background: var(--primary); cursor: pointer; margin-top: -8px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+        width: 100%; height: 6px; cursor: pointer; background: #ddd; border-radius: 3px;
+    }
 
-        /* Section History Chip */
-        .history-btn {
-            font-size: 0.8rem; background: rgba(0,0,0,0.05); padding: 5px 10px; border-radius: 20px; cursor: pointer; margin-left: 10px; display: inline-flex; align-items: center; gap: 5px;
-        }
-        .history-btn:hover { background: var(--primary); color: white; }
+    /* استایل خاص برای فیلدهای تاریخ سفارشی */
+    .date-picker-row {
+        display: flex;
+        gap: 5px;
+        direction: ltr; /* روز سمت راست، سال سمت چپ در چیدمان فلکس */
+    }
+    .date-picker-row select {
+        flex: 1;
+        padding: 8px;
+        font-size: 0.9rem;
+        direction: rtl;
+    }
 
-        /* Auth Name Input (دستور ۱) */
-        #authNameInput {
-            margin-bottom: 20px; text-align: center; font-weight: bold;
-        }
+    /* استایل لیبل پول */
+    .money-input-wrapper {
+        position: relative;
+        margin-bottom: 10px;
+    }
+    .money-input-wrapper input {
+        padding-left: 60px; /* جا برای متن ریال/تومان */
+        margin-bottom: 0;
+        direction: ltr;
+        text-align: right;
+    }
+    .money-unit {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-sec);
+        font-size: 0.8rem;
+        font-weight: bold;
+        pointer-events: none;
+    }
 
-    </style>
+    /* --- پین کد (PIN Screen) --- */
+    .pin-screen {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: var(--bg-body); z-index: 9999;
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+    }
+    .pin-dots { display: flex; gap: 15px; margin: 30px 0; }
+    .pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--primary); transition: 0.2s; }
+    .pin-dot.filled { background: var(--primary); transform: scale(1.1); }
+    
+    .numpad {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; direction: ltr; /* چپ به راست */
+    }
+    .num-key {
+        width: 70px; height: 70px; border-radius: 50%;
+        background: var(--glass-bg); border: 1px solid var(--text-sec);
+        font-size: 1.5rem; font-weight: bold; color: var(--text-main);
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        box-shadow: var(--shadow); transition: 0.1s;
+    }
+    .num-key:active { background: var(--primary); color: white; transform: scale(0.9); }
+
+    /* --- کارت اعتباری (HERO) --- */
+    .hero-card {
+        perspective: 1000px;
+        height: 200px;
+        margin-bottom: 25px;
+        cursor: pointer;
+    }
+    .card-inner {
+        position: relative;
+        width: 100%; height: 100%;
+        text-align: center;
+        transition: transform 0.8s;
+        transform-style: preserve-3d;
+        border-radius: 20px;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+    .hero-card.flipped .card-inner { transform: rotateY(180deg); }
+    
+    .card-front, .card-back {
+        position: absolute;
+        width: 100%; height: 100%;
+        backface-visibility: hidden;
+        border-radius: 20px;
+        padding: 25px;
+        color: white;
+        display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .card-front {
+        background: linear-gradient(135deg, #4f46e5, #3b82f6);
+    }
+    .card-back {
+        background: #1e293b;
+        transform: rotateY(180deg);
+        align-items: center; justify-content: center;
+    }
+
+    .balance-label { font-size: 0.9rem; opacity: 0.8; text-align: right; display: block;}
+    .balance-value { font-size: 2.2rem; font-weight: 800; margin: 5px 0; direction: ltr; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    .currency-tag { font-size: 1rem; vertical-align: middle; }
+
+    /* --- BENTO GRID (بودجه) --- */
+    .budget-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+        gap: 15px;
+    }
+    @media(min-width: 600px) { .budget-grid { grid-template-columns: 1fr 1fr; } }
+
+    .bento-item {
+        background: var(--glass-bg);
+        border: var(--glass-border);
+        border-radius: 12px;
+        padding: 15px;
+        position: relative;
+        display: flex; flex-direction: column; gap: 8px;
+        box-shadow: var(--shadow);
+    }
+    
+    .bento-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 1rem; }
+    
+    .progress-bar {
+        height: 10px; background: rgba(0,0,0,0.05); border-radius: 5px; overflow: hidden; margin: 5px 0;
+    }
+    .progress-fill { height: 100%; transition: width 0.5s; border-radius: 5px; }
+    
+    /* وضعیت‌های رنگی */
+    .stat-green .progress-fill { background: var(--success); }
+    .stat-green .remain-val { color: var(--success); }
+    
+    .stat-yellow .progress-fill { background: var(--warning); }
+    .stat-yellow .remain-val { color: var(--warning); }
+    
+    .stat-red .progress-fill { background: var(--danger); }
+    .stat-red .remain-val { color: var(--danger); }
+    .stat-red { border: 1px solid var(--danger); }
+
+    .bento-actions {
+        margin-top: 5px;
+        display: flex; gap: 5px;
+        overflow-x: auto;
+    }
+    .action-chip {
+        flex: 1; padding: 6px; font-size: 0.75rem; border-radius: 6px;
+        border: 1px solid var(--text-sec); background: transparent; color: var(--text-main);
+        cursor: pointer; text-align: center; font-weight: bold; white-space: nowrap;
+    }
+    .action-chip:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+    /* --- Template Chips (New) --- */
+    .template-row {
+        display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px;
+    }
+    .template-chip {
+        white-space: nowrap; padding: 5px 12px; border-radius: 20px;
+        background: var(--glass-bg); border: 1px solid var(--primary); color: var(--primary);
+        font-size: 0.8rem; cursor: pointer; transition: 0.2s;
+    }
+    .template-chip:hover { background: var(--primary); color: white; }
+
+    /* --- BOTTOM NAV --- */
+    .bottom-nav {
+        position: fixed; bottom: 0; left: 0; width: 100%;
+        height: var(--nav-height);
+        background: var(--glass-bg);
+        backdrop-filter: blur(15px);
+        border-top: var(--glass-border);
+        display: flex; justify-content: space-around; align-items: center;
+        z-index: 1000;
+        box-shadow: 0 -5px 10px rgba(0,0,0,0.05);
+    }
+    .nav-btn {
+        background: none; border: none;
+        display: flex; flex-direction: column; align-items: center; gap: 4px;
+        color: var(--text-sec); font-size: 0.75rem; cursor: pointer;
+        width: 60px; font-weight: bold;
+    }
+    .nav-btn i { font-size: 1.4rem; margin-bottom: 2px; transition: transform 0.2s; }
+    .nav-btn.active { color: var(--primary); }
+    .nav-btn.active i { transform: translateY(-5px); }
+
+    /* --- MODALS --- */
+    .modal {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6);
+        z-index: 2000;
+        display: none; 
+        justify-content: center; 
+        align-items: flex-end; /* باز شدن از پایین */
+        backdrop-filter: blur(3px);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    .modal.active { 
+        display: flex; 
+        opacity: 1;
+    }
+    .modal-content {
+        background: var(--bg-body);
+        width: 100%; max-width: 600px; /* تمام عرض در موبایل */
+        padding: 25px;
+        border-radius: 25px 25px 0 0; /* گرد شدن فقط بالا */
+        border-top: 1px solid var(--text-sec);
+        box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+        max-height: 90vh; overflow-y: auto;
+        transform: translateY(100%); /* پیش فرض پایین */
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+    }
+    .modal.active .modal-content {
+        transform: translateY(0); /* آمدن به بالا */
+    }
+
+    /* --- TAB CONTENT --- */
+    .tab-pane { display: none; padding-bottom: 20px; }
+    .tab-pane.active { display: block; animation: slideUp 0.3s; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* --- REPORT (PRINT) --- */
+    #printArea {
+        position: absolute; top: -9999px; left: -9999px;
+        width: 800px; background: white; color: black; padding: 40px;
+        border: 2px solid #333; font-family: 'Tahoma', sans-serif;
+    }
+    .print-header { text-align: center; border-bottom: 2px solid #000; margin-bottom: 20px; padding-bottom: 15px; }
+    .print-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    .print-table th { background: #eee; border: 1px solid #000; padding: 10px; }
+    .print-table td { border: 1px solid #000; padding: 8px; text-align: center; }
+    .print-summary { display: flex; justify-content: space-between; margin-top: 20px; font-weight: bold; border: 1px solid #000; padding: 10px; background: #f9f9f9; }
+    .print-section-title { font-weight: bold; margin-top: 20px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+
+    /* Section History Chip */
+    .history-btn {
+        font-size: 0.8rem; background: rgba(0,0,0,0.05); padding: 5px 10px; border-radius: 20px; cursor: pointer; margin-left: 10px; display: inline-flex; align-items: center; gap: 5px;
+    }
+    .history-btn:hover { background: var(--primary); color: white; }
+
+</style>
 </head>
 <body>
 
-<!-- 1. LOCK SCREEN (PIN) -->
+<!-- 1. LOCK SCREEN (PIN) - ویرایش دستور اول: نام در ورود -->
+
 <div id="authModal" class="pin-screen" style="display: flex;">
     <i class="fas fa-fingerprint" style="font-size: 4rem; color: var(--primary);"></i>
     <h2 id="authTitle" style="margin: 15px 0 5px 0;">امنیت</h2>
-    <p id="authSub" style="font-size: 0.9rem; color: var(--text-sec); margin-bottom: 20px;">...</p>
     
-    <!-- Input for Name (First Login) -->
-    <input type="text" id="authNameInput" placeholder="نام و نام خانوادگی خود را وارد کنید" style="display:none; width: 80%; max-width: 300px;">
+    <!-- فیلد نام برای ثبت نام اولیه (دستور اول) -->
+    <div id="setupNameContainer" style="display:none; width: 80%; text-align: center;">
+        <p style="font-size: 0.9rem; color: var(--text-sec); margin-bottom: 10px;">لطفا نام و نام خانوادگی خود را وارد کنید:</p>
+        <input type="text" id="setupNameInput" placeholder="مثلاً: علی احمدی" style="text-align:center; background:var(--glass-bg); border-color:var(--primary);">
+    </div>
+    
+    <p id="authSub" style="font-size: 0.9rem; color: var(--text-sec); margin-bottom: 20px;">...</p>
 
     <div class="pin-dots">
         <div class="pin-dot" id="pd1"></div>
@@ -459,8 +466,9 @@
 </div>
 
 <!-- 2. MAIN APP -->
+
 <div class="container" id="appContent" style="display:none;">
-    
+
     <!-- Header -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 10px;">
         <div>
@@ -614,11 +622,13 @@
                     <input type="checkbox" id="rawCopyCheck" style="width:20px; height:20px;">
                 </div>
 
-                <!-- Priority Settings (دستور ۲: رفع مشکل هنگ + دستور ۶ قبلی: جابجایی) -->
-                <button class="btn btn-outline" onclick="openModal('prioritySettingsModal')">
+                <!-- Priority Settings (ویرایش دستور دوم: رفع هنگ کردن) -->
+                <!-- فراخوانی مستقیم تابع برای جلوگیری از لوپ بی نهایت در openModal -->
+                <button class="btn btn-outline" onclick="openPrioritySettings()">
                     <i class="fas fa-list-ol"></i> مدیریت اولویت‌ها
                 </button>
 
+                <!-- Change Name -->
                 <button class="btn btn-outline" onclick="changeUserName()">
                     <i class="fas fa-user-edit"></i> تغییر نام کاربر
                 </button>
@@ -650,10 +660,10 @@
             </div>
         </div>
     </div>
-
 </div>
 
 <!-- BOTTOM NAVIGATION -->
+
 <nav class="bottom-nav">
     <button class="nav-btn active" onclick="switchTab('dashboard')">
         <i class="fas fa-home"></i> داشبورد
@@ -671,13 +681,13 @@
 
 <!-- MODALS -->
 
-<!-- Edit Modal (Instruction 3: Fixed Population) -->
+<!-- Edit Modal (ویرایش دستور سوم: پر شدن داده‌ها، و دستور پنجم: دکمه محدود سازی) -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h3>ویرایش آیتم</h3>
         <input type="hidden" id="editType">
         <input type="hidden" id="editIndex">
-        
+
         <label>عنوان:</label>
         <input type="text" id="editName">
         
@@ -692,10 +702,40 @@
         <div id="editPercentWrapper" style="display:none;">
             <label>درصد:</label>
             <input type="number" id="editPercent">
+            
+            <!-- دکمه دستور پنجم: محدود سازی و پخش بودجه -->
+            <button id="suspendBudgetBtn" class="btn btn-outline" style="width:100%; margin-top:10px; color:var(--warning); border-color:var(--warning);" onclick="suspendAndDistribute()">
+                <i class="fas fa-ban"></i> غیرفعال و پخش بودجه (طبق اولویت)
+            </button>
         </div>
 
         <div style="margin-top:20px; display:flex; gap:10px;">
             <button class="btn btn-primary" style="flex:1" onclick="performEdit()">ذخیره تغییرات</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+        </div>
+    </div>
+</div>
+
+<!-- Manual Fund Modal (دستور چهارم: افزودن مستقیم بودجه) -->
+<div id="manualFundModal" class="modal">
+    <div class="modal-content">
+        <h3>تراکنش مستقیم (دستی)</h3>
+        <p style="font-size:0.8rem; color:var(--text-sec)">این مبلغ مستقیماً به موجودی این ردیف اضافه یا کم می‌شود و در محاسبات درصدی تغییری ایجاد نمی‌کند.</p>
+        <input type="hidden" id="mfIndex">
+        
+        <label>مبلغ (برای کسر از منفی - استفاده کنید):</label>
+        <div class="money-input-wrapper">
+            <input type="text" id="mfVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
+            <span class="money-unit currency-text">تومان</span>
+        </div>
+
+        <div style="margin-bottom:15px; display:flex; gap:10px; align-items:center;">
+             <input type="checkbox" id="mfFromWallet" style="width:20px; height:20px;">
+             <label for="mfFromWallet" style="font-size:0.9rem;">اگر افزودن است، از موجودی اصلی (کیف پول) کسر شود؟</label>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+            <button class="btn btn-primary" style="flex:1" onclick="applyManualFund()">ثبت</button>
             <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
         </div>
     </div>
@@ -868,7 +908,7 @@
         <p style="font-size:0.9rem; color:var(--text-sec);">انتخاب کنید هزینه از کدام ردیف بودجه کسر شود:</p>
         <input type="hidden" id="allocType"> <!-- goal or shop -->
         <input type="hidden" id="allocId">
-        
+
         <label>ردیف بودجه:</label>
         <select id="allocBudgetSelect"></select>
         
@@ -890,7 +930,7 @@
     <div class="modal-content">
         <h3><i class="fas fa-exclamation-triangle" style="color:var(--warning)"></i> خطا در درصد کل</h3>
         <p>مجموع درصد‌ها از ۱۰۰٪ بیشتر شده است. لطفاً یکی از گزینه‌های زیر را انتخاب کنید:</p>
-        
+
         <div style="margin:20px 0; padding:15px; background:rgba(0,0,0,0.05); border-radius:10px;">
             <p><b>حالت اول:</b> انتخاب دستی تا سقف مجاز</p>
             <p style="font-size:0.9rem;">حداکثر درصد قابل انتخاب: <b id="maxAllowedPercent" style="color:var(--primary)">0%</b></p>
@@ -918,12 +958,12 @@
     </div>
 </div>
 
-<!-- Priority Settings Modal (Instruction 2) -->
+<!-- Priority Settings Modal -->
 <div id="prioritySettingsModal" class="modal">
     <div class="modal-content">
         <h3>مدیریت اولویت‌ها</h3>
         <p style="font-size:0.8rem; color:var(--text-sec); margin-bottom:15px;">اولویت ۱ (بالاترین) تا ۴ (پایین‌ترین). در صورت کمبود درصد، سیستم از اولویت ۴ کم می‌کند.</p>
-        
+
         <div id="priorityList" style="max-height:400px; overflow-y:auto;">
             <!-- Generated via JS -->
         </div>
@@ -960,7 +1000,7 @@
         <p id="printDate">تاریخ: ---</p>
         <p>کاربر: <span id="printUser">---</span></p>
     </div>
-    
+
     <div class="print-summary">
         <div>کل دارایی: <b id="printInc">0</b></div>
         <div>کل بدهی: <b id="printDebt">0</b></div>
@@ -988,7 +1028,7 @@
     <div id="printGoalsList" style="margin-top:5px; font-size:0.9rem;"></div>
 
     <div style="margin-top:30px; text-align:center; font-size:12px; color:#666; border-top:1px solid #000; padding-top:10px;">
-        تولید شده توسط سامانه مدیریت مالی شخصی V12
+        تولید شده توسط سامانه مدیریت مالی شخصی V13
     </div>
 </div>
 
@@ -996,22 +1036,22 @@
     // --- STATE & DATA ---
     const defaultState = {
         security: { hasPin: false, pin: "" },
-        user: { name: "", theme: "light", currency: "toman" }, // Default name empty for first login
+        user: { name: "", theme: "light", currency: "toman" }, // نام خالی برای شروع
         wallets: [],
         debts: [], 
         checks: [], 
         loans: [],  
         budgets: [
-            {id: 1, name: "کرایه و رفت‌وآمد", percent: 27, spent: 0, history: []},
-            {id: 2, name: "خورد و خوراک", percent: 12, spent: 0, history: []},
-            {id: 3, name: "پس‌انداز مشهد", percent: 25, spent: 0, history: []},
-            {id: 4, name: "درمان", percent: 3, spent: 0, history: []},
-            {id: 5, name: "شارژ و نت", percent: 10, spent: 0, history: []},
-            {id: 6, name: "زیبایی و مکمل", percent: 7, spent: 0, history: []},
-            {id: 7, name: "لباس", percent: 5, spent: 0, history: []},
-            {id: 8, name: "ضروری", percent: 5, spent: 0, history: []},
-            {id: 9, name: "تفریح", percent: 3, spent: 0, history: []},
-            {id: 10, name: "پس‌انداز کل", percent: 3, spent: 0, history: []}
+            {id: 1, name: "کرایه و رفت‌وآمد", percent: 27, spent: 0, offset: 0, history: []},
+            {id: 2, name: "خورد و خوراک", percent: 12, spent: 0, offset: 0, history: []},
+            {id: 3, name: "پس‌انداز مشهد", percent: 25, spent: 0, offset: 0, history: []},
+            {id: 4, name: "درمان", percent: 3, spent: 0, offset: 0, history: []},
+            {id: 5, name: "شارژ و نت", percent: 10, spent: 0, offset: 0, history: []},
+            {id: 6, name: "زیبایی و مکمل", percent: 7, spent: 0, offset: 0, history: []},
+            {id: 7, name: "لباس", percent: 5, spent: 0, offset: 0, history: []},
+            {id: 8, name: "ضروری", percent: 5, spent: 0, offset: 0, history: []},
+            {id: 9, name: "تفریح", percent: 3, spent: 0, offset: 0, history: []},
+            {id: 10, name: "پس‌انداز کل", percent: 3, spent: 0, offset: 0, history: []}
         ],
         priorities: {
             "کرایه و رفت‌وآمد": 1, "خورد و خوراک": 1, "درمان": 1, "ضروری": 1, "اجاره خانه": 1,
@@ -1021,7 +1061,7 @@
         goals: [],
         shopping: [],
         history: [], // Backup history
-        sectionHistory: { dashboard: [], budget: [], tools: [] }
+        sectionHistory: { dashboard: [], budget: [], tools: [] } // Separate Undo History
     };
 
     let app = JSON.parse(JSON.stringify(defaultState));
@@ -1069,28 +1109,27 @@
         return `${y}/${m}/${d}`;
     }
 
-    // --- AUTH & LOGIN (Instruction 1) ---
+    // --- AUTH (ویرایش دستور اول) ---
     function checkAuth() {
         const modal = document.getElementById('authModal');
         const title = document.getElementById('authTitle');
         const sub = document.getElementById('authSub');
-        const nameInput = document.getElementById('authNameInput');
+        const setupNameContainer = document.getElementById('setupNameContainer');
         
         modal.style.display = 'flex';
         pinBuffer = "";
         updatePinDots();
 
         if (!app.security.hasPin) {
-            // First time login
+            // اولین ورود
             title.innerText = "خوش آمدید";
-            sub.innerText = "لطفاً نام خود را وارد کرده و رمز عبور تعیین کنید";
-            nameInput.style.display = "block";
-            nameInput.focus();
+            sub.innerText = "برای شروع یک رمز ۴ رقمی انتخاب کنید";
+            setupNameContainer.style.display = 'block'; // نمایش فیلد نام
         } else {
-            // Returning user
-            title.innerText = `خوش آمدی، ${app.user.name || 'کاربر'}`;
+            // ورودهای بعدی
+            title.innerText = app.user.name ? `${app.user.name} عزیز، خوش آمدی` : "خوش آمدید";
             sub.innerText = "رمز عبور خود را وارد کنید";
-            nameInput.style.display = "none";
+            setupNameContainer.style.display = 'none'; // مخفی کردن فیلد نام
         }
     }
 
@@ -1110,13 +1149,11 @@
     }
 
     function processPin() {
-        const nameInput = document.getElementById('authNameInput');
-
         if (!app.security.hasPin) {
-            // Create PIN Logic
-            const enteredName = nameInput.value.trim();
-            if(enteredName === "") {
-                alert("لطفاً نام خود را وارد کنید!");
+            // ثبت نام اولیه و ذخیره نام
+            const nameInput = document.getElementById('setupNameInput').value;
+            if(!nameInput.trim()) {
+                alert("لطفاً نام خود را وارد کنید.");
                 pinBuffer = ""; updatePinDots();
                 return;
             }
@@ -1124,7 +1161,7 @@
             if(confirm("رمز شما: " + pinBuffer + "\nآیا مطمئن هستید؟")) {
                 app.security.pin = pinBuffer;
                 app.security.hasPin = true;
-                app.user.name = enteredName; // Save Name
+                app.user.name = nameInput.trim();
                 saveData();
                 document.getElementById('authModal').style.display = 'none';
                 document.getElementById('appContent').style.display = 'block';
@@ -1133,7 +1170,6 @@
                 pinBuffer = ""; updatePinDots();
             }
         } else {
-            // Login Logic
             if (pinBuffer === app.security.pin) {
                 document.getElementById('authModal').style.display = 'none';
                 document.getElementById('appContent').style.display = 'block';
@@ -1259,7 +1295,7 @@
         document.getElementById('totalBalance').innerText = format(net);
         document.getElementById('totalDebtDisplay').innerText = format(totalDebt);
         document.getElementById('distributable').innerText = format(net);
-        document.getElementById('userNameDisplay').innerText = app.user.name;
+        document.getElementById('userNameDisplay').innerText = app.user.name || "کاربر";
 
         renderWallets();
         renderDebts();
@@ -1349,25 +1385,34 @@
         badge.style.background = totalP > 100 ? 'var(--danger)' : (totalP === 100 ? 'var(--success)' : 'var(--text-sec)');
 
         app.budgets.forEach((b, i) => {
-            const share = Math.round((net * b.percent) / 100);
+            // محاسبه: سهم درصدی + مقدار دستی (offset)
+            // دستور چهارم: افزودن مستقیم به بودجه
+            const percentShare = Math.round((net * b.percent) / 100);
+            const manualAdd = b.offset || 0;
+            const share = percentShare + manualAdd;
+            
             const remain = share - b.spent;
             const percent = share > 0 ? (b.spent / share) * 100 : 0;
             
             let status = 'stat-green';
             if(percent > 50) status = 'stat-yellow';
             if(percent > 90) status = 'stat-red';
+            
+            // نمایش متفاوت برای آیتم‌های معلق (دستور پنجم)
+            let suspendedClass = b.percent === 0 && manualAdd === 0 ? 'opacity:0.6;' : '';
+            let nameDisplay = b.name + (b.percent === 0 && manualAdd === 0 ? ' (غیرفعال)' : ` (${b.percent}%)`);
 
             div.innerHTML += `
-                <div class="bento-item ${status}">
+                <div class="bento-item ${status}" style="${suspendedClass}">
                     <div class="bento-header">
-                        <span>${b.name} (${b.percent}%) <i class="fas fa-edit" style="font-size:0.8rem; cursor:pointer; margin-right:5px; color:var(--text-sec);" onclick="openEdit('budget', ${i})"></i></span>
+                        <span>${nameDisplay} <i class="fas fa-edit" style="font-size:0.8rem; cursor:pointer; margin-right:5px; color:var(--text-sec);" onclick="openEdit('budget', ${i})"></i></span>
                         <div style="display:flex; gap:8px;">
                             <i class="fas fa-list-alt" style="opacity:0.5; cursor:pointer;" onclick="openItemHistory(${i})" title="تاریخچه"></i>
                             <i class="fas fa-trash" style="opacity:0.3; cursor:pointer;" onclick="delBudget(${i})"></i>
                         </div>
                     </div>
                     <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-top:5px; color:var(--text-sec);">
-                        <span>سهم: ${format(share)}</span>
+                        <span>سهم: ${format(percentShare)} ${manualAdd !== 0 ? `<span style="color:var(--primary)">${manualAdd > 0 ? '+' : ''}${format(manualAdd)}</span>` : ''}</span>
                         <span style="color:var(--danger)">خرج: ${format(b.spent)}</span>
                     </div>
                     <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(percent,100)}%"></div></div>
@@ -1376,6 +1421,7 @@
                     </div>
                     <div class="bento-actions">
                         <button class="action-chip" onclick="openExp(${i})">➖ ثبت هزینه</button>
+                        <button class="action-chip" onclick="openManualFund(${i})">➕/➖ مستقیم</button>
                         <button class="action-chip" onclick="copyTxt(${remain})">📋 کپی</button>
                     </div>
                 </div>
@@ -1424,7 +1470,7 @@
         `).join('');
     }
 
-    // --- EDIT SYSTEM (Instruction 3: Fixed Population) ---
+    // --- EDIT SYSTEM (ویرایش دستور سوم: اطمینان از قرارگیری داده‌ها در فیلد) ---
     function openEdit(type, index) {
         document.getElementById('editType').value = type;
         document.getElementById('editIndex').value = index;
@@ -1449,7 +1495,8 @@
             if(type === 'goal') val = item.target;
             else if(type === 'shop') val = item.price || 0;
             else val = item.value;
-            document.getElementById('editVal').value = val.toLocaleString();
+            // اینجا اطمینان حاصل میکنیم که مقدار فرمت شده در اینپوت قرار بگیرد
+            document.getElementById('editVal').value = val.toLocaleString('en-US');
         } else {
             document.getElementById('editAmountWrapper').style.display = 'none';
         }
@@ -1461,9 +1508,7 @@
             document.getElementById('editPercentWrapper').style.display = 'none';
         }
 
-        // Open modal without clearing inputs!
-        const modal = document.getElementById('editModal');
-        modal.classList.add('active');
+        openModal('editModal');
     }
 
     function performEdit() {
@@ -1473,7 +1518,6 @@
         
         if(!newName) return alert("نام نمی‌تواند خالی باشد");
 
-        // Save Snapshot before edit
         if(type === 'wallet' || type === 'debt' || type === 'check' || type === 'loan') saveSectionSnap('dashboard');
         else if(type === 'budget') saveSectionSnap('budget');
         else if(type === 'goal' || type === 'shop') saveSectionSnap('tools');
@@ -1495,7 +1539,6 @@
             app.budgets[index].name = newName;
             app.budgets[index].percent = parseInt(document.getElementById('editPercent').value) || 0;
             
-            // Sync Priority Name
             if(oldName !== newName && app.priorities[oldName]) {
                 app.priorities[newName] = app.priorities[oldName];
                 delete app.priorities[oldName];
@@ -1517,29 +1560,29 @@
     // --- TEMPLATE LOGIC ---
     function applyTemplate(type) {
         if(!confirm("آیا مطمئن هستید؟ بودجه‌بندی فعلی جایگزین می‌شود.")) return;
-        saveSectionSnap('budget'); // Save before template apply
+        saveSectionSnap('budget'); 
         
         let newBudgets = [];
         if(type === 'default') {
             newBudgets = JSON.parse(JSON.stringify(defaultState.budgets));
         } else if(type === 'student') {
             newBudgets = [
-                {id: 1, name: "رفت‌وآمد", percent: 30, spent: 0, history: []},
-                {id: 2, name: "غذا (سلف/بیرون)", percent: 25, spent: 0, history: []},
-                {id: 3, name: "اینترنت و شارژ", percent: 15, spent: 0, history: []},
-                {id: 4, name: "کتاب و جزوه", percent: 10, spent: 0, history: []},
-                {id: 5, name: "تفریح دوستانه", percent: 15, spent: 0, history: []},
-                {id: 6, name: "پس‌انداز اضطراری", percent: 5, spent: 0, history: []}
+                {id: 1, name: "رفت‌وآمد", percent: 30, spent: 0, offset:0, history: []},
+                {id: 2, name: "غذا (سلف/بیرون)", percent: 25, spent: 0, offset:0, history: []},
+                {id: 3, name: "اینترنت و شارژ", percent: 15, spent: 0, offset:0, history: []},
+                {id: 4, name: "کتاب و جزوه", percent: 10, spent: 0, offset:0, history: []},
+                {id: 5, name: "تفریح دوستانه", percent: 15, spent: 0, offset:0, history: []},
+                {id: 6, name: "پس‌انداز اضطراری", percent: 5, spent: 0, offset:0, history: []}
             ];
         } else if(type === 'married') {
             newBudgets = [
-                {id: 1, name: "اجاره خانه", percent: 35, spent: 0, history: []},
-                {id: 2, name: "خورد و خوراک منزل", percent: 25, spent: 0, history: []},
-                {id: 3, name: "قبوض و شارژ", percent: 10, spent: 0, history: []},
-                {id: 4, name: "درمان و بهداشت", percent: 10, spent: 0, history: []},
-                {id: 5, name: "پوشاک", percent: 5, spent: 0, history: []},
-                {id: 6, name: "پس‌انداز آینده", percent: 10, spent: 0, history: []},
-                {id: 7, name: "تفریح", percent: 5, spent: 0, history: []}
+                {id: 1, name: "اجاره خانه", percent: 35, spent: 0, offset:0, history: []},
+                {id: 2, name: "خورد و خوراک منزل", percent: 25, spent: 0, offset:0, history: []},
+                {id: 3, name: "قبوض و شارژ", percent: 10, spent: 0, offset:0, history: []},
+                {id: 4, name: "درمان و بهداشت", percent: 10, spent: 0, offset:0, history: []},
+                {id: 5, name: "پوشاک", percent: 5, spent: 0, offset:0, history: []},
+                {id: 6, name: "پس‌انداز آینده", percent: 10, spent: 0, offset:0, history: []},
+                {id: 7, name: "تفریح", percent: 5, spent: 0, offset:0, history: []}
             ];
         } else if(type === 'clear') {
             newBudgets = [];
@@ -1607,7 +1650,7 @@
         app.budgets.forEach(b => currentTotal += b.percent);
 
         if (currentTotal + p > 100) {
-            tempBudget = { name: n, percent: p, id: Date.now(), spent: 0, history: [] };
+            tempBudget = { name: n, percent: p, id: Date.now(), spent: 0, offset:0, history: [] };
             
             const max = 100 - currentTotal;
             const safeMax = max > 0 ? max : 0;
@@ -1623,7 +1666,7 @@
             openModal('fixPercentModal');
         } else {
             saveSectionSnap('budget');
-            app.budgets.push({id:Date.now(), name:n, percent:p, spent:0, history:[]});
+            app.budgets.push({id:Date.now(), name:n, percent:p, spent:0, offset:0, history:[]});
             if (!app.priorities[n]) app.priorities[n] = 4;
             saveData(); renderUI(); closeAllModals();
         }
@@ -1706,26 +1749,46 @@
         tempBudget = null;
     }
 
-    // --- PRIORITY SETTINGS (Instruction 2: Fixed Crash) ---
-    function openModal(id) { 
-        // Logic for specific modals that need data prep
-        if(id === 'prioritySettingsModal') {
-            openPrioritySettings(); // Just Render the list
-        }
-        
-        // Clear inputs logic (Modified to skip editModal)
-        const m = document.getElementById(id);
-        
-        if (id !== 'editModal') { // Instruction 3: Don't clear inputs if editing
-            const inputs = m.querySelectorAll('input');
-            inputs.forEach(i => {
-                if(i.type !== 'hidden' && i.type !== 'checkbox' && i.type !== 'range') i.value = '';
-            });
-        }
-        
-        m.classList.add('active'); 
+    // --- MANUAL FUND SYSTEM (دستور چهارم: افزودن مستقیم بودجه) ---
+    function openManualFund(index) {
+        document.getElementById('mfIndex').value = index;
+        document.getElementById('mfVal').value = '';
+        document.getElementById('mfFromWallet').checked = false;
+        openModal('manualFundModal');
     }
 
+    function applyManualFund() {
+        const idx = parseInt(document.getElementById('mfIndex').value);
+        const amt = parseFormatted(document.getElementById('mfVal').value);
+        const fromWallet = document.getElementById('mfFromWallet').checked;
+
+        if (isNaN(amt) || amt === 0) return alert("مبلغ نامعتبر است");
+
+        saveSectionSnap('budget');
+        if(fromWallet) saveSectionSnap('dashboard'); // چون روی کیف پول هم اثر می‌گذارد
+
+        if (!app.budgets[idx].offset) app.budgets[idx].offset = 0;
+        app.budgets[idx].offset += amt;
+
+        if (fromWallet) {
+            // کسر از اولین کیف پول دارای موجودی یا کیف پول اصلی
+            if(app.wallets.length > 0) {
+                app.wallets[0].value -= amt;
+            } else {
+                alert("کیف پولی برای کسر موجود نیست، فقط به بودجه اضافه شد.");
+            }
+        }
+
+        let reason = amt > 0 ? "افزودن مستقیم" : "کسر مستقیم";
+        addToHistory(idx, Math.abs(amt), reason);
+
+        saveData();
+        renderUI();
+        closeAllModals();
+    }
+
+
+    // --- PRIORITY SETTINGS (ویرایش دستور دوم: رفع هنگ کردن) ---
     function openPrioritySettings() {
         const list = document.getElementById('priorityList');
         let allNames = new Set([...app.budgets.map(b=>b.name), ...Object.keys(app.priorities)]);
@@ -1746,7 +1809,8 @@
             `;
         });
         list.innerHTML = html;
-        // REMOVED RECURSIVE CALL TO openModal HERE
+        // تغییر مهم: مستقیم مدال را باز می‌کنیم بدون شرط بازگشتی در openModal
+        openModal('prioritySettingsModal');
     }
 
     function savePriorities() {
@@ -1758,6 +1822,59 @@
         saveData();
         closeAllModals();
         alert("اولویت‌ها ذخیره شدند.");
+    }
+
+    // --- SUSPEND & DISTRIBUTE (دستور پنجم: محدود سازی و پخش بودجه) ---
+    function suspendAndDistribute() {
+        const index = parseInt(document.getElementById('editIndex').value);
+        const item = app.budgets[index];
+        const freedPercent = item.percent;
+
+        if(freedPercent === 0) return alert("این آیتم درصدی ندارد یا قبلاً غیرفعال شده است.");
+        if(!confirm(`آیا مطمئن هستید؟ بودجه ${item.name} (${freedPercent}%) صفر می‌شود و بین سایر موارد بر اساس اولویت تقسیم می‌شود.`)) return;
+
+        saveSectionSnap('budget');
+
+        // صفر کردن درصد آیتم فعلی
+        app.budgets[index].percent = 0;
+
+        // پیدا کردن سایر آیتم‌های فعال
+        let otherItems = app.budgets.filter((b, i) => i !== index && b.percent > 0);
+        
+        if(otherItems.length === 0) {
+            alert("موردی برای پخش بودجه یافت نشد.");
+            saveData(); renderUI(); closeAllModals();
+            return;
+        }
+
+        // محاسبه وزن بر اساس اولویت (اولویت ۱ وزن ۴، اولویت ۴ وزن ۱)
+        let totalWeight = 0;
+        let weightedItems = otherItems.map(b => {
+            let pri = app.priorities[b.name] || 4;
+            let weight = 5 - pri; // 1->4, 2->3, 3->2, 4->1
+            totalWeight += weight;
+            return { budget: b, weight: weight };
+        });
+
+        // توزیع درصد آزاد شده
+        let distributed = 0;
+        weightedItems.forEach(wi => {
+            let share = Math.round((wi.weight / totalWeight) * freedPercent);
+            wi.budget.percent += share;
+            distributed += share;
+        });
+
+        // اگر بخاطر گرد کردن چیزی باقی ماند به بالاترین اولویت بده
+        let diff = freedPercent - distributed;
+        if(diff !== 0 && weightedItems.length > 0) {
+            weightedItems.sort((a,b) => b.weight - a.weight);
+            weightedItems[0].budget.percent += diff;
+        }
+
+        saveData();
+        renderUI();
+        closeAllModals();
+        alert("بودجه با موفقیت پخش شد.");
     }
 
     function delBudget(i) { if(confirm('حذف ردیف؟')) { saveSectionSnap('budget'); app.budgets.splice(i,1); saveData(); renderUI(); } }
@@ -1832,7 +1949,6 @@
         const sel = document.getElementById('allocBudgetSelect');
         sel.innerHTML = app.budgets.map((b, i) => `<option value="${i}">${b.name}</option>`).join('');
         
-        // Auto fill price if shopping
         if(type === 'shop' && app.shopping[id].price) {
             document.getElementById('allocAmt').value = app.shopping[id].price.toLocaleString();
         } else {
@@ -1850,8 +1966,8 @@
 
         if(isNaN(amt) || amt <= 0) return alert("مبلغ نامعتبر");
 
-        saveSectionSnap('budget'); // Changes budget spent
-        saveSectionSnap('tools'); // Changes goal/shop status if needed (future)
+        saveSectionSnap('budget'); 
+        saveSectionSnap('tools'); 
 
         app.budgets[bIdx].spent += amt;
         
@@ -1900,22 +2016,19 @@
         document.getElementById('printDebt').innerText = format(debt);
         document.getElementById('printNet').innerText = format(net);
 
-        // Budget Table
         const tb = document.getElementById('printBody');
         tb.innerHTML = '';
         app.budgets.forEach(b => {
-            const s = Math.round((net*b.percent)/100);
+            const s = Math.round((net*b.percent)/100) + (b.offset || 0);
             tb.innerHTML += `<tr><td>${b.name}</td><td>${b.percent}%</td><td>${format(s)}</td><td>${format(b.spent)}</td><td>${format(s-b.spent)}</td></tr>`;
         });
 
-        // Debt List
         const dList = document.getElementById('printDebtsList');
         let debtHtml = "";
         app.debts.forEach(d => debtHtml += `<div>${d.name}: ${format(d.value)}</div>`);
         app.checks.forEach(c => debtHtml += `<div>چک (${c.name}): ${format(c.value)} - ${c.date}</div>`);
         dList.innerHTML = debtHtml || "ندارد";
 
-        // Goals List
         const gList = document.getElementById('printGoalsList');
         let goalHtml = "";
         app.goals.forEach(g => goalHtml += `<div>${g.name}: ${format(g.curr)} / ${format(g.target)}</div>`);
@@ -1935,7 +2048,6 @@
         const a = document.createElement('a');
         a.href = str; a.download = "backup.json"; a.click();
         
-        // Add to history
         app.history.unshift({date: Date.now(), name: "بکاپ دستی"});
         if(app.history.length > 5) app.history.pop();
         saveData();
@@ -1947,7 +2059,6 @@
         reader.onload = (e) => {
             try {
                 app = JSON.parse(e.target.result);
-                // Ensure new structures exist
                 if(!app.priorities) app.priorities = defaultState.priorities;
                 if(!app.sectionHistory) app.sectionHistory = { dashboard: [], budget: [], tools: [] };
                 saveData();
@@ -1985,14 +2096,15 @@
     function loadData() {
         const d = localStorage.getItem('amir_fin_v9');
         if(d) app = JSON.parse(d);
-        // Ensure new arrays exist in old data
         if(!app.checks) app.checks = [];
         if(!app.loans) app.loans = [];
         if(!app.priorities) app.priorities = defaultState.priorities;
         if(!app.sectionHistory) app.sectionHistory = { dashboard: [], budget: [], tools: [] };
-        // Clean up name if it was default
-        if(app.user.name === "امیرحسین" && !app.security.hasPin) app.user.name = ""; 
-        app.budgets.forEach(b => { if(!b.history) b.history = []; });
+        if(!app.user.name) app.user.name = ""; // اطمینان از وجود فیلد نام
+        app.budgets.forEach(b => { 
+            if(!b.history) b.history = []; 
+            if(b.offset === undefined) b.offset = 0; // اطمینان از وجود فیلد offset
+        });
     }
     function saveData() {
         localStorage.setItem('amir_fin_v9', JSON.stringify(app));
@@ -2008,9 +2120,18 @@
         document.getElementById('view-'+id).classList.add('active');
         event.currentTarget.classList.add('active');
     }
-    
+    function openModal(id) { 
+        // ویرایش دستور دوم: حذف فراخوانی recursive (loop) اولویت ها از اینجا
+        const m = document.getElementById(id);
+        const inputs = m.querySelectorAll('input');
+        inputs.forEach(i => {
+            if(i.type !== 'hidden' && i.type !== 'checkbox' && i.type !== 'range') i.value = '';
+        });
+        m.classList.add('active'); 
+    }
     function closeAllModals() { document.querySelectorAll('.modal').forEach(e => e.classList.remove('active')); }
 
 </script>
+
 </body>
 </html>
