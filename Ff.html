@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مدیریت مالی حرفه‌ای | V14 Ultimate (Analytics & Security)</title>
+    <title>مدیریت مالی حرفه‌ای | V13 Ultimate (Full Edit & History)</title>
 
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
@@ -13,8 +13,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- تبدیل به عکس -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- کتابخانه PDF (دستور ۱) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
         :root {
@@ -160,23 +158,6 @@
         .btn-del { color: var(--danger); border: 1px solid var(--danger); background: transparent; }
         .btn-inject { color: var(--success); border: 1px solid var(--success); background: transparent; }
         .btn-pause { color: var(--text-sec); border: 1px solid var(--text-sec); background: transparent; }
-
-        /* دستور ۳: استایل بهتر برای دکمه واحد پول */
-        .currency-toggle {
-            padding: 5px 12px;
-            border-radius: 20px;
-            background: var(--glass-bg);
-            border: 2px solid var(--primary);
-            color: var(--primary);
-            font-size: 0.85rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-            display: flex; align-items: center; gap: 5px;
-        }
-        .currency-toggle:hover {
-            background: var(--primary); color: white;
-        }
 
         .badge-currency {
             background: linear-gradient(135deg, #10b981, #059669);
@@ -425,18 +406,22 @@
             transform: translateY(0); /* آمدن به بالا */
         }
 
+        /* --- TAB CONTENT --- */
+        .tab-pane { display: none; padding-bottom: 20px; }
+        .tab-pane.active { display: block; animation: slideUp 0.3s; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
         /* --- REPORT (PRINT) --- */
-        /* استایل خاص برای PDF (دستور ۱) */
         #printArea {
-            position: fixed; top: -9999px; left: -9999px;
-            width: 790px; /* A4 Width approx */
-            background: white; color: black; padding: 20px;
-            border: 1px solid #000; font-family: 'Tahoma', sans-serif;
+            position: absolute; top: -9999px; left: -9999px;
+            width: 800px; background: white; color: black; padding: 40px;
+            border: 2px solid #333; font-family: 'Tahoma', sans-serif;
         }
         .print-header { text-align: center; border-bottom: 2px solid #000; margin-bottom: 20px; padding-bottom: 15px; }
-        .print-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
-        .print-table th { background: #eee; border: 1px solid #000; padding: 5px; }
-        .print-table td { border: 1px solid #000; padding: 5px; text-align: center; }
+        .print-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .print-table th { background: #eee; border: 1px solid #000; padding: 10px; }
+        .print-table td { border: 1px solid #000; padding: 8px; text-align: center; }
         .print-summary { display: flex; justify-content: space-between; margin-top: 20px; font-weight: bold; border: 1px solid #000; padding: 10px; background: #f9f9f9; }
         .print-section-title { font-weight: bold; margin-top: 20px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
 
@@ -446,48 +431,34 @@
         }
         .history-btn:hover { background: var(--primary); color: white; }
 
-        .auth-input-group { width: 100%; margin-bottom: 15px; text-align: center; }
-        .forget-btn { font-size: 0.8rem; color: var(--text-sec); margin-top: 10px; background: none; border: none; cursor: pointer; }
-        .forget-btn:hover { color: var(--primary); text-decoration: underline; }
+        .auth-input-group { width: 100%; margin-bottom: 20px; }
 
     </style>
 </head>
 <body>
 
-<!-- 1. LOCK SCREEN (PIN & AUTH - Instructions 4) -->
+<!-- 1. LOCK SCREEN (PIN & AUTH - Instruction 1) -->
 
 <div id="authModal" class="pin-screen" style="display: flex;">
     <i class="fas fa-fingerprint" style="font-size: 4rem; color: var(--primary);"></i>
     <h2 id="authTitle" style="margin: 15px 0 5px 0;">امنیت</h2>
     
+    <!-- New Welcome or Setup Message -->
     <p id="authSub" style="font-size: 0.9rem; color: var(--text-sec); margin-bottom: 20px;">...</p>
 
-    <!-- Setup / Recovery Inputs -->
-    <div id="setupDiv" class="auth-input-group" style="display:none; max-width: 280px;">
-        <input type="text" id="setupNameInput" placeholder="نام خود را وارد کنید" style="text-align:center;">
-        <label style="display:block; margin-top:10px; font-size:0.8rem; color:var(--text-sec);">سوال امنیتی (برای فراموشی رمز):</label>
-        <div id="setupQuestionDisplay" style="font-weight:bold; margin:5px 0; color:var(--primary);">---</div>
-        <input type="text" id="setupAnswerInput" placeholder="پاسخ سوال امنیتی" style="text-align:center;">
+    <!-- First Time Setup Input -->
+    <div id="setupNameDiv" class="auth-input-group" style="display:none; max-width: 250px;">
+        <input type="text" id="setupNameInput" placeholder="نام و نام خانوادگی خود را وارد کنید" style="text-align:center;">
     </div>
 
-    <div id="recoveryDiv" class="auth-input-group" style="display:none; max-width: 280px;">
-        <p style="font-size:0.8rem;">لطفاً پاسخ دهید:</p>
-        <div id="recoveryQuestionDisplay" style="font-weight:bold; margin:10px 0; color:var(--primary);">---</div>
-        <input type="text" id="recoveryAnswerInput" placeholder="پاسخ..." style="text-align:center;">
-        <button class="btn btn-primary" style="width:100%" onclick="checkRecovery()">بازیابی رمز</button>
-        <button class="btn btn-outline" style="width:100%; margin-top:5px;" onclick="cancelRecovery()">انصراف</button>
-    </div>
-
-    <!-- PIN Dots -->
-    <div class="pin-dots" id="pinDotsDiv">
+    <div class="pin-dots">
         <div class="pin-dot" id="pd1"></div>
         <div class="pin-dot" id="pd2"></div>
         <div class="pin-dot" id="pd3"></div>
         <div class="pin-dot" id="pd4"></div>
     </div>
 
-    <!-- Numpad -->
-    <div class="numpad" id="numpadDiv">
+    <div class="numpad">
         <button class="num-key" onclick="pressKey(1)">1</button>
         <button class="num-key" onclick="pressKey(2)">2</button>
         <button class="num-key" onclick="pressKey(3)">3</button>
@@ -497,9 +468,7 @@
         <button class="num-key" onclick="pressKey(7)">7</button>
         <button class="num-key" onclick="pressKey(8)">8</button>
         <button class="num-key" onclick="pressKey(9)">9</button>
-        <button class="num-key" onclick="initRecovery()" style="font-size:0.7rem; display:flex; flex-direction:column; gap:2px;">
-            <i class="fas fa-question"></i><span style="font-size:0.6rem">فراموشی</span>
-        </button>
+        <div class="num-key" style="visibility: hidden;"></div>
         <button class="num-key" onclick="pressKey(0)">0</button>
         <button class="num-key" onclick="pressKey('del')" style="color:var(--danger)"><i class="fas fa-backspace"></i></button>
     </div>
@@ -516,10 +485,8 @@
             <span style="font-size:0.8rem; color:var(--text-sec);" id="headerDate">---</span>
         </div>
         <div style="display:flex; gap:10px;">
-            <!-- دستور ۳: دکمه واحد پول جدید -->
-            <button class="currency-toggle" onclick="toggleCurrency()" title="تبدیل واحد پول">
-                <i class="fas fa-coins"></i>
-                <span id="currBadge">تومان</span>
+            <button class="btn-icon" onclick="toggleCurrency()" title="تبدیل واحد پول">
+                <span id="currBadge" class="badge-currency">T</span>
             </button>
             <button class="btn-icon" onclick="toggleTheme()" title="تم شب/روز">
                 <i class="fas fa-moon"></i>
@@ -588,7 +555,7 @@
         </div>
     </div>
 
-    <!-- TAB 2: BUDGET -->
+    <!-- TAB 2: BUDGET (Instructions 4, 5, 8) -->
     <div id="view-budget" class="tab-pane">
         <div class="glass-panel" style="text-align:center;">
             <span style="color:var(--text-sec); font-size:0.9rem;">بودجه کل توزیع شده:</span>
@@ -596,6 +563,7 @@
                 <div id="distributable" style="font-size:1.5rem; font-weight:bold; color:var(--primary); direction:ltr;">0</div>
                 <small id="totalPercentBadge" style="background:var(--text-sec); color:white; padding:2px 6px; border-radius:4px;">0%</small>
             </div>
+            <!-- Instruction 8: Distribute Button -->
             <button id="btnDistribute" class="btn btn-primary" style="margin-top:10px; width:100%; display:none;" onclick="triggerDistribution()">
                 <i class="fas fa-sync-alt"></i> توزیع موجودی جدید
             </button>
@@ -606,6 +574,7 @@
                 <h3 style="display:flex; align-items:center;">مدیریت ردیف‌ها <span class="history-btn" onclick="showSectionHistory('budget')"><i class="fas fa-history"></i> سابقه</span></h3>
                 <button class="btn btn-primary" onclick="openModal('addBudgetModal')"><i class="fas fa-plus"></i> جدید</button>
             </div>
+            <!-- Template Selection -->
             <div class="template-row" style="width: 100%; margin-top: 10px;">
                 <span style="font-size:0.8rem; line-height:30px; margin-left:5px;">قالب‌ها:</span>
                 <div class="template-chip" onclick="applyTemplate('default')">پیش‌فرض</div>
@@ -616,7 +585,7 @@
         </div>
 
         <div id="budgetGrid" class="budget-grid">
-            <!-- Cards -->
+            <!-- کارت‌های بودجه اینجا ساخته می‌شوند -->
         </div>
     </div>
 
@@ -624,15 +593,6 @@
     <div id="view-tools" class="tab-pane">
         <div class="header-row" style="padding:0 10px;">
              <h3>ابزارها <span class="history-btn" onclick="showSectionHistory('tools')"><i class="fas fa-history"></i> سابقه</span></h3>
-        </div>
-
-        <!-- دستور ۱: دکمه گزارش تحلیلی -->
-        <div class="glass-panel" style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-color: #86efac;">
-            <div class="header-row" style="border-bottom:none;">
-                <h3 style="color:#15803d;"><i class="fas fa-chart-line"></i> تحلیل و گزارشات روزانه</h3>
-            </div>
-            <p style="font-size:0.85rem; color:#166534; margin-bottom:15px;">مشاهده پیشرفت روزانه، نمودارها و دانلود PDF کامل گزارشات.</p>
-            <button class="btn" style="width:100%; background:#16a34a; color:white;" onclick="openAnalysis()">مشاهده و دریافت گزارش</button>
         </div>
 
         <!-- Goals -->
@@ -675,13 +635,18 @@
                     <input type="checkbox" id="rawCopyCheck" style="width:20px; height:20px;">
                 </div>
 
-                <!-- Priority Settings (Instruction 2 Fix) -->
+                <!-- Priority Settings (Modified - Instruction 2 & 7) -->
                 <button class="btn btn-outline" onclick="openPrioritySettings()">
                     <i class="fas fa-list-ol"></i> مدیریت اولویت‌ها
                 </button>
 
+                <!-- Change Name (Instruction 5) -->
                 <button class="btn btn-outline" onclick="changeUserName()">
                     <i class="fas fa-user-edit"></i> تغییر نام کاربر
+                </button>
+
+                <button class="btn btn-outline" onclick="generateReportImage()">
+                    <i class="fas fa-file-image"></i> دانلود فاکتور تصویری (دقیق)
                 </button>
                 
                 <button class="btn btn-outline" onclick="downloadBackup()">
@@ -728,27 +693,7 @@
 
 <!-- MODALS -->
 
-<!-- Analytics Modal (Instruction 1) -->
-<div id="analyticsModal" class="modal">
-    <div class="modal-content" style="max-height: 95vh;">
-        <h3>تحلیل و گزارشات</h3>
-        <p id="daysCountDisplay" style="text-align:center; color:var(--text-sec); font-size:0.9rem;">...</p>
-        
-        <div style="margin:20px 0; height:200px;">
-            <canvas id="dailyChart"></canvas>
-        </div>
-
-        <h4>تاریخچه روزانه</h4>
-        <div id="dailyLogList" style="max-height:200px; overflow-y:auto; border:1px solid #eee; border-radius:8px; padding:10px;"></div>
-
-        <button class="btn btn-primary" style="width:100%; margin-top:15px;" onclick="downloadPDF()">
-            <i class="fas fa-file-pdf"></i> دانلود گزارش PDF کامل
-        </button>
-        <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="closeAllModals()">بستن</button>
-    </div>
-</div>
-
-<!-- Edit Modal -->
+<!-- Edit Modal (Instruction 1 & 3 & 6) -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h3>ویرایش آیتم</h3>
@@ -768,7 +713,9 @@
 
         <div id="editDateWrapper" style="display:none;">
             <label>تاریخ:</label>
-            <div class="date-picker-row" id="editDateRow"></div>
+            <div class="date-picker-row" id="editDateRow">
+                <!-- Populated dynamically -->
+            </div>
         </div>
 
         <div id="editPercentWrapper" style="display:none;">
@@ -948,7 +895,7 @@
     <div class="modal-content">
         <h3>اختصاص بودجه</h3>
         <p style="font-size:0.9rem; color:var(--text-sec);">انتخاب کنید هزینه از کدام ردیف بودجه کسر شود:</p>
-        <input type="hidden" id="allocType">
+        <input type="hidden" id="allocType"> <!-- goal or shop -->
         <input type="hidden" id="allocId">
 
         <label>ردیف بودجه:</label>
@@ -1000,12 +947,13 @@
     </div>
 </div>
 
-<!-- Priority Settings Modal (Fixed Instruction 2) -->
+<!-- Priority Settings Modal (Fixed Instruction 2 & 7) -->
 <div id="prioritySettingsModal" class="modal">
     <div class="modal-content">
         <h3>مدیریت اولویت‌ها</h3>
         <p style="font-size:0.8rem; color:var(--text-sec); margin-bottom:10px;">تعریف بازه درصدها (اختیاری):</p>
         
+        <!-- Instruction 7: Define Ranges -->
         <div style="display:flex; gap:5px; margin-bottom:15px; background:#f9f9f9; padding:10px; border-radius:8px;">
             <div style="flex:1">
                 <small>کم (تا %)</small>
@@ -1018,8 +966,9 @@
         </div>
         <button class="btn btn-outline" style="width:100%; margin-bottom:15px; font-size:0.8rem;" onclick="savePriorityRanges()">ذخیره بازه‌ها</button>
 
-        <!-- Container cleaned before population to avoid crash -->
-        <div id="priorityList" style="max-height:300px; overflow-y:auto;"></div>
+        <div id="priorityList" style="max-height:300px; overflow-y:auto;">
+            <!-- Generated via JS safely -->
+        </div>
 
         <div style="margin-top:20px; display:flex; gap:10px;">
             <button class="btn btn-primary" style="flex:1" onclick="savePriorities()">ذخیره اولویت‌ها</button>
@@ -1046,13 +995,12 @@
     </div>
 </div>
 
-<!-- REPORT TEMPLATE (Instruction 1 - Full PDF Area) -->
+<!-- REPORT TEMPLATE -->
 <div id="printArea">
     <div class="print-header">
         <h1>گزارش جامع وضعیت مالی</h1>
         <p id="printDate">تاریخ: ---</p>
         <p>کاربر: <span id="printUser">---</span></p>
-        <p>مدت استفاده: <span id="printDuration">---</span></p>
     </div>
 
     <div class="print-summary">
@@ -1061,12 +1009,7 @@
         <div>خالص قابل خرج: <b id="printNet">0</b></div>
     </div>
 
-    <!-- Chart Placeholder for PDF -->
-    <div style="margin-top:20px; height:200px; border:1px dashed #ccc; display:flex; align-items:center; justify-content:center;">
-        <canvas id="printChart"></canvas>
-    </div>
-
-    <div class="print-section-title">جزئیات بودجه‌بندی (امروز)</div>
+    <div class="print-section-title">جزئیات بودجه‌بندی</div>
     <table class="print-table">
         <thead>
             <tr>
@@ -1083,34 +1026,18 @@
     <div class="print-section-title">وضعیت بدهی‌ها</div>
     <div id="printDebtsList" style="margin-top:5px; font-size:0.9rem;"></div>
 
-    <div class="print-section-title">تاریخچه روزانه (آرشیو)</div>
-    <table class="print-table">
-        <thead>
-            <tr>
-                <th>تاریخ</th>
-                <th>موجودی</th>
-                <th>خرج کل بودجه</th>
-            </tr>
-        </thead>
-        <tbody id="printHistoryBody"></tbody>
-    </table>
+    <div class="print-section-title">وضعیت اهداف مالی</div>
+    <div id="printGoalsList" style="margin-top:5px; font-size:0.9rem;"></div>
 
     <div style="margin-top:30px; text-align:center; font-size:12px; color:#666; border-top:1px solid #000; padding-top:10px;">
-        تولید شده توسط سامانه مدیریت مالی شخصی V14
+        تولید شده توسط سامانه مدیریت مالی شخصی V13
     </div>
 </div>
 
 <script>
     // --- STATE & DATA ---
     const defaultState = {
-        security: { 
-            hasPin: false, 
-            pin: "", 
-            isSetup: false,
-            // Instruction 4: Security Question
-            questionIndex: 0,
-            answer: "" 
-        },
+        security: { hasPin: false, pin: "", isSetup: false },
         user: { name: "", theme: "light", currency: "toman" },
         wallets: [],
         debts: [], 
@@ -1133,32 +1060,18 @@
             "شارژ و نت": 2, "لباس": 2, "زیبایی و مکمل": 3, "پس‌انداز کل": 3, "پس‌انداز مشهد": 3,
             "تفریح": 4, "سایر": 4
         },
-        priorityRanges: { low: 40, mid: 70 },
-        distributedAmount: 0,
+        priorityRanges: { low: 40, mid: 70 }, // Instruction 7
+        distributedAmount: 0, // Instruction 8
         goals: [],
         shopping: [],
-        history: [], 
-        sectionHistory: { dashboard: [], budget: [], tools: [] },
-        // Instruction 1: Daily Logs & Start Date
-        startDate: new Date().toLocaleDateString('fa-IR'),
-        lastLogDate: "",
-        dailyLogs: [] 
+        history: [], // Backup history
+        sectionHistory: { dashboard: [], budget: [], tools: [] }
     };
-
-    // Instruction 4: Security Questions List
-    const securityQuestions = [
-        "نام اولین حیوان خانگی شما؟",
-        "نام شهر محل تولد شما؟",
-        "نام بهترین دوست دوران کودکی؟",
-        "مدل اولین ماشین شما؟",
-        "غذای مورد علاقه شما؟"
-    ];
 
     let app = JSON.parse(JSON.stringify(defaultState));
     let pinBuffer = "";
-    let rate = 1; 
-    let tempBudget = null; 
-    let myChart = null; // Chart instance
+    let rate = 1; // 1=Toman, 10=Rial
+    let tempBudget = null; // To hold data during auto-correction
 
     // --- STARTUP ---
     window.onload = () => {
@@ -1166,89 +1079,12 @@
         checkAuth();
         updateDate();
         setupDatePickers();
-        checkDailyLog(); // Instruction 1: Auto log on load
     };
-
-    // --- INSTRUCTION 1: DAILY LOGGING ---
-    function checkDailyLog() {
-        const today = new Date().toLocaleDateString('fa-IR');
-        if(app.lastLogDate !== today) {
-            // Create Snapshot for today
-            const income = app.wallets.reduce((a,b)=>a+b.value,0);
-            const totalSpent = app.budgets.reduce((a,b)=>a+b.spent,0);
-            
-            app.dailyLogs.push({
-                date: today,
-                income: income,
-                spent: totalSpent
-            });
-            
-            // Keep log size reasonable (e.g., 365 days)
-            if(app.dailyLogs.length > 365) app.dailyLogs.shift();
-            
-            app.lastLogDate = today;
-            saveData();
-        }
-    }
-
-    function openAnalysis() {
-        // Calculate days passed
-        const start = new Date(dateToISO(app.startDate) || Date.now()); // Fallback logic
-        const now = new Date();
-        const diffTime = Math.abs(now - start);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-        
-        document.getElementById('daysCountDisplay').innerText = `مدت زمان عضویت: ${diffDays} روز | تعداد رکوردهای ثبت شده: ${app.dailyLogs.length}`;
-
-        // Populate List
-        const list = document.getElementById('dailyLogList');
-        list.innerHTML = app.dailyLogs.slice().reverse().map(l => 
-            `<div style="display:flex; justify-content:space-between; font-size:0.85rem; border-bottom:1px solid #f0f0f0; padding:5px;">
-                <span>${l.date}</span>
-                <span>دارایی: ${format(l.income)}</span>
-                <span style="color:var(--danger)">خرج: ${format(l.spent)}</span>
-            </div>`
-        ).join('');
-
-        // Draw Chart
-        const ctx = document.getElementById('dailyChart').getContext('2d');
-        if(myChart) myChart.destroy();
-        
-        const labels = app.dailyLogs.map(l => l.date);
-        const dataInc = app.dailyLogs.map(l => l.income * rate);
-        const dataExp = app.dailyLogs.map(l => l.spent * rate);
-
-        myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [
-                    { label: 'دارایی', data: dataInc, borderColor: '#10b981', tension: 0.3, fill: false },
-                    { label: 'خرج کرد', data: dataExp, borderColor: '#ef4444', tension: 0.3, fill: false }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
-            }
-        });
-
-        openModal('analyticsModal');
-    }
-
-    // Date converter helper for rough calculation (Persian string to JS Date is complex, simplied here)
-    function dateToISO(persianDate) {
-        // This is a placeholder. For accurate Persian date calc, a library is needed. 
-        // We will rely on simple approximation or just tracking the first run time.
-        // If app.startDate was just set on first run in millis, it's easier.
-        // Let's assume startDate is stored as string but we also store a timestamp if needed.
-        // For now, we return null to use 'now' if parsing fails.
-        return null; 
-    }
 
     // --- DATE PICKER SETUP ---
     function setupDatePickers() {
-        // ... handled in modals
+        // Create generic Date Picker content
+        // Used dynamically in modals
     }
 
     function createDatePickerHTML(prefix, defaultD=1, defaultM=1, defaultY=1403) {
@@ -1279,42 +1115,28 @@
         return `${y}/${m}/${d}`;
     }
 
-    // --- AUTH & SECURITY (Instruction 4) ---
+    // --- AUTH (Instruction 1) ---
     function checkAuth() {
         const modal = document.getElementById('authModal');
         const title = document.getElementById('authTitle');
         const sub = document.getElementById('authSub');
-        const setupDiv = document.getElementById('setupDiv');
-        const recoveryDiv = document.getElementById('recoveryDiv');
-        const pinDiv = document.getElementById('pinDotsDiv');
-        const numDiv = document.getElementById('numpadDiv');
+        const nameDiv = document.getElementById('setupNameDiv');
         
         modal.style.display = 'flex';
         pinBuffer = "";
         updatePinDots();
-        recoveryDiv.style.display = 'none';
 
+        // Instruction 1: First time logic
         if (!app.security.hasPin || !app.security.isSetup) {
-            // FIRST TIME SETUP
             title.innerText = "خوش آمدید";
-            sub.innerText = "تعیین نام، سوال امنیتی و رمز عبور";
-            setupDiv.style.display = 'block';
-            pinDiv.style.display = 'flex';
-            numDiv.style.display = 'grid';
-            
-            // Generate Random Question Index
-            const qIdx = Math.floor(Math.random() * securityQuestions.length);
-            app.security.questionIndex = qIdx;
-            document.getElementById('setupQuestionDisplay').innerText = securityQuestions[qIdx];
-            
+            sub.innerText = "برای شروع، نام خود و یک رمز ۴ رقمی تعیین کنید";
+            nameDiv.style.display = 'block';
             app.security.isSetup = false;
         } else {
-            // LOGIN
             title.innerText = "ورود به سامانه";
-            sub.innerText = `${app.user.name} عزیز، خوش آمدی.`;
-            setupDiv.style.display = 'none';
-            pinDiv.style.display = 'flex';
-            numDiv.style.display = 'grid';
+            // Instruction 1: Show name on subsequent logins
+            sub.innerText = `${app.user.name} عزیز، خوش آمدی. رمز را وارد کن`;
+            nameDiv.style.display = 'none';
         }
     }
 
@@ -1334,16 +1156,13 @@
     }
 
     function processPin() {
-        // SETUP PROCESS
+        const nameInput = document.getElementById('setupNameInput');
+        
         if (!app.security.hasPin) {
-            const nameInput = document.getElementById('setupNameInput');
-            const ansInput = document.getElementById('setupAnswerInput');
-            
+            // First time setup
             const nameVal = nameInput.value.trim();
-            const ansVal = ansInput.value.trim();
-
-            if(!nameVal || !ansVal) {
-                alert("لطفاً نام و پاسخ سوال امنیتی را وارد کنید");
+            if(!nameVal && !app.security.isSetup) {
+                alert("لطفاً نام خود را وارد کنید");
                 pinBuffer = ""; updatePinDots();
                 return;
             }
@@ -1351,10 +1170,8 @@
             if(confirm("رمز شما: " + pinBuffer + "\nآیا مطمئن هستید؟")) {
                 app.security.pin = pinBuffer;
                 app.security.hasPin = true;
-                app.user.name = nameVal;
-                app.security.answer = ansVal;
+                if(nameVal) app.user.name = nameVal;
                 app.security.isSetup = true;
-                app.startDate = new Date().toLocaleDateString('fa-IR');
                 
                 saveData();
                 document.getElementById('authModal').style.display = 'none';
@@ -1363,9 +1180,8 @@
             } else {
                 pinBuffer = ""; updatePinDots();
             }
-        } 
-        // LOGIN PROCESS
-        else {
+        } else {
+            // Login
             if (pinBuffer === app.security.pin) {
                 document.getElementById('authModal').style.display = 'none';
                 document.getElementById('appContent').style.display = 'block';
@@ -1377,54 +1193,11 @@
         }
     }
 
-    // Instruction 4: Forgotten Password Logic
-    function initRecovery() {
-        if(!app.security.isSetup) return;
-        document.getElementById('numpadDiv').style.display = 'none';
-        document.getElementById('pinDotsDiv').style.display = 'none';
-        document.getElementById('setupDiv').style.display = 'none';
-        
-        const recDiv = document.getElementById('recoveryDiv');
-        recDiv.style.display = 'block';
-        
-        const qIdx = app.security.questionIndex || 0;
-        document.getElementById('recoveryQuestionDisplay').innerText = securityQuestions[qIdx];
-        document.getElementById('authTitle').innerText = "بازیابی رمز";
-        document.getElementById('authSub').innerText = "پاسخ سوال امنیتی را وارد کنید";
-    }
-
-    function checkRecovery() {
-        const input = document.getElementById('recoveryAnswerInput').value.trim();
-        if(input === app.security.answer) {
-            alert("هویت تایید شد. لطفاً رمز جدید ۴ رقمی خود را وارد کنید.");
-            app.security.hasPin = false; 
-            // Reset UI for new pin entry but keep user data
-            document.getElementById('recoveryDiv').style.display = 'none';
-            document.getElementById('numpadDiv').style.display = 'grid';
-            document.getElementById('pinDotsDiv').style.display = 'flex';
-            document.getElementById('authTitle').innerText = "تعیین رمز جدید";
-            document.getElementById('authSub').innerText = "";
-            pinBuffer = "";
-            updatePinDots();
-        } else {
-            alert("پاسخ اشتباه است.");
-        }
-    }
-
-    function cancelRecovery() {
-        document.getElementById('recoveryDiv').style.display = 'none';
-        document.getElementById('numpadDiv').style.display = 'grid';
-        document.getElementById('pinDotsDiv').style.display = 'flex';
-        document.getElementById('authTitle').innerText = "ورود به سامانه";
-        document.getElementById('authSub').innerText = "رمز را وارد کنید";
-        pinBuffer = "";
-        updatePinDots();
-    }
-
     function changePin() {
         if(confirm("آیا می‌خواهید رمز را تغییر دهید؟")) {
             app.security.hasPin = false;
             app.security.pin = "";
+            // We keep user name, so it's not a full reset, just PIN
             saveData();
             location.reload();
         }
@@ -1526,6 +1299,8 @@
         document.getElementById('cardCurrency').innerText = curName;
         document.querySelectorAll('.currency-text').forEach(el => el.innerText = curName);
 
+        // Instruction 4: Total calculation adjustments
+        // We subtract manualAdd because that money is moved from "Main Wallet" to "Budget Item" directly
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
         const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
         const checkDebt = (app.checks || []).reduce((a,b)=>a+b.value,0);
@@ -1538,6 +1313,7 @@
         document.getElementById('totalDebtDisplay').innerText = format(totalDebt);
         document.getElementById('userNameDisplay').innerText = app.user.name;
 
+        // Populate Date Pickers for Add Modals
         document.getElementById('dDay').innerHTML = genOpts(1,31,1);
         document.getElementById('checkDateRow').innerHTML = createDatePickerHTML('c');
         document.getElementById('loanDateRow').innerHTML = createDatePickerHTML('l');
@@ -1619,9 +1395,11 @@
     }
 
     function renderBudgets(net) {
+        // Instruction 8: Logic to only update on click
         const distributeBtn = document.getElementById('btnDistribute');
         const distributableDisplay = document.getElementById('distributable');
         
+        // If calculated net is different from what was last distributed, show button
         if(net !== app.distributedAmount) {
             distributeBtn.style.display = 'flex';
             distributableDisplay.style.color = 'var(--warning)';
@@ -1642,9 +1420,11 @@
         badge.innerText = totalP + '%';
         badge.style.background = totalP > 100 ? 'var(--danger)' : (totalP === 100 ? 'var(--success)' : 'var(--text-sec)');
 
+        // Base calculation on Distributed Amount (Instruction 8)
         const baseAmount = app.distributedAmount;
 
         app.budgets.forEach((b, i) => {
+            // Instruction 4: Add manualAdd to the share calculation
             const shareFromPercent = Math.round((baseAmount * b.percent) / 100);
             const totalShare = shareFromPercent + (b.manualAdd || 0);
             const remain = totalShare - b.spent;
@@ -1654,6 +1434,7 @@
             if(percent > 50) status = 'stat-yellow';
             if(percent > 90) status = 'stat-red';
             
+            // Instruction 5: Paused State Styling
             const pausedClass = b.isPaused ? 'paused' : '';
             const pausedText = b.isPaused ? '(متوقف)' : '';
 
@@ -1677,7 +1458,9 @@
                     <div class="bento-actions">
                         <button class="action-chip" onclick="openExp(${i})" ${b.isPaused ? 'disabled' : ''}>➖ ثبت هزینه</button>
                         <button class="action-chip" onclick="copyTxt(${remain})">📋 کپی</button>
+                        <!-- Instruction 4 -->
                         <button class="action-chip btn-inject" onclick="injectBudget(${i})">➕ واریز</button>
+                        <!-- Instruction 5 -->
                         <button class="action-chip btn-pause" onclick="togglePause(${i})">${b.isPaused ? '▶️' : '⏸'}</button>
                     </div>
                 </div>
@@ -1685,19 +1468,23 @@
         });
     }
 
+    // Instruction 8: Trigger Distribution
     function triggerDistribution() {
+        // Recalculate net to be sure
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
         const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
         const checkDebt = (app.checks || []).reduce((a,b)=>a+b.value,0);
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
+        const net = income - totalDebt - manualDeductions;
         const totalDebt = fixedDebt + checkDebt;
 
-        app.distributedAmount = income - totalDebt - manualDeductions; 
+        app.distributedAmount = income - totalDebt - manualDeductions; // Net
         saveData();
         renderUI();
         alert("بودجه با موفقیت بر اساس موجودی جدید توزیع شد.");
     }
 
+    // Instruction 4: Inject Budget (Direct Transfer)
     function injectBudget(index) {
         const amt = prompt("مبلغ واریزی مستقیم به این آیتم (از حساب اصلی کسر می‌شود):");
         if(amt && !isNaN(parseFormatted(amt))) {
@@ -1706,6 +1493,10 @@
             if(!app.budgets[index].manualAdd) app.budgets[index].manualAdd = 0;
             app.budgets[index].manualAdd += val;
             
+            // Deduct from distributed amount so it balances out visually?
+            // Actually, per instruction, it reduces from "Main Pure Balance".
+            // Our calc logic handles this: Net = Income - Debt - ManualDeductions.
+            // But we also need to reduce distributedAmount to reflect the change immediately if we don't want to re-distribute.
             app.distributedAmount -= val;
             
             saveData();
@@ -1713,10 +1504,12 @@
         }
     }
 
+    // Instruction 5: Toggle Pause
     function togglePause(index) {
         saveSectionSnap('budget');
         const b = app.budgets[index];
         if(b.isPaused) {
+            // Unpause
             let restore = confirm(`آیا درصد قبلی (${b.savedPercent}%) اعمال شود؟\nتایید = بله\nلغو = خیر (وارد کردن درصد جدید)`);
             b.isPaused = false;
             if(restore) {
@@ -1725,12 +1518,17 @@
                 const newP = prompt("درصد جدید را وارد کنید:", b.savedPercent);
                 b.percent = parseInt(newP) || 0;
             }
+            // Check overflow
             let total = app.budgets.reduce((a,i)=>a+i.percent,0);
             if(total > 100) {
-                tempBudget = b; 
+                // If overflow, trigger fix logic
+                tempBudget = b; // Treat as new/edited
+                // Actually, simplest is to use existing fix modal logic but we are not in "Add Mode".
+                // Let's force the user to fix it.
                 alert("توجه: مجموع درصدها از ۱۰۰ بیشتر شد. لطفا دستی اصلاح کنید.");
             }
         } else {
+            // Pause
             b.savedPercent = b.percent;
             b.percent = 0;
             b.isPaused = true;
@@ -1755,7 +1553,7 @@
                     </div>
                     <div class="progress-bar"><div class="progress-fill" style="width:${p}%; background:var(--warning);"></div></div>
                     <div style="display:flex; gap:5px; margin-top:5px;">
-                         <button class="btn btn-primary" style="font-size:0.8rem; padding:2px 8px;" onclick="openAllocate('goal', ${i})">🔗 اختصاص</button>
+                         <button class="btn btn-primary" style="font-size:0.8rem; padding:2px 8px;" onclick="openAllocate('goal', ${i})">🔗 اختصاص از بودجه</button>
                          <button class="btn btn-outline" style="font-size:0.8rem; padding:2px 8px;" onclick="addGoalMoneyDirect(${i})">+ مستقیم</button>
                          <button class="btn btn-danger" style="font-size:0.8rem; padding:2px 8px;" onclick="delGoal(${i})">×</button>
                     </div>
@@ -1781,7 +1579,7 @@
         `).join('');
     }
 
-    // --- EDIT SYSTEM ---
+    // --- EDIT SYSTEM (Instruction 3) ---
     function openEdit(type, index) {
         document.getElementById('editType').value = type;
         document.getElementById('editIndex').value = index;
@@ -1792,7 +1590,12 @@
         let showDate = false;
 
         if(type === 'wallet') item = app.wallets[index];
-        else if(type === 'debt') { item = app.debts[index]; showDate = true; }
+        else if(type === 'debt') { 
+            item = app.debts[index]; 
+            // Add debt uses generic day, but edit needs to handle it.
+            // Currently debt only stores 'day' (number).
+            showDate = true; 
+        }
         else if(type === 'check') { item = app.checks[index]; showDate = true; }
         else if(type === 'loan') { item = app.loans[index]; showDate = true; }
         else if(type === 'budget') { item = app.budgets[index]; showPercent = true; showAmount = false; }
@@ -1801,6 +1604,7 @@
 
         document.getElementById('editName').value = item.name;
         
+        // Instruction 3: Populate Data Correctly
         if(showAmount) {
             document.getElementById('editAmountWrapper').style.display = 'block';
             let val = 0;
@@ -1825,6 +1629,7 @@
             if(type === 'debt') {
                 row.innerHTML = `<select id="editDDay" class="date-sel" style="width:100%">${genOpts(1,31, item.day)}</select>`;
             } else {
+                // Check/Loan store date as string yyyy/mm/dd
                 const parts = item.date ? item.date.split('/') : [1403, 1, 1];
                 row.innerHTML = createDatePickerHTML('editD', parseInt(parts[2]), parseInt(parts[1]), parseInt(parts[0]));
             }
@@ -1842,6 +1647,7 @@
         
         if(!newName) return alert("نام نمی‌تواند خالی باشد");
 
+        // Save Snapshot
         if(type.includes('budget')) saveSectionSnap('budget');
         else if(type.includes('goal') || type.includes('shop')) saveSectionSnap('tools');
         else saveSectionSnap('dashboard');
@@ -1862,19 +1668,25 @@
             app.loans[index].value = parseFormatted(document.getElementById('editVal').value);
             app.loans[index].date = getDateString('editD');
         } else if(type === 'budget') {
+            // Instruction 6: Edit Budget Percent Check
             const oldName = app.budgets[index].name;
             const newP = parseInt(document.getElementById('editPercent').value) || 0;
             
+            // Calculate potential total
             let total = 0;
             app.budgets.forEach((b, i) => {
                 if(i !== index) total += b.percent;
             });
             
             if(total + newP > 100) {
+                // Trigger Fix Logic
                 tempBudget = JSON.parse(JSON.stringify(app.budgets[index]));
                 tempBudget.name = newName;
                 tempBudget.percent = newP;
                 
+                // Remove the old item temporarily from calc to use logic? 
+                // Better approach: Set global tempBudget and open Fix Modal
+                // We need to set the slider max correctly.
                 const safeMax = 100 - total;
                 document.getElementById('maxAllowedPercent').innerText = safeMax + '%';
                 const slider = document.getElementById('percentSlider');
@@ -1882,16 +1694,18 @@
                 slider.value = 0;
                 document.getElementById('sliderValDisplay').innerText = 0;
                 
+                // We need to know we are editing, not adding
                 tempBudget.isEdit = true;
                 tempBudget.editIndex = index;
                 
                 openModal('fixPercentModal');
-                return; 
+                return; // Stop here
             }
 
             app.budgets[index].name = newName;
             app.budgets[index].percent = newP;
             
+            // Sync Priority Name
             if(oldName !== newName && app.priorities[oldName]) {
                 app.priorities[newName] = app.priorities[oldName];
                 delete app.priorities[oldName];
@@ -1992,6 +1806,7 @@
     }
     function delLoan(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard'); app.loans.splice(i,1); saveData(); renderUI(); } }
 
+    // --- BUDGET ADDITION & AUTO CORRECTION ---
     function addNewBudget() {
         const n = document.getElementById('bName').value;
         const p = parseInt(document.getElementById('bPercent').value);
@@ -2050,9 +1865,11 @@
         if(!tempBudget) return;
         saveSectionSnap('budget');
         
+        // Handle Edit case separately if needed, but for simplicity we calculate overflow globally
+        // Re-calculate overflow with the target percent
         let currentTotal = 0;
         app.budgets.forEach((b,i) => {
-            if(tempBudget.isEdit && i === tempBudget.editIndex) return; 
+            if(tempBudget.isEdit && i === tempBudget.editIndex) return; // skip self if editing
             currentTotal += b.percent;
         });
         
@@ -2062,6 +1879,7 @@
         let overflow = (currentTotal + needed) - 100;
         
         if(overflow <= 0) {
+             // Should not happen here usually, but safe guard
             if(tempBudget.isEdit) {
                  app.budgets[tempBudget.editIndex].name = tempBudget.name;
                  app.budgets[tempBudget.editIndex].percent = needed;
@@ -2072,14 +1890,15 @@
             return;
         }
 
+        // Auto correct logic
         let sortedItems = app.budgets.map((b, index) => {
-            if(tempBudget.isEdit && index === tempBudget.editIndex) return null;
+            if(tempBudget.isEdit && index === tempBudget.editIndex) return null; // don't cannibalize self
             return {
                 index: index,
                 priority: app.priorities[b.name] || 4, 
                 percent: b.percent
             };
-        }).filter(x => x !== null).sort((a, b) => b.priority - a.priority);
+        }).filter(x => x !== null).sort((a, b) => b.priority - a.priority); // Priority 4 (Low) first
 
         for (let item of sortedItems) {
             if (overflow <= 0) break;
@@ -2101,6 +1920,7 @@
 
         if(overflow > 0) {
             alert("امکان اصلاح خودکار کامل وجود ندارد. فضا کافی نیست.");
+            // Revert via restore snap manually or just reload logic
              const lastSnap = JSON.parse(app.sectionHistory['budget'][0].data);
              app.budgets = lastSnap.budgets;
              return;
@@ -2118,50 +1938,55 @@
         tempBudget = null;
     }
 
-    // --- PRIORITY SETTINGS (Instruction 2: Fixed Logic) ---
+    // --- PRIORITY SETTINGS (Fixed Crash - Instruction 2) ---
     function openPrioritySettings() {
         const list = document.getElementById('priorityList');
         
+        // Fix Crash: Ensure priorities object exists
         if(!app.priorities) app.priorities = defaultState.priorities;
         if(!app.priorityRanges) app.priorityRanges = {low: 40, mid: 70};
 
+        // Populate Range Inputs
         document.getElementById('pRangeLow').value = app.priorityRanges.low;
         document.getElementById('pRangeMid').value = app.priorityRanges.mid;
 
-        // Clear previous list
-        list.innerHTML = '';
+        // Use DocumentFragment for performance and crash prevention
+        const frag = document.createDocumentFragment();
         
-        // Get Unique Names from current budgets + priorities list to handle deleted items still in priority map
+        // Get Unique Names Safe Way
         const allNames = new Set();
         app.budgets.forEach(b => allNames.add(b.name));
-        
-        // Use a clean HTML string builder instead of complex DOM manipulation loops that caused freezes
-        let html = '';
+        Object.keys(app.priorities).forEach(k => allNames.add(k));
+
         allNames.forEach(name => {
             let p = app.priorities[name] || 4;
-            html += `
-                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:10px;">
-                    <span>${name}</span>
-                    <select class="priority-select" data-name="${name}" style="width:100px; margin:0; padding:5px;">
-                        <option value="1" ${p==1?'selected':''}>۱ (خیلی مهم)</option>
-                        <option value="2" ${p==2?'selected':''}>۲ (مهم)</option>
-                        <option value="3" ${p==3?'selected':''}>۳ (متوسط)</option>
-                        <option value="4" ${p==4?'selected':''}>۴ (کم)</option>
-                    </select>
-                </div>`;
+            const div = document.createElement('div');
+            div.style.cssText = "display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:10px;";
+            div.innerHTML = `
+                <span>${name}</span>
+                <select class="priority-select" data-name="${name}" style="width:100px; margin:0; padding:5px;">
+                    <option value="1" ${p==1?'selected':''}>۱ (خیلی مهم)</option>
+                    <option value="2" ${p==2?'selected':''}>۲ (مهم)</option>
+                    <option value="3" ${p==3?'selected':''}>۳ (متوسط)</option>
+                    <option value="4" ${p==4?'selected':''}>۴ (کم)</option>
+                </select>
+            `;
+            frag.appendChild(div);
         });
         
-        list.innerHTML = html;
+        list.innerHTML = '';
+        list.appendChild(frag);
         openModal('prioritySettingsModal');
     }
 
+    // Instruction 7: Save Ranges
     function savePriorityRanges() {
         const l = parseInt(document.getElementById('pRangeLow').value);
         const m = parseInt(document.getElementById('pRangeMid').value);
         if(!isNaN(l) && !isNaN(m)) {
             app.priorityRanges.low = l;
             app.priorityRanges.mid = m;
-            alert("بازه ها ذخیره شدند");
+            alert("بازه ها ذخیره شدند: \nکم: 0 تا "+l+"%\nمتوسط: "+l+" تا "+m+"%\nزیاد: "+m+" تا 100%");
             saveData();
         }
     }
@@ -2241,6 +2066,7 @@
     }
     function delShop(i) { saveSectionSnap('tools'); app.shopping.splice(i,1); saveData(); renderUI(); }
 
+    // --- ALLOCATION LOGIC ---
     function openAllocate(type, id) {
         document.getElementById('allocType').value = type;
         document.getElementById('allocId').value = id;
@@ -2248,6 +2074,7 @@
         const sel = document.getElementById('allocBudgetSelect');
         sel.innerHTML = app.budgets.map((b, i) => `<option value="${i}">${b.name}</option>`).join('');
         
+        // Auto fill price if shopping
         if(type === 'shop' && app.shopping[id].price) {
             document.getElementById('allocAmt').value = app.shopping[id].price.toLocaleString();
         } else {
@@ -2303,30 +2130,22 @@
         if(app.user.theme === 'dark') document.body.setAttribute('data-theme', 'dark');
     }
 
-    // --- REPORT GENERATION (Instruction 1 - Full PDF) ---
+    // --- INVOICE ---
     function generateReportImage() {
-        // Keeps old functionality for backwards compatibility if needed, 
-        // but downloadPDF is the main one now.
-        downloadPDF();
-    }
-
-    async function downloadPDF() {
-        const { jsPDF } = window.jspdf;
-        const printArea = document.getElementById('printArea');
-        
-        // Prepare Data
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
-        const totalDebt = getDebtTotal();
-        const net = income - totalDebt - app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
+        const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
+        const checkDebt = (app.checks || []).reduce((a,b)=>a+b.value,0);
+        const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
+        const totalDebt = fixedDebt + checkDebt;
+        const net = income - totalDebt - manualDeductions;
 
         document.getElementById('printDate').innerText = new Date().toLocaleDateString('fa-IR');
         document.getElementById('printUser').innerText = app.user.name;
-        document.getElementById('printDuration').innerText = document.getElementById('daysCountDisplay').innerText.split('|')[0] || "---";
         document.getElementById('printInc').innerText = format(income);
         document.getElementById('printDebt').innerText = format(totalDebt);
         document.getElementById('printNet').innerText = format(net);
 
-        // Populate Budget Table
+        // Budget Table
         const tb = document.getElementById('printBody');
         tb.innerHTML = '';
         app.budgets.forEach(b => {
@@ -2335,46 +2154,26 @@
             tb.innerHTML += `<tr><td>${b.name}</td><td>${b.percent}%</td><td>${format(s)}</td><td>${format(b.spent)}</td><td>${format(s-b.spent)}</td></tr>`;
         });
 
-        // Populate Debts
+        // Debt List
         const dList = document.getElementById('printDebtsList');
         let debtHtml = "";
         app.debts.forEach(d => debtHtml += `<div>${d.name}: ${format(d.value)}</div>`);
         app.checks.forEach(c => debtHtml += `<div>چک (${c.name}): ${format(c.value)} - ${c.date}</div>`);
         dList.innerHTML = debtHtml || "ندارد";
 
-        // Populate History Table
-        const thb = document.getElementById('printHistoryBody');
-        thb.innerHTML = '';
-        app.dailyLogs.slice().reverse().forEach(l => {
-            thb.innerHTML += `<tr><td>${l.date}</td><td>${format(l.income)}</td><td>${format(l.spent)}</td></tr>`;
+        // Goals List
+        const gList = document.getElementById('printGoalsList');
+        let goalHtml = "";
+        app.goals.forEach(g => goalHtml += `<div>${g.name}: ${format(g.curr)} / ${format(g.target)}</div>`);
+        gList.innerHTML = goalHtml || "ندارد";
+
+        const el = document.getElementById('printArea');
+        el.style.top = "0";
+        html2canvas(el).then(c => {
+            const a = document.createElement('a');
+            a.download = 'Financial_Report.png'; a.href = c.toDataURL(); a.click();
+            el.style.top = "-9999px";
         });
-
-        // Draw Chart on PDF Canvas
-        const pCtx = document.getElementById('printChart').getContext('2d');
-        // Destroy old if exists or it will glitch
-        if(window.printChartInstance) window.printChartInstance.destroy();
-
-        const labels = app.dailyLogs.map(l => l.date);
-        const dInc = app.dailyLogs.map(l => l.income * rate);
-        window.printChartInstance = new Chart(pCtx, {
-            type: 'line',
-            data: { labels: labels, datasets: [{ label: 'روند دارایی', data: dInc, borderColor: '#4338ca', borderWidth: 2 }] },
-            options: { animation: false, responsive: true, maintainAspectRatio: false }
-        });
-
-        // Wait for chart render
-        await new Promise(r => setTimeout(r, 500));
-
-        // Use html2canvas
-        const canvas = await html2canvas(printArea, { scale: 2 });
-        const imgData = canvas.toDataURL('image/png');
-        
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        pdf.save(`Financial_Report_${new Date().toLocaleDateString('fa-IR').replace(/\//g,'-')}.pdf`);
     }
 
     function downloadBackup() {
@@ -2382,6 +2181,7 @@
         const a = document.createElement('a');
         a.href = str; a.download = "backup.json"; a.click();
         
+        // Add to history
         app.history.unshift({date: Date.now(), name: "بکاپ دستی"});
         if(app.history.length > 5) app.history.pop();
         saveData();
@@ -2393,20 +2193,18 @@
         reader.onload = (e) => {
             try {
                 app = JSON.parse(e.target.result);
-                
-                // Compatibility Checks
+                // Ensure new structures exist
                 if(!app.priorities) app.priorities = defaultState.priorities;
-                if(!app.dailyLogs) app.dailyLogs = [];
-                if(!app.security.questionIndex) app.security.questionIndex = 0;
-                if(!app.startDate) app.startDate = new Date().toLocaleDateString('fa-IR');
-                
+                if(!app.sectionHistory) app.sectionHistory = { dashboard: [], budget: [], tools: [] };
+                // Ensure new fields exist for budget items
                 app.budgets.forEach(b => { 
                     if(!b.history) b.history = [];
                     if(b.manualAdd === undefined) b.manualAdd = 0;
                     if(b.isPaused === undefined) b.isPaused = false;
                     if(b.savedPercent === undefined) b.savedPercent = 0;
                 });
-                
+                if(app.distributedAmount === undefined) app.distributedAmount = 0;
+
                 saveData();
                 location.reload();
             } catch(err) { alert("فایل نامعتبر"); }
@@ -2442,26 +2240,14 @@
         const d = localStorage.getItem('amir_fin_v9');
         if(d) {
             app = JSON.parse(d);
-            
-            // Backward Compatibility - Ensure new fields exist
+            // Backward Compatibility Checks
             if(!app.checks) app.checks = [];
             if(!app.loans) app.loans = [];
             if(!app.priorities) app.priorities = defaultState.priorities;
             if(!app.sectionHistory) app.sectionHistory = { dashboard: [], budget: [], tools: [] };
             if(!app.priorityRanges) app.priorityRanges = { low: 40, mid: 70 };
             if(app.distributedAmount === undefined) app.distributedAmount = 0;
-            
-            // Security Upgrade
             if(app.security.isSetup === undefined) app.security.isSetup = app.security.hasPin;
-            if(app.security.questionIndex === undefined) {
-                app.security.questionIndex = 0;
-                app.security.answer = ""; 
-                app.security.isSetup = false; // Force re-setup for security question
-            }
-
-            // Daily Log Upgrade
-            if(!app.dailyLogs) app.dailyLogs = [];
-            if(!app.startDate) app.startDate = new Date().toLocaleDateString('fa-IR');
 
             app.budgets.forEach(b => { 
                 if(!b.history) b.history = []; 
@@ -2478,10 +2264,12 @@
         document.getElementById('headerDate').innerText = new Date().toLocaleDateString('fa-IR');
     }
 
+    // --- UI NAVIGATION ---
     function switchTab(id) {
         document.querySelectorAll('.tab-pane').forEach(e => e.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(e => e.classList.remove('active'));
         document.getElementById('view-'+id).classList.add('active');
+        // Fix for event.currentTarget issue in some contexts
         const btns = document.querySelectorAll('.nav-btn');
         btns.forEach(b => {
             if(b.getAttribute('onclick').includes(id)) b.classList.add('active');
@@ -2492,12 +2280,11 @@
             openPrioritySettings(); 
         }
         
+        // Clear inputs (except slider range and range thresholds)
         const m = document.getElementById(id);
         const inputs = m.querySelectorAll('input');
         inputs.forEach(i => {
-            // Keep specialized inputs intact
-            if(i.type !== 'hidden' && i.type !== 'checkbox' && i.type !== 'range' && 
-               i.id !== 'pRangeLow' && i.id !== 'pRangeMid') i.value = '';
+            if(i.type !== 'hidden' && i.type !== 'checkbox' && i.type !== 'range' && i.id !== 'pRangeLow' && i.id !== 'pRangeMid') i.value = '';
         });
         m.classList.add('active'); 
     }
