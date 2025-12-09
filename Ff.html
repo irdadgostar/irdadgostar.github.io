@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مدیریت مالی حرفه‌ای | V12 Ultimate (Full Edit & History)</title>
+    <title>مدیریت مالی حرفه‌ای | V13 Ultimate (Bug Fixes & Auth)</title>
     
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
@@ -335,7 +335,7 @@
         }
         .action-chip:hover { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* --- Template Chips (New) --- */
+        /* --- Template Chips --- */
         .template-row {
             display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px;
         }
@@ -398,12 +398,6 @@
             transform: translateY(0); /* آمدن به بالا */
         }
 
-        /* --- TAB CONTENT --- */
-        .tab-pane { display: none; padding-bottom: 20px; }
-        .tab-pane.active { display: block; animation: slideUp 0.3s; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
         /* --- REPORT (PRINT) --- */
         #printArea {
             position: absolute; top: -9999px; left: -9999px;
@@ -423,6 +417,11 @@
         }
         .history-btn:hover { background: var(--primary); color: white; }
 
+        /* Auth Name Input (دستور ۱) */
+        #authNameInput {
+            margin-bottom: 20px; text-align: center; font-weight: bold;
+        }
+
     </style>
 </head>
 <body>
@@ -433,6 +432,9 @@
     <h2 id="authTitle" style="margin: 15px 0 5px 0;">امنیت</h2>
     <p id="authSub" style="font-size: 0.9rem; color: var(--text-sec); margin-bottom: 20px;">...</p>
     
+    <!-- Input for Name (First Login) -->
+    <input type="text" id="authNameInput" placeholder="نام و نام خانوادگی خود را وارد کنید" style="display:none; width: 80%; max-width: 300px;">
+
     <div class="pin-dots">
         <div class="pin-dot" id="pd1"></div>
         <div class="pin-dot" id="pd2"></div>
@@ -612,12 +614,11 @@
                     <input type="checkbox" id="rawCopyCheck" style="width:20px; height:20px;">
                 </div>
 
-                <!-- Priority Settings (Moved Down - Instruction 6) -->
+                <!-- Priority Settings (دستور ۲: رفع مشکل هنگ + دستور ۶ قبلی: جابجایی) -->
                 <button class="btn btn-outline" onclick="openModal('prioritySettingsModal')">
                     <i class="fas fa-list-ol"></i> مدیریت اولویت‌ها
                 </button>
 
-                <!-- Change Name (Instruction 5) -->
                 <button class="btn btn-outline" onclick="changeUserName()">
                     <i class="fas fa-user-edit"></i> تغییر نام کاربر
                 </button>
@@ -670,7 +671,7 @@
 
 <!-- MODALS -->
 
-<!-- Edit Modal (Instruction 1) -->
+<!-- Edit Modal (Instruction 3: Fixed Population) -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h3>ویرایش آیتم</h3>
@@ -700,7 +701,7 @@
     </div>
 </div>
 
-<!-- Section History Modal (Instruction 4) -->
+<!-- Section History Modal -->
 <div id="sectionHistoryModal" class="modal">
     <div class="modal-content">
         <h3>تاریخچه تغییرات (۱۰ مورد آخر)</h3>
@@ -884,7 +885,7 @@
     </div>
 </div>
 
-<!-- Percentage Correction Modal (دستور ۲ و ۳) -->
+<!-- Percentage Correction Modal -->
 <div id="fixPercentModal" class="modal">
     <div class="modal-content">
         <h3><i class="fas fa-exclamation-triangle" style="color:var(--warning)"></i> خطا در درصد کل</h3>
@@ -917,7 +918,7 @@
     </div>
 </div>
 
-<!-- Priority Settings Modal (دستور ۶) -->
+<!-- Priority Settings Modal (Instruction 2) -->
 <div id="prioritySettingsModal" class="modal">
     <div class="modal-content">
         <h3>مدیریت اولویت‌ها</h3>
@@ -952,7 +953,7 @@
     </div>
 </div>
 
-<!-- REPORT TEMPLATE (Hidden - Instruction 7) -->
+<!-- REPORT TEMPLATE (Hidden) -->
 <div id="printArea">
     <div class="print-header">
         <h1>گزارش جامع وضعیت مالی</h1>
@@ -995,7 +996,7 @@
     // --- STATE & DATA ---
     const defaultState = {
         security: { hasPin: false, pin: "" },
-        user: { name: "امیرحسین", theme: "light", currency: "toman" },
+        user: { name: "", theme: "light", currency: "toman" }, // Default name empty for first login
         wallets: [],
         debts: [], 
         checks: [], 
@@ -1020,7 +1021,7 @@
         goals: [],
         shopping: [],
         history: [], // Backup history
-        sectionHistory: { dashboard: [], budget: [], tools: [] } // Separate Undo History (Instruction 4)
+        sectionHistory: { dashboard: [], budget: [], tools: [] }
     };
 
     let app = JSON.parse(JSON.stringify(defaultState));
@@ -1068,22 +1069,28 @@
         return `${y}/${m}/${d}`;
     }
 
-    // --- AUTH ---
+    // --- AUTH & LOGIN (Instruction 1) ---
     function checkAuth() {
         const modal = document.getElementById('authModal');
         const title = document.getElementById('authTitle');
         const sub = document.getElementById('authSub');
+        const nameInput = document.getElementById('authNameInput');
         
         modal.style.display = 'flex';
         pinBuffer = "";
         updatePinDots();
 
         if (!app.security.hasPin) {
-            title.innerText = "تعیین رمز عبور جدید";
-            sub.innerText = "برای شروع یک رمز ۴ رقمی انتخاب کنید";
+            // First time login
+            title.innerText = "خوش آمدید";
+            sub.innerText = "لطفاً نام خود را وارد کرده و رمز عبور تعیین کنید";
+            nameInput.style.display = "block";
+            nameInput.focus();
         } else {
-            title.innerText = "ورود به سامانه";
+            // Returning user
+            title.innerText = `خوش آمدی، ${app.user.name || 'کاربر'}`;
             sub.innerText = "رمز عبور خود را وارد کنید";
+            nameInput.style.display = "none";
         }
     }
 
@@ -1103,10 +1110,21 @@
     }
 
     function processPin() {
+        const nameInput = document.getElementById('authNameInput');
+
         if (!app.security.hasPin) {
+            // Create PIN Logic
+            const enteredName = nameInput.value.trim();
+            if(enteredName === "") {
+                alert("لطفاً نام خود را وارد کنید!");
+                pinBuffer = ""; updatePinDots();
+                return;
+            }
+
             if(confirm("رمز شما: " + pinBuffer + "\nآیا مطمئن هستید؟")) {
                 app.security.pin = pinBuffer;
                 app.security.hasPin = true;
+                app.user.name = enteredName; // Save Name
                 saveData();
                 document.getElementById('authModal').style.display = 'none';
                 document.getElementById('appContent').style.display = 'block';
@@ -1115,6 +1133,7 @@
                 pinBuffer = ""; updatePinDots();
             }
         } else {
+            // Login Logic
             if (pinBuffer === app.security.pin) {
                 document.getElementById('authModal').style.display = 'none';
                 document.getElementById('appContent').style.display = 'block';
@@ -1160,7 +1179,7 @@
         return (n * rate).toLocaleString('en-US'); 
     }
 
-    // --- HISTORY SYSTEM (Instruction 4) ---
+    // --- HISTORY SYSTEM ---
     function saveSectionSnap(section) {
         let snap = null;
         if(section === 'dashboard') {
@@ -1216,9 +1235,6 @@
             app.shopping = snap.shopping;
         }
         
-        // Remove newer history? No, let's keep it (standard undo behavior usually keeps redo, but here simpler is better)
-        // Or just act like it's a new state.
-        
         saveData();
         renderUI();
         closeAllModals();
@@ -1254,7 +1270,7 @@
         renderShop();
     }
 
-    // --- RENDER FUNCTIONS (With Edit Buttons - Instruction 1) ---
+    // --- RENDER FUNCTIONS ---
     function renderWallets() {
         const div = document.getElementById('walletList');
         div.innerHTML = app.wallets.map((w, i) => `
@@ -1408,7 +1424,7 @@
         `).join('');
     }
 
-    // --- EDIT SYSTEM (Instruction 1) ---
+    // --- EDIT SYSTEM (Instruction 3: Fixed Population) ---
     function openEdit(type, index) {
         document.getElementById('editType').value = type;
         document.getElementById('editIndex').value = index;
@@ -1445,7 +1461,9 @@
             document.getElementById('editPercentWrapper').style.display = 'none';
         }
 
-        openModal('editModal');
+        // Open modal without clearing inputs!
+        const modal = document.getElementById('editModal');
+        modal.classList.add('active');
     }
 
     function performEdit() {
@@ -1578,7 +1596,7 @@
     }
     function delLoan(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard'); app.loans.splice(i,1); saveData(); renderUI(); } }
 
-    // --- BUDGET ADDITION & AUTO CORRECTION (Instruction 2 & 3) ---
+    // --- BUDGET ADDITION & AUTO CORRECTION ---
     function addNewBudget() {
         const n = document.getElementById('bName').value;
         const p = parseInt(document.getElementById('bPercent').value);
@@ -1655,7 +1673,6 @@
             if (overflow <= 0) break;
             
             let currentP = item.percent;
-            // If allowZero is false, we must keep at least 1%, unless it's already 0
             let deductible = currentP;
             if(!allowZero && currentP > 0) {
                 deductible = currentP - 1; // leave 1%
@@ -1671,11 +1688,7 @@
         }
 
         if(overflow > 0) {
-            // Revert changes in memory (or simply alert and don't save because we saved snap)
-            // But we actually modified app.budgets in loop. We need to revert if fail.
-            // Since we saved snap, restoring snap is best, but easier to just alert and let user decide.
             alert("امکان کاهش وجود ندارد! بودجه پر شده است و با شرط «عدم صفر شدن» فضای کافی ایجاد نشد.");
-            // Restore from snap quickly to undo in-memory changes
             const lastSnap = JSON.parse(app.sectionHistory['budget'][0].data);
             app.budgets = lastSnap.budgets;
             return;
@@ -1693,7 +1706,26 @@
         tempBudget = null;
     }
 
-    // --- PRIORITY SETTINGS ---
+    // --- PRIORITY SETTINGS (Instruction 2: Fixed Crash) ---
+    function openModal(id) { 
+        // Logic for specific modals that need data prep
+        if(id === 'prioritySettingsModal') {
+            openPrioritySettings(); // Just Render the list
+        }
+        
+        // Clear inputs logic (Modified to skip editModal)
+        const m = document.getElementById(id);
+        
+        if (id !== 'editModal') { // Instruction 3: Don't clear inputs if editing
+            const inputs = m.querySelectorAll('input');
+            inputs.forEach(i => {
+                if(i.type !== 'hidden' && i.type !== 'checkbox' && i.type !== 'range') i.value = '';
+            });
+        }
+        
+        m.classList.add('active'); 
+    }
+
     function openPrioritySettings() {
         const list = document.getElementById('priorityList');
         let allNames = new Set([...app.budgets.map(b=>b.name), ...Object.keys(app.priorities)]);
@@ -1714,7 +1746,7 @@
             `;
         });
         list.innerHTML = html;
-        openModal('prioritySettingsModal');
+        // REMOVED RECURSIVE CALL TO openModal HERE
     }
 
     function savePriorities() {
@@ -1856,7 +1888,7 @@
         if(app.user.theme === 'dark') document.body.setAttribute('data-theme', 'dark');
     }
 
-    // --- INVOICE (Instruction 7) ---
+    // --- INVOICE ---
     function generateReportImage() {
         const net = getNetTotal();
         const debt = getDebtTotal();
@@ -1958,6 +1990,8 @@
         if(!app.loans) app.loans = [];
         if(!app.priorities) app.priorities = defaultState.priorities;
         if(!app.sectionHistory) app.sectionHistory = { dashboard: [], budget: [], tools: [] };
+        // Clean up name if it was default
+        if(app.user.name === "امیرحسین" && !app.security.hasPin) app.user.name = ""; 
         app.budgets.forEach(b => { if(!b.history) b.history = []; });
     }
     function saveData() {
@@ -1974,20 +2008,7 @@
         document.getElementById('view-'+id).classList.add('active');
         event.currentTarget.classList.add('active');
     }
-    function openModal(id) { 
-        // Logic for specific modals that need data prep
-        if(id === 'prioritySettingsModal') {
-            openPrioritySettings(); 
-        }
-        
-        // Clear inputs (except slider range)
-        const m = document.getElementById(id);
-        const inputs = m.querySelectorAll('input');
-        inputs.forEach(i => {
-            if(i.type !== 'hidden' && i.type !== 'checkbox' && i.type !== 'range') i.value = '';
-        });
-        m.classList.add('active'); 
-    }
+    
     function closeAllModals() { document.querySelectorAll('.modal').forEach(e => e.classList.remove('active')); }
 
 </script>
