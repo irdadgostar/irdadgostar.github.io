@@ -1,10 +1,9 @@
-
 <!DOCTYPE html> 
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مدیریت مالی حرفه‌ای | V15 Ultimate (Bank Connected UI)</title>
+    <title>مدیریت مالی حرفه‌ای | V14 Ultimate (Security & Analytics)</title>
 
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
@@ -17,17 +16,18 @@
 
     <style>
         :root {
-            --bg-body: #f1f5f9;
-            --glass-bg: rgba(255, 255, 255, 0.95);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.8);
-            --shadow-soft: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+            --bg-body: #f3f4f6;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.9);
+            --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.04);
             --shadow-card: 0 15px 35px rgba(0, 0, 0, 0.1);
             
-            --primary: #3b82f6;      /* Blue 500 */
-            --primary-dark: #1d4ed8; /* Blue 700 */
-            --accent: #6366f1;       /* Indigo */
-            --text-main: #0f172a;     /* Slate 900 */
+            --primary: #4f46e5;      /* Indigo 600 */
+            --primary-dark: #4338ca;
+            --primary-light: #818cf8;
+            --text-main: #1e293b;     /* Slate 800 */
             --text-sec: #64748b;      /* Slate 500 */
+            
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
@@ -36,15 +36,14 @@
         }
 
         [data-theme="dark"] {
-            --bg-body: #0b0f19;
-            --glass-bg: rgba(30, 41, 59, 0.95);
-            --glass-border: 1px solid rgba(71, 85, 105, 0.3);
-            --text-main: #f8fafc;
+            --bg-body: #0f172a;
+            --glass-bg: rgba(30, 41, 59, 0.85);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+            --text-main: #f1f5f9;
             --text-sec: #94a3b8;
-            --primary: #60a5fa;
-            --primary-dark: #3b82f6;
-            --shadow-soft: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
-            --shadow-card: 0 15px 35px rgba(0, 0, 0, 0.6);
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         * {
@@ -64,9 +63,42 @@
             transition: background 0.3s ease;
         }
 
+        /* --- Toast Notification (Modern Alert) --- */
+        .toast-container {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 12000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+        .toast {
+            background: rgba(30, 41, 59, 0.95);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .toast i { color: var(--success); }
+
         /* --- کامپوننت‌های عمومی --- */
         .container {
-            max-width: 600px; /* موبایل فرست */
+            max-width: 600px;
             margin: 0 auto;
             padding: 20px;
             padding-bottom: 40px;
@@ -77,11 +109,11 @@
             border: var(--glass-border);
             border-radius: var(--card-radius);
             box-shadow: var(--shadow-soft);
-            padding: 22px;
+            padding: 20px;
             margin-bottom: 24px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             transition: transform 0.2s, box-shadow 0.2s;
-            position: relative;
-            overflow: hidden;
         }
         
         .header-row {
@@ -89,18 +121,19 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 18px;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
             padding-bottom: 12px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
+        [data-theme="dark"] .header-row { border-bottom: 1px solid rgba(255,255,255,0.05); }
 
         .header-row h3 { margin: 0; font-size: 1.1rem; color: var(--primary); display: flex; align-items: center; gap: 10px; font-weight: 800; }
 
-        /* دکمه‌ها - مدرن و حرفه‌ای */
+        /* دکمه‌ها - مدرن و آیکون‌دار */
         .btn {
-            padding: 12px 18px;
+            padding: 12px 20px;
             border-radius: 16px;
             font-size: 0.9rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
@@ -108,7 +141,7 @@
             gap: 8px;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             border: none;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
         }
 
         .btn-primary { 
@@ -127,7 +160,7 @@
         .btn-outline:hover { 
             border-color: var(--primary); 
             color: var(--primary); 
-            background: rgba(59, 130, 246, 0.05);
+            background: rgba(79, 70, 229, 0.05);
             opacity: 1;
         }
 
@@ -153,10 +186,11 @@
         .btn-icon:hover { 
             background: var(--primary); 
             color: white; 
-            transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(59, 130, 246, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(79, 70, 229, 0.25);
         }
         
+        /* دکمه‌های کوچک عملیاتی */
         .btn-small-icon {
             width: 32px; height: 32px;
             border-radius: 10px;
@@ -165,19 +199,17 @@
             font-size: 0.9rem;
             transition: all 0.2s;
         }
-        .btn-edit { color: var(--warning); background: rgba(245, 158, 11, 0.1); border: none; }
-        .btn-del { color: var(--danger); background: rgba(239, 68, 68, 0.1); border: none; }
-        .btn-inject { color: var(--success); background: rgba(16, 185, 129, 0.1); border: none; }
-        .btn-pause { color: var(--text-sec); background: rgba(148, 163, 184, 0.1); border: none; }
-
+        .btn-edit { color: var(--warning); background: rgba(245, 158, 11, 0.15); border: none; }
+        .btn-del { color: var(--danger); background: rgba(239, 68, 68, 0.15); border: none; }
+        
         .currency-toggle-btn {
             background: var(--glass-bg);
             border: 1px solid var(--primary);
             color: var(--primary);
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 20px;
             font-size: 0.85rem;
-            font-weight: bold;
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -187,50 +219,45 @@
         .currency-toggle-btn.active {
             background: var(--primary);
             color: white;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
         }
 
         /* ورودی‌ها - مدرن */
         input, select {
             background: var(--bg-body);
-            border: 1px solid transparent;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+            border: 2px solid transparent;
             color: var(--text-main);
             padding: 16px;
-            border-radius: 14px;
+            border-radius: 16px;
             font-size: 1rem;
             width: 100%;
-            margin-bottom: 16px;
+            margin-bottom: 15px;
             transition: all 0.2s;
+            font-weight: 500;
         }
         input:focus, select:focus { 
             border-color: var(--primary); 
             background: var(--glass-bg);
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); 
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); 
         }
         
         input[type=range] {
-            -webkit-appearance: none; width: 100%; margin: 15px 0; background: transparent; box-shadow: none;
+            -webkit-appearance: none; width: 100%; margin: 15px 0; background: transparent; box-shadow: none; border:none;
         }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%;
             background: var(--primary); cursor: pointer; margin-top: -10px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2); border: 2px solid white;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.4); border: 3px solid white;
         }
         input[type=range]::-webkit-slider-runnable-track {
             width: 100%; height: 6px; cursor: pointer; background: #e2e8f0; border-radius: 3px;
         }
 
         .date-picker-row {
-            display: flex;
-            gap: 8px;
-            direction: ltr; 
+            display: flex; gap: 8px; direction: ltr; 
         }
         .date-picker-row select {
-            flex: 1;
-            padding: 12px;
-            font-size: 0.9rem;
-            direction: rtl;
-            text-align: center;
+            flex: 1; padding: 12px; font-size: 0.9rem; direction: rtl; text-align: center;
         }
 
         .money-input-wrapper {
@@ -238,7 +265,7 @@
             margin-bottom: 15px;
         }
         .money-input-wrapper input {
-            padding-left: 70px; 
+            padding-left: 80px; 
             margin-bottom: 0;
             direction: ltr;
             text-align: right;
@@ -252,53 +279,52 @@
             top: 50%;
             transform: translateY(-50%);
             color: var(--primary);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: bold;
             pointer-events: none;
-            background: rgba(59, 130, 246, 0.1);
-            padding: 4px 8px;
-            border-radius: 8px;
+            background: rgba(79, 70, 229, 0.1);
+            padding: 6px 10px;
+            border-radius: 10px;
         }
 
-        /* --- صفحه ورود (Lock Screen) - اصلاح شده طبق دستور ۱ --- */
+        /* --- صفحه ورود (Lock Screen) - اصلاح فاصله و ساختار --- */
         .pin-screen {
-            position: fixed; top: 0; left: 0; width: 100%; 
-            min-height: 100dvh; /* Dynamic Height for Mobile */
-            height: 100%;
-            background: var(--bg-body); z-index: 10000; /* Z-Index تنظیم شده */
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-body); z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             padding: 20px;
-            overflow-y: auto;
+            overflow-y: auto; /* برای اسکرول در صورت کوچک بودن صفحه */
         }
         
         .auth-card {
             background: var(--glass-bg);
-            border: var(--glass-border);
-            border-radius: 35px;
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 32px;
             padding: 40px 30px;
             width: 100%;
-            max-width: 380px;
-            box-shadow: var(--shadow-card);
+            max-width: 380px; /* سایز استاندارد */
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.1);
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin: auto 0; /* Center Vertical */
+            backdrop-filter: blur(10px);
+            margin: auto; /* برای سنتر شدن عمودی کامل */
         }
 
         .auth-avatar {
             width: 80px; height: 80px;
-            border-radius: 25px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 24px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             display: flex; align-items: center; justify-content: center;
             font-size: 2rem;
             margin-bottom: 20px;
-            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 15px 30px rgba(79, 70, 229, 0.3);
             transform: rotate(-5deg);
         }
 
-        .pin-dots { display: flex; gap: 15px; margin: 30px 0; justify-content: center; }
+        .pin-dots { display: flex; gap: 18px; margin: 30px 0; justify-content: center; }
         .pin-dot { 
             width: 16px; height: 16px; border-radius: 50%; 
             background: #cbd5e1; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
@@ -306,27 +332,25 @@
         .pin-dot.filled { 
             background: var(--primary); 
             transform: scale(1.4); 
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.6); 
+            box-shadow: 0 0 15px rgba(79, 70, 229, 0.5); 
         }
         
         .numpad {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; direction: ltr; 
-            width: 100%; max-width: 320px; margin: 0 auto;
+            width: 100%; max-width: 280px; margin: 0 auto;
         }
         .num-key {
-            width: 70px; height: 70px; border-radius: 24px;
-            background: rgba(255,255,255,0.5); border: 1px solid rgba(0,0,0,0.05);
+            width: 65px; height: 65px; border-radius: 20px;
+            background: transparent; 
             font-size: 1.5rem; font-weight: 700; color: var(--text-main);
             cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: all 0.1s;
+            transition: all 0.2s;
             margin: 0 auto;
-            box-shadow: 0 4px 0 rgba(0,0,0,0.05);
+            border: none;
         }
-        .num-key:active { 
-            background: var(--primary); border-color: var(--primary); 
-            color: white; transform: translateY(4px); box-shadow: none; 
-        }
-        .num-key.del { border-color: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .num-key:hover { background: rgba(0,0,0,0.03); }
+        .num-key:active { background: var(--primary); color: white; transform: scale(0.9); border-radius: 50%; }
+        .num-key.del { color: var(--danger); }
         .num-key.del:active { background: var(--danger); color: white; }
 
         .auth-link {
@@ -336,27 +360,28 @@
             text-decoration: none;
             cursor: pointer;
             border-bottom: 1px dashed var(--text-sec);
-            padding-bottom: 2px;
-            transition: 0.3s;
+            padding-bottom: 4px;
+            transition: 0.2s;
         }
         .auth-link:hover { color: var(--primary); border-color: var(--primary); }
         
         .guest-btn {
-            margin-top: 20px;
-            background: transparent;
-            border: 2px solid var(--warning);
+            margin-top: 25px;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
             color: var(--warning);
-            padding: 12px 20px;
-            border-radius: 16px;
+            padding: 12px 25px;
+            border-radius: 14px;
             cursor: pointer;
             font-weight: bold;
             transition: 0.2s;
+            width: 100%;
         }
         .guest-btn:hover { background: var(--warning); color: white; }
 
-        /* --- کارت اعتباری (HERO) - اصلاح شده طبق دستور ۶ --- */
+        /* --- کارت اعتباری مدرن (ایرانی) --- */
         .hero-card {
-            perspective: 1000px;
+            perspective: 1500px;
             height: 230px;
             margin-bottom: 30px;
             cursor: pointer;
@@ -364,11 +389,11 @@
         .card-inner {
             position: relative;
             width: 100%; height: 100%;
-            text-align: center;
+            text-align: right;
             transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             transform-style: preserve-3d;
-            border-radius: 26px;
-            box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.5);
+            border-radius: 28px;
+            box-shadow: 0 25px 50px -12px rgba(67, 56, 202, 0.4);
         }
         .hero-card.flipped .card-inner { transform: rotateY(180deg); }
         
@@ -376,33 +401,40 @@
             position: absolute;
             width: 100%; height: 100%;
             backface-visibility: hidden;
-            border-radius: 26px;
+            border-radius: 28px;
             padding: 25px;
             color: white;
             display: flex; flex-direction: column; justify-content: space-between;
             overflow: hidden;
         }
-        /* استایل کارت بانکی ایرانی مدرن */
         .card-front {
-            background: linear-gradient(110deg, #1e3a8a 0%, #3b82f6 50%, #1e40af 100%);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: linear-gradient(110deg, #1e3a8a 0%, #3b82f6 100%);
+            /* پترن برای شبیه سازی کارت بانکی */
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255,255,255,0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255,255,255,0.1) 0%, transparent 20%),
+                linear-gradient(110deg, #1e3a8a 0%, #2563eb 100%);
         }
         .card-front::before {
-            content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
-            background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 20.5V18H0v-2h20v-2H0v-2h20v-2H0V8h20V6H0V4h20V2H0V0h22v20h2V0h2v20h2V0h2v20h2V0h2v20h2V0h2v20h2v2H20v-1.5zM0 20h2v20H0V20zm4 0h2v20H4V20zm4 0h2v20H8V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
-            opacity: 0.3; pointer-events: none;
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
-        /* شبیه سازی چیپ کارت */
+
+        /* چیپ کارت بانکی */
         .card-chip {
-            width: 45px; height: 35px;
-            background: linear-gradient(135deg, #fcd34d, #d97706);
+            width: 50px; height: 35px;
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 50%, #fbbf24 100%);
             border-radius: 6px;
             margin-bottom: 10px;
             position: relative;
-            overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.4), 0 2px 5px rgba(0,0,0,0.2);
+            border: 1px solid rgba(0,0,0,0.1);
         }
         .card-chip::after {
-            content:''; position: absolute; top:0; left:50%; width:1px; height:100%; background:rgba(0,0,0,0.2);
+            content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: rgba(0,0,0,0.3);
+        }
+        .card-chip::before {
+            content: ''; position: absolute; left: 30%; top: 0; height: 100%; width: 1px; background: rgba(0,0,0,0.3);
         }
 
         .card-back {
@@ -410,14 +442,10 @@
             transform: rotateY(180deg);
             align-items: center; justify-content: center;
             border: 1px solid rgba(255,255,255,0.1);
-            background-image: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
         }
 
-        .balance-label { font-size: 0.85rem; opacity: 0.8; text-align: right; display: block; font-weight: 300; margin-bottom: 5px; }
-        .balance-value { 
-            font-size: 2.2rem; font-weight: 800; margin: 5px 0; direction: ltr; 
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3); letter-spacing: 2px; font-family: 'Courier New', monospace;
-        }
+        .balance-label { font-size: 0.9rem; opacity: 0.8; font-weight: 300; display:block; margin-bottom:5px;}
+        .balance-value { font-size: 2.2rem; font-weight: 800; margin: 5px 0; direction: ltr; text-shadow: 0 4px 10px rgba(0,0,0,0.2); letter-spacing: 2px; font-family: 'Courier New', monospace; }
 
         /* --- BENTO GRID (بودجه) --- */
         .budget-grid {
@@ -430,55 +458,65 @@
         .bento-item {
             background: var(--glass-bg);
             border: var(--glass-border);
-            border-radius: 20px;
+            border-radius: 22px;
             padding: 20px;
             position: relative;
             display: flex; flex-direction: column; gap: 12px;
             box-shadow: var(--shadow-soft);
             transition: all 0.3s;
         }
-        .bento-item:hover { transform: translateY(-4px); box-shadow: var(--shadow-card); }
+        .bento-item:hover { transform: translateY(-5px); box-shadow: var(--shadow-card); }
         .bento-item.paused {
             opacity: 0.7;
-            filter: grayscale(0.8);
+            filter: grayscale(1);
             border: 2px dashed var(--text-sec);
         }
         
-        .bento-header { display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 1.1rem; }
+        .bento-header { display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 1.1rem; color: var(--text-main); }
         
         .progress-bar {
-            height: 14px; background: rgba(0,0,0,0.06); border-radius: 8px; overflow: hidden; margin: 8px 0;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            height: 14px; background: rgba(0,0,0,0.06); border-radius: 10px; overflow: hidden; margin: 5px 0;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
         }
-        .progress-fill { height: 100%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 8px; }
+        .progress-fill { height: 100%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 10px; }
         
-        .stat-green .progress-fill { background: linear-gradient(90deg, var(--success), #34d399); box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3); }
-        .stat-yellow .progress-fill { background: linear-gradient(90deg, var(--warning), #fbbf24); box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3); }
-        .stat-red .progress-fill { background: linear-gradient(90deg, var(--danger), #f87171); box-shadow: 0 2px 10px rgba(239, 68, 68, 0.3); }
+        .stat-green .progress-fill { background: linear-gradient(90deg, var(--success), #34d399); }
+        .stat-yellow .progress-fill { background: linear-gradient(90deg, var(--warning), #fbbf24); }
+        .stat-red .progress-fill { background: linear-gradient(90deg, var(--danger), #f87171); }
 
-        /* Modern Action Chips (Icons Only/Modern) - اصلاح شده طبق دستور ۴ */
+        /* دکمه‌های عملیاتی مدرن (آیکون دار و کپسولی) */
         .bento-actions {
             margin-top: 8px;
-            display: flex; gap: 8px; flex-wrap: wrap;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
         }
         .action-chip {
-            flex: 1; padding: 10px; font-size: 0.95rem; border-radius: 12px;
-            border: 1px solid transparent; background: rgba(255,255,255,0.8); color: var(--text-sec);
-            cursor: pointer; text-align: center; display: flex; align-items: center; justify-content: center; gap: 5px;
-            transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding: 10px; font-size: 0.8rem; border-radius: 12px;
+            border: none;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            cursor: pointer; font-weight: 700; white-space: nowrap;
+            transition: 0.2s;
         }
-        .action-chip:hover { transform: translateY(-2px); color: var(--primary); background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
-        .action-chip i { font-size: 1.1rem; }
+        .action-btn-exp { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .action-btn-exp:hover { background: var(--danger); color: white; }
+
+        .action-btn-copy { background: rgba(79, 70, 229, 0.1); color: var(--primary); }
+        .action-btn-copy:hover { background: var(--primary); color: white; }
+
+        .action-btn-add { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .action-btn-add:hover { background: var(--success); color: white; }
+
+        .action-btn-pause { background: rgba(148, 163, 184, 0.1); color: var(--text-sec); }
+        .action-btn-pause:hover { background: var(--text-sec); color: white; }
 
         /* --- Template Chips --- */
         .template-row {
-            display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 12px; scrollbar-width: none;
+            display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; margin-bottom: 10px; scrollbar-width: none;
         }
         .template-chip {
-            white-space: nowrap; padding: 10px 20px; border-radius: 30px;
+            white-space: nowrap; padding: 8px 18px; border-radius: 50px;
             background: var(--glass-bg); border: 1px solid var(--primary); color: var(--primary);
-            font-size: 0.9rem; font-weight: bold; cursor: pointer; transition: 0.2s;
-            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.15);
+            font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
         .template-chip:hover { background: var(--primary); color: white; transform: scale(1.05); }
 
@@ -486,29 +524,32 @@
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; width: 100%;
             height: var(--nav-height);
-            background: var(--glass-bg);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border-top: var(--glass-border);
+            border-top: 1px solid rgba(255,255,255,0.5);
             display: flex; justify-content: space-around; align-items: center;
-            z-index: 5000;
+            z-index: 9000;
             box-shadow: 0 -10px 40px rgba(0,0,0,0.05);
-            padding-bottom: 15px; /* Safe area for iPhone */
+            padding-bottom: 15px;
         }
+        [data-theme="dark"] .bottom-nav { background: rgba(15, 23, 42, 0.85); border-top: 1px solid rgba(255,255,255,0.05); }
+
         .nav-btn {
             background: none; border: none;
             display: flex; flex-direction: column; align-items: center; gap: 6px;
             color: var(--text-sec); font-size: 0.75rem; cursor: pointer;
             width: 70px; font-weight: bold; opacity: 0.6; transition: 0.3s;
         }
-        .nav-btn i { font-size: 1.6rem; margin-bottom: 4px; transition: transform 0.2s; }
+        .nav-btn i { font-size: 1.4rem; margin-bottom: 4px; transition: transform 0.2s; padding: 8px; border-radius: 12px; }
         .nav-btn.active { color: var(--primary); opacity: 1; }
-        .nav-btn.active i { transform: translateY(-6px); filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.4)); }
+        .nav-btn.active i { background: rgba(79, 70, 229, 0.1); transform: translateY(-5px); }
 
-        /* --- MODALS (Modernized) --- */
+        /* --- MODALS (مدرن و شیشه‌ای) --- */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6);
-            z-index: 20000; /* Higher than lock screen for recovery - اصلاح دستور ۲ */
+            /* z-index بسیار بالا برای اطمینان از نمایش روی همه چیز (به خصوص دستور ۲) */
+            z-index: 11000; 
             display: none; 
             justify-content: center; 
             align-items: flex-end;
@@ -516,45 +557,33 @@
             opacity: 0;
             transition: opacity 0.3s;
         }
-        .modal.active { display: flex; opacity: 1; }
+        .modal.active { 
+            display: flex; 
+            opacity: 1;
+        }
         .modal-content {
-            background: var(--bg-body);
+            background: var(--glass-bg);
+            /* استایل شیشه‌ای قوی‌تر */
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             width: 100%; max-width: 600px;
             padding: 35px 25px;
             border-radius: 35px 35px 0 0;
-            border-top: 1px solid rgba(255,255,255,0.3);
-            box-shadow: 0 -20px 60px rgba(0,0,0,0.3);
-            max-height: 85vh; overflow-y: auto;
+            border-top: 1px solid rgba(255,255,255,0.6);
+            box-shadow: 0 -20px 80px rgba(0,0,0,0.3);
+            max-height: 90vh; overflow-y: auto;
             transform: translateY(100%);
             transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
         }
-        .modal.active .modal-content { transform: translateY(0); }
-
-        /* --- TOAST NOTIFICATION (دستور ۵: پیغام‌های مدرن) --- */
-        .toast-container {
-            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
-            z-index: 25000; pointer-events: none;
+        [data-theme="dark"] .modal-content { border-top: 1px solid rgba(255,255,255,0.1); }
+        
+        .modal.active .modal-content {
+            transform: translateY(0);
         }
-        .toast {
-            background: rgba(30, 41, 59, 0.9);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 50px;
-            margin-top: 10px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            display: flex; align-items: center; gap: 10px;
-            font-size: 0.9rem;
-            opacity: 0; transform: translateY(20px);
-            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-        }
-        .toast.show { opacity: 1; transform: translateY(0); }
-        .toast i { color: var(--success); font-size: 1.2rem; }
 
         /* --- TAB CONTENT --- */
         .tab-pane { display: none; padding-bottom: 20px; animation: fadeIn 0.4s ease; }
         .tab-pane.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- REPORT (PRINT) --- */
         #printArea {
@@ -573,26 +602,28 @@
 
         /* History Chip */
         .history-btn {
-            font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 5px 12px; border-radius: 20px; cursor: pointer; margin-left: 10px; display: inline-flex; align-items: center; gap: 5px; transition: 0.2s;
+            font-size: 0.8rem; background: rgba(79, 70, 229, 0.1); color: var(--primary); padding: 6px 14px; border-radius: 20px; cursor: pointer; margin-left: 10px; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; border: 1px solid transparent;
         }
-        .history-btn:hover { background: var(--primary); color: white; }
+        .history-btn:hover { background: var(--primary); color: white; border-color: var(--primary-light); }
 
         .auth-input-group { width: 100%; margin-bottom: 20px; text-align: center; }
-        .auth-label { display: block; text-align: right; font-size: 0.85rem; color: var(--text-sec); margin-bottom: 5px; margin-right: 5px; }
+        .auth-label { display: block; text-align: right; font-size: 0.85rem; color: var(--text-sec); margin-bottom: 8px; margin-right: 5px; font-weight: bold; }
 
     </style>
 </head>
 <body>
 
-<!-- 1. LOCK SCREEN (اصلاح شده دستور ۱: مرکز چین و فاصله مناسب) -->
+<!-- سیستم نمایش پیام‌های مدرن (Toast) به جای Alert -->
+<div id="toastContainer" class="toast-container"></div>
 
-<div id="authModal" class="pin-screen">
+<!-- 1. LOCK SCREEN (بازنویسی شده با Z-index کمتر از مودال‌ها) -->
+<div id="authModal" class="pin-screen" style="display: flex;">
     <div class="auth-card">
         <div class="auth-avatar" id="authIcon">
             <i class="fas fa-fingerprint"></i>
         </div>
-        <h2 id="authTitle" style="margin: 0 0 10px 0; color: var(--primary);">خوش آمدید</h2>
-        <p id="authSub" style="font-size: 0.9rem; color: var(--text-sec); margin-bottom: 25px;">سیستم مدیریت مالی هوشمند</p>
+        <h2 id="authTitle" style="margin: 0 0 10px 0; color: var(--primary);">امیر</h2>
+        <p id="authSub" style="font-size: 0.95rem; color: var(--text-sec); margin-bottom: 30px;">جهت ورود رمز خود را وارد کنید</p>
 
         <!-- Step 1: Registration / Info -->
         <div id="authStep1" style="display:none; width:100%;">
@@ -604,10 +635,10 @@
                 <input type="text" id="setupNatId" inputmode="numeric" placeholder="کد ملی خود را وارد کنید">
 
                 <label class="auth-label">سوال امنیتی (تصادفی):</label>
-                <div style="background: rgba(59, 130, 246, 0.05); padding: 12px; border-radius: 12px; margin-bottom: 12px; color: var(--primary); font-weight: bold; font-size: 0.9rem;" id="setupSecurityQ">---</div>
+                <div style="background: rgba(79,70,229,0.05); padding: 15px; border-radius: 12px; margin-bottom: 10px; color: var(--primary); font-weight: bold; font-size: 0.9rem; text-align: right;" id="setupSecurityQ">---</div>
                 <input type="text" id="setupSecurityA" placeholder="پاسخ را بنویسید">
             </div>
-            <button class="btn btn-primary" style="width:100%; padding:15px;" onclick="goToPinSetup()">تایید و تعیین رمز</button>
+            <button class="btn btn-primary" style="width:100%; padding: 15px;" onclick="goToPinSetup()">تایید و تعیین رمز</button>
         </div>
 
         <!-- Step 2: PIN Entry -->
@@ -629,7 +660,7 @@
                 <button class="num-key" onclick="pressKey(7)">7</button>
                 <button class="num-key" onclick="pressKey(8)">8</button>
                 <button class="num-key" onclick="pressKey(9)">9</button>
-                <div class="num-key" style="visibility: hidden; box-shadow: none;"></div>
+                <div class="num-key" style="visibility: hidden;"></div>
                 <button class="num-key" onclick="pressKey(0)">0</button>
                 <button class="num-key del" onclick="pressKey('del')"><i class="fas fa-backspace"></i></button>
             </div>
@@ -638,7 +669,7 @@
         <!-- Actions -->
         <div id="authActions" style="width:100%; margin-top:15px;">
             <div id="forgotPassDiv" class="auth-link" onclick="startRecovery()" style="display:none;">
-                رمز عبور را فراموش کردم
+                <i class="fas fa-key"></i> رمز عبور را فراموش کردم
             </div>
             <button class="guest-btn" onclick="enterGuestMode()" style="width:100%;">
                 <i class="fas fa-user-secret"></i> ورود آزاد (مهمان)
@@ -654,13 +685,13 @@
     <!-- Header -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-top: 10px;">
         <div>
-            <h2 style="margin:0; color:var(--primary); font-weight:900; letter-spacing:-1px;">مدیریت مالی</h2>
-            <div style="display:flex; align-items:center; gap:8px;">
-                <span style="font-size:0.85rem; color:var(--text-sec);" id="headerDate">---</span>
-                <span style="font-size:0.75rem; background:rgba(16,185,129,0.1); color:var(--success); padding:4px 8px; border-radius:8px; font-weight:bold;" id="daysPassedLabel">روز ۰</span>
+            <h2 style="margin:0; color:var(--primary); font-weight:900; font-size:1.6rem;">مدیریت مالی</h2>
+            <div style="display:flex; align-items:center; gap:8px; margin-top:5px;">
+                <span style="font-size:0.85rem; color:var(--text-sec); font-weight:500;" id="headerDate">---</span>
+                <span style="font-size:0.75rem; background:rgba(16,185,129,0.1); color:var(--success); padding:3px 8px; border-radius:8px; font-weight:bold;" id="daysPassedLabel">روز ۰</span>
             </div>
         </div>
-        <div style="display:flex; gap:8px;">
+        <div style="display:flex; gap:10px;">
             <button class="currency-toggle-btn" id="currBtn" onclick="toggleCurrency()" title="تغییر واحد پول">
                 <i class="fas fa-coins"></i>
                 <span id="currBtnText">تومان</span>
@@ -673,21 +704,23 @@
 
     <!-- TAB 1: DASHBOARD -->
     <div id="view-dashboard" class="tab-pane active">
-        <!-- Hero Card (دستور ۶: شبیه کارت بانکی ایرانی) -->
+        <!-- Hero Card (Bank Style) -->
         <div class="hero-card" onclick="this.classList.toggle('flipped')">
             <div class="card-inner">
                 <div class="card-front">
-                    <div style="display:flex; justify-content:space-between; align-items:start;">
-                         <div class="card-chip"></div>
-                         <i class="fas fa-wifi" style="opacity:0.8; font-size:1.5rem; transform: rotate(90deg);"></i>
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div class="card-chip"></div>
+                        <i class="fas fa-wifi" style="opacity:0.7; transform: rotate(90deg);"></i>
                     </div>
+                    
                     <div>
                         <span class="balance-label">موجودی خالص (قابل تقسیم)</span>
                         <div class="balance-value" id="totalBalance">0</div>
                     </div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.95rem; opacity:0.9; font-weight:600; text-shadow:0 1px 2px rgba(0,0,0,0.5);">
-                        <span id="userNameDisplay" style="letter-spacing:1px;">کاربر</span>
-                        <span id="cardCurrency">IRR</span>
+                    
+                    <div style="display:flex; justify-content:space-between; font-size:1rem; opacity:0.95; font-weight:600; margin-top:10px;">
+                        <span id="userNameDisplay" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);">کاربر</span>
+                        <span id="cardCurrency">تومان</span>
                     </div>
                 </div>
                 <div class="card-back">
@@ -734,12 +767,12 @@
     <!-- TAB 2: BUDGET -->
     <div id="view-budget" class="tab-pane">
         <div class="glass-panel" style="text-align:center; padding: 25px;">
-            <span style="color:var(--text-sec); font-size:0.95rem;">بودجه کل توزیع شده:</span>
+            <span style="color:var(--text-sec); font-size:0.95rem; font-weight:bold;">بودجه کل توزیع شده:</span>
             <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top:5px;">
-                <div id="distributable" style="font-size:1.8rem; font-weight:800; color:var(--primary); direction:ltr;">0</div>
-                <small id="totalPercentBadge" style="background:var(--text-sec); color:white; padding:3px 8px; border-radius:8px; font-weight:bold;">0%</small>
+                <div id="distributable" style="font-size:2rem; font-weight:800; color:var(--primary); direction:ltr;">0</div>
+                <small id="totalPercentBadge" style="background:var(--text-sec); color:white; padding:4px 10px; border-radius:10px; font-weight:bold;">0%</small>
             </div>
-            <button id="btnDistribute" class="btn btn-primary" style="margin-top:15px; width:100%; display:none;" onclick="triggerDistribution()">
+            <button id="btnDistribute" class="btn btn-primary" style="margin-top:20px; width:100%; display:none; justify-content:center;" onclick="triggerDistribution()">
                 <i class="fas fa-sync-alt"></i> توزیع موجودی جدید
             </button>
         </div>
@@ -844,9 +877,6 @@
     </div>
 </div>
 
-<!-- TOAST CONTAINER (دستور ۵: پیغام مدرن) -->
-<div class="toast-container" id="toastBox"></div>
-
 <!-- BOTTOM NAVIGATION -->
 
 <nav class="bottom-nav">
@@ -857,7 +887,7 @@
         <i class="fas fa-chart-pie"></i> بودجه
     </button>
     <button class="nav-btn" onclick="switchTab('tools')">
-        <i class="fas fa-toolbox"></i> ابزارها
+        <i class="fas fa-tools"></i> ابزارها
     </button>
     <button class="nav-btn" onclick="switchTab('settings')">
         <i class="fas fa-cog"></i> تنظیمات
@@ -866,17 +896,17 @@
 
 <!-- MODALS -->
 
-<!-- Recovery Modal (اصلاح دستور دوم: نمایش روی صفحه قفل) -->
+<!-- Recovery Modal (اصلاح دستور دوم: z-index بالا و نمایش فوری) -->
 <div id="recoveryModal" class="modal">
     <div class="modal-content">
-        <h3>بازیابی رمز عبور</h3>
+        <h3><i class="fas fa-key"></i> بازیابی رمز عبور</h3>
         <p style="color:var(--text-sec); font-size:0.9rem; margin-bottom:15px;">برای بازیابی، اطلاعات اولیه خود را وارد کنید.</p>
         
         <label>کد ملی:</label>
         <input type="text" id="recNatId" inputmode="numeric" placeholder="کد ملی خود را وارد کنید">
 
         <label>سوال امنیتی:</label>
-        <p id="recoveryQuestionText" style="font-weight:bold; color:var(--primary); margin: 10px 0; background:rgba(59,130,246,0.1); padding:10px; border-radius:10px;">---</p>
+        <p id="recoveryQuestionText" style="font-weight:bold; color:var(--primary); margin: 10px 0; background:rgba(79,70,229,0.1); padding:15px; border-radius:12px; border:1px dashed var(--primary);">---</p>
         
         <label>پاسخ:</label>
         <input type="text" id="recoveryAnswerInput" placeholder="پاسخ شما...">
@@ -888,10 +918,10 @@
     </div>
 </div>
 
-<!-- Edit Modal (دستور ۳: پر شدن مقادیر) -->
+<!-- Edit Modal (دستور سوم و پنجم: پر شدن مقادیر) -->
 <div id="editModal" class="modal">
     <div class="modal-content">
-        <h3>ویرایش آیتم</h3>
+        <h3><i class="fas fa-edit"></i> ویرایش آیتم</h3>
         <input type="hidden" id="editType">
         <input type="hidden" id="editIndex">
 
@@ -1113,7 +1143,7 @@
         <h3><i class="fas fa-exclamation-triangle" style="color:var(--warning)"></i> خطا در درصد کل</h3>
         <p>مجموع درصد‌ها از ۱۰۰٪ بیشتر شده است.</p>
 
-        <div style="margin:20px 0; padding:15px; background:rgba(0,0,0,0.05); border-radius:16px;">
+        <div style="margin:20px 0; padding:15px; background:rgba(0,0,0,0.05); border-radius:12px;">
             <p><b>حالت اول:</b> انتخاب دستی تا سقف مجاز</p>
             <p style="font-size:0.9rem;">حداکثر درصد قابل انتخاب: <b id="maxAllowedPercent" style="color:var(--primary)">0%</b></p>
             <div style="display:flex; align-items:center; gap:10px;">
@@ -1124,7 +1154,7 @@
             <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="useSliderPercent()">ثبت درصد انتخابی</button>
         </div>
 
-        <div style="margin:20px 0; padding:15px; background:rgba(0,0,0,0.05); border-radius:16px;">
+        <div style="margin:20px 0; padding:15px; background:rgba(0,0,0,0.05); border-radius:12px;">
             <p><b>حالت دوم:</b> اصلاح هوشمند سیستم</p>
             <p style="font-size:0.9rem;">سیستم بر اساس اولویت‌بندی‌ها، درصدهای اولویت پایین‌تر را کاهش می‌دهد.</p>
             
@@ -1236,7 +1266,7 @@
     <div id="printGoalsList" style="margin-top:5px; font-size:0.9rem;"></div>
 
     <div style="margin-top:30px; text-align:center; font-size:12px; color:#666; border-top:1px solid #000; padding-top:10px;">
-        تولید شده توسط سامانه مدیریت مالی شخصی V15 Ultimate
+        تولید شده توسط سامانه مدیریت مالی شخصی V14 Ultimate
     </div>
 </div>
 
@@ -1287,7 +1317,26 @@
     let pinBuffer = "";
     let rate = 1; 
     let tempBudget = null; 
-    let isGuestMode = false; 
+    let isGuestMode = false;
+
+    // --- TOAST NOTIFICATION SYSTEM (Instruction 5) ---
+    function showToast(message, icon="check-circle") {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
+        container.appendChild(toast);
+        
+        // Trigger Animation
+        requestAnimationFrame(() => {
+            toast.classList.add('show');
+        });
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 400);
+        }, 3000);
+    }
 
     // --- STARTUP ---
     window.onload = () => {
@@ -1297,7 +1346,7 @@
     };
 
     function processDailyLog() {
-        if(isGuestMode) return; 
+        if(isGuestMode) return;
         const today = new Date().toLocaleDateString('fa-IR');
         if(!app.dailyLogs) app.dailyLogs = [];
         
@@ -1361,6 +1410,7 @@
         pinBuffer = "";
         updatePinDots();
 
+        // If not setup, show Registration Form
         if (!app.security.hasPin || !app.security.isSetup) {
             title.innerText = "راه‌اندازی اولیه";
             sub.innerText = "لطفاً اطلاعات هویتی و امنیتی خود را وارد کنید";
@@ -1370,11 +1420,13 @@
             forgotDiv.style.display = 'none';
             app.security.isSetup = false;
 
+            // Set Random Question
             const randIdx = Math.floor(Math.random() * securityQuestions.length);
             document.getElementById('setupSecurityQ').innerText = securityQuestions[randIdx];
             document.getElementById('setupSecurityQ').setAttribute('data-qid', randIdx);
 
         } else {
+            // Login Mode
             title.innerText = app.user.name || "خوش آمدید";
             sub.innerText = "جهت ورود رمز خود را وارد کنید";
             step1.style.display = 'none';
@@ -1389,7 +1441,7 @@
         const natId = document.getElementById('setupNatId').value.trim();
         const ans = document.getElementById('setupSecurityA').value.trim();
 
-        if(!name || !natId || !ans) return showToast("لطفا تمام فیلدها را پر کنید", "error");
+        if(!name || !natId || !ans) return alert("لطفا تمام فیلدها را پر کنید.");
 
         app.user.name = name;
         app.security.nationalId = natId;
@@ -1429,6 +1481,7 @@
     }
 
     function processPin() {
+        // Setup Mode
         if (!app.security.hasPin) {
             if(confirm("رمز شما: " + pinBuffer + "\nآیا این رمز تایید است؟")) {
                 app.security.pin = pinBuffer;
@@ -1444,6 +1497,7 @@
                 pinBuffer = ""; updatePinDots();
             }
         } else {
+            // Login Mode
             if (pinBuffer === app.security.pin) {
                 document.getElementById('authModal').style.display = 'none';
                 document.getElementById('appContent').style.display = 'block';
@@ -1451,13 +1505,13 @@
                 updateDate();
                 renderUI();
             } else {
-                showToast("رمز اشتباه است!", "error");
+                showToast("رمز اشتباه است!", "times-circle");
                 pinBuffer = ""; updatePinDots();
             }
         }
     }
 
-    // --- RECOVERY (دستور ۲: نمایش صحیح روی صفحه قفل) ---
+    // --- RECOVERY (Instruction 2) ---
     function startRecovery() {
         const qId = app.security.questionId || 0;
         document.getElementById('recoveryQuestionText').innerText = securityQuestions[qId];
@@ -1474,11 +1528,11 @@
             alert("اطلاعات صحیح است. لطفا رمز جدید تعریف کنید.");
             app.security.hasPin = false;
             app.security.pin = "";
-            app.security.isSetup = true; 
+            app.security.isSetup = true;
             saveData();
             location.reload();
         } else {
-            showToast("اطلاعات وارد شده اشتباه است.", "error");
+            alert("اطلاعات وارد شده اشتباه است.");
         }
     }
 
@@ -1515,23 +1569,6 @@
 
     function format(n) { 
         return (n * rate).toLocaleString('en-US'); 
-    }
-
-    // --- TOAST NOTIFICATION (دستور ۵: سیستم پیغام مدرن) ---
-    function showToast(message, type='success') {
-        const container = document.getElementById('toastBox');
-        const el = document.createElement('div');
-        el.className = 'toast';
-        const icon = type === 'success' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-times-circle" style="color:var(--danger)"></i>';
-        el.innerHTML = `${icon} <span>${message}</span>`;
-        container.appendChild(el);
-        
-        requestAnimationFrame(() => { el.classList.add('show'); });
-        
-        setTimeout(() => {
-            el.classList.remove('show');
-            setTimeout(() => el.remove(), 500);
-        }, 3000);
     }
 
     // --- HISTORY SYSTEM ---
@@ -1595,7 +1632,7 @@
         saveData();
         renderUI();
         closeAllModals();
-        showToast("بازیابی با موفقیت انجام شد");
+        showToast("بازیابی شد");
     }
 
     // --- CORE UI RENDER ---
@@ -1603,10 +1640,9 @@
         applyTheme();
         rate = app.user.currency === 'rial' ? 10 : 1;
         const curName = app.user.currency === 'toman' ? 'تومان' : 'ریال';
-        const curCode = app.user.currency === 'toman' ? 'TMN' : 'IRR';
         
         document.getElementById('currBtnText').innerText = curName;
-        document.getElementById('cardCurrency').innerText = curCode;
+        document.getElementById('cardCurrency').innerText = curName;
         document.querySelectorAll('.currency-text').forEach(el => el.innerText = curName);
 
         if(app.user.startDate) {
@@ -1627,6 +1663,7 @@
         document.getElementById('totalDebtDisplay').innerText = format(totalDebt);
         document.getElementById('userNameDisplay').innerText = app.user.name;
 
+        // Populate Date Pickers
         document.getElementById('dDay').innerHTML = genOpts(1,31,1);
         document.getElementById('checkDateRow').innerHTML = createDatePickerHTML('c');
         document.getElementById('loanDateRow').innerHTML = createDatePickerHTML('l');
@@ -1648,7 +1685,7 @@
                 <span style="font-weight:600;">${w.name}</span>
                 <div style="display:flex; align-items:center;">
                     <b style="font-size:1.1rem; color:var(--primary);">${format(w.value)}</b>
-                    <span style="margin-right:15px;">
+                    <span style="margin-right:15px; display:flex;">
                         <button class="btn-small-icon btn-edit" onclick="openEdit('wallet', ${i})"><i class="fas fa-edit"></i></button>
                         <button class="btn-small-icon btn-del" onclick="delWallet(${i})"><i class="fas fa-trash"></i></button>
                     </span>
@@ -1664,7 +1701,7 @@
                 <span>${d.name} <small style="color:var(--text-sec); font-size:0.8rem;">(دهم ${d.day} ماه)</small></span>
                 <div style="display:flex; align-items:center;">
                     <b style="color:var(--danger);">${format(d.value)}</b>
-                    <span style="margin-right:15px;">
+                    <span style="margin-right:15px; display:flex;">
                         <button class="btn-small-icon btn-edit" onclick="openEdit('debt', ${i})"><i class="fas fa-edit"></i></button>
                         <button class="btn-small-icon btn-del" onclick="delDebt(${i})"><i class="fas fa-trash"></i></button>
                     </span>
@@ -1681,7 +1718,7 @@
                 <div>${c.name} <br><small style="color:var(--text-sec);">${c.date}</small></div>
                 <div style="display:flex; align-items:center;">
                     <b style="color:var(--danger);">${format(c.value)}</b>
-                    <span style="margin-right:15px;">
+                    <span style="margin-right:15px; display:flex;">
                         <button class="btn-small-icon btn-edit" onclick="openEdit('check', ${i})"><i class="fas fa-edit"></i></button>
                         <button class="btn-small-icon btn-del" onclick="delCheck(${i})"><i class="fas fa-trash"></i></button>
                     </span>
@@ -1698,7 +1735,7 @@
                 <div>${l.name} <br><small style="color:var(--text-sec);">وصول: ${l.date}</small></div>
                 <div style="display:flex; align-items:center;">
                     <b style="color:var(--success);">${format(l.value)}</b>
-                    <span style="margin-right:15px;">
+                    <span style="margin-right:15px; display:flex;">
                         <button class="btn-small-icon btn-edit" onclick="openEdit('loan', ${i})"><i class="fas fa-edit"></i></button>
                         <button class="btn-small-icon btn-del" onclick="delLoan(${i})"><i class="fas fa-trash"></i></button>
                     </span>
@@ -1745,11 +1782,11 @@
             
             const pausedClass = b.isPaused ? 'paused' : '';
 
-            // دستور ۴: استفاده از آیکون‌های مدرن FontAwesome
+            // Instruction 4: Modern Buttons
             div.innerHTML += `
                 <div class="bento-item ${status} ${pausedClass}">
                     <div class="bento-header">
-                        <span>${b.name} (${b.percent}%) ${b.isPaused ? '<small>(توقف)</small>' : ''} <i class="fas fa-edit" style="font-size:0.8rem; cursor:pointer; margin-right:5px; color:var(--text-sec);" onclick="openEdit('budget', ${i})"></i></span>
+                        <span>${b.name} (${b.percent}%) ${b.isPaused ? '<small>(توقف)</small>' : ''} <i class="fas fa-edit" style="font-size:0.9rem; cursor:pointer; margin-right:5px; color:var(--text-sec);" onclick="openEdit('budget', ${i})"></i></span>
                         <div style="display:flex; gap:8px;">
                             <i class="fas fa-list-alt" style="opacity:0.5; cursor:pointer;" onclick="openItemHistory(${i})" title="تاریخچه"></i>
                             <i class="fas fa-trash" style="opacity:0.3; cursor:pointer;" onclick="delBudget(${i})"></i>
@@ -1760,14 +1797,14 @@
                         <span style="color:var(--danger)">خرج: ${format(b.spent)}</span>
                     </div>
                     <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(percent,100)}%"></div></div>
-                    <div style="text-align:left; font-weight:bold; font-size:1.2rem; color:var(--primary); direction:ltr; letter-spacing:1px;">
+                    <div style="text-align:left; font-weight:800; font-size:1.4rem; color:var(--primary); direction:ltr; letter-spacing:1px; margin: 5px 0;">
                         ${format(remain)}
                     </div>
                     <div class="bento-actions">
-                        <button class="action-chip" onclick="openExp(${i})" ${b.isPaused ? 'disabled' : ''} title="ثبت هزینه"><i class="fas fa-minus-circle" style="color:var(--danger)"></i> هزینه</button>
-                        <button class="action-chip" onclick="copyTxt(${remain})" title="کپی مبلغ"><i class="fas fa-copy"></i> کپی</button>
-                        <button class="action-chip" onclick="injectBudget(${i})" title="واریز دستی"><i class="fas fa-plus-circle" style="color:var(--success)"></i> واریز</button>
-                        <button class="action-chip" onclick="togglePause(${i})" title="توقف/شروع"><i class="fas ${b.isPaused ? 'fa-play' : 'fa-pause'}" style="color:var(--text-sec)"></i></button>
+                        <button class="action-chip action-btn-exp" onclick="openExp(${i})" ${b.isPaused ? 'disabled' : ''}><i class="fas fa-minus-circle"></i> ثبت هزینه</button>
+                        <button class="action-chip action-btn-copy" onclick="copyTxt(${remain})"><i class="fas fa-copy"></i> کپی</button>
+                        <button class="action-chip action-btn-add" onclick="injectBudget(${i})"><i class="fas fa-plus-circle"></i> واریز</button>
+                        <button class="action-chip action-btn-pause" onclick="togglePause(${i})">${b.isPaused ? '<i class="fas fa-play"></i> فعال' : '<i class="fas fa-pause"></i> توقف'}</button>
                     </div>
                 </div>
             `;
@@ -1785,7 +1822,7 @@
         app.distributedAmount = net;
         saveData();
         renderUI();
-        showToast("بودجه جدید توزیع شد");
+        showToast("بودجه توزیع شد");
     }
 
     function injectBudget(index) {
@@ -1800,7 +1837,7 @@
             
             saveData();
             renderUI();
-            showToast("واریز دستی انجام شد");
+            showToast("واریز شد");
         }
     }
 
@@ -1820,7 +1857,7 @@
             b.savedPercent = b.percent;
             b.percent = 0;
             b.isPaused = true;
-            showToast("آیتم متوقف شد", "warning");
+            showToast("آیتم متوقف شد");
         }
         saveData();
         renderUI();
@@ -1841,9 +1878,9 @@
                     </div>
                     <div class="progress-bar"><div class="progress-fill" style="width:${p}%; background:var(--warning);"></div></div>
                     <div style="display:flex; gap:8px; margin-top:8px;">
-                         <button class="btn btn-primary" style="font-size:0.8rem; padding:4px 10px;" onclick="openAllocate('goal', ${i})">🔗 اختصاص بودجه</button>
-                         <button class="btn btn-outline" style="font-size:0.8rem; padding:4px 10px;" onclick="addGoalMoneyDirect(${i})">+ مستقیم</button>
-                         <button class="btn btn-danger" style="font-size:0.8rem; padding:4px 10px;" onclick="delGoal(${i})">×</button>
+                         <button class="btn btn-primary" style="font-size:0.8rem; padding:6px 12px;" onclick="openAllocate('goal', ${i})">🔗 اختصاص بودجه</button>
+                         <button class="btn btn-outline" style="font-size:0.8rem; padding:6px 12px;" onclick="addGoalMoneyDirect(${i})">+ مستقیم</button>
+                         <button class="btn btn-danger" style="font-size:0.8rem; padding:6px 12px;" onclick="delGoal(${i})">×</button>
                     </div>
                 </div>
             `;
@@ -1861,13 +1898,13 @@
                 <div style="display:flex; gap:8px; align-items:center;">
                     <button class="btn btn-primary" style="font-size:0.8rem;" onclick="openAllocate('shop', ${i})">خرید با بودجه</button>
                     <button class="btn-small-icon btn-edit" onclick="openEdit('shop', ${i})"><i class="fas fa-edit"></i></button>
-                    <i class="fas fa-check-circle text-success" style="cursor:pointer; font-size:1.4rem; color:var(--success);" onclick="delShop(${i})"></i>
+                    <i class="fas fa-check-circle" style="cursor:pointer; font-size:1.4rem; color:var(--success);" onclick="delShop(${i})"></i>
                 </div>
             </div>
         `).join('');
     }
 
-    // --- EDIT SYSTEM (دستور ۳: پر شدن دقیق فیلدها) ---
+    // --- EDIT SYSTEM (Instruction 3 & 5: Prefill & Populating) ---
     function openEdit(type, index) {
         document.getElementById('editType').value = type;
         document.getElementById('editIndex').value = index;
@@ -1878,7 +1915,10 @@
         let showDate = false;
 
         if(type === 'wallet') item = app.wallets[index];
-        else if(type === 'debt') { item = app.debts[index]; showDate = true; }
+        else if(type === 'debt') { 
+            item = app.debts[index]; 
+            showDate = true; 
+        }
         else if(type === 'check') { item = app.checks[index]; showDate = true; }
         else if(type === 'loan') { item = app.loans[index]; showDate = true; }
         else if(type === 'budget') { item = app.budgets[index]; showPercent = true; showAmount = false; }
@@ -1893,7 +1933,8 @@
             if(type === 'goal') val = item.target;
             else if(type === 'shop') val = item.price || 0;
             else val = item.value;
-            // پر شدن با مقدار خام (بدون فرمت) برای ویرایش راحت تر
+            
+            // Set value and trigger format immediately
             document.getElementById('editVal').value = val;
             formatCurrency(document.getElementById('editVal'));
         } else {
@@ -1928,7 +1969,7 @@
         const index = parseInt(document.getElementById('editIndex').value);
         const newName = document.getElementById('editName').value;
         
-        if(!newName) return showToast("نام نمی‌تواند خالی باشد", "error");
+        if(!newName) return alert("نام نمی‌تواند خالی باشد");
 
         if(type.includes('budget')) saveSectionSnap('budget');
         else if(type.includes('goal') || type.includes('shop')) saveSectionSnap('tools');
@@ -2031,14 +2072,12 @@
         }
         
         app.budgets = newBudgets;
-        // Fix priorities for new items
         app.budgets.forEach(b => {
              if(!app.priorities[b.name]) app.priorities[b.name] = 4;
         });
 
         saveData();
         renderUI();
-        showToast("قالب اعمال شد");
     }
 
     // --- ACTIONS ---
@@ -2092,7 +2131,7 @@
         const n = document.getElementById('bName').value;
         const p = parseInt(document.getElementById('bPercent').value);
         
-        if(!n || isNaN(p)) return showToast("لطفا مقادیر صحیح وارد کنید", "error");
+        if(!n || isNaN(p)) return alert("لطفا مقادیر صحیح وارد کنید");
 
         let currentTotal = 0;
         app.budgets.forEach(b => currentTotal += b.percent);
@@ -2212,7 +2251,6 @@
 
         saveData(); renderUI(); closeAllModals();
         tempBudget = null;
-        showToast("اصلاح خودکار انجام شد");
     }
 
     // --- PRIORITY SETTINGS ---
@@ -2273,7 +2311,7 @@
         });
         saveData();
         closeAllModals();
-        showToast("اولویت‌ها بروزرسانی شدند");
+        showToast("اولویت‌ها ذخیره شدند");
     }
 
     function delBudget(i) { if(confirm('حذف ردیف؟')) { saveSectionSnap('budget'); app.budgets.splice(i,1); saveData(); renderUI(); } }
@@ -2364,7 +2402,7 @@
         const bIdx = parseInt(document.getElementById('allocBudgetSelect').value);
         const amt = parseFormatted(document.getElementById('allocAmt').value);
 
-        if(isNaN(amt) || amt <= 0) return showToast("مبلغ نامعتبر", "error");
+        if(isNaN(amt) || amt <= 0) return alert("مبلغ نامعتبر");
 
         saveSectionSnap('budget'); 
         saveSectionSnap('tools'); 
@@ -2434,10 +2472,10 @@
                 data: {
                     labels: logs.map(l => l.date),
                     datasets: [{
-                        label: 'خالص دارایی',
+                        label: 'خالص دارایی (تومان)',
                         data: logs.map(l => l.net),
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderColor: '#4338ca',
+                        backgroundColor: 'rgba(67, 56, 202, 0.1)',
                         fill: true
                     }]
                 },
@@ -2507,11 +2545,12 @@
                     if(b.savedPercent === undefined) b.savedPercent = 0;
                 });
                 if(app.distributedAmount === undefined) app.distributedAmount = 0;
+                
                 if(!app.security.nationalId) app.security.nationalId = "";
 
                 saveData();
                 location.reload();
-            } catch(err) { showToast("فایل نامعتبر است", "error"); }
+            } catch(err) { alert("فایل نامعتبر"); }
         };
         reader.readAsText(file);
     }
