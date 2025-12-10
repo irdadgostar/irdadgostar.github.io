@@ -3,851 +3,722 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>برنامه هفتگی جامع PRO</title>
+    <title>سامانه جامع برنامه‌ریزی مدرن</title>
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <!-- کتابخانه HTML2Canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
-            --primary: #6366f1;       /* نیلی مدرن */
-            --primary-dark: #4338ca;
-            --bg: #f8fafc;
-            --surface: #ffffff;
-            --border: #e2e8f0;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --success: #10b981;
-            --danger: #ef4444;
-            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --radius: 16px;
+            --primary: #4f46e5;       /* رنگ اصلی مدرن */
+            --primary-light: #818cf8;
+            --primary-dark: #3730a3;
+            --secondary: #10b981;     /* رنگ موفقیت */
+            --accent: #f59e0b;        /* رنگ تاکید */
+            --danger: #ef4444;        /* رنگ خطر */
+            --dark: #0f172a;
+            --gray: #64748b;
+            --bg-body: #f1f5f9;
+            --bg-surface: #ffffff;
+            --border-radius: 16px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --font-family: 'Vazirmatn', system-ui, sans-serif;
         }
 
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
 
         body {
-            font-family: 'Vazirmatn', system-ui, sans-serif;
-            background-color: var(--bg);
+            font-family: var(--font-family);
+            background-color: var(--bg-body);
             margin: 0;
             padding: 20px;
-            color: var(--text-main);
+            color: var(--dark);
             font-size: 14px;
-            padding-bottom: 140px;
+            padding-bottom: 100px;
         }
 
-        /* --- Security Lock Screen --- */
-        #lockScreen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(248, 250, 252, 0.98); z-index: 20000;
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-            backdrop-filter: blur(10px);
-        }
-        .lock-box {
-            background: white; padding: 40px; border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1); text-align: center;
-            width: 90%; max-width: 350px; border: 1px solid var(--border);
-        }
-        .pin-dots { display: flex; gap: 15px; justify-content: center; margin: 20px 0; }
-        .pin-dot { width: 15px; height: 15px; border-radius: 50%; border: 2px solid var(--primary); transition: 0.2s; }
-        .pin-dot.filled { background: var(--primary); }
-        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; direction: ltr;}
-        .num-btn {
-            width: 60px; height: 60px; border-radius: 50%; border: 1px solid var(--border);
-            background: #fff; font-size: 20px; font-weight: bold; color: var(--text-main);
-            cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center;
-        }
-        .num-btn:hover { background: var(--bg); transform: scale(1.05); }
-        .num-btn:active { background: var(--primary); color: white; transform: scale(0.95); }
-
-        /* --- Loading Overlays --- */
+        /* --- UI Components --- */
+        
+        /* Loading */
         #loadingBar {
             position: fixed; top: 0; left: 0; width: 100%; height: 4px;
-            background: linear-gradient(90deg, var(--primary), #ec4899, var(--primary));
-            background-size: 200% 100%; z-index: 10001; display: none;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--primary));
+            background-size: 200% 100%; z-index: 99999; display: none;
             animation: loadingAnim 1.5s infinite linear;
         }
         @keyframes loadingAnim { 0% {background-position: 100% 0;} 100% {background-position: -100% 0;} }
 
         #processingMsg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.95); z-index: 10000;
+            background: rgba(255, 255, 255, 0.9); z-index: 99998;
             display: none; flex-direction: column; align-items: center; justify-content: center;
             backdrop-filter: blur(5px);
         }
         .spinner {
-            width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top-color: var(--primary);
+            width: 50px; height: 50px; border: 5px solid #e2e8f0; border-top-color: var(--primary);
             border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 20px;
         }
         @keyframes spin { to {transform: rotate(360deg);} }
 
-        /* --- Toolbar --- */
-        .toolbar {
-            background: var(--surface); padding: 20px; border-radius: var(--radius);
-            box-shadow: var(--shadow); margin-bottom: 24px; border: 1px solid white;
-            display: flex; flex-direction: column; gap: 16px;
+        /* --- Header & Toolbar --- */
+        .app-header {
+            background: var(--bg-surface);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 24px;
+            border: 1px solid #e2e8f0;
         }
-        .toolbar-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
-        
-        .brand { 
-            font-weight: 900; font-size: 20px; color: var(--primary); 
-            display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px;
+
+        .header-top {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;
         }
-        
-        .input-group { display: flex; gap: 12px; flex-wrap: wrap; width: 100%; }
+
+        .brand-section {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .brand-icon {
+            width: 48px; height: 48px; background: var(--primary); color: white;
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+        }
+        .brand-text h1 { margin: 0; font-size: 22px; font-weight: 900; color: var(--dark); letter-spacing: -0.5px; }
+        .brand-text p { margin: 2px 0 0 0; font-size: 12px; color: var(--gray); }
+
+        .user-inputs {
+            display: flex; gap: 10px; flex: 1; justify-content: flex-end; max-width: 600px; flex-wrap: wrap;
+        }
         .input-modern {
-            padding: 12px 16px; border: 1px solid var(--border); border-radius: 12px;
-            font-family: inherit; background: #f1f5f9; transition: 0.3s; flex: 1; min-width: 220px;
-            font-size: 14px;
+            padding: 12px 16px; border: 2px solid #f1f5f9; border-radius: 12px;
+            font-family: inherit; background: #f8fafc; transition: 0.3s; flex: 1; min-width: 200px; font-weight: 500;
         }
-        .input-modern:focus { background: #fff; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        .input-modern:focus { background: #fff; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+
+        .toolbar-actions {
+            display: flex; flex-wrap: wrap; gap: 12px; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 20px;
+        }
+        
+        /* Action Groups */
+        .action-group {
+            display: flex; gap: 8px; align-items: center; background: #f8fafc; padding: 6px; border-radius: 14px; border: 1px solid #e2e8f0;
+        }
+        .action-divider { width: 1px; height: 30px; background: #e2e8f0; margin: 0 10px; }
 
         /* Buttons */
         .btn {
-            padding: 10px 18px; border: none; border-radius: 12px; cursor: pointer;
+            padding: 10px 16px; border: none; border-radius: 10px; cursor: pointer;
             font-family: inherit; font-weight: 700; font-size: 13px; color: white;
             display: flex; align-items: center; gap: 8px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); justify-content: center;
+            position: relative; overflow: hidden;
         }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 12px rgba(0,0,0,0.1); }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
         .btn:active { transform: translateY(0); }
-        .btn svg { width: 18px; height: 18px; stroke-width: 2.5px; }
+        .btn svg { width: 18px; height: 18px; stroke-width: 2.2px; }
 
-        .btn-primary { background: linear-gradient(135deg, #6366f1, #4f46e5); }
-        .btn-success { background: linear-gradient(135deg, #10b981, #059669); }
-        .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .btn-primary { background: linear-gradient(135deg, #4f46e5, #4338ca); box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2); }
+        .btn-success { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2); }
+        .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2); }
+        .btn-warning { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+        .btn-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
         .btn-dark { background: linear-gradient(135deg, #334155, #1e293b); }
-        .btn-purple { background: linear-gradient(135deg, #a855f7, #7e22ce); }
-        .btn-orange { background: linear-gradient(135deg, #f97316, #c2410c); }
-        .btn-teal { background: linear-gradient(135deg, #14b8a6, #0f766e); }
-        .btn-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .btn-ghost { background: transparent; color: var(--gray); border: 1px solid transparent; }
+        .btn-ghost:hover { background: #e2e8f0; color: var(--dark); box-shadow: none; transform: none; }
         
-        .mode-toggle { background: #e2e8f0; color: var(--text-muted); border: 1px solid #cbd5e1; box-shadow: none; }
-        .mode-toggle.active { background: var(--primary); color: white; border-color: transparent; box-shadow: var(--shadow); }
-
-        /* --- Table --- */
-        .planner-wrapper {
-            background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow);
-            overflow: auto; position: relative; border: 1px solid var(--border);
-            max-height: 75vh;
+        .btn-toggle {
+            background: #e2e8f0; color: var(--gray); border: 1px solid #cbd5e1;
         }
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 900px; }
+        .btn-toggle.active {
+            background: var(--primary); color: white; border-color: transparent;
+        }
+
+        /* --- Planner Table --- */
+        .planner-container {
+            background: var(--bg-surface); border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg); overflow: hidden; border: 1px solid #e2e8f0;
+            position: relative; min-height: 600px;
+        }
+        .table-scroll { overflow: auto; max-height: 75vh; }
+        
+        table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1000px; table-layout: fixed; }
         
         thead th {
-            background: #1e293b; color: white; padding: 16px; position: sticky; top: 0; z-index: 20;
-            border-right: 1px solid #334155; font-weight: 700; font-size: 14px;
+            background: #1e293b; color: white; padding: 15px; position: sticky; top: 0; z-index: 20;
+            font-size: 14px; text-align: center; border-bottom: 4px solid var(--primary);
         }
-        
-        /* دکمه کپی در هدر */
-        .copy-col-btn { 
-            background: rgba(255,255,255,0.1); border-radius: 8px; padding: 4px 8px; 
-            cursor: pointer; float: left; transition:0.2s; font-size: 12px; display:flex; align-items:center;
+        /* Corner Cell */
+        thead th:first-child { 
+            width: 90px; z-index: 30; left: 0; background: #0f172a; 
+            border-left: 1px solid #334155;
         }
-        .copy-col-btn:hover { background: rgba(255,255,255,0.3); }
-        
-        th:first-child, td:first-child {
-            width: 90px; background: #f8fafc; color: var(--text-muted); font-weight: 800; font-size: 11px;
-            position: sticky; right: 0; z-index: 30; border-left: 2px solid #e2e8f0; text-align: center;
-            line-height: 1.5; letter-spacing: 0.5px;
-        }
-        td { border: 1px solid #f1f5f9; text-align: center; height: 40px; padding: 0; vertical-align: middle; }
 
-        /* Task Cell */
-        td.task-cell {
-            color: white; padding: 4px 8px; font-size: 12px; cursor: pointer;
-            border-bottom: 1px solid rgba(255,255,255,0.2); position: relative;
-            transition: filter 0.2s; border-radius: 4px;
+        /* Copy Button in Header */
+        .day-header-content { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .copy-day-btn {
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px; padding: 2px 8px; font-size: 11px; cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; gap: 4px; color: #cbd5e1;
         }
-        td.task-cell:hover { filter: brightness(1.1); z-index: 5; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
-        
-        .task-inner {
-            display: flex; flex-direction: column; justify-content: center; height: 100%;
-            pointer-events: none; text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            white-space: normal; line-height: 1.4;
-        }
-        .task-title { font-weight: 800; margin-bottom: 2px; font-size: 13px; }
-        .task-time-range { font-size: 10px; opacity: 0.9; font-weight: 500; background: rgba(0,0,0,0.2); border-radius: 4px; padding: 1px 6px; width: fit-content; margin: 0 auto; }
+        .copy-day-btn:hover { background: var(--secondary); color: white; border-color: transparent; }
 
-        /* Selection */
-        body.selection-mode td.empty-cell { cursor: crosshair; }
-        .selected-cell { background-color: #c7d2fe !important; }
+        /* Time Column */
+        tbody td:first-child {
+            background: #f8fafc; color: var(--gray); font-weight: 700; font-size: 12px;
+            position: sticky; right: 0; z-index: 10; border-left: 2px solid #e2e8f0;
+            text-align: center; padding: 5px; width: 90px;
+        }
+
+        tbody td {
+            border-bottom: 1px solid #f1f5f9; border-left: 1px solid #f1f5f9;
+            height: 45px; padding: 0; vertical-align: top; position: relative;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover td { background-color: #f8fafc; }
+
+        /* Task Cell Styling */
+        .task-block {
+            position: absolute; top: 1px; left: 1px; right: 1px; bottom: 1px;
+            border-radius: 8px; padding: 6px 8px;
+            color: white; font-size: 12px; cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; justify-content: center;
+            transition: transform 0.1s, box-shadow 0.2s;
+            overflow: hidden; z-index: 5;
+        }
+        .task-block:hover { transform: scale(1.02); box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 10; }
+        
+        .task-time { font-size: 10px; background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 2px; width: fit-content; }
+        .task-name { font-weight: 700; line-height: 1.3; font-size: 13px; white-space: normal; }
+
+        /* Empty Cell Interaction */
+        .empty-slot { width: 100%; height: 100%; cursor: cell; transition: 0.1s; }
+        body.selection-mode .empty-slot:hover { background-color: #e0e7ff; }
+        .selected-highlight { background-color: #c7d2fe !important; }
 
         /* --- Modals --- */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.7); z-index: 2000;
-            justify-content: center; align-items: center; backdrop-filter: blur(8px);
+            background: rgba(15, 23, 42, 0.6); z-index: 1000; backdrop-filter: blur(4px);
+            justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s;
         }
-        .modal {
-            background: white; padding: 24px; border-radius: 24px; width: 90%; max-width: 450px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); display: flex; flex-direction: column; gap: 16px;
-            animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-height: 90vh; overflow-y: auto;
-        }
-        @keyframes pop { from {transform: scale(0.9); opacity: 0;} to {transform: scale(1); opacity: 1;} }
+        .modal-overlay.show { opacity: 1; }
         
-        .modal-header { display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 16px; align-items: center; }
-        .modal-header h3 { margin: 0; font-size: 18px; color: #1e293b; display:flex; align-items:center; gap:8px; }
-        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #94a3b8; transition: 0.2s; }
-        .close-btn:hover { color: var(--danger); transform: rotate(90deg); }
+        .modal-box {
+            background: white; width: 90%; max-width: 480px; border-radius: 20px;
+            padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+            transform: translateY(20px); transition: transform 0.3s; display: flex; flex-direction: column; gap: 16px;
+            max-height: 85vh; overflow-y: auto;
+        }
+        .modal-overlay.show .modal-box { transform: translateY(0); }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; }
+        .modal-title { font-size: 18px; font-weight: 800; color: var(--dark); display: flex; align-items: center; gap: 8px; }
+        .modal-close { background: none; border: none; font-size: 24px; color: var(--gray); cursor: pointer; padding: 0; line-height: 1; }
         
-        .copy-list { display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; }
-        .copy-item {
-            display: flex; align-items: center; gap: 12px; padding: 12px;
-            background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s;
+        /* Template Grid */
+        .template-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .template-card {
+            background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 15px;
+            cursor: pointer; transition: 0.2s; text-align: center;
         }
-        .copy-item:hover { background: #f1f5f9; border-color: var(--primary); }
-        .copy-item input { width: 20px; height: 20px; cursor: pointer; accent-color: var(--primary); }
+        .template-card:hover { border-color: var(--primary); background: #eef2ff; }
+        .template-icon { font-size: 24px; margin-bottom: 8px; display: block; }
+        .template-name { font-weight: 700; color: var(--dark); display: block; }
+        .template-desc { font-size: 11px; color: var(--gray); margin-top: 4px; display: block; }
 
-        /* Modern Extras List */
-        .extras-list { list-style: none; padding: 0; margin: 0; max-height: 300px; overflow-y: auto; }
-        .extra-row {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 12px; border-bottom: 1px solid #f1f5f9; background: #fff; 
-            margin-bottom: 8px; border-radius: 12px; border: 1px solid #e2e8f0;
-            transition: 0.2s;
-        }
-        .extra-row:hover { border-color: #cbd5e1; transform: translateX(-2px); }
-        .extra-content { display: flex; align-items: center; gap: 10px; flex: 1; font-weight: 500; }
+        /* Form Elements */
+        .form-label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: var(--dark); }
+        .color-picker-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 5px; }
+        .color-circle { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+        .color-circle:hover { transform: scale(1.1); }
+        .color-circle.active { border-color: var(--dark); transform: scale(1.1); box-shadow: 0 0 0 2px white inset; }
+
+        /* --- EXPORT & PRINT STYLES (HIDDEN FROM UI) --- */
         
-        .extra-controls { display: flex; gap: 6px; align-items: center; }
-        .extra-btn {
-            background: #f1f5f9; border: none; cursor: pointer; font-size: 14px; padding: 6px; 
-            border-radius: 8px; color: var(--text-muted); transition: 0.2s; display: flex; align-items: center; justify-content: center;
-        }
-        .extra-btn:hover { background: #e2e8f0; color: var(--text-main); }
-        .extra-btn.active { background: #e0e7ff; color: var(--primary); }
-        .extra-btn.delete { background: #fee2e2; color: var(--danger); }
-        .extra-btn.delete:hover { background: #fecaca; }
-
-        /* Custom Checkbox for Checklist */
-        .custom-chk {
-            width: 24px; height: 24px; border-radius: 6px; border: 2px solid #cbd5e1;
-            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;
-            color: white; flex-shrink: 0;
-        }
-        .custom-chk.checked { background: var(--success); border-color: var(--success); }
-        .custom-chk svg { width: 16px; height: 16px; display: none; }
-        .custom-chk.checked svg { display: block; }
-
-        .color-options { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
-        .color-dot { width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 3px solid #fff; box-shadow: 0 0 0 1px #cbd5e1; transition: transform 0.2s; }
-        .color-dot:hover { transform: scale(1.1); }
-        .color-dot.active { box-shadow: 0 0 0 3px var(--primary); transform: scale(1.1); }
-
-        .chart-container { display: flex; justify-content: center; padding: 30px; background: #f8fafc; border-radius: 16px; margin-bottom: 10px; }
-        .chart-legend { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
-        .legend-item { font-size: 12px; display: flex; align-items: center; gap: 6px; background: #fff; padding: 6px 12px; border-radius: 20px; border: 1px solid #e2e8f0; font-weight: 600; }
-
-        /* --- EXPORT IMAGE STYLES (Fixed Alignment) --- */
-        #print-area { display: none; }
-
-        /* استایل مخصوص اکسپورت مدرن */
-        .export-mode {
-            background: white;
-            padding: 40px;
+        /* Image Export Container (Off-screen) */
+        #image-export-area {
+            position: absolute; top: 0; left: -9999px; width: 1600px; /* Fixed Width for Quality */
+            background: white; padding: 40px; border-radius: 0;
             font-family: 'Vazirmatn', sans-serif;
-            width: 2000px; /* عرض ثابت برای کیفیت بالا */
-            margin: 0 auto;
-            color: #0f172a;
-            position: absolute;
-            top: 0; left: -9999px;
+            direction: rtl; display: none;
         }
+        .export-header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid var(--primary); padding-bottom: 20px; }
+        .export-title { font-size: 36px; font-weight: 900; color: var(--primary-dark); margin: 0; }
+        .export-meta { display: flex; justify-content: space-between; margin-top: 10px; font-size: 18px; color: var(--gray); font-weight: 600; }
         
-        .export-mode .copy-col-btn { display: none !important; }
-
-        .print-header {
-            display: flex; justify-content: space-between; align-items: flex-end;
-            border-bottom: 4px solid var(--primary); padding-bottom: 20px; margin-bottom: 30px;
-        }
-        .print-title h1 { margin: 0; font-size: 48px; color: var(--primary-dark); font-weight: 900; letter-spacing: -1px; }
-        .print-meta { text-align: left; display: flex; flex-direction: column; gap: 5px; }
-        .print-meta div { font-size: 18px; color: #475569; font-weight: 600; display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
-
-        .print-grid-top {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 30px;
-        }
-        .print-box {
-            border: 2px solid #e2e8f0; border-radius: 16px; padding: 20px;
-            background-color: #f8fafc;
-        }
-        .print-box h4 {
-            margin: 0 0 15px 0; border-bottom: 2px solid #cbd5e1; padding-bottom: 8px;
-            font-size: 22px; color: #1e293b; font-weight: 800; display: flex; align-items: center; gap: 10px;
-        }
-        .print-items { list-style: none; padding: 0; margin: 0; font-size: 16px; columns: 2; gap: 20px; }
-        .print-items li { margin-bottom: 8px; break-inside: avoid; display: flex; align-items: center; gap: 8px; font-weight: 500; }
-
-        /* جدول اکسپورت تصویر */
-        .print-table-container table {
-            border: 2px solid #0f172a; font-size: 14px; width: 100%; border-collapse: collapse;
-            table-layout: fixed; /* مهم برای تراز دقیق */
-        }
-        .print-table-container th {
-            background-color: #1e293b !important; color: white !important;
-            border: 1px solid #0f172a; padding: 12px; font-size: 18px; text-align: center;
-        }
-        /* اصلاح تراز ستون ساعت در عکس */
-        .print-table-container tr td:first-child {
-            background-color: #1e293b !important; color: white !important;
-            border: 1px solid #0f172a; font-weight: bold; text-align: center; font-size: 14px;
-            width: 120px; /* عرض ثابت و بیشتر */
-            min-width: 120px;
-            max-width: 120px;
-            white-space: nowrap;
-            overflow: hidden;
-            padding: 0 5px;
-            direction: ltr; /* جهت چپ به راست برای اعداد ساعت */
-        }
-        .print-table-container td {
-            border: 1px solid #94a3b8; height: 32px; padding: 0;
-        }
-        .print-table-container td.task-cell {
-            border: 1px solid #0f172a !important; 
-            color: white !important;
-            text-align: center; vertical-align: middle; padding: 4px;
-        }
-        .print-table-container .task-title { font-size: 16px; font-weight: 900; display: block; margin-bottom: 4px; }
-        .print-table-container .task-time-range { font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.6); margin-bottom: 4px; display: inline-block; padding: 0 5px; }
-
-        .print-footer {
-            margin-top: 30px; border: 3px dashed #cbd5e1; padding: 25px;
-            border-radius: 16px; background: #fff;
-        }
-        .print-note-text { font-size: 16px; white-space: pre-wrap; line-height: 1.8; color: #334155; }
-
-        /* --- PRINT LIST VIEW (PDF Style) --- */
-        .print-list-view { display: none; } /* در حالت عادی مخفی */
+        .export-table { width: 100%; border-collapse: collapse; border: 2px solid #0f172a; table-layout: fixed; }
+        .export-table th { background: #1e293b; color: white; padding: 12px; font-size: 16px; border: 1px solid #0f172a; }
+        .export-table td { border: 1px solid #cbd5e1; height: 35px; padding: 0; vertical-align: top; background: white; }
+        .export-table td:first-child { background: #f1f5f9; color: #0f172a; font-weight: bold; text-align: center; width: 100px; vertical-align: middle; border-left: 2px solid #0f172a; }
         
-        .pl-header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #000; padding-bottom: 10px; }
-        .pl-title { font-size: 24px; font-weight: bold; margin: 0; }
-        .pl-meta { font-size: 14px; color: #333; margin-top: 5px; }
+        .export-task {
+            margin: 2px; padding: 4px; border-radius: 4px; color: white; text-align: center;
+            box-shadow: none; font-size: 14px; display: flex; flex-direction: column; justify-content: center; height: calc(100% - 4px);
+        }
+        .export-task-time { font-size: 12px; background: rgba(0,0,0,0.2); border-radius: 3px; display: inline-block; margin: 0 auto 2px auto; padding: 1px 5px; }
         
-        .pl-day-block { margin-bottom: 20px; page-break-inside: avoid; }
-        .pl-day-title { font-size: 16px; font-weight: 900; border-bottom: 1px solid #000; margin-bottom: 5px; padding-bottom: 2px; }
-        .pl-tasks { list-style: none; padding: 0; margin: 0; }
-        .pl-task-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dotted #ccc; font-size: 14px; }
-        .pl-time { font-weight: bold; width: 120px; }
-        .pl-name { flex: 1; text-align: right; }
-        .pl-req-sec { margin-top: 20px; border-top: 2px solid #000; padding-top: 10px; }
+        .export-footer { margin-top: 30px; display: flex; gap: 20px; }
+        .export-box { flex: 1; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 15px; background: #f8fafc; }
+        .export-box h4 { margin: 0 0 10px 0; color: var(--dark); font-size: 18px; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; }
 
-        /* --- MEDIA PRINT (Paper/PDF) --- */
+        /* --- PRINT MEDIA (PDF - LIST VIEW) --- */
         @media print {
             @page { size: A4 portrait; margin: 10mm; }
-            body { background: white; padding: 0; margin: 0; font-family: 'Vazirmatn', sans-serif; }
-            .no-print, .toolbar, .copy-col-btn, #mainTableWrapper, #loadingBar, #processingMsg, #lockScreen { display: none !important; }
+            body { background: white; padding: 0; margin: 0; color: black; }
             
-            /* مخفی کردن حالت عکس */
-            #print-area { display: none !important; }
+            /* Hide UI Elements */
+            .app-header, .toolbar-actions, .planner-container, #loadingBar, #processingMsg, .modal-overlay { display: none !important; }
             
-            /* نمایش حالت لیست */
-            .print-list-view { display: block !important; width: 100%; color: black; }
+            /* Show Simple Print View */
+            #print-simple-view { display: block !important; font-family: 'Vazirmatn', sans-serif; }
+            
+            .print-header-simple { text-align: center; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 20px; }
+            .print-header-simple h1 { font-size: 24px; margin: 0; }
+            .print-header-simple p { font-size: 14px; margin: 5px 0 0 0; color: #444; }
+            
+            .day-block-print { margin-bottom: 15px; page-break-inside: avoid; border: 1px solid #ccc; border-radius: 8px; overflow: hidden; }
+            .day-title-print { background: #eee; padding: 8px 12px; font-weight: bold; font-size: 16px; border-bottom: 1px solid #ccc; display: flex; justify-content: space-between; }
+            .task-list-print { list-style: none; padding: 0; margin: 0; }
+            .task-item-print { display: flex; padding: 8px 12px; border-bottom: 1px dotted #ddd; align-items: baseline; }
+            .task-item-print:last-child { border-bottom: none; }
+            .time-print { font-weight: bold; width: 110px; flex-shrink: 0; font-size: 13px; font-family: monospace; }
+            .name-print { font-size: 14px; flex-grow: 1; }
+            
+            .print-extras { margin-top: 30px; border-top: 2px solid black; padding-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         }
+
+        #print-simple-view { display: none; } /* Hidden normally */
     </style>
 </head>
 <body>
 
-<!-- Lock Screen -->
-<div id="lockScreen">
-    <div class="lock-box">
-        <div style="margin-bottom:20px; color:var(--primary);">
-            <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-        </div>
-        <h3 style="margin:0 0 10px 0;">برنامه قفل است</h3>
-        <p style="margin:0; color:var(--text-muted); font-size:13px;">لطفاً رمز عبور (PIN) را وارد کنید</p>
-        <div class="pin-dots" id="pinDots">
-            <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
-        </div>
-        <div class="numpad">
-            <button class="num-btn" onclick="enterPin(1)">1</button>
-            <button class="num-btn" onclick="enterPin(2)">2</button>
-            <button class="num-btn" onclick="enterPin(3)">3</button>
-            <button class="num-btn" onclick="enterPin(4)">4</button>
-            <button class="num-btn" onclick="enterPin(5)">5</button>
-            <button class="num-btn" onclick="enterPin(6)">6</button>
-            <button class="num-btn" onclick="enterPin(7)">7</button>
-            <button class="num-btn" onclick="enterPin(8)">8</button>
-            <button class="num-btn" onclick="enterPin(9)">9</button>
-            <button class="num-btn" style="grid-column:2" onclick="enterPin(0)">0</button>
-            <button class="num-btn" onclick="clearPin()" style="color:var(--danger)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="18" y1="9" x2="12" y2="15"></line><line x1="12" y1="9" x2="18" y2="15"></line></svg></button>
-        </div>
-    </div>
-</div>
-
 <div id="loadingBar"></div>
 <div id="processingMsg">
     <div class="spinner"></div>
-    <h3 style="color:#1e293b; margin:0;">لطفاً صبر کنید...</h3>
-    <p id="procTxt" style="color:#64748b; margin-top:10px;">در حال پردازش درخواست</p>
+    <h3 style="margin:0;">لطفاً صبر کنید...</h3>
+    <p id="procTxt" style="color:#64748b; margin-top:10px;">در حال پردازش</p>
 </div>
 
-<!-- Container for Image Export (The "Table" View) - Hidden Offscreen -->
-<div id="print-area" class="export-mode">
-    <div class="print-header">
-        <div class="print-title" style="text-align: right;">
-            <h1 id="printTitleDisplay">برنامه هفتگی</h1>
-        </div>
-        <div class="print-meta">
-            <div id="printUserDisplay">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                <span id="printUserText"></span>
+<!-- Header & Toolbar -->
+<header class="app-header">
+    <div class="header-top">
+        <div class="brand-section">
+            <div class="brand-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
             </div>
-            <div id="printDateDisplay">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                <span id="printDateText"></span>
+            <div class="brand-text">
+                <h1>برنامه‌ریز هفتگی PRO</h1>
+                <p>مدیریت زمان هوشمند و حرفه‌ای</p>
             </div>
         </div>
-    </div>
-
-    <div class="print-grid-top">
-        <div class="print-box">
-            <h4>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                نکات و الزامات
-            </h4>
-            <ul class="print-items" id="printReqList"></ul>
-        </div>
-        <div class="print-box">
-            <h4>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-                چک‌لیست
-            </h4>
-            <ul class="print-items" id="printChkList"></ul>
+        <div class="user-inputs">
+            <input type="text" id="headerTitleInput" class="input-modern" placeholder="عنوان برنامه (مثلاً: برنامه کنکور)" oninput="updateHeader(this.value)">
+            <input type="text" id="userNameInput" class="input-modern" placeholder="نام صاحب اثر" oninput="updateUserName(this.value)">
         </div>
     </div>
 
-    <div id="printTableContainer" class="print-table-container"></div>
-
-    <div class="print-footer" id="printFooter" style="display:none;">
-        <h5 style="margin:0 0 10px 0; font-size:20px; display:flex; align-items:center; gap:8px;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-            یادداشت‌ها:
-        </h5>
-        <div class="print-note-text" id="printNoteText"></div>
-    </div>
-</div>
-
-<!-- Container for PDF Print (The "List" View) -->
-<div id="print-list-area" class="print-list-view"></div>
-
-<!-- Main Toolbar -->
-<div class="toolbar no-print">
-    <!-- Header: Logo & Title -->
-    <div class="toolbar-header">
-        <div class="brand" id="pageBrandTitle">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            پلنر هوشمند PRO
-        </div>
-        <div style="display:flex; gap:10px;">
-             <button class="btn btn-dark" onclick="openSettings()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                تنظیمات
-            </button>
-            <button class="btn mode-toggle" id="selectModeBtn" onclick="toggleSelectMode()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
-                <span id="modeText">حالت اسکرول</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- Inputs -->
-    <div class="input-group">
-        <input type="text" id="headerTitleInput" class="input-modern" placeholder="عنوان برنامه (مثلاً: برنامه مطالعاتی)" oninput="updateHeader(this.value)">
-        <input type="text" id="userNameInput" class="input-modern" placeholder="نام شما (برای چاپ)" oninput="updateUserName(this.value)">
-    </div>
-
-    <!-- Tool Groups -->
-    <div class="toolbar-header">
-        <!-- Edit Tools -->
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="btn btn-teal" onclick="openPresetsModal()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                الگوهای آماده
-            </button>
-            <button class="btn btn-purple" onclick="openModal('extrasModal'); renderExtras();">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-                الزامات / لیست
-            </button>
-            <button class="btn btn-orange" onclick="openModal('noteModal')">
+    <div class="toolbar-actions">
+        <!-- Tools -->
+        <div class="action-group">
+            <button class="btn btn-purple" onclick="openModal('templatesModal')">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                قالب‌های آماده
+            </button>
+            <button class="btn btn-warning" onclick="openModal('extrasModal'); renderExtras();">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                الزامات / چک‌لیست
+            </button>
+            <button class="btn btn-dark" onclick="openModal('noteModal')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                 یادداشت
             </button>
-            <button class="btn btn-dark" onclick="openStats()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
-                آمار
+        </div>
+
+        <div class="action-divider"></div>
+
+        <!-- Mode -->
+        <div class="action-group">
+            <button class="btn btn-toggle" id="selectModeBtn" onclick="toggleSelectMode()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                <span id="modeText">حالت اسکرول</span>
             </button>
         </div>
 
         <div style="flex:1"></div>
 
-        <!-- File/Export Tools -->
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="btn btn-blue" onclick="downloadAsImage()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                دانلود عکس
+        <!-- Output Actions -->
+        <div class="action-group">
+            <button class="btn btn-primary" onclick="downloadAsImage()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                دانلود تصویر (PNG)
             </button>
             <button class="btn btn-dark" onclick="printApp()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                چاپ PDF (لیستی)
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                چاپ (PDF ساده)
             </button>
             <button class="btn btn-success" onclick="exportData()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                فایل داده
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                ذخیره فایل
             </button>
-            <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                بازگذاری داده
+             <button class="btn btn-ghost" onclick="document.getElementById('fileInput').click()" title="بازگردانی فایل">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
             </button>
             <input type="file" id="fileInput" hidden onchange="importData(this)">
-        </div>
-    </div>
-</div>
-
-<!-- Main Table -->
-<div class="planner-wrapper" id="mainTableWrapper">
-    <table id="plannerTable">
-        <thead><tr id="tableHeader"><th>زمان</th></tr></thead>
-        <tbody id="plannerBody"></tbody>
-    </table>
-</div>
-
-<!-- Modals -->
-
-<!-- Settings Modal -->
-<div class="modal-overlay" id="settingsModal">
-    <div class="modal">
-        <div class="modal-header"><h3>تنظیمات سیستم</h3><button class="close-btn" onclick="closeModal('settingsModal')">&times;</button></div>
-        
-        <div style="border-bottom:1px solid #f1f5f9; padding-bottom:15px; margin-bottom:15px;">
-            <h4 style="margin:0 0 10px 0;">امنیت (PIN Code)</h4>
-            <div style="display:flex; gap:10px;">
-                <input type="number" id="newPinInput" class="input-modern" placeholder="رمز جدید (4 رقم)" oninput="if(this.value.length>4) this.value=this.value.slice(0,4)">
-                <button class="btn btn-primary" onclick="setAppPin()">ثبت رمز</button>
-            </div>
-            <div style="margin-top:10px;">
-                <button class="btn btn-danger" onclick="removeAppPin()">حذف رمز عبور</button>
-            </div>
-            <p style="font-size:11px; color:var(--text-muted); margin-top:5px;">با تنظیم رمز، هنگام ورود به برنامه از شما پین خواسته می‌شود.</p>
-        </div>
-
-        <div>
-            <h4 style="margin:0 0 10px 0;">مدیریت داده</h4>
-            <button class="btn btn-danger" onclick="clearAll()" style="width:100%">
+            <button class="btn btn-danger" onclick="clearAll()" title="حذف کل">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                حذف تمام اطلاعات و بازنشانی
             </button>
         </div>
     </div>
-</div>
+</header>
 
-<!-- Presets Modal -->
-<div class="modal-overlay" id="presetsModal">
-    <div class="modal">
-        <div class="modal-header"><h3>انتخاب الگو (برنامه آماده)</h3><button class="close-btn" onclick="closeModal('presetsModal')">&times;</button></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <button class="btn btn-purple" style="flex-direction:column; padding:20px;" onclick="loadPreset('student')">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
-                دانشجویی
-            </button>
-            <button class="btn btn-blue" style="flex-direction:column; padding:20px;" onclick="loadPreset('employee')">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-                کارمندی
-            </button>
-            <button class="btn btn-success" style="flex-direction:column; padding:20px;" onclick="loadPreset('healthy')">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                زندگی سالم
-            </button>
-            <button class="btn btn-teal" style="flex-direction:column; padding:20px;" onclick="loadPreset('clean')">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                پاکسازی ذهنی
-            </button>
-        </div>
-        <p style="color:var(--danger); font-size:12px; margin-top:10px;">توجه: با انتخاب الگو، برنامه فعلی شما حذف و جایگزین می‌شود.</p>
+<!-- Main Table Wrapper -->
+<div class="planner-container">
+    <div class="table-scroll" id="mainTableScroll">
+        <table id="plannerTable">
+            <thead>
+                <tr id="tableHeader">
+                    <th>زمان</th>
+                    <!-- Days will be injected here -->
+                </tr>
+            </thead>
+            <tbody id="plannerBody">
+                <!-- Rows will be injected here -->
+            </tbody>
+        </table>
     </div>
 </div>
 
-<!-- Copy Modal -->
-<div class="modal-overlay" id="copyModal">
-    <div class="modal">
-        <div class="modal-header"><h3>کپی برنامه <span id="copySourceLabel" style="color:var(--primary)"></span></h3><button class="close-btn" onclick="closeModal('copyModal')">&times;</button></div>
-        <div style="font-size:13px; color:var(--text-muted);">روزهایی که می‌خواهید برنامه در آن‌ها کپی شود:</div>
-        <div id="copyTargetList" class="copy-list"></div>
-        <button class="btn btn-primary" style="justify-content:center; margin-top:10px;" onclick="executeCopy()">تایید و کپی</button>
-    </div>
-</div>
+<!-- ================= MODALS ================= -->
 
-<!-- Single Copy -->
-<div class="modal-overlay" id="singleCopyModal">
-    <div class="modal">
-        <div class="modal-header"><h3>کپی این فعالیت به...</h3><button class="close-btn" onclick="closeModal('singleCopyModal')">&times;</button></div>
-        <div style="font-size:13px; color:var(--text-muted);">روز مقصد را انتخاب کنید:</div>
-        <div id="singleCopyTargetList" class="copy-list"></div>
-    </div>
-</div>
-
-<!-- Extras -->
-<div class="modal-overlay" id="extrasModal">
-    <div class="modal">
-        <div class="modal-header"><h3>الزامات و لیست</h3><button class="close-btn" onclick="closeModal('extrasModal')">&times;</button></div>
-        <div style="display:flex; gap:10px; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">
-            <button class="btn btn-purple" style="flex:1; justify-content:center;" onclick="switchTab('req')">🔸 نکات</button>
-            <button class="btn btn-dark" style="flex:1; justify-content:center;" onclick="switchTab('chk')">▫️ چک‌لیست</button>
+<!-- Templates Modal (New Feature) -->
+<div class="modal-overlay" id="templatesModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div class="modal-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                انتخاب قالب آماده
+            </div>
+            <button class="modal-close" onclick="closeModal('templatesModal')">&times;</button>
         </div>
-        <div id="tab-req">
-            <div style="display:flex; gap:8px; margin-top:10px;"><input type="text" id="reqInput" class="input-modern" placeholder="نکته جدید..."><button class="btn btn-success" onclick="addItem('req')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button></div>
-            <ul class="extras-list" id="reqListUi" style="margin-top:10px;"></ul>
-        </div>
-        <div id="tab-chk" style="display:none">
-            <div style="display:flex; gap:8px; margin-top:10px;"><input type="text" id="chkInput" class="input-modern" placeholder="مورد جدید..."><button class="btn btn-success" onclick="addItem('chk')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button></div>
-            <ul class="extras-list" id="chkListUi" style="margin-top:10px;"></ul>
+        <p style="color:var(--gray); margin-top:0;">یکی از برنامه‌های استاندارد زیر را انتخاب کنید. توجه کنید برنامه فعلی شما پاک خواهد شد.</p>
+        <div class="template-grid">
+            <div class="template-card" onclick="applyTemplate('student')">
+                <span class="template-icon">🎓</span>
+                <span class="template-name">دانش‌آموز / دانشجو</span>
+                <span class="template-desc">تعادل درس و استراحت</span>
+            </div>
+            <div class="template-card" onclick="applyTemplate('employee')">
+                <span class="template-icon">💼</span>
+                <span class="template-name">کارمند / شاغل</span>
+                <span class="template-desc">ساعات اداری منظم</span>
+            </div>
+            <div class="template-card" onclick="applyTemplate('healthy')">
+                <span class="template-icon">🧘‍♂️</span>
+                <span class="template-name">زندگی سالم</span>
+                <span class="template-desc">ورزش، خواب و تغذیه</span>
+            </div>
+            <div class="template-card" onclick="applyTemplate('konkur')">
+                <span class="template-icon">📚</span>
+                <span class="template-name">ویژه کنکوری</span>
+                <span class="template-desc">مطالعه فشرده با مرور</span>
+            </div>
         </div>
     </div>
 </div>
 
 <!-- Task Modal -->
 <div class="modal-overlay" id="taskModal">
-    <div class="modal">
-        <div class="modal-header"><h3>مدیریت فعالیت</h3><button class="close-btn" onclick="closeModal('taskModal')">&times;</button></div>
+    <div class="modal-box">
+        <div class="modal-header">
+            <div class="modal-title">مدیریت فعالیت</div>
+            <button class="modal-close" onclick="closeModal('taskModal')">&times;</button>
+        </div>
         <input type="hidden" id="taskId"><input type="hidden" id="taskDay">
-        <div><label class="form-label">ساعت شروع</label><select id="inpStart" class="input-modern" onchange="updateEndOptions()"></select></div>
-        <div><label class="form-label">عنوان</label><input type="text" id="inpName" class="input-modern" autofocus></div>
-        <div><label class="form-label">ساعت پایان</label><select id="inpEnd" class="input-modern"></select></div>
-        <div><label class="form-label">رنگ</label><div class="color-options" id="colorPalette"></div><input type="color" id="customColor" style="margin-top:10px; width:100%; height:40px; border:none; border-radius:10px; cursor:pointer;"></div>
-        <div style="display:flex; justify-content:space-between; margin-top:10px; flex-wrap:wrap; gap:8px;">
+        
+        <div><label class="form-label">عنوان فعالیت</label><input type="text" id="inpName" class="input-modern" placeholder="مثلاً: مطالعه ریاضی" autofocus></div>
+        
+        <div style="display:flex; gap:10px;">
+            <div style="flex:1"><label class="form-label">شروع</label><select id="inpStart" class="input-modern" onchange="updateEndOptions()"></select></div>
+            <div style="flex:1"><label class="form-label">مدت / پایان</label><select id="inpEnd" class="input-modern"></select></div>
+        </div>
+
+        <div>
+            <label class="form-label">رنگ برچسب</label>
+            <div class="color-picker-grid" id="colorPalette"></div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; margin-top:20px; padding-top:15px; border-top:1px solid #f1f5f9;">
             <button class="btn btn-danger" id="btnDeleteTask" onclick="deleteTask()" style="display:none">حذف</button>
-            <button class="btn btn-teal" id="btnCopyTask" onclick="openSingleCopyModal()" style="display:none">کپی به...</button>
             <div style="flex:1"></div>
-            <button class="btn btn-dark" onclick="closeModal('taskModal')">لغو</button>
-            <button class="btn btn-primary" onclick="saveTask()">ثبت</button>
+            <button class="btn btn-primary" onclick="saveTask()">ثبت فعالیت</button>
+        </div>
+    </div>
+</div>
+
+<!-- Extras Modal -->
+<div class="modal-overlay" id="extrasModal">
+    <div class="modal-box">
+        <div class="modal-header"><div class="modal-title">الزامات و چک‌لیست</div><button class="modal-close" onclick="closeModal('extrasModal')">&times;</button></div>
+        
+        <div style="display:flex; background:#f1f5f9; padding:4px; border-radius:10px; margin-bottom:15px;">
+            <button class="btn btn-ghost" id="tabReqBtn" style="flex:1; justify-content:center;" onclick="switchTab('req')">🔸 نکات مهم</button>
+            <button class="btn btn-ghost" id="tabChkBtn" style="flex:1; justify-content:center;" onclick="switchTab('chk')">▫️ چک‌لیست</button>
+        </div>
+
+        <div id="tab-req">
+            <div style="display:flex; gap:8px;"><input type="text" id="reqInput" class="input-modern" placeholder="نکته جدید..."><button class="btn btn-success" onclick="addItem('req')">+</button></div>
+            <ul id="reqListUi" style="list-style:none; padding:0; margin-top:10px; max-height:200px; overflow-y:auto;"></ul>
+        </div>
+        <div id="tab-chk" style="display:none">
+            <div style="display:flex; gap:8px;"><input type="text" id="chkInput" class="input-modern" placeholder="مورد جدید..."><button class="btn btn-success" onclick="addItem('chk')">+</button></div>
+            <ul id="chkListUi" style="list-style:none; padding:0; margin-top:10px; max-height:200px; overflow-y:auto;"></ul>
         </div>
     </div>
 </div>
 
 <!-- Note Modal -->
 <div class="modal-overlay" id="noteModal">
-    <div class="modal">
-        <div class="modal-header"><h3>یادداشت‌ها</h3><button class="close-btn" onclick="closeModal('noteModal')">&times;</button></div>
-        <textarea id="noteText" class="input-modern" rows="10"></textarea>
-        <div style="display:flex; align-items:center; gap:8px; font-size:13px;">
-            <input type="checkbox" id="notePrintCheck" style="width:18px; height:18px; accent-color:var(--primary);"> <label for="notePrintCheck">نمایش در انتهای چاپ</label>
+    <div class="modal-box">
+        <div class="modal-header"><div class="modal-title">یادداشت‌های کلی</div><button class="modal-close" onclick="closeModal('noteModal')">&times;</button></div>
+        <textarea id="noteText" class="input-modern" rows="8" placeholder="هر چیزی که می‌خواهید بنویسید..."></textarea>
+        <div style="display:flex; justify-content:flex-end; margin-top:10px;"><button class="btn btn-success" onclick="saveNote()">ذخیره</button></div>
+    </div>
+</div>
+
+<!-- Copy Modal -->
+<div class="modal-overlay" id="copyModal">
+    <div class="modal-box">
+        <div class="modal-header"><div class="modal-title">کپی برنامه <span id="copySourceLabel" style="color:var(--primary); margin-right:5px;"></span></div><button class="modal-close" onclick="closeModal('copyModal')">&times;</button></div>
+        <p style="font-size:13px; color:var(--gray);">برنامه این روز را به کدام روزها کپی کنم؟</p>
+        <div id="copyTargetList" style="display:flex; flex-direction:column; gap:8px;"></div>
+        <button class="btn btn-primary" style="margin-top:15px; justify-content:center;" onclick="executeCopy()">انجام کپی</button>
+    </div>
+</div>
+
+<!-- ================= OFF-SCREEN RENDER AREAS ================= -->
+
+<!-- 1. Image Export Container (Fixed Size & Layout for html2canvas) -->
+<div id="image-export-area">
+    <div class="export-header">
+        <h1 class="export-title" id="expTitle">برنامه هفتگی</h1>
+        <div class="export-meta">
+            <span id="expUser"></span>
+            <span id="expDate"></span>
         </div>
-        <div style="display:flex; justify-content:flex-end;"><button class="btn btn-success" onclick="saveNote()">ذخیره</button></div>
+    </div>
+    
+    <div style="display:flex; gap:20px; margin-bottom:20px;">
+        <div class="export-box" id="expReqBox" style="display:none"><h4>نکات و الزامات</h4><ul id="expReqList" style="padding-right:20px;"></ul></div>
+        <div class="export-box" id="expChkBox" style="display:none"><h4>چک‌لیست</h4><ul id="expChkList" style="padding-right:20px;"></ul></div>
+    </div>
+
+    <table class="export-table">
+        <thead id="expThead"></thead>
+        <tbody id="expTbody"></tbody>
+    </table>
+
+    <div class="export-footer" id="expFooter" style="display:none">
+        <div class="export-box" style="width:100%">
+            <h4>یادداشت‌ها:</h4>
+            <div id="expNoteText" style="white-space: pre-wrap; line-height:1.6;"></div>
+        </div>
     </div>
 </div>
 
-<!-- Stats Modal -->
-<div class="modal-overlay" id="statsModal">
-    <div class="modal">
-        <div class="modal-header"><h3>آمار</h3><button class="close-btn" onclick="closeModal('statsModal')">&times;</button></div>
-        <div class="chart-container" id="chartArea"></div>
-        <div class="chart-legend" id="chartLegend"></div>
+<!-- 2. Print Simple View (Visible only in Print Mode) -->
+<div id="print-simple-view">
+    <div class="print-header-simple">
+        <h1 id="printSimpleTitle">برنامه هفتگی</h1>
+        <p>کاربر: <span id="printSimpleUser"></span> | تاریخ چاپ: <span id="printSimpleDate"></span></p>
+    </div>
+    
+    <div id="printSimpleListContainer"></div>
+    
+    <div class="print-extras">
+        <div>
+            <h3>نکات:</h3>
+            <ul id="printSimpleReqs"></ul>
+        </div>
+        <div>
+            <h3>چک‌لیست:</h3>
+            <ul id="printSimpleChks"></ul>
+        </div>
+    </div>
+    <div style="margin-top:20px; border-top:1px solid #ddd; padding-top:10px;">
+        <strong>یادداشت:</strong> <span id="printSimpleNote"></span>
     </div>
 </div>
 
+
+<!-- ================= LOGIC ================= -->
 <script>
+    // --- CONSTANTS ---
     const DAYS = [
         {id:'sat', l:'شنبه'}, {id:'sun', l:'یکشنبه'}, {id:'mon', l:'دوشنبه'},
         {id:'tue', l:'سه‌شنبه'}, {id:'wed', l:'چهارشنبه'}, {id:'thu', l:'پنج‌شنبه'}, {id:'fri', l:'جمعه'}
     ];
-    const COLORS = ['#6366f1', '#10b981', '#ef4444', '#f97316', '#a855f7', '#06b6d4', '#ec4899', '#64748b'];
     const TIMELINE = [];
-    for(let h=0; h<24; h++) for(let m=0; m<60; m+=15) TIMELINE.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
-    TIMELINE.push("24:00");
+    for(let h=6; h<24; h++) { // Start from 6 AM for better view
+        TIMELINE.push(`${String(h).padStart(2,'0')}:00`);
+        TIMELINE.push(`${String(h).padStart(2,'0')}:30`);
+    }
+    TIMELINE.push("24:00"); // End
 
-    let appData = {
-        tasks: [], header: "", userName: "", note: {text:"", print:false},
-        reqs: [{t:"بررسی امور مالی", s:true}],
-        chks: [{t:"خرید هفتگی", s:true, c:false}]
-    };
+    const COLORS = [
+        '#4f46e5', '#10b981', '#ef4444', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#64748b'
+    ];
 
-    let isSelect=false, isDrag=false, selStart=null, selCurr=null;
-    let pendingCopySource = null; 
-    let currentEditingTask = null;
-    let enteredPin = "";
-
-    // --- Data for Presets (Scientific/Standard-ish) ---
-    const PRESETS = {
+    const TEMPLATES = {
         student: [
-            {id:1, day:'sat', startStr:'08:00', duration:8, name:'کلاس دانشگاه', color:'#6366f1'},
-            {id:2, day:'sat', startStr:'16:00', duration:4, name:'مطالعه', color:'#f97316'},
-            {id:3, day:'sun', startStr:'08:00', duration:8, name:'کلاس دانشگاه', color:'#6366f1'},
-            {id:4, day:'mon', startStr:'10:00', duration:6, name:'پروژه گروهی', color:'#10b981'},
-            {id:5, day:'mon', startStr:'18:00', duration:4, name:'ورزش', color:'#ef4444'},
-            {id:6, day:'wed', startStr:'14:00', duration:4, name:'مرور درس‌ها', color:'#a855f7'}
+            {day:'sat', s:'07:00', d:2, n:'بیدار شدن و صبحانه', c:'#10b981'},
+            {day:'sat', s:'08:00', d:6, n:'مدرسه / کلاس', c:'#4f46e5'},
+            {day:'sat', s:'11:00', d:1, n:'زنگ تفریح', c:'#f59e0b'},
+            {day:'sat', s:'14:00', d:2, n:'ناهار و استراحت', c:'#ef4444'},
+            {day:'sat', s:'16:00', d:3, n:'انجام تکالیف', c:'#8b5cf6'},
+            {day:'sat', s:'19:00', d:2, n:'زمان آزاد / شام', c:'#06b6d4'},
+            {day:'sat', s:'22:00', d:1, n:'آماده‌سازی فردا', c:'#64748b'},
+            {day:'sat', s:'23:00', d:2, n:'خواب', c:'#0f172a'}
         ],
         employee: [
-            {id:1, day:'sat', startStr:'07:30', duration:34, name:'کار اداری', color:'#334155'},
-            {id:2, day:'sun', startStr:'07:30', duration:34, name:'کار اداری', color:'#334155'},
-            {id:3, day:'mon', startStr:'07:30', duration:34, name:'کار اداری', color:'#334155'},
-            {id:4, day:'tue', startStr:'07:30', duration:34, name:'کار اداری', color:'#334155'},
-            {id:5, day:'wed', startStr:'07:30', duration:34, name:'کار اداری', color:'#334155'},
-            {id:6, day:'thu', startStr:'18:00', duration:4, name:'خرید خانه', color:'#f97316'}
+            {day:'sat', s:'06:30', d:2, n:'آماده‌سازی و صبحانه', c:'#f59e0b'},
+            {day:'sat', s:'08:00', d:16, n:'ساعات کاری', c:'#4f46e5'}, // 8 hours (16 * 30min)
+            {day:'sat', s:'16:00', d:2, n:'مسیر برگشت', c:'#64748b'},
+            {day:'sat', s:'17:00', d:2, n:'استراحت و چای', c:'#10b981'},
+            {day:'sat', s:'19:00', d:2, n:'وقت با خانواده', c:'#ec4899'},
+            {day:'sat', s:'23:00', d:2, n:'خواب', c:'#0f172a'}
         ],
         healthy: [
-            {id:1, day:'sat', startStr:'06:00', duration:2, name:'مدیتیشن و یوگا', color:'#10b981'},
-            {id:2, day:'sat', startStr:'07:00', duration:2, name:'صبحانه سالم', color:'#f97316'},
-            {id:3, day:'sat', startStr:'18:00', duration:4, name:'پیاده‌روی', color:'#6366f1'},
-            {id:4, day:'sun', startStr:'22:00', duration:4, name:'خواب به موقع', color:'#334155'}
+            {day:'sat', s:'06:00', d:2, n:'یوگا / ورزش صبحگاهی', c:'#10b981'},
+            {day:'sat', s:'07:00', d:2, n:'صبحانه سالم', c:'#f59e0b'},
+            {day:'sat', s:'13:00', d:2, n:'ناهار رژیمی', c:'#ef4444'},
+            {day:'sat', s:'17:00', d:2, n:'باشگاه / پیاده‌روی', c:'#4f46e5'},
+            {day:'sat', s:'21:00', d:1, n:'مطالعه', c:'#8b5cf6'},
+            {day:'sat', s:'22:30', d:3, n:'خواب کافی', c:'#0f172a'}
         ],
-        clean: [
-            {id:1, day:'fri', startStr:'09:00', duration:8, name:'نظافت منزل', color:'#06b6d4'},
-            {id:2, day:'fri', startStr:'12:00', duration:4, name:'مرتب‌سازی فایل‌ها', color:'#a855f7'}
+        konkur: [
+            {day:'sat', s:'06:00', d:3, n:'بیدار باش و صبحانه', c:'#f59e0b'},
+            {day:'sat', s:'07:30', d:3, n:'بلاک مطالعاتی ۱ (اختصاصی)', c:'#4f46e5'},
+            {day:'sat', s:'09:00', d:1, n:'استراحت', c:'#10b981'},
+            {day:'sat', s:'09:30', d:3, n:'بلاک مطالعاتی ۲', c:'#4f46e5'},
+            {day:'sat', s:'11:00', d:1, n:'استراحت', c:'#10b981'},
+            {day:'sat', s:'11:30', d:3, n:'بلاک مطالعاتی ۳', c:'#4f46e5'},
+            {day:'sat', s:'13:00', d:3, n:'ناهار و نماز', c:'#ef4444'},
+            {day:'sat', s:'15:00', d:3, n:'بلاک مطالعاتی ۴', c:'#8b5cf6'},
+            {day:'sat', s:'17:00', d:3, n:'تست زنی سرعتی', c:'#ec4899'},
+            {day:'sat', s:'23:00', d:2, n:'خواب', c:'#0f172a'}
         ]
     };
 
-    function showLoader(msg) { 
-        document.getElementById('procTxt').innerText = msg || 'در حال پردازش';
-        document.getElementById('processingMsg').style.display = 'flex'; 
-    }
-    function hideLoader() { document.getElementById('processingMsg').style.display = 'none'; }
-    function showBar() { document.getElementById('loadingBar').style.display = 'block'; }
-    function hideBar() { document.getElementById('loadingBar').style.display = 'none'; }
+    // --- STATE ---
+    let appData = {
+        tasks: [], header: "", userName: "", note: "",
+        reqs: [], chks: []
+    };
+    let isSelect=false, isDrag=false, selStart=null, selCurr=null, currentEditingTask = null, pendingCopySource = null;
 
+    // --- INIT ---
     function init() {
-        checkLock(); // Security Check
-
-        const saved = localStorage.getItem('finalProPlannerV10');
+        const saved = localStorage.getItem('proPlannerData');
         if(saved) {
-            try {
-                const d = JSON.parse(saved);
-                if(Array.isArray(d)) appData.tasks = d; else appData = {...appData, ...d};
-            } catch(e){}
+            try { appData = JSON.parse(saved); } catch(e){ console.error(e); }
         }
 
         updateHeader(appData.header || "");
         document.getElementById('userNameInput').value = appData.userName || "";
-        
-        const startSel = document.getElementById('inpStart');
-        TIMELINE.slice(0, -1).forEach(t => startSel.add(new Option(t, t)));
+        document.getElementById('noteText').value = appData.note || "";
 
+        // Fill Time Selects
+        const sSel = document.getElementById('inpStart');
+        TIMELINE.slice(0,-1).forEach(t => sSel.add(new Option(t, t)));
+
+        // Fill Color Palette
         const pal = document.getElementById('colorPalette');
         COLORS.forEach(c => {
-            const dot = document.createElement('div');
-            dot.className='color-dot'; dot.style.background=c;
-            dot.onclick=()=>{
-                document.getElementById('customColor').value=c;
-                document.querySelectorAll('.color-dot').forEach(el=>el.classList.remove('active'));
-                dot.classList.add('active');
+            const d = document.createElement('div');
+            d.className='color-circle'; d.style.background=c;
+            d.onclick=()=>{
+                document.querySelectorAll('.color-circle').forEach(x=>x.classList.remove('active'));
+                d.classList.add('active');
             };
-            pal.appendChild(dot);
+            pal.appendChild(d);
         });
 
-        renderHeader(); renderTable(); setupTouch();
+        renderHeader();
+        renderTable();
+        setupEvents();
     }
 
-    // --- Security Functions ---
-    function checkLock() {
-        const pin = localStorage.getItem('appPin');
-        if (pin) {
-            document.getElementById('lockScreen').style.display = 'flex';
-        }
-    }
-    function enterPin(num) {
-        const dots = document.querySelectorAll('.pin-dot');
-        if (enteredPin.length < 4) {
-            enteredPin += num;
-            dots[enteredPin.length - 1].classList.add('filled');
-        }
-        if (enteredPin.length === 4) {
-            const savedPin = localStorage.getItem('appPin');
-            setTimeout(() => {
-                if (enteredPin === savedPin) {
-                    document.getElementById('lockScreen').style.display = 'none';
-                    enteredPin = "";
-                    dots.forEach(d => d.classList.remove('filled'));
-                } else {
-                    alert("رمز اشتباه است");
-                    clearPin();
-                }
-            }, 100);
-        }
-    }
-    function clearPin() {
-        enteredPin = "";
-        document.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('filled'));
-    }
-    function openSettings() { openModal('settingsModal'); }
-    function setAppPin() {
-        const val = document.getElementById('newPinInput').value;
-        if(val.length !== 4) return alert("رمز باید 4 رقم باشد");
-        localStorage.setItem('appPin', val);
-        alert("رمز ثبت شد. در ورود بعدی فعال خواهد بود.");
-        closeModal('settingsModal');
-    }
-    function removeAppPin() {
-        if(confirm("آیا رمز عبور حذف شود؟")) {
-            localStorage.removeItem('appPin');
-            alert("رمز حذف شد.");
-            closeModal('settingsModal');
-        }
-    }
-
-    // --- Presets Logic ---
-    function openPresetsModal() { openModal('presetsModal'); }
-    function loadPreset(type) {
-        if(!confirm("با بارگذاری الگو، برنامه فعلی شما حذف می‌شود. ادامه می‌دهید؟")) return;
-        
-        // Deep copy preset
-        let newTasks = JSON.parse(JSON.stringify(PRESETS[type]));
-        // Unique IDs
-        newTasks = newTasks.map(t => ({...t, id: Date.now() + Math.random()}));
-        
-        appData.tasks = newTasks;
-        if(type === 'student') updateHeader("برنامه دانشجویی");
-        else if(type === 'employee') updateHeader("برنامه کارمندی");
-        else if(type === 'healthy') updateHeader("برنامه زندگی سالم");
-        else updateHeader("برنامه پاکسازی");
-        
-        saveData(); renderTable(); closeModal('presetsModal');
-    }
-
+    // --- RENDERERS ---
     function renderHeader() {
-        const tr = document.getElementById('tableHeader');
-        while(tr.children.length>1) tr.removeChild(tr.lastChild);
-        DAYS.forEach(d=>{
-            const th=document.createElement('th');
-            th.innerHTML=`<div style="display:flex;justify-content:center;gap:5px;align-items:center;">
-                <span class="copy-col-btn" onclick="openCopyModal('${d.id}')" title="کپی کل روز">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                    کپی
-                </span>
-                ${d.l}
-            </div>`;
-            tr.appendChild(th);
+        const r = document.getElementById('tableHeader');
+        while(r.children.length > 1) r.removeChild(r.lastChild);
+        DAYS.forEach(d => {
+            const th = document.createElement('th');
+            th.innerHTML = `
+                <div class="day-header-content">
+                    <span>${d.l}</span>
+                    <button class="copy-day-btn" onclick="openCopyModal('${d.id}')">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        کپی
+                    </button>
+                </div>`;
+            r.appendChild(th);
         });
     }
 
     function renderTable() {
         const b = document.getElementById('plannerBody'); b.innerHTML='';
-        const occ = {}; DAYS.forEach(d=>occ[d.id]=new Array(TIMELINE.length).fill(false));
+        const occupancy = {}; 
+        DAYS.forEach(d => occupancy[d.id] = new Array(TIMELINE.length).fill(false));
 
         for(let idx=0; idx < TIMELINE.length - 1; idx++) {
             const time = TIMELINE[idx];
-            const nextTime = TIMELINE[idx+1];
             const tr = document.createElement('tr');
-            const tdTime = document.createElement('td'); 
-            tdTime.innerText = `${time} تا ${nextTime}`; 
+            
+            // Time Column
+            const tdTime = document.createElement('td');
+            tdTime.innerText = time;
             tr.appendChild(tdTime);
 
             DAYS.forEach(day => {
-                if(occ[day.id][idx]) return;
-                const task = appData.tasks.find(t=>t.day===day.id && t.startStr===time);
+                if(occupancy[day.id][idx]) return; // Slot already taken
+
+                const task = appData.tasks.find(t => t.day === day.id && t.startStr === time);
 
                 if(task) {
                     const td = document.createElement('td');
-                    td.rowSpan = task.duration; td.className='task-cell';
-                    td.style.backgroundColor=task.color;
+                    td.rowSpan = task.duration;
+                    
+                    // Inner Block
+                    const block = document.createElement('div');
+                    block.className = 'task-block';
+                    block.style.backgroundColor = task.color;
+                    
+                    // Calculate End Time
                     const endIdx = idx + task.duration;
-                    const endStr = TIMELINE[endIdx];
-                    td.innerHTML=`<div class="task-inner"><span class="task-time-range">${task.startStr} تا ${endStr}</span><span class="task-title">${task.name}</span></div>`;
-                    td.onclick=(e)=>{e.stopPropagation(); openTaskModal(task);};
-                    td.draggable=true;
-                    td.ondragstart=(e)=>{e.dataTransfer.setData('tid', task.id);};
+                    const endTime = TIMELINE[endIdx] || "End";
+                    
+                    block.innerHTML = `
+                        <span class="task-time">${time} - ${endTime}</span>
+                        <span class="task-name">${task.name}</span>
+                    `;
+                    block.onclick = (e) => { e.stopPropagation(); openTaskModal(task); };
+                    
+                    td.appendChild(block);
                     tr.appendChild(td);
-                    for(let i=1; i<task.duration; i++) if(idx+i<TIMELINE.length) occ[day.id][idx+i]=true;
+
+                    // Mark slots as occupied
+                    for(let k=1; k < task.duration; k++) {
+                        if(idx+k < TIMELINE.length) occupancy[day.id][idx+k] = true;
+                    }
+
                 } else {
+                    // Empty Slot
                     const td = document.createElement('td');
-                    td.className='empty-cell'; td.dataset.d=day.id; td.dataset.i=idx;
-                    td.ondragover=(e)=>e.preventDefault();
-                    td.ondrop=(e)=>handleDrop(e, day.id, time);
+                    td.className = 'empty-slot';
+                    td.dataset.day = day.id;
+                    td.dataset.idx = idx;
                     tr.appendChild(td);
                 }
             });
@@ -855,386 +726,536 @@
         }
     }
 
-    function updateEndOptions() {
-        const startVal = document.getElementById('inpStart').value;
-        const sIdx = TIMELINE.indexOf(startVal);
-        const endSel = document.getElementById('inpEnd');
-        endSel.innerHTML = '';
-        for (let i = sIdx + 1; i < TIMELINE.length; i++) {
-            const time = TIMELINE[i];
-            const duration = i - sIdx;
-            let durationText = "";
-            const totalMin = duration * 15;
-            if(totalMin < 60) durationText = `${totalMin} دقیقه`;
-            else {
-                const h = Math.floor(totalMin/60);
-                const m = totalMin%60;
-                durationText = `${h} ساعت` + (m>0 ? ` و ${m} دقیقه` : "");
-            }
-            endSel.add(new Option(`${time} | ${durationText}`, duration));
-        }
-    }
-
-    // --- Helper: Clone Table for Image Export ---
-    function preparePrintDOM() {
-        document.getElementById('printTitleDisplay').innerText = appData.header || "برنامه هفتگی";
-        document.getElementById('printUserText').innerText = appData.userName ? `نام کاربر: ${appData.userName}` : "نام کاربر: ثبت نشده";
-        document.getElementById('printDateText').innerText = `تاریخ: ${new Date().toLocaleDateString('fa-IR')}`;
-
-        const rL = document.getElementById('printReqList'); rL.innerHTML='';
-        appData.reqs.filter(x=>x.s).forEach(x => rL.innerHTML+=`<li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg> ${x.t}</li>`);
+    // --- TEMPLATE LOGIC ---
+    function applyTemplate(type) {
+        if(!confirm("آیا مطمئن هستید؟ برنامه فعلی شما پاک شده و قالب جدید جایگزین می‌شود.")) return;
         
-        const cL = document.getElementById('printChkList'); cL.innerHTML='';
-        appData.chks.filter(x=>x.s).forEach(x => {
-            const icon = x.c ? 
-                `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>` : 
-                `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>`;
-            cL.innerHTML+=`<li>${icon} ${x.t}</li>`;
-        });
+        showLoader("در حال اعمال قالب...");
+        const tpl = TEMPLATES[type];
+        if(!tpl) return;
 
-        const tblCont = document.getElementById('printTableContainer');
-        tblCont.innerHTML = '';
-        const originalTable = document.getElementById('plannerTable');
-        if(originalTable) {
-            const clone = originalTable.cloneNode(true);
-            tblCont.appendChild(clone);
-        }
+        // Clear current tasks
+        appData.tasks = [];
 
-        const ftr = document.getElementById('printFooter');
-        if(appData.note.print && appData.note.text) {
-            ftr.style.display = 'block';
-            document.getElementById('printNoteText').innerText = appData.note.text;
-        } else { ftr.style.display = 'none'; }
-    }
-
-    // --- Generate Simple List for PDF Print (Command 4) ---
-    function generatePrintListView() {
-        const container = document.getElementById('print-list-area');
-        container.innerHTML = '';
-
-        // Build HTML
-        let html = `
-        <div class="pl-header">
-            <h1 class="pl-title">${appData.header || 'برنامه هفتگی'}</h1>
-            <div class="pl-meta">${appData.userName ? appData.userName + ' - ' : ''} ${new Date().toLocaleDateString('fa-IR')}</div>
-        </div>
-        `;
-
-        DAYS.forEach(day => {
-            // Get tasks for this day
-            const dayTasks = appData.tasks
-                .filter(t => t.day === day.id)
-                .sort((a, b) => TIMELINE.indexOf(a.startStr) - TIMELINE.indexOf(b.startStr));
-
-            // Only show day if there are tasks (optional - showing all days for structure)
-            html += `<div class="pl-day-block"><div class="pl-day-title">${day.l}</div><ul class="pl-tasks">`;
-            
-            if (dayTasks.length === 0) {
-                html += `<li class="pl-task-row" style="color:#777; font-style:italic;">بدون فعالیت</li>`;
-            } else {
-                dayTasks.forEach(t => {
-                    const sIdx = TIMELINE.indexOf(t.startStr);
-                    const eIdx = sIdx + t.duration;
-                    const endStr = TIMELINE[eIdx];
-                    html += `
-                    <li class="pl-task-row">
-                        <span class="pl-time">${t.startStr} تا ${endStr}</span>
-                        <span class="pl-name">${t.name}</span>
-                    </li>
-                    `;
+        // Apply logic: Expand template for all days if needed, or just copy sample data
+        // For simplicity, we copy the sample 'sat' schedule to ALL days except Friday (weekend)
+        // Or keep it simple: Copy the sample structure to Saturday, then user can copy.
+        // BETTER UX: Populate Sat-Wed with the template, maybe Thu/Fri lighter.
+        
+        // Let's populate Sat-Thu with the template.
+        const workDays = ['sat','sun','mon','tue','wed','thu'];
+        
+        workDays.forEach(dId => {
+            tpl.forEach(item => {
+                appData.tasks.push({
+                    id: Date.now() + Math.random(),
+                    day: dId,
+                    startStr: item.s,
+                    duration: item.d,
+                    name: item.n,
+                    color: item.c
                 });
-            }
-            html += `</ul></div>`;
+            });
         });
 
-        // Add Notes/Reqs if needed in list view
-        if ((appData.reqs.length > 0 || appData.chks.length > 0)) {
-            html += `<div class="pl-req-sec"><b>یادداشت‌ها و الزامات:</b><ul style="margin-top:5px; font-size:12px;">`;
-            appData.reqs.filter(r=>r.s).forEach(r => html+=`<li>${r.t}</li>`);
-            appData.chks.filter(c=>c.s).forEach(c => html+=`<li>[${c.c?'✓':' '}] ${c.t}</li>`);
-            html += `</ul></div>`;
+        saveData();
+        renderTable();
+        closeModal('templatesModal');
+        setTimeout(hideLoader, 800);
+    }
+
+    // --- TASK MANAGEMENT ---
+    function updateEndOptions() {
+        const sVal = document.getElementById('inpStart').value;
+        const sIdx = TIMELINE.indexOf(sVal);
+        const eSel = document.getElementById('inpEnd');
+        eSel.innerHTML = '';
+        
+        for(let i = sIdx + 1; i < TIMELINE.length; i++) {
+            const dur = i - sIdx;
+            const min = dur * 30;
+            const h = Math.floor(min / 60);
+            const m = min % 60;
+            let txt = (h > 0 ? `${h} ساعت` : "") + (m > 0 ? ` ${m} دقیقه` : "");
+            eSel.add(new Option(`${TIMELINE[i]} (${txt})`, dur));
         }
+    }
+
+    function openTaskModal(task, freshData) {
+        openModal('taskModal');
+        const delBtn = document.getElementById('btnDeleteTask');
         
-        if (appData.note.print && appData.note.text) {
-            html += `<div style="margin-top:10px; border-top:1px dashed #000; padding-top:5px; font-size:12px; white-space:pre-wrap;">${appData.note.text}</div>`;
-        }
+        // Reset Color Selection
+        document.querySelectorAll('.color-circle').forEach(c => c.classList.remove('active'));
 
-        container.innerHTML = html;
-    }
-
-    // --- Download Image (Direct) - Enhanced Quality (Command 3) ---
-    function downloadAsImage() {
-        showLoader("دانلود عکس با کیفیت بالا...");
-        const element = document.getElementById('print-area');
-        preparePrintDOM(); // Prepares the TABLE view for image
-        
-        // Ensure element is visible for capture but stays offscreen
-        // The CSS .export-mode handles the positioning
-        element.style.display = 'block'; 
-        
-        setTimeout(() => {
-            html2canvas(element, { 
-                scale: 2, // High DPI
-                useCORS: true, 
-                width: 2000, 
-                windowWidth: 2000,
-                scrollY: -window.scrollY // Fix for scroll misalignment
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `${appData.header || 'Plan'}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                element.style.display = 'none'; 
-                hideLoader();
-            }).catch(e => {
-                console.error(e);
-                alert("خطا در تولید تصویر");
-                element.style.display = 'none';
-                hideLoader();
-            });
-        }, 800);
-    }
-
-    // --- Print Function (Command 4: PDF List View) ---
-    function printApp() {
-        // Switch title temporarily for the file name
-        const originalTitle = document.title;
-        document.title = appData.header || "Weekly-Plan";
-        
-        generatePrintListView(); // Builds the LIST view
-        
-        // CSS @media print handles showing the list and hiding the table
-        window.print();
-        
-        document.title = originalTitle;
-    }
-
-    // --- Common Functions ---
-    function toggleExtraVis(type, i) {
-        if(type==='req') appData.reqs[i].s = !appData.reqs[i].s;
-        else appData.chks[i].s = !appData.chks[i].s;
-        saveData(); renderExtras();
-    }
-
-    function handleDrop(e, day, time) {
-        e.preventDefault(); const tid=e.dataTransfer.getData('tid');
-        const task=appData.tasks.find(t=>t.id==tid); if(!task)return;
-        const sIdx=TIMELINE.indexOf(time);
-        if(sIdx+task.duration >= TIMELINE.length) return alert("زمان ناکافی");
-        const conf=appData.tasks.some(t=>{if(t.id==tid || t.day!==day)return false; const tS=TIMELINE.indexOf(t.startStr); return (sIdx<tS+t.duration && sIdx+task.duration>tS);});
-        if(!conf) { task.day=day; task.startStr=time; saveData(); renderTable(); } else alert("تداخل!");
-    }
-
-    function toggleSelectMode() {
-        isSelect=!isSelect;
-        const btn=document.getElementById('selectModeBtn'); const txt=document.getElementById('modeText');
-        if(isSelect) {document.body.classList.add('selection-mode'); btn.classList.add('active'); txt.innerText="حالت انتخاب فعال";}
-        else {document.body.classList.remove('selection-mode'); btn.classList.remove('active'); txt.innerText="حالت اسکرول"; clearSel();}
-    }
-    function setupTouch() {
-        const t=document.getElementById('plannerTable');
-        const start=(e)=>{if(!isSelect)return; const c=e.target.closest('td.empty-cell'); if(!c)return; e.preventDefault(); isDrag=true; selStart={d:c.dataset.d, i:parseInt(c.dataset.i)}; selCurr={...selStart}; highlight();};
-        const move=(e)=>{if(!isDrag)return; const el=document.elementFromPoint(e.clientX||e.touches[0].clientX, e.clientY||e.touches[0].clientY); if(!el)return; const c=el.closest('td.empty-cell'); if(c&&c.dataset.d===selStart.d){selCurr={d:selStart.d, i:parseInt(c.dataset.i)}; highlight();}};
-        const end=()=>{if(!isDrag)return; isDrag=false; if(selStart&&selCurr){const s=Math.min(selStart.i,selCurr.i), dur=Math.max(selStart.i,selCurr.i)-s+1; openTaskModal(null,{d:selStart.d,s:TIMELINE[s],dur});} clearSel();};
-        t.addEventListener('mousedown',start); t.addEventListener('touchstart',start,{passive:false});
-        window.addEventListener('mousemove',move); window.addEventListener('touchmove',move,{passive:false});
-        window.addEventListener('mouseup',end); window.addEventListener('touchend',end);
-    }
-    function highlight(){document.querySelectorAll('.selected-cell').forEach(e=>e.classList.remove('selected-cell')); if(!selStart||!selCurr)return; const s=Math.min(selStart.i,selCurr.i), e=Math.max(selStart.i,selCurr.i); for(let i=s;i<=e;i++) {const td=document.querySelector(`td.empty-cell[data-d="${selStart.d}"][data-i="${i}"]`); if(td)td.classList.add('selected-cell');}}
-    function clearSel(){selStart=null; selCurr=null; document.querySelectorAll('.selected-cell').forEach(e=>e.classList.remove('selected-cell'));}
-
-    function openTaskModal(task, fresh) {
-        openModal('taskModal'); const del=document.getElementById('btnDeleteTask');
-        const startEl = document.getElementById('inpStart');
-        const endEl = document.getElementById('inpEnd');
-        const copyBtn = document.getElementById('btnCopyTask');
         if(task) {
             currentEditingTask = task;
-            document.getElementById('taskId').value=task.id; document.getElementById('taskDay').value=task.day;
-            startEl.value=task.startStr;
+            document.getElementById('taskId').value = task.id;
+            document.getElementById('taskDay').value = task.day;
+            document.getElementById('inpName').value = task.name;
+            document.getElementById('inpStart').value = task.startStr;
             updateEndOptions();
-            endEl.value = task.duration;
-            document.getElementById('inpName').value=task.name;
-            document.getElementById('customColor').value=task.color;
-            del.style.display='block';
-            copyBtn.style.display='block';
+            document.getElementById('inpEnd').value = task.duration;
+            
+            // Set Color
+            const colDiv = Array.from(document.querySelectorAll('.color-circle')).find(d => 
+                // Convert rgb to hex if needed or direct compare
+                rgb2hex(d.style.backgroundColor) === task.color || d.style.backgroundColor === task.color
+            );
+            if(colDiv) colDiv.classList.add('active');
+            
+            delBtn.style.display = 'block';
         } else {
             currentEditingTask = null;
-            document.getElementById('taskId').value=''; document.getElementById('taskDay').value=fresh.d;
-            startEl.value=fresh.s;
+            document.getElementById('taskId').value = '';
+            document.getElementById('taskDay').value = freshData ? freshData.day : 'sat';
+            document.getElementById('inpName').value = '';
+            document.getElementById('inpStart').value = freshData ? freshData.start : TIMELINE[0];
             updateEndOptions();
-            endEl.value = fresh.dur;
-            document.getElementById('inpName').value='';
-            document.getElementById('customColor').value='#6366f1';
-            del.style.display='none';
-            copyBtn.style.display='none';
+            document.getElementById('inpEnd').value = freshData ? freshData.dur : 2; // Default 1 hour
+            
+            // Default Color
+            document.querySelector('.color-circle').classList.add('active');
+            delBtn.style.display = 'none';
         }
     }
+
     function saveTask() {
-        const id=document.getElementById('taskId').value, day=document.getElementById('taskDay').value;
-        const name=document.getElementById('inpName').value.trim();
-        const color=document.getElementById('customColor').value;
-        const startVal = document.getElementById('inpStart').value;
-        const durVal = parseInt(document.getElementById('inpEnd').value);
-        if(!name) return alert("نام الزامی است");
-        const sIdx = TIMELINE.indexOf(startVal);
-        if(sIdx + durVal >= TIMELINE.length) return alert("زمان نامعتبر");
-        const conf=appData.tasks.some(t=>{
-            if(t.id==id||t.day!==day)return false; 
-            const tS=TIMELINE.indexOf(t.startStr); 
-            return (sIdx<tS+t.duration && sIdx+durVal>tS);
+        const id = document.getElementById('taskId').value;
+        const day = document.getElementById('taskDay').value;
+        const name = document.getElementById('inpName').value.trim();
+        const start = document.getElementById('inpStart').value;
+        const dur = parseInt(document.getElementById('inpEnd').value);
+        
+        const activeCol = document.querySelector('.color-circle.active');
+        const color = activeCol ? rgb2hex(activeCol.style.backgroundColor) : COLORS[0];
+
+        if(!name) return alert("لطفاً نام فعالیت را وارد کنید");
+
+        // Conflict Check
+        const sIdx = TIMELINE.indexOf(start);
+        const conflict = appData.tasks.some(t => {
+            if(t.day !== day) return false;
+            if(id && t.id == id) return false; // Ignore self
+            const tStart = TIMELINE.indexOf(t.startStr);
+            return (sIdx < tStart + t.duration) && (sIdx + dur > tStart);
         });
-        if(conf) return alert("تداخل زمانی");
-        if(id){const ix=appData.tasks.findIndex(t=>t.id==id); if(ix!==-1) appData.tasks[ix]={...appData.tasks[ix],name,startStr:startVal,duration:durVal,color};}
-        else appData.tasks.push({id:Date.now(),day,startStr:startVal,duration:durVal,name,color});
-        saveData(); renderTable(); closeModal('taskModal');
-    }
-    function deleteTask(){const id=document.getElementById('taskId').value; if(confirm("حذف؟")){appData.tasks=appData.tasks.filter(t=>t.id!=id); saveData(); renderTable(); closeModal('taskModal');}}
 
-    function switchTab(t){document.getElementById('tab-req').style.display=t==='req'?'block':'none'; document.getElementById('tab-chk').style.display=t==='chk'?'block':'none';}
-    
-    function renderExtras() {
-        const rL=document.getElementById('reqListUi'); rL.innerHTML='';
-        appData.reqs.forEach((r,i)=>{
-            rL.innerHTML+=`
-            <li class="extra-row">
-                <div class="extra-content">🔸 ${r.t}</div>
-                <div class="extra-controls">
-                    <button class="extra-btn" onclick="moveExtra('req', ${i}, -1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
-                    <button class="extra-btn" onclick="moveExtra('req', ${i}, 1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
-                    <button class="extra-btn" onclick="editExtra('req', ${i})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-                    <button class="extra-btn ${r.s?'active':''}" onclick="toggleExtraVis('req',${i})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
-                    <button class="extra-btn delete" onclick="delEx('req',${i})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-                </div>
-            </li>`;
-        });
-        const cL=document.getElementById('chkListUi'); cL.innerHTML='';
-        appData.chks.forEach((c,i)=>{
-            cL.innerHTML+=`
-            <li class="extra-row">
-                <div class="extra-content">
-                    <div class="custom-chk ${c.c?'checked':''}" onclick="togChk(${i})">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    </div>
-                    ${c.t}
-                </div>
-                <div class="extra-controls">
-                    <button class="extra-btn" onclick="moveExtra('chk', ${i}, -1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
-                    <button class="extra-btn" onclick="moveExtra('chk', ${i}, 1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
-                    <button class="extra-btn" onclick="editExtra('chk', ${i})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-                    <button class="extra-btn ${c.s?'active':''}" onclick="toggleExtraVis('chk',${i})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
-                    <button class="extra-btn delete" onclick="delEx('chk',${i})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-                </div>
-            </li>`;
-        });
+        if(conflict) return alert("تداخل زمانی با فعالیت دیگر!");
+
+        if(id) {
+            // Edit
+            const tIndex = appData.tasks.findIndex(t => t.id == id);
+            if(tIndex > -1) {
+                appData.tasks[tIndex] = { ...appData.tasks[tIndex], name, startStr: start, duration: dur, color };
+            }
+        } else {
+            // New
+            appData.tasks.push({ id: Date.now(), day, startStr: start, duration: dur, name, color });
+        }
+
+        saveData();
+        renderTable();
+        closeModal('taskModal');
     }
 
-    function addItem(t){const i=document.getElementById(t+'Input'); if(i.value){if(t==='req')appData.reqs.push({t:i.value,s:true}); else appData.chks.push({t:i.value,s:true,c:false}); i.value=''; saveData(); renderExtras();}}
-    function delEx(t,i){if(t==='req')appData.reqs.splice(i,1); else appData.chks.splice(i,1); saveData(); renderExtras();}
-    function togChk(i){appData.chks[i].c=!appData.chks[i].c; saveData(); renderExtras();}
-    function editExtra(type, i) {const arr = type === 'req' ? appData.reqs : appData.chks; const newVal = prompt("ویرایش:", arr[i].t); if (newVal) { arr[i].t = newVal; saveData(); renderExtras(); }}
-    function moveExtra(type, i, dir) {
-        const arr = type === 'req' ? appData.reqs : appData.chks;
-        if (dir === -1 && i > 0) { [arr[i], arr[i-1]] = [arr[i-1], arr[i]]; } 
-        else if (dir === 1 && i < arr.length - 1) { [arr[i], arr[i+1]] = [arr[i+1], arr[i]]; }
-        saveData(); renderExtras();
+    function deleteTask() {
+        if(!confirm("حذف شود؟")) return;
+        const id = document.getElementById('taskId').value;
+        appData.tasks = appData.tasks.filter(t => t.id != id);
+        saveData();
+        renderTable();
+        closeModal('taskModal');
     }
 
-    function saveNote(){
-        appData.note.text=document.getElementById('noteText').value; 
-        appData.note.print=document.getElementById('notePrintCheck').checked; 
-        saveData(); closeModal('noteModal');
-    }
-    
-    function openStats(){
-        openModal('statsModal'); const a=document.getElementById('chartArea'), l=document.getElementById('chartLegend');
-        a.innerHTML=''; l.innerHTML=''; const s={}; let tot=0;
-        appData.tasks.forEach(t=>{s[t.color]=(s[t.color]||0)+t.duration; tot+=t.duration;});
-        if(tot===0){a.innerHTML='داده‌ای نیست'; return;}
-        let g=[], curr=0;
-        Object.keys(s).forEach(c=>{const d=(s[c]/tot)*360; g.push(`${c} ${curr}deg ${curr+d}deg`); curr+=d; l.innerHTML+=`<div class="legend-item"><div style="width:10px;height:10px;border-radius:50%;background:${c}"></div> ${((s[c]*15)/60).toFixed(1)}h</div>`;});
-        const ch=document.createElement('div'); ch.style.width='150px'; ch.style.height='150px'; ch.style.borderRadius='50%'; ch.style.background=`conic-gradient(${g.join(', ')})`; a.appendChild(ch);
-    }
-
-    function openCopyModal(sourceId) {
-        pendingCopySource = sourceId;
-        const sourceDay = DAYS.find(d => d.id === sourceId);
-        document.getElementById('copySourceLabel').innerText = sourceDay.l;
+    // --- COPY LOGIC ---
+    function openCopyModal(srcId) {
+        pendingCopySource = srcId;
+        const dayName = DAYS.find(d => d.id === srcId).l;
+        document.getElementById('copySourceLabel').innerText = dayName;
+        
         const list = document.getElementById('copyTargetList');
         list.innerHTML = '';
-        DAYS.filter(d => d.id !== sourceId).forEach(d => {
-            list.innerHTML += `<label class="copy-item"><input type="checkbox" value="${d.id}" class="copy-checkbox">${d.l}</label>`;
+        DAYS.forEach(d => {
+            if(d.id !== srcId) {
+                list.innerHTML += `
+                    <label style="display:flex; align-items:center; gap:8px; padding:8px; background:#f8fafc; border-radius:8px; cursor:pointer;">
+                        <input type="checkbox" value="${d.id}" class="copy-chk">
+                        ${d.l}
+                    </label>
+                `;
+            }
         });
         openModal('copyModal');
     }
 
     function executeCopy() {
-        const checkboxes = document.querySelectorAll('.copy-checkbox:checked');
-        if(checkboxes.length === 0) { alert("لطفاً حداقل یک روز را انتخاب کنید."); return; }
-        const targetIds = Array.from(checkboxes).map(cb => cb.value);
-        if(!confirm(`آیا مطمئن هستید؟`)) return;
-        closeModal('copyModal'); showBar();
-        setTimeout(() => {
-            const sourceTasks = appData.tasks.filter(t => t.day === pendingCopySource);
-            appData.tasks = appData.tasks.filter(t => !targetIds.includes(t.day));
-            targetIds.forEach(targetId => {
-                sourceTasks.forEach(t => { appData.tasks.push({ ...t, id: Date.now() + Math.random(), day: targetId }); });
+        const targets = Array.from(document.querySelectorAll('.copy-chk:checked')).map(c => c.value);
+        if(targets.length === 0) return alert("روز مقصد را انتخاب کنید");
+
+        if(!confirm("فعالیت‌های روزهای انتخاب شده پاک و با برنامه جدید جایگزین می‌شوند. ادامه می‌دهید؟")) return;
+
+        const srcTasks = appData.tasks.filter(t => t.day === pendingCopySource);
+        
+        // Remove existing tasks in targets
+        appData.tasks = appData.tasks.filter(t => !targets.includes(t.day));
+
+        // Add copied tasks
+        targets.forEach(tgt => {
+            srcTasks.forEach(t => {
+                appData.tasks.push({
+                    ...t,
+                    id: Date.now() + Math.random(),
+                    day: tgt
+                });
             });
-            saveData(); renderTable(); hideBar();
-        }, 300);
-    }
-
-    function openSingleCopyModal() {
-        if(!currentEditingTask) return;
-        closeModal('taskModal');
-        const list = document.getElementById('singleCopyTargetList'); list.innerHTML = '';
-        DAYS.forEach(d => {
-            if (d.id !== currentEditingTask.day) {
-                list.innerHTML += `<label class="copy-item" onclick="executeSingleCopy('${d.id}')"><span style="flex:1">${d.l}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></label>`;
-            }
         });
-        document.getElementById('singleCopyModal').style.display = 'flex';
-    }
 
-    function executeSingleCopy(targetDayId) {
-        if(!currentEditingTask) return;
-        const t = currentEditingTask;
-        const sIdx = TIMELINE.indexOf(t.startStr);
-        const conflict = appData.tasks.some(existing => {
-            if (existing.day !== targetDayId) return false;
-            const existStartIdx = TIMELINE.indexOf(existing.startStr);
-            return (sIdx < existStartIdx + existing.duration && sIdx + t.duration > existStartIdx);
-        });
-        if (conflict) { alert(`در روز مقصد تداخل زمانی وجود دارد.`); return; }
-        appData.tasks.push({ ...t, id: Date.now() + Math.random(), day: targetDayId });
-        saveData(); renderTable(); closeModal('singleCopyModal'); showBar(); setTimeout(hideBar, 300);
-    }
-
-    function openModal(id){document.getElementById(id).style.display='flex'; if(id==='noteModal'){document.getElementById('noteText').value=appData.note.text; document.getElementById('notePrintCheck').checked=appData.note.print;}}
-    function closeModal(id){document.getElementById(id).style.display='none';}
-    function saveData(){localStorage.setItem('finalProPlannerV10', JSON.stringify(appData));}
-    
-    function updateHeader(v){
-        appData.header=v; document.title = v || "برنامه هفتگی"; 
-        document.getElementById('headerTitleInput').value = v;
-        document.querySelector('.brand').innerHTML = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>${v || "پلنر هوشمند PRO"}`;
         saveData();
+        renderTable();
+        closeModal('copyModal');
     }
-    function updateUserName(v){appData.userName=v; saveData();}
-    function clearAll(){if(confirm("آیا مطمئن هستید که تمام اطلاعات پاک شود؟")){localStorage.removeItem('finalProPlannerV10'); localStorage.removeItem('appPin'); location.reload();}}
+
+    // --- EXTRAS & NOTES ---
+    function renderExtras() {
+        const rl = document.getElementById('reqListUi'); rl.innerHTML='';
+        const cl = document.getElementById('chkListUi'); cl.innerHTML='';
+        
+        appData.reqs.forEach((r,i) => {
+            rl.innerHTML += `<li style="display:flex; justify-content:space-between; padding:5px; border-bottom:1px solid #eee;">
+                <span>${r}</span>
+                <button class="btn-ghost" style="color:red; padding:2px;" onclick="delExtra('req',${i})">&times;</button>
+            </li>`;
+        });
+        appData.chks.forEach((c,i) => {
+            cl.innerHTML += `<li style="display:flex; align-items:center; gap:8px; padding:5px; border-bottom:1px solid #eee;">
+                <input type="checkbox" ${c.done?'checked':''} onchange="toggleChk(${i})">
+                <span style="${c.done?'text-decoration:line-through; opacity:0.6':''}">${c.text}</span>
+                <button class="btn-ghost" style="color:red; padding:2px; margin-right:auto;" onclick="delExtra('chk',${i})">&times;</button>
+            </li>`;
+        });
+    }
+    function addItem(type) {
+        const inp = document.getElementById(type+'Input');
+        if(!inp.value.trim()) return;
+        if(type==='req') appData.reqs.push(inp.value.trim());
+        else appData.chks.push({text:inp.value.trim(), done:false});
+        inp.value=''; saveData(); renderExtras();
+    }
+    function delExtra(type, i) {
+        if(type==='req') appData.reqs.splice(i,1);
+        else appData.chks.splice(i,1);
+        saveData(); renderExtras();
+    }
+    function toggleChk(i) {
+        appData.chks[i].done = !appData.chks[i].done;
+        saveData(); renderExtras();
+    }
+    function switchTab(t) {
+        document.getElementById('tab-req').style.display = t==='req'?'block':'none';
+        document.getElementById('tab-chk').style.display = t==='chk'?'block':'none';
+        document.getElementById('tabReqBtn').style.background = t==='req'?'#e2e8f0':'transparent';
+        document.getElementById('tabChkBtn').style.background = t==='chk'?'#e2e8f0':'transparent';
+    }
+
+    function saveNote() {
+        appData.note = document.getElementById('noteText').value;
+        saveData(); closeModal('noteModal');
+    }
+
+    // --- INTERACTION (DRAG SELECT) ---
+    function toggleSelectMode() {
+        isSelect = !isSelect;
+        const btn = document.getElementById('selectModeBtn');
+        const txt = document.getElementById('modeText');
+        if(isSelect) {
+            btn.classList.add('active');
+            txt.innerText = 'حالت انتخاب فعال';
+            document.body.classList.add('selection-mode');
+        } else {
+            btn.classList.remove('active');
+            txt.innerText = 'حالت اسکرول';
+            document.body.classList.remove('selection-mode');
+        }
+    }
     
-    function exportData(){
-        const b=new Blob([JSON.stringify(appData, null, 2)],{type:'application/json'}); 
-        const a=document.createElement('a'); 
-        a.href=URL.createObjectURL(b); 
-        a.download=`${appData.header || 'plan'}.json`; 
+    function setupEvents() {
+        const table = document.getElementById('plannerTable');
+        
+        const getCell = (e) => {
+            // Touch or Mouse
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            const el = document.elementFromPoint(clientX, clientY);
+            return el ? el.closest('td.empty-slot') : null;
+        }
+
+        const start = (e) => {
+            if(!isSelect) return;
+            const cell = getCell(e);
+            if(cell) {
+                // e.preventDefault(); // Prevent scrolling on touch if in select mode
+                isDrag = true;
+                selStart = { d: cell.dataset.day, i: parseInt(cell.dataset.idx) };
+                selCurr = selStart;
+                drawSelection();
+            }
+        };
+
+        const move = (e) => {
+            if(!isDrag) return;
+            const cell = getCell(e);
+            if(cell && cell.dataset.day === selStart.d) {
+                selCurr = { d: cell.dataset.day, i: parseInt(cell.dataset.idx) };
+                drawSelection();
+            }
+        };
+
+        const end = () => {
+            if(!isDrag) return;
+            isDrag = false;
+            // Open modal if selection is valid
+            if(selStart && selCurr) {
+                const s = Math.min(selStart.i, selCurr.i);
+                const e = Math.max(selStart.i, selCurr.i);
+                const dur = e - s + 1;
+                openTaskModal(null, { day: selStart.d, start: TIMELINE[s], dur: dur });
+            }
+            clearSelection();
+        };
+
+        // Events
+        table.addEventListener('mousedown', start);
+        window.addEventListener('mousemove', move);
+        window.addEventListener('mouseup', end);
+        
+        table.addEventListener('touchstart', (e)=>{ if(isSelect) e.preventDefault(); start(e); }, {passive:false});
+        window.addEventListener('touchmove', move, {passive:false});
+        window.addEventListener('touchend', end);
+    }
+
+    function drawSelection() {
+        document.querySelectorAll('.selected-highlight').forEach(e => e.classList.remove('selected-highlight'));
+        if(!selStart || !selCurr) return;
+        const s = Math.min(selStart.i, selCurr.i);
+        const e = Math.max(selStart.i, selCurr.i);
+        for(let i=s; i<=e; i++) {
+            const td = document.querySelector(`td.empty-slot[data-day="${selStart.d}"][data-idx="${i}"]`);
+            if(td) td.classList.add('selected-highlight');
+        }
+    }
+    function clearSelection() {
+        selStart=null; selCurr=null;
+        document.querySelectorAll('.selected-highlight').forEach(e => e.classList.remove('selected-highlight'));
+    }
+
+
+    // --- EXPORT & PRINT (Engineered) ---
+
+    // 1. Image Download Logic
+    function downloadAsImage() {
+        showLoader("در حال رندر تصویر با کیفیت بالا...");
+        
+        // Populate hidden export container
+        const c = document.getElementById('image-export-area');
+        document.getElementById('expTitle').innerText = appData.header || 'برنامه هفتگی';
+        document.getElementById('expUser').innerText = appData.userName ? `نام: ${appData.userName}` : '';
+        document.getElementById('expDate').innerText = `تاریخ: ${new Date().toLocaleDateString('fa-IR')}`;
+        
+        // Extras
+        const rqBox = document.getElementById('expReqBox');
+        const ckBox = document.getElementById('expChkBox');
+        const rqL = document.getElementById('expReqList'); rqL.innerHTML='';
+        const ckL = document.getElementById('expChkList'); ckL.innerHTML='';
+        
+        if(appData.reqs.length){ rqBox.style.display='block'; appData.reqs.forEach(r=>rqL.innerHTML+=`<li>${r}</li>`); } 
+        else rqBox.style.display='none';
+        
+        if(appData.chks.length){ ckBox.style.display='block'; appData.chks.forEach(x=>ckL.innerHTML+=`<li>${x.done?'☑':'☐'} ${x.text}</li>`); }
+        else ckBox.style.display='none';
+
+        // Table Generation (Table-based for image stability)
+        const thead = document.getElementById('expThead'); thead.innerHTML = '';
+        const tbody = document.getElementById('expTbody'); tbody.innerHTML = '';
+        
+        // Header
+        let hRow = '<tr><th>زمان</th>';
+        DAYS.forEach(d => hRow += `<th>${d.l}</th>`);
+        hRow += '</tr>';
+        thead.innerHTML = hRow;
+
+        // Body
+        const occ = {}; DAYS.forEach(d => occ[d.id] = new Array(TIMELINE.length).fill(false));
+        
+        for(let i=0; i<TIMELINE.length-1; i++) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td style="font-family:'Vazirmatn';">${TIMELINE[i]}</td>`;
+            
+            DAYS.forEach(d => {
+                if(occ[d.id][i]) return;
+                const task = appData.tasks.find(t => t.day === d.id && t.startStr === TIMELINE[i]);
+                
+                if(task) {
+                    const td = document.createElement('td');
+                    td.rowSpan = task.duration;
+                    td.style.backgroundColor = task.color;
+                    td.style.border = '1px solid #0f172a'; // Strong border for image
+                    td.innerHTML = `
+                        <div class="export-task">
+                            <span class="export-task-time" style="font-family:'Vazirmatn';">${task.startStr}</span>
+                            <span style="font-weight:bold; font-size:16px;">${task.name}</span>
+                        </div>`;
+                    tr.appendChild(td);
+                    for(let k=1; k<task.duration; k++) occ[d.id][i+k] = true;
+                } else {
+                    tr.appendChild(document.createElement('td'));
+                }
+            });
+            tbody.appendChild(tr);
+        }
+
+        // Notes
+        const ft = document.getElementById('expFooter');
+        if(appData.note) { ft.style.display='flex'; document.getElementById('expNoteText').innerText = appData.note; }
+        else ft.style.display='none';
+
+        // Display temporarily
+        c.style.display = 'block';
+
+        // Capture
+        setTimeout(() => {
+            html2canvas(c, {
+                scale: 2, // High DPI
+                useCORS: true,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `plan-${Date.now()}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                c.style.display = 'none';
+                hideLoader();
+            }).catch(e => {
+                alert('خطا در تولید تصویر');
+                console.error(e);
+                c.style.display = 'none';
+                hideLoader();
+            });
+        }, 500); // Wait for DOM render
+    }
+
+    // 2. Print Logic (The Simple List)
+    function printApp() {
+        // Generate Simple List View
+        const c = document.getElementById('printSimpleListContainer');
+        c.innerHTML = '';
+        
+        document.getElementById('printSimpleTitle').innerText = appData.header || 'برنامه هفتگی';
+        document.getElementById('printSimpleUser').innerText = appData.userName || '-';
+        document.getElementById('printSimpleDate').innerText = new Date().toLocaleDateString('fa-IR');
+        document.getElementById('printSimpleNote').innerText = appData.note || 'ندارد';
+
+        // Extras
+        const rl = document.getElementById('printSimpleReqs'); rl.innerHTML='';
+        appData.reqs.forEach(r => rl.innerHTML+=`<li>${r}</li>`);
+        const cl = document.getElementById('printSimpleChks'); cl.innerHTML='';
+        appData.chks.forEach(x => cl.innerHTML+=`<li>[${x.done?'x':' '}] ${x.text}</li>`);
+
+        // Loop Days
+        DAYS.forEach(d => {
+            // Filter tasks for this day and sort by time
+            const dayTasks = appData.tasks
+                .filter(t => t.day === d.id)
+                .sort((a,b) => TIMELINE.indexOf(a.startStr) - TIMELINE.indexOf(b.startStr));
+            
+            // Only show day if it has tasks (Optional: remove check to show empty days)
+            // Showing all days for completeness
+            const div = document.createElement('div');
+            div.className = 'day-block-print';
+            
+            let tasksHtml = '';
+            if(dayTasks.length === 0) {
+                tasksHtml = '<li style="padding:10px; color:#777; font-style:italic;">بدون فعالیت</li>';
+            } else {
+                dayTasks.forEach(t => {
+                    // Calculate end time
+                    const sIdx = TIMELINE.indexOf(t.startStr);
+                    const eIdx = sIdx + t.duration;
+                    const endStr = TIMELINE[eIdx] || '...';
+                    
+                    tasksHtml += `
+                        <li class="task-item-print">
+                            <span class="time-print">${t.startStr} تا ${endStr}</span>
+                            <span class="name-print">${t.name}</span>
+                        </li>
+                    `;
+                });
+            }
+
+            div.innerHTML = `
+                <div class="day-title-print">
+                    <span>${d.l}</span>
+                    <span style="font-weight:normal; font-size:12px;">${dayTasks.length} فعالیت</span>
+                </div>
+                <ul class="task-list-print">${tasksHtml}</ul>
+            `;
+            c.appendChild(div);
+        });
+
+        // Trigger Print
+        window.print();
+    }
+
+    // --- DATA UTILS ---
+    function updateHeader(v) { appData.header = v; document.title = v || 'برنامه هفتگی'; saveData(); }
+    function updateUserName(v) { appData.userName = v; saveData(); }
+    function saveData() { localStorage.setItem('proPlannerData', JSON.stringify(appData)); }
+    function clearAll() { if(confirm("حذف کامل اطلاعات؟")) { localStorage.removeItem('proPlannerData'); location.reload(); } }
+    
+    function exportData() {
+        const b = new Blob([JSON.stringify(appData)], {type:'application/json'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(b);
+        a.download = 'weekly-plan-backup.json';
         a.click();
     }
     
-    function importData(i){const f=i.files[0]; const r=new FileReader(); r.onload=e=>{try{const d=JSON.parse(e.target.result); if(d.tasks||Array.isArray(d)){if(Array.isArray(d))appData.tasks=d; else appData=d; saveData(); location.reload();}}catch(x){alert("فایل نامعتبر");}}; if(f)r.readAsText(f);}
+    function importData(inp) {
+        const f = inp.files[0];
+        if(!f) return;
+        const r = new FileReader();
+        r.onload = (e) => {
+            try {
+                appData = JSON.parse(e.target.result);
+                saveData();
+                location.reload();
+            } catch(x) { alert("فایل نامعتبر"); }
+        };
+        r.readAsText(f);
+    }
 
+    function openModal(id) { 
+        document.getElementById(id).style.display = 'flex'; 
+        setTimeout(()=>document.getElementById(id).classList.add('show'), 10);
+    }
+    function closeModal(id) { 
+        document.getElementById(id).classList.remove('show');
+        setTimeout(()=>document.getElementById(id).style.display = 'none', 300);
+    }
+    function showLoader(txt) { document.getElementById('loadingBar').style.display='block'; document.getElementById('processingMsg').style.display='flex'; document.getElementById('procTxt').innerText=txt; }
+    function hideLoader() { document.getElementById('loadingBar').style.display='none'; document.getElementById('processingMsg').style.display='none'; }
+    function rgb2hex(rgb) {
+        if (!rgb) return '#000000';
+        if (rgb.startsWith('#')) return rgb;
+        const rgbMatch = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+        if (!rgbMatch) return rgb; 
+        function hex(x) { return ("0" + parseInt(x).toString(16)).slice(-2); }
+        return "#" + hex(rgbMatch[1]) + hex(rgbMatch[2]) + hex(rgbMatch[3]);
+    }
+
+    // Run
     init();
-</script>
 
+</script>
 </body>
 </html>
