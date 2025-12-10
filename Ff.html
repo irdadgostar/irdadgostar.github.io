@@ -63,6 +63,42 @@
             transition: background 0.3s ease;
         }
 
+        /* --- Loading Overlay (New Modern Design) --- */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(15px);
+            z-index: 20000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .loading-overlay.active { display: flex; opacity: 1; }
+        
+        .loading-spinner {
+            width: 60px; height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--primary-light);
+            border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+            box-shadow: 0 0 20px rgba(79, 70, 229, 0.4);
+        }
+        .loading-text {
+            margin-top: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { opacity: 0.8; } 50% { opacity: 1; transform: scale(1.05); } }
+
         /* --- Toast Notification --- */
         .toast-container {
             position: fixed;
@@ -549,6 +585,11 @@
 </head>
 <body>
 
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">درحال پردازش...</div>
+</div>
+
 <div id="toastContainer" class="toast-container"></div>
 
 <!-- 1. LOCK SCREEN (REDESIGNED) -->
@@ -809,6 +850,27 @@
 </nav>
 
 <!-- MODALS -->
+
+<!-- Deposit Selection Modal (New Instruction 1) -->
+<div id="depositOptionsModal" class="modal">
+    <div class="modal-content">
+        <h3>انتخاب روش واریز</h3>
+        <p style="font-size:0.9rem; color:var(--text-sec); margin-bottom:20px;">لطفاً نوع واریز به این ردیف بودجه را مشخص کنید:</p>
+        <button class="btn btn-primary" style="width:100%; margin-bottom:10px; display:flex; justify-content:space-between;" onclick="selectDepositType('system')">
+            <span>واریز از حساب سیستم</span>
+            <i class="fas fa-exchange-alt"></i>
+        </button>
+        <p style="font-size:0.8rem; color:var(--text-sec); margin-bottom:15px; margin-right:5px;">از موجودی کل توزیع نشده کسر می‌شود.</p>
+        
+        <button class="btn btn-success" style="width:100%; background:var(--success); color:white; margin-bottom:10px; display:flex; justify-content:space-between;" onclick="selectDepositType('direct')">
+            <span>واریز مستقیم (پول بیرونی)</span>
+            <i class="fas fa-hand-holding-usd"></i>
+        </button>
+        <p style="font-size:0.8rem; color:var(--text-sec); margin-bottom:15px; margin-right:5px;">به موجودی آیتم و موجودی کل حساب افزوده می‌شود.</p>
+        
+        <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="closeAllModals()">انصراف</button>
+    </div>
+</div>
 
 <!-- Universal Input Modal -->
 <div id="universalInputModal" class="modal">
@@ -1261,6 +1323,7 @@
     let isGuestMode = false;
     let tempSubIndex = -1;
     let universalCallback = null;
+    let tempDepositIndex = -1;
 
     function showToast(message, icon="check-circle") {
         const container = document.getElementById('toastContainer');
@@ -1273,6 +1336,21 @@
             toast.classList.remove('show');
             setTimeout(() => toast.remove(), 400);
         }, 3000);
+    }
+
+    // --- Loading Logic (Instruction 3) ---
+    function toggleLoading(active) {
+        const overlay = document.getElementById('loadingOverlay');
+        if (active) overlay.classList.add('active');
+        else overlay.classList.remove('active');
+    }
+    
+    function withLoading(callback, duration=800) {
+        toggleLoading(true);
+        setTimeout(() => {
+            callback();
+            toggleLoading(false);
+        }, duration);
     }
 
     window.onload = () => { loadData(); checkAuth(); setupDatePickers(); };
@@ -1529,15 +1607,17 @@
     }
     function restoreSectionSnap(section, index) {
         if(!confirm("آیا مطمئن هستید؟ با این کار وضعیت به حالت انتخاب شده برمی‌گردد.")) return;
-        const snap = JSON.parse(app.sectionHistory[section][index].data);
-        if(section === 'dashboard') {
-            app.wallets = snap.wallets; app.debts = snap.debts; app.checks = snap.checks; app.loans = snap.loans;
-        } else if(section === 'budget') {
-            app.budgets = snap.budgets; app.priorities = snap.priorities; app.distributedAmount = snap.distributedAmount || 0;
-        } else if(section === 'tools') {
-            app.goals = snap.goals; app.shopping = snap.shopping;
-        }
-        saveData(); renderUI(); closeAllModals(); showToast("بازیابی شد");
+        withLoading(() => {
+            const snap = JSON.parse(app.sectionHistory[section][index].data);
+            if(section === 'dashboard') {
+                app.wallets = snap.wallets; app.debts = snap.debts; app.checks = snap.checks; app.loans = snap.loans;
+            } else if(section === 'budget') {
+                app.budgets = snap.budgets; app.priorities = snap.priorities; app.distributedAmount = snap.distributedAmount || 0;
+            } else if(section === 'tools') {
+                app.goals = snap.goals; app.shopping = snap.shopping;
+            }
+            saveData(); renderUI(); closeAllModals(); showToast("بازیابی شد");
+        }, 1000);
     }
 
     // --- CORE UI RENDER ---
@@ -1549,10 +1629,17 @@
         document.getElementById('cardCurrency').innerText = curName;
         document.querySelectorAll('.currency-text').forEach(el => el.innerText = curName);
 
+        // --- Day Calculation Fix (Instruction 2) ---
         if(app.user.startDate) {
+            // Ensure strict calculation including the first day as day 1
             const diff = Date.now() - app.user.startDate;
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            document.getElementById('daysPassedLabel').innerText = `روز ${days + 1}`;
+            // Use Math.floor but add 1 to count today as Day 1 if diff is small
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24)) + 1; 
+            document.getElementById('daysPassedLabel').innerText = `روز ${days}`;
+        } else {
+             // Fallback if somehow deleted
+             app.user.startDate = Date.now();
+             document.getElementById('daysPassedLabel').innerText = `روز ۱`;
         }
 
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
@@ -1703,6 +1790,7 @@
                 subLegend = `<div class="sub-budget-legend">${legHtml}</div>`;
             }
 
+            // --- Updated Button for Instruction 1: openDepositOptions instead of injectBudget ---
             div.innerHTML += `
                 <div class="bento-item ${status} ${pausedClass}">
                     <div class="bento-header">
@@ -1725,7 +1813,7 @@
                     <div class="bento-actions">
                         <button class="action-chip action-btn-exp" onclick="openExp(${i})" ${b.isPaused ? 'disabled' : ''}><i class="fas fa-minus-circle"></i> ثبت هزینه</button>
                         <button class="action-chip action-btn-copy" onclick="copyTxt(${remain})"><i class="fas fa-copy"></i> کپی</button>
-                        <button class="action-chip action-btn-add" onclick="injectBudget(${i})"><i class="fas fa-plus-circle"></i> واریز</button>
+                        <button class="action-chip action-btn-add" onclick="openDepositOptions(${i})"><i class="fas fa-plus-circle"></i> واریز</button>
                         <button class="action-chip action-btn-pause" onclick="togglePause(${i})">${b.isPaused ? '<i class="fas fa-play"></i> فعال' : '<i class="fas fa-pause"></i> توقف'}</button>
                         <button class="action-chip action-btn-sub" onclick="openSubBudgetManager(${i})"><i class="fas fa-layer-group"></i> مدیریت زیرمجموعه</button>
                     </div>
@@ -1735,25 +1823,27 @@
     }
 
     function triggerDistribution() {
-        const income = app.wallets.reduce((a,b)=>a+b.value,0);
-        const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
-        const checkDebt = (app.checks || []).reduce((a,b)=>a+b.value,0);
-        const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
-        const totalDebt = fixedDebt + checkDebt;
-        const net = income - totalDebt - manualDeductions;
-        const previousAmount = app.distributedAmount;
-        
-        // Auto Allocation Logic
-        if(net > previousAmount) {
-             const addedAmount = net - previousAmount;
-             processAutoTransfer(addedAmount, net);
-        }
+        withLoading(() => {
+            const income = app.wallets.reduce((a,b)=>a+b.value,0);
+            const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
+            const checkDebt = (app.checks || []).reduce((a,b)=>a+b.value,0);
+            const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
+            const totalDebt = fixedDebt + checkDebt;
+            const net = income - totalDebt - manualDeductions;
+            const previousAmount = app.distributedAmount;
+            
+            // Auto Allocation Logic
+            if(net > previousAmount) {
+                const addedAmount = net - previousAmount;
+                processAutoTransfer(addedAmount, net);
+            }
 
-        app.distributedAmount = net;
-        saveSectionSnap('budget', 'توزیع موجودی جدید');
-        saveData();
-        renderUI();
-        showToast("بودجه توزیع شد");
+            app.distributedAmount = net;
+            saveSectionSnap('budget', 'توزیع موجودی جدید');
+            saveData();
+            renderUI();
+            showToast("بودجه توزیع شد");
+        }, 1200);
     }
 
     function processAutoTransfer(addedAmount, currentNet) {
@@ -1793,16 +1883,54 @@
         });
     }
 
-    function injectBudget(index) {
-        openUniversalInput('واریز مستقیم', 'مبلغ واریزی مستقیم به این آیتم:', true, (val) => {
-             if(val && !isNaN(val)) {
-                saveSectionSnap('budget', `واریز دستی به ${app.budgets[index].name}: ${format(val)}`);
-                if(!app.budgets[index].manualAdd) app.budgets[index].manualAdd = 0;
-                app.budgets[index].manualAdd += val;
-                app.distributedAmount -= val;
-                saveData(); renderUI(); showToast("واریز شد");
-             }
-        });
+    // --- NEW DEPOSIT LOGIC (Instruction 1) ---
+    function openDepositOptions(index) {
+        tempDepositIndex = index;
+        openModal('depositOptionsModal');
+    }
+
+    function selectDepositType(type) {
+        closeAllModals();
+        if(type === 'system') {
+            openUniversalInput('واریز از سیستم', 'مبلغ برداشتی از بودجه کل:', true, (val) => {
+                 if(val && !isNaN(val)) {
+                    saveSectionSnap('budget', `واریز سیستمی به ${app.budgets[tempDepositIndex].name}: ${format(val)}`);
+                    if(!app.budgets[tempDepositIndex].manualAdd) app.budgets[tempDepositIndex].manualAdd = 0;
+                    
+                    // Original logic: Move from Distributable Pool to Item
+                    app.budgets[tempDepositIndex].manualAdd += val;
+                    app.distributedAmount -= val;
+                    
+                    saveData(); renderUI(); showToast("واریز سیستمی انجام شد");
+                 }
+            });
+        } else if (type === 'direct') {
+            // Instruction 1: Direct deposit must add to item AND add to account balance
+            openUniversalInput('واریز مستقیم (بیرونی)', 'مبلغ واریزی:', true, (val) => {
+                 if(val && !isNaN(val)) {
+                    saveSectionSnap('budget', `واریز مستقیم به ${app.budgets[tempDepositIndex].name}: ${format(val)}`);
+                    if(!app.budgets[tempDepositIndex].manualAdd) app.budgets[tempDepositIndex].manualAdd = 0;
+                    
+                    // 1. Add to item
+                    app.budgets[tempDepositIndex].manualAdd += val;
+                    
+                    // 2. Add to Account Balance (Must add to a wallet to increase Net Worth)
+                    // We add to the first wallet by default or system wallet to keep it simple and automated
+                    if(app.wallets.length > 0) {
+                        app.wallets[0].value += val;
+                    } else {
+                        // If no wallet exists, create one
+                        app.wallets.push({name: "کیف پول اصلی", value: val});
+                    }
+
+                    // 3. Update Distributed Amount to match the new Net Worth so it doesn't show as "Unallocated"
+                    // Because the money is already allocated to this item manually
+                    app.distributedAmount += val; 
+
+                    saveData(); renderUI(); showToast("واریز مستقیم ثبت شد");
+                 }
+            });
+        }
     }
 
     function togglePause(index) {
@@ -2109,64 +2237,66 @@
     }
 
     function performEdit() {
-        const type = document.getElementById('editType').value;
-        const index = parseInt(document.getElementById('editIndex').value);
-        const newName = document.getElementById('editName').value;
-        if(!newName) return alert("نام نمی‌تواند خالی باشد");
+        withLoading(() => {
+            const type = document.getElementById('editType').value;
+            const index = parseInt(document.getElementById('editIndex').value);
+            const newName = document.getElementById('editName').value;
+            if(!newName) return alert("نام نمی‌تواند خالی باشد");
 
-        let desc = "ویرایش آیتم";
-        if(type === 'wallet') {
-            saveSectionSnap('dashboard', `ویرایش کیف پول ${newName}`);
-            app.wallets[index].name = newName;
-            app.wallets[index].value = parseFormatted(document.getElementById('editVal').value);
-        } else if(type === 'debt') {
-            saveSectionSnap('dashboard', `ویرایش قسط ${newName}`);
-            app.debts[index].name = newName;
-            app.debts[index].value = parseFormatted(document.getElementById('editVal').value);
-            app.debts[index].day = document.getElementById('editDDay').value;
-        } else if(type === 'check') {
-            saveSectionSnap('dashboard', `ویرایش چک ${newName}`);
-            app.checks[index].name = newName;
-            app.checks[index].value = parseFormatted(document.getElementById('editVal').value);
-            app.checks[index].date = getDateString('editD');
-        } else if(type === 'loan') {
-            saveSectionSnap('dashboard', `ویرایش طلب ${newName}`);
-            app.loans[index].name = newName;
-            app.loans[index].value = parseFormatted(document.getElementById('editVal').value);
-            app.loans[index].date = getDateString('editD');
-        } else if(type === 'budget') {
-            const oldName = app.budgets[index].name;
-            const newP = parseInt(document.getElementById('editPercent').value) || 0;
-            let total = 0;
-            app.budgets.forEach((b, i) => { if(i !== index) total += b.percent; });
-            
-            if(total + newP > 100) {
-                tempBudget = JSON.parse(JSON.stringify(app.budgets[index]));
-                tempBudget.name = newName; tempBudget.percent = newP;
-                const safeMax = 100 - total;
-                document.getElementById('maxAllowedPercent').innerText = safeMax + '%';
-                const slider = document.getElementById('percentSlider');
-                slider.max = safeMax; slider.value = 0;
-                document.getElementById('sliderValDisplay').innerText = 0;
-                tempBudget.isEdit = true; tempBudget.editIndex = index;
-                openModal('fixPercentModal'); return; 
+            let desc = "ویرایش آیتم";
+            if(type === 'wallet') {
+                saveSectionSnap('dashboard', `ویرایش کیف پول ${newName}`);
+                app.wallets[index].name = newName;
+                app.wallets[index].value = parseFormatted(document.getElementById('editVal').value);
+            } else if(type === 'debt') {
+                saveSectionSnap('dashboard', `ویرایش قسط ${newName}`);
+                app.debts[index].name = newName;
+                app.debts[index].value = parseFormatted(document.getElementById('editVal').value);
+                app.debts[index].day = document.getElementById('editDDay').value;
+            } else if(type === 'check') {
+                saveSectionSnap('dashboard', `ویرایش چک ${newName}`);
+                app.checks[index].name = newName;
+                app.checks[index].value = parseFormatted(document.getElementById('editVal').value);
+                app.checks[index].date = getDateString('editD');
+            } else if(type === 'loan') {
+                saveSectionSnap('dashboard', `ویرایش طلب ${newName}`);
+                app.loans[index].name = newName;
+                app.loans[index].value = parseFormatted(document.getElementById('editVal').value);
+                app.loans[index].date = getDateString('editD');
+            } else if(type === 'budget') {
+                const oldName = app.budgets[index].name;
+                const newP = parseInt(document.getElementById('editPercent').value) || 0;
+                let total = 0;
+                app.budgets.forEach((b, i) => { if(i !== index) total += b.percent; });
+                
+                if(total + newP > 100) {
+                    tempBudget = JSON.parse(JSON.stringify(app.budgets[index]));
+                    tempBudget.name = newName; tempBudget.percent = newP;
+                    const safeMax = 100 - total;
+                    document.getElementById('maxAllowedPercent').innerText = safeMax + '%';
+                    const slider = document.getElementById('percentSlider');
+                    slider.max = safeMax; slider.value = 0;
+                    document.getElementById('sliderValDisplay').innerText = 0;
+                    tempBudget.isEdit = true; tempBudget.editIndex = index;
+                    openModal('fixPercentModal'); return; 
+                }
+                saveSectionSnap('budget', `ویرایش بودجه ${newName}`);
+                app.budgets[index].name = newName;
+                app.budgets[index].percent = newP;
+                if(oldName !== newName && app.priorities[oldName]) {
+                    app.priorities[newName] = app.priorities[oldName]; delete app.priorities[oldName];
+                }
+            } else if(type === 'goal') {
+                saveSectionSnap('tools', `ویرایش هدف ${newName}`);
+                app.goals[index].name = newName;
+                app.goals[index].target = parseFormatted(document.getElementById('editVal').value);
+            } else if(type === 'shop') {
+                saveSectionSnap('tools', `ویرایش کالا ${newName}`);
+                app.shopping[index].name = newName;
+                app.shopping[index].price = parseFormatted(document.getElementById('editVal').value);
             }
-            saveSectionSnap('budget', `ویرایش بودجه ${newName}`);
-            app.budgets[index].name = newName;
-            app.budgets[index].percent = newP;
-            if(oldName !== newName && app.priorities[oldName]) {
-                app.priorities[newName] = app.priorities[oldName]; delete app.priorities[oldName];
-            }
-        } else if(type === 'goal') {
-            saveSectionSnap('tools', `ویرایش هدف ${newName}`);
-            app.goals[index].name = newName;
-            app.goals[index].target = parseFormatted(document.getElementById('editVal').value);
-        } else if(type === 'shop') {
-            saveSectionSnap('tools', `ویرایش کالا ${newName}`);
-            app.shopping[index].name = newName;
-            app.shopping[index].price = parseFormatted(document.getElementById('editVal').value);
-        }
-        saveData(); renderUI(); closeAllModals(); showToast("تغییرات ذخیره شد");
+            saveData(); renderUI(); closeAllModals(); showToast("تغییرات ذخیره شد");
+        }, 800);
     }
 
     // --- OTHER ACTIONS ---
@@ -2473,90 +2603,102 @@
     function applyTheme() { if(app.user.theme === 'dark') document.body.setAttribute('data-theme', 'dark'); }
 
     function generateReportImage() {
-        const income = app.wallets.reduce((a,b)=>a+b.value,0);
-        const totalDebt = app.debts.reduce((a,b)=>a+b.value,0) + (app.checks || []).reduce((a,b)=>a+b.value,0);
-        const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
-        const net = income - totalDebt - manualDeductions;
-        const days = app.user.startDate ? Math.floor((Date.now() - app.user.startDate)/(1000*60*60*24))+1 : 0;
+        withLoading(() => {
+            const income = app.wallets.reduce((a,b)=>a+b.value,0);
+            const totalDebt = app.debts.reduce((a,b)=>a+b.value,0) + (app.checks || []).reduce((a,b)=>a+b.value,0);
+            const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
+            const net = income - totalDebt - manualDeductions;
+            
+            // Calculate days for report
+            const days = app.user.startDate ? Math.floor((Date.now() - app.user.startDate)/(1000*60*60*24))+1 : 0;
 
-        document.getElementById('printDate').innerText = new Date().toLocaleDateString('fa-IR');
-        document.getElementById('printUser').innerText = app.user.name;
-        document.getElementById('printDays').innerText = days;
-        document.getElementById('printInc').innerText = format(income);
-        document.getElementById('printDebt').innerText = format(totalDebt);
-        document.getElementById('printNet').innerText = format(net);
+            document.getElementById('printDate').innerText = new Date().toLocaleDateString('fa-IR');
+            document.getElementById('printUser').innerText = app.user.name;
+            document.getElementById('printDays').innerText = days;
+            document.getElementById('printInc').innerText = format(income);
+            document.getElementById('printDebt').innerText = format(totalDebt);
+            document.getElementById('printNet').innerText = format(net);
 
-        if(app.dailyLogs && app.dailyLogs.length > 0) {
-            const ctx = document.getElementById('printChart').getContext('2d');
-            if(window.myPrintChart) window.myPrintChart.destroy();
-            const logs = app.dailyLogs.slice(-15);
-            window.myPrintChart = new Chart(ctx, {
-                type: 'line',
-                data: { labels: logs.map(l => l.date), datasets: [{ label: 'خالص دارایی (تومان)', data: logs.map(l => l.net), borderColor: '#4338ca', backgroundColor: 'rgba(67, 56, 202, 0.1)', fill: true }] },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-            const hTab = document.getElementById('printHistoryTable');
-            hTab.innerHTML = logs.map(l => `<tr><td>${l.date}</td><td>${format(l.net)}</td><td>${format(l.spent)}</td></tr>`).join('');
-        }
-        const tb = document.getElementById('printBody');
-        tb.innerHTML = '';
-        app.budgets.forEach(b => {
-            const baseAmount = app.distributedAmount;
-            const s = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
-            tb.innerHTML += `<tr><td>${b.name}</td><td>${b.percent}%</td><td>${format(s)}</td><td>${format(b.spent)}</td><td>${format(s-b.spent)}</td></tr>`;
-            if(b.subs && b.subs.length > 0) {
-               // Render sub-budgets in print based on calculated amount
-               let subStr = b.subs.map(sub => {
-                   const amt = Math.round((s * (sub.percent||0)) / 100);
-                   return `${sub.name}: ${format(amt)}`;
-               }).join(' | ');
-               tb.innerHTML += `<tr><td colspan="5" style="background:#f9f9f9; font-size:0.8rem; text-align:right; color:#666;">زیرمجموعه‌ها: ${subStr}</td></tr>`;
+            if(app.dailyLogs && app.dailyLogs.length > 0) {
+                const ctx = document.getElementById('printChart').getContext('2d');
+                if(window.myPrintChart) window.myPrintChart.destroy();
+                const logs = app.dailyLogs.slice(-15);
+                window.myPrintChart = new Chart(ctx, {
+                    type: 'line',
+                    data: { labels: logs.map(l => l.date), datasets: [{ label: 'خالص دارایی (تومان)', data: logs.map(l => l.net), borderColor: '#4338ca', backgroundColor: 'rgba(67, 56, 202, 0.1)', fill: true }] },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+                const hTab = document.getElementById('printHistoryTable');
+                hTab.innerHTML = logs.map(l => `<tr><td>${l.date}</td><td>${format(l.net)}</td><td>${format(l.spent)}</td></tr>`).join('');
             }
-        });
-        const dList = document.getElementById('printDebtsList');
-        let debtHtml = "";
-        app.debts.forEach(d => debtHtml += `<div>${d.name}: ${format(d.value)}</div>`);
-        app.checks.forEach(c => debtHtml += `<div>چک (${c.name}): ${format(c.value)} - ${c.date}</div>`);
-        dList.innerHTML = debtHtml || "ندارد";
-        const gList = document.getElementById('printGoalsList');
-        let goalHtml = "";
-        app.goals.forEach(g => goalHtml += `<div>${g.name}: ${format(g.curr)} / ${format(g.target)}</div>`);
-        gList.innerHTML = goalHtml || "ندارد";
-        const el = document.getElementById('printArea');
-        el.style.top = "0";
-        setTimeout(() => {
-            html2canvas(el).then(c => {
-                const a = document.createElement('a');
-                a.download = `Financial_Report_${days}Days.png`; a.href = c.toDataURL(); a.click();
-                el.style.top = "-9999px";
+            const tb = document.getElementById('printBody');
+            tb.innerHTML = '';
+            app.budgets.forEach(b => {
+                const baseAmount = app.distributedAmount;
+                const s = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
+                tb.innerHTML += `<tr><td>${b.name}</td><td>${b.percent}%</td><td>${format(s)}</td><td>${format(b.spent)}</td><td>${format(s-b.spent)}</td></tr>`;
+                if(b.subs && b.subs.length > 0) {
+                   // Render sub-budgets in print based on calculated amount
+                   let subStr = b.subs.map(sub => {
+                       const amt = Math.round((s * (sub.percent||0)) / 100);
+                       return `${sub.name}: ${format(amt)}`;
+                   }).join(' | ');
+                   tb.innerHTML += `<tr><td colspan="5" style="background:#f9f9f9; font-size:0.8rem; text-align:right; color:#666;">زیرمجموعه‌ها: ${subStr}</td></tr>`;
+                }
             });
-        }, 1000);
+            const dList = document.getElementById('printDebtsList');
+            let debtHtml = "";
+            app.debts.forEach(d => debtHtml += `<div>${d.name}: ${format(d.value)}</div>`);
+            app.checks.forEach(c => debtHtml += `<div>چک (${c.name}): ${format(c.value)} - ${c.date}</div>`);
+            dList.innerHTML = debtHtml || "ندارد";
+            const gList = document.getElementById('printGoalsList');
+            let goalHtml = "";
+            app.goals.forEach(g => goalHtml += `<div>${g.name}: ${format(g.curr)} / ${format(g.target)}</div>`);
+            gList.innerHTML = goalHtml || "ندارد";
+            const el = document.getElementById('printArea');
+            el.style.top = "0";
+            
+            setTimeout(() => {
+                html2canvas(el).then(c => {
+                    const a = document.createElement('a');
+                    a.download = `Financial_Report_${days}Days.png`; a.href = c.toDataURL(); a.click();
+                    el.style.top = "-9999px";
+                    toggleLoading(false); // Hide loading after download starts
+                });
+            }, 500); // Slight delay to ensure chart rendering
+        }, 100); // Start Loading
     }
 
     function downloadBackup() {
-        const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(app));
-        const a = document.createElement('a'); a.href = str; a.download = "backup.json"; a.click();
-        if(!isGuestMode) { app.history.unshift({date: Date.now(), name: "بکاپ دستی"}); if(app.history.length > 5) app.history.pop(); saveData(); }
+        withLoading(() => {
+            const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(app));
+            const a = document.createElement('a'); a.href = str; a.download = "backup.json"; a.click();
+            if(!isGuestMode) { app.history.unshift({date: Date.now(), name: "بکاپ دستی"}); if(app.history.length > 5) app.history.pop(); saveData(); }
+        }, 1500);
     }
+    
     function restoreBackup(input) {
-        const file = input.files[0];
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                app = JSON.parse(e.target.result);
-                // Data Migration / Fixes
-                if(!app.priorities) app.priorities = defaultState.priorities;
-                if(!app.sectionHistory) app.sectionHistory = { dashboard: [], budget: [], tools: [] };
-                app.budgets.forEach(b => { 
-                    if(!b.history) b.history = []; if(b.manualAdd === undefined) b.manualAdd = 0; if(b.isPaused === undefined) b.isPaused = false; if(b.savedPercent === undefined) b.savedPercent = 0; if(!b.subs) b.subs = [];
-                });
-                if(app.distributedAmount === undefined) app.distributedAmount = 0;
-                if(!app.security.nationalId) app.security.nationalId = "";
-                saveData(); location.reload();
-            } catch(err) { alert("فایل نامعتبر"); }
-        };
-        reader.readAsText(file);
+        withLoading(() => {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    app = JSON.parse(e.target.result);
+                    // Data Migration / Fixes
+                    if(!app.priorities) app.priorities = defaultState.priorities;
+                    if(!app.sectionHistory) app.sectionHistory = { dashboard: [], budget: [], tools: [] };
+                    app.budgets.forEach(b => { 
+                        if(!b.history) b.history = []; if(b.manualAdd === undefined) b.manualAdd = 0; if(b.isPaused === undefined) b.isPaused = false; if(b.savedPercent === undefined) b.savedPercent = 0; if(!b.subs) b.subs = [];
+                    });
+                    if(app.distributedAmount === undefined) app.distributedAmount = 0;
+                    if(!app.security.nationalId) app.security.nationalId = "";
+                    saveData(); location.reload();
+                } catch(err) { alert("فایل نامعتبر"); }
+            };
+            reader.readAsText(file);
+        }, 2000);
     }
+    
     function showHistory() {
         const d = document.getElementById('histList');
         d.innerHTML = app.history.map(h => `<div style="padding:10px; border-bottom:1px solid #eee;">${h.name} - ${new Date(h.date).toLocaleDateString('fa-IR')}</div>`).join('');
