@@ -1,14 +1,9 @@
- همانطور که درخواست کردید، کد کامل و یکپارچه (HTML + CSS + JS) را با اعمال دقیق تمام ویرایش‌های ۱ تا ۷ آماده کرده‌ام. تمام جزئیات قبلی حفظ شده، `prompt`های قدیمی با مودال‌های مدرن جایگزین شده‌اند، سیستم زیرمجموعه‌سازی بودجه و واریز خودکار اضافه شده و باگ‌های ظاهری و عملکردی برطرف شده‌اند.
-
-این کد بدون نیاز به هیچ فایل خارجی دیگری (بجز لینک‌های CDN فونت و آیکون که در هدر هستند) قابل اجراست.
-
-```html
 <!DOCTYPE html> 
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مدیریت مالی حرفه‌ای | V15 Ultimate (Automation & Sub-Budgets)</title>
+    <title>مدیریت مالی حرفه‌ای | V16 Ultimate (Smart Alloc & Sub-Amts)</title>
 
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
@@ -22,7 +17,7 @@
     <style>
         :root {
             --bg-body: #f3f4f6;
-            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-bg: rgba(255, 255, 255, 0.90);
             --glass-border: 1px solid rgba(255, 255, 255, 0.9);
             --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.04);
             --shadow-card: 0 15px 35px rgba(0, 0, 0, 0.1);
@@ -42,7 +37,7 @@
 
         [data-theme="dark"] {
             --bg-body: #0f172a;
-            --glass-bg: rgba(30, 41, 59, 0.85);
+            --glass-bg: rgba(30, 41, 59, 0.90);
             --glass-border: 1px solid rgba(255, 255, 255, 0.08);
             --text-main: #f1f5f9;
             --text-sec: #94a3b8;
@@ -95,13 +90,10 @@
             align-items: center;
             gap: 10px;
         }
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        .toast.show { opacity: 1; transform: translateY(0); }
         .toast i { color: var(--success); }
 
-        /* --- کامپوننت‌های عمومی --- */
+        /* --- Components --- */
         .container {
             max-width: 600px;
             margin: 0 auto;
@@ -133,7 +125,7 @@
 
         .header-row h3 { margin: 0; font-size: 1.1rem; color: var(--primary); display: flex; align-items: center; gap: 10px; font-weight: 800; }
 
-        /* دکمه‌ها */
+        /* Buttons */
         .btn {
             padding: 12px 20px;
             border-radius: 16px;
@@ -202,9 +194,13 @@
             cursor: pointer; margin-right: 5px;
             font-size: 0.9rem;
             transition: all 0.2s;
+            border: none;
         }
-        .btn-edit { color: var(--warning); background: rgba(245, 158, 11, 0.15); border: none; }
-        .btn-del { color: var(--danger); background: rgba(239, 68, 68, 0.15); border: none; }
+        .btn-edit { color: var(--warning); background: rgba(245, 158, 11, 0.15); }
+        .btn-del { color: var(--danger); background: rgba(239, 68, 68, 0.15); }
+        .btn-settings { color: var(--primary); background: rgba(79, 70, 229, 0.15); }
+        .btn-copy { color: var(--text-sec); background: rgba(100, 116, 139, 0.15); }
+        .btn-copy:hover { background: var(--text-main); color: white; }
         
         .currency-toggle-btn {
             background: var(--glass-bg);
@@ -226,7 +222,7 @@
             box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
         }
 
-        /* ورودی‌ها */
+        /* Inputs */
         input, select {
             background: var(--bg-body);
             border: 2px solid transparent;
@@ -257,17 +253,10 @@
             width: 100%; height: 6px; cursor: pointer; background: #e2e8f0; border-radius: 3px;
         }
 
-        .date-picker-row {
-            display: flex; gap: 8px; direction: ltr; 
-        }
-        .date-picker-row select {
-            flex: 1; padding: 12px; font-size: 0.9rem; direction: rtl; text-align: center;
-        }
+        .date-picker-row { display: flex; gap: 8px; direction: ltr; }
+        .date-picker-row select { flex: 1; padding: 12px; font-size: 0.9rem; direction: rtl; text-align: center; }
 
-        .money-input-wrapper {
-            position: relative;
-            margin-bottom: 15px;
-        }
+        .money-input-wrapper { position: relative; margin-bottom: 15px; }
         .money-input-wrapper input {
             padding-left: 80px; 
             margin-bottom: 0;
@@ -278,26 +267,20 @@
             font-size: 1.1rem;
         }
         .money-unit {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--primary);
-            font-size: 0.8rem;
-            font-weight: bold;
-            pointer-events: none;
-            background: rgba(79, 70, 229, 0.1);
-            padding: 6px 10px;
-            border-radius: 10px;
+            position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
+            color: var(--primary); font-size: 0.8rem; font-weight: bold; pointer-events: none;
+            background: rgba(79, 70, 229, 0.1); padding: 6px 10px; border-radius: 10px;
         }
 
-        /* --- صفحه ورود (Lock Screen) - ویرایش شده طبق دستور ۱ --- */
+        /* --- Lock Screen --- */
         .pin-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg-body); z-index: 9999;
-            display: flex; flex-direction: column; justify-content: space-between; align-items: center;
-            padding: 10vh 20px; /* فاصله زیاد از بالا و پایین */
-            overflow-y: auto; 
+            display: flex; flex-direction: column; 
+            justify-content: center; /* Center Vertically */
+            align-items: center; /* Center Horizontally */
+            padding: 20px;
+            overflow-y: auto;
         }
         
         .auth-card {
@@ -309,11 +292,11 @@
             max-width: 380px; 
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.1);
             text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            display: flex; flex-direction: column; align-items: center;
             backdrop-filter: blur(10px);
-            margin: auto 0; /* سنتر عمودی در فضای باقی مانده */
+            margin: auto; /* Ensure no sticking */
+            max-height: 90vh; /* Safety for small screens */
+            overflow-y: auto;
         }
 
         .auth-avatar {
@@ -334,9 +317,7 @@
             background: #cbd5e1; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
         }
         .pin-dot.filled { 
-            background: var(--primary); 
-            transform: scale(1.4); 
-            box-shadow: 0 0 15px rgba(79, 70, 229, 0.5); 
+            background: var(--primary); transform: scale(1.4); box-shadow: 0 0 15px rgba(79, 70, 229, 0.5); 
         }
         
         .numpad {
@@ -348,9 +329,7 @@
             background: transparent; 
             font-size: 1.5rem; font-weight: 700; color: var(--text-main);
             cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s;
-            margin: 0 auto;
-            border: none;
+            transition: all 0.2s; margin: 0 auto; border: none;
         }
         .num-key:hover { background: rgba(0,0,0,0.03); }
         .num-key:active { background: var(--primary); color: white; transform: scale(0.9); border-radius: 50%; }
@@ -358,58 +337,33 @@
         .num-key.del:active { background: var(--danger); color: white; }
 
         .auth-link {
-            margin-top: 30px;
-            color: var(--text-sec);
-            font-size: 0.9rem;
-            text-decoration: none;
-            cursor: pointer;
-            border-bottom: 1px dashed var(--text-sec);
-            padding-bottom: 4px;
-            transition: 0.2s;
+            margin-top: 30px; color: var(--text-sec); font-size: 0.9rem;
+            text-decoration: none; cursor: pointer; border-bottom: 1px dashed var(--text-sec);
+            padding-bottom: 4px; transition: 0.2s;
         }
         .auth-link:hover { color: var(--primary); border-color: var(--primary); }
         
         .guest-btn {
-            margin-top: 25px;
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            color: var(--warning);
-            padding: 12px 25px;
-            border-radius: 14px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
-            width: 100%;
+            margin-top: 25px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3);
+            color: var(--warning); padding: 12px 25px; border-radius: 14px; cursor: pointer;
+            font-weight: bold; transition: 0.2s; width: 100%;
         }
         .guest-btn:hover { background: var(--warning); color: white; }
 
-        /* --- کارت اعتباری --- */
-        .hero-card {
-            perspective: 1500px;
-            height: 230px;
-            margin-bottom: 30px;
-            cursor: pointer;
-        }
+        /* --- Bank Card --- */
+        .hero-card { perspective: 1500px; height: 230px; margin-bottom: 30px; cursor: pointer; }
         .card-inner {
-            position: relative;
-            width: 100%; height: 100%;
-            text-align: right;
+            position: relative; width: 100%; height: 100%; text-align: right;
             transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform-style: preserve-3d;
-            border-radius: 28px;
+            transform-style: preserve-3d; border-radius: 28px;
             box-shadow: 0 25px 50px -12px rgba(67, 56, 202, 0.4);
         }
         .hero-card.flipped .card-inner { transform: rotateY(180deg); }
         
         .card-front, .card-back {
-            position: absolute;
-            width: 100%; height: 100%;
-            backface-visibility: hidden;
-            border-radius: 28px;
-            padding: 25px;
-            color: white;
-            display: flex; flex-direction: column; justify-content: space-between;
-            overflow: hidden;
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+            border-radius: 28px; padding: 25px; color: white;
+            display: flex; flex-direction: column; justify-content: space-between; overflow: hidden;
         }
         .card-front {
             background: linear-gradient(110deg, #1e3a8a 0%, #3b82f6 100%);
@@ -422,57 +376,37 @@
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
-
         .card-chip {
             width: 50px; height: 35px;
             background: linear-gradient(135deg, #fbbf24 0%, #d97706 50%, #fbbf24 100%);
-            border-radius: 6px;
-            margin-bottom: 10px;
-            position: relative;
+            border-radius: 6px; margin-bottom: 10px; position: relative;
             box-shadow: inset 0 1px 2px rgba(255,255,255,0.4), 0 2px 5px rgba(0,0,0,0.2);
             border: 1px solid rgba(0,0,0,0.1);
         }
-        .card-chip::after {
-            content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: rgba(0,0,0,0.3);
-        }
-        .card-chip::before {
-            content: ''; position: absolute; left: 30%; top: 0; height: 100%; width: 1px; background: rgba(0,0,0,0.3);
-        }
+        .card-chip::after { content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: rgba(0,0,0,0.3); }
+        .card-chip::before { content: ''; position: absolute; left: 30%; top: 0; height: 100%; width: 1px; background: rgba(0,0,0,0.3); }
 
         .card-back {
-            background: #0f172a;
-            transform: rotateY(180deg);
-            align-items: center; justify-content: center;
-            border: 1px solid rgba(255,255,255,0.1);
+            background: #0f172a; transform: rotateY(180deg);
+            align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1);
         }
 
         .balance-label { font-size: 0.9rem; opacity: 0.8; font-weight: 300; display:block; margin-bottom:5px;}
         .balance-value { font-size: 2.2rem; font-weight: 800; margin: 5px 0; direction: ltr; text-shadow: 0 4px 10px rgba(0,0,0,0.2); letter-spacing: 2px; font-family: 'Courier New', monospace; }
 
-        /* --- BENTO GRID (بودجه) --- */
+        /* --- BENTO GRID (Budget) --- */
         .budget-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
-            gap: 20px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); gap: 20px;
         }
         @media(min-width: 600px) { .budget-grid { grid-template-columns: 1fr 1fr; } }
 
         .bento-item {
-            background: var(--glass-bg);
-            border: var(--glass-border);
-            border-radius: 22px;
-            padding: 20px;
-            position: relative;
-            display: flex; flex-direction: column; gap: 12px;
-            box-shadow: var(--shadow-soft);
-            transition: all 0.3s;
+            background: var(--glass-bg); border: var(--glass-border); border-radius: 22px;
+            padding: 20px; position: relative; display: flex; flex-direction: column; gap: 12px;
+            box-shadow: var(--shadow-soft); transition: all 0.3s;
         }
         .bento-item:hover { transform: translateY(-5px); box-shadow: var(--shadow-card); }
-        .bento-item.paused {
-            opacity: 0.7;
-            filter: grayscale(1);
-            border: 2px dashed var(--text-sec);
-        }
+        .bento-item.paused { opacity: 0.7; filter: grayscale(1); border: 2px dashed var(--text-sec); }
         
         .bento-header { display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 1.1rem; color: var(--text-main); }
         
@@ -486,38 +420,34 @@
         .stat-yellow .progress-fill { background: linear-gradient(90deg, var(--warning), #fbbf24); }
         .stat-red .progress-fill { background: linear-gradient(90deg, var(--danger), #f87171); }
 
-        /* دکمه‌های عملیاتی مدرن */
-        .bento-actions {
-            margin-top: 8px;
-            display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-        }
+        .bento-actions { margin-top: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .action-chip {
-            padding: 10px; font-size: 0.8rem; border-radius: 12px;
-            border: none;
+            padding: 10px; font-size: 0.8rem; border-radius: 12px; border: none;
             display: flex; align-items: center; justify-content: center; gap: 6px;
-            cursor: pointer; font-weight: 700; white-space: nowrap;
-            transition: 0.2s;
+            cursor: pointer; font-weight: 700; white-space: nowrap; transition: 0.2s;
         }
         .action-btn-exp { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
         .action-btn-exp:hover { background: var(--danger); color: white; }
-
         .action-btn-copy { background: rgba(79, 70, 229, 0.1); color: var(--primary); }
         .action-btn-copy:hover { background: var(--primary); color: white; }
-
         .action-btn-add { background: rgba(16, 185, 129, 0.1); color: var(--success); }
         .action-btn-add:hover { background: var(--success); color: white; }
-
         .action-btn-pause { background: rgba(148, 163, 184, 0.1); color: var(--text-sec); }
         .action-btn-pause:hover { background: var(--text-sec); color: white; }
+        .action-btn-sub { background: rgba(245, 158, 11, 0.1); color: var(--warning); grid-column: span 2; }
+        .action-btn-sub:hover { background: var(--warning); color: white; }
 
-        .action-btn-subs { background: rgba(245, 158, 11, 0.1); color: var(--warning); grid-column: span 2; }
-        .action-btn-subs:hover { background: var(--warning); color: white; }
-
+        /* Sub-Budget Styles */
+        .sub-budget-bar {
+            display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 5px; background: rgba(0,0,0,0.05);
+        }
+        .sub-budget-seg { height: 100%; transition: width 0.3s; }
+        .sub-budget-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px; font-size: 0.75rem; color: var(--text-sec); }
+        .sub-legend-item { display: flex; align-items: center; gap: 4px; }
+        .sub-dot { width: 8px; height: 8px; border-radius: 50%; }
 
         /* --- Template Chips --- */
-        .template-row {
-            display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; margin-bottom: 10px; scrollbar-width: none;
-        }
+        .template-row { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; margin-bottom: 10px; scrollbar-width: none; }
         .template-chip {
             white-space: nowrap; padding: 8px 18px; border-radius: 50px;
             background: var(--glass-bg); border: 1px solid var(--primary); color: var(--primary);
@@ -534,67 +464,44 @@
             backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border-top: 1px solid rgba(255,255,255,0.5);
             display: flex; justify-content: space-around; align-items: center;
-            z-index: 9000;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.05);
-            padding-bottom: 15px;
+            z-index: 9000; box-shadow: 0 -10px 40px rgba(0,0,0,0.05); padding-bottom: 15px;
         }
         [data-theme="dark"] .bottom-nav { background: rgba(15, 23, 42, 0.85); border-top: 1px solid rgba(255,255,255,0.05); }
 
         .nav-btn {
-            background: none; border: none;
-            display: flex; flex-direction: column; align-items: center; gap: 6px;
-            color: var(--text-sec); font-size: 0.75rem; cursor: pointer;
-            width: 70px; font-weight: bold; opacity: 0.6; transition: 0.3s;
+            background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 6px;
+            color: var(--text-sec); font-size: 0.75rem; cursor: pointer; width: 70px; font-weight: bold; opacity: 0.6; transition: 0.3s;
         }
         .nav-btn i { font-size: 1.4rem; margin-bottom: 4px; transition: transform 0.2s; padding: 8px; border-radius: 12px; }
         .nav-btn.active { color: var(--primary); opacity: 1; }
         .nav-btn.active i { background: rgba(79, 70, 229, 0.1); transform: translateY(-5px); }
 
-        /* --- MODALS --- */
+        /* --- MODALS (Modern & Bottom Sheet) --- */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 11000; 
-            display: none; 
-            justify-content: center; 
-            align-items: flex-end;
-            backdrop-filter: blur(8px);
-            opacity: 0;
-            transition: opacity 0.3s;
+            background: rgba(0,0,0,0.6); z-index: 11000; 
+            display: none; justify-content: center; align-items: flex-end;
+            backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s;
         }
-        .modal.active { 
-            display: flex; 
-            opacity: 1;
-        }
+        .modal.active { display: flex; opacity: 1; }
         .modal-content {
-            background: var(--glass-bg);
-            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            width: 100%; max-width: 600px;
-            padding: 35px 25px;
-            border-radius: 35px 35px 0 0;
-            border-top: 1px solid rgba(255,255,255,0.6);
-            box-shadow: 0 -20px 80px rgba(0,0,0,0.3);
-            max-height: 90vh; overflow-y: auto;
-            transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            width: 100%; max-width: 600px; padding: 35px 25px;
+            border-radius: 35px 35px 0 0; border-top: 1px solid rgba(255,255,255,0.6);
+            box-shadow: 0 -20px 80px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto;
+            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
         }
         [data-theme="dark"] .modal-content { border-top: 1px solid rgba(255,255,255,0.1); }
-        
-        .modal.active .modal-content {
-            transform: translateY(0);
-        }
+        .modal.active .modal-content { transform: translateY(0); }
 
-        /* --- TAB CONTENT --- */
         .tab-pane { display: none; padding-bottom: 20px; animation: fadeIn 0.4s ease; }
         .tab-pane.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- REPORT (PRINT) --- */
         #printArea {
-            position: absolute; top: -9999px; left: -9999px;
-            width: 800px; background: white; color: black; padding: 40px;
-            border: 2px solid #333; font-family: 'Tahoma', sans-serif;
-            z-index: 99999;
+            position: absolute; top: -9999px; left: -9999px; width: 800px; background: white; color: black; padding: 40px;
+            border: 2px solid #333; font-family: 'Tahoma', sans-serif; z-index: 99999;
         }
         .print-header { text-align: center; border-bottom: 2px solid #000; margin-bottom: 20px; padding-bottom: 15px; }
         .print-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
@@ -608,21 +515,27 @@
             font-size: 0.8rem; background: rgba(79, 70, 229, 0.1); color: var(--primary); padding: 6px 14px; border-radius: 20px; cursor: pointer; margin-left: 10px; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; border: 1px solid transparent;
         }
         .history-btn:hover { background: var(--primary); color: white; border-color: var(--primary-light); }
-
         .auth-input-group { width: 100%; margin-bottom: 20px; text-align: center; }
         .auth-label { display: block; text-align: right; font-size: 0.85rem; color: var(--text-sec); margin-bottom: 8px; margin-right: 5px; font-weight: bold; }
+
+        /* Instruction 1 & 2 fixes */
+        .alloc-info-box {
+            background: rgba(79, 70, 229, 0.05); padding: 12px; border-radius: 12px;
+            margin-bottom: 15px; border: 1px dashed var(--primary); color: var(--primary);
+            font-size: 0.9rem; display: flex; justify-content: space-between;
+        }
+        .sub-budget-row {
+            background:rgba(0,0,0,0.03); padding:10px; border-radius:12px; margin-bottom:10px; display:flex; gap:10px; align-items:center;
+        }
 
     </style>
 </head>
 <body>
 
-<!-- سیستم نمایش پیام‌های مدرن -->
 <div id="toastContainer" class="toast-container"></div>
 
-<!-- 1. LOCK SCREEN (فاصله مناسب) -->
+<!-- 1. LOCK SCREEN -->
 <div id="authModal" class="pin-screen" style="display: flex;">
-    <div style="width:100%; text-align:center;"></div> <!-- Spacer Top -->
-    
     <div class="auth-card">
         <div class="auth-avatar" id="authIcon">
             <i class="fas fa-fingerprint"></i>
@@ -630,15 +543,13 @@
         <h2 id="authTitle" style="margin: 0 0 10px 0; color: var(--primary);">امیر</h2>
         <p id="authSub" style="font-size: 0.95rem; color: var(--text-sec); margin-bottom: 30px;">جهت ورود رمز خود را وارد کنید</p>
 
-        <!-- Step 1: Registration -->
+        <!-- Step 1: Registration / Info -->
         <div id="authStep1" style="display:none; width:100%;">
             <div class="auth-input-group">
                 <label class="auth-label">نام و نام خانوادگی:</label>
                 <input type="text" id="setupNameInput" placeholder="نام خود را وارد کنید">
-                
                 <label class="auth-label">کد ملی (جهت بازیابی):</label>
                 <input type="text" id="setupNatId" inputmode="numeric" placeholder="کد ملی خود را وارد کنید">
-
                 <label class="auth-label">سوال امنیتی (تصادفی):</label>
                 <div style="background: rgba(79,70,229,0.05); padding: 15px; border-radius: 12px; margin-bottom: 10px; color: var(--primary); font-weight: bold; font-size: 0.9rem; text-align: right;" id="setupSecurityQ">---</div>
                 <input type="text" id="setupSecurityA" placeholder="پاسخ را بنویسید">
@@ -681,8 +592,6 @@
             </button>
         </div>
     </div>
-    
-    <div style="width:100%; text-align:center;"></div> <!-- Spacer Bottom -->
 </div>
 
 <!-- 2. MAIN APP -->
@@ -710,7 +619,6 @@
 
     <!-- TAB 1: DASHBOARD -->
     <div id="view-dashboard" class="tab-pane active">
-        <!-- Hero Card -->
         <div class="hero-card" onclick="this.classList.toggle('flipped')">
             <div class="card-inner">
                 <div class="card-front">
@@ -718,12 +626,10 @@
                         <div class="card-chip"></div>
                         <i class="fas fa-wifi" style="opacity:0.7; transform: rotate(90deg);"></i>
                     </div>
-                    
                     <div>
                         <span class="balance-label">موجودی خالص (قابل تقسیم)</span>
                         <div class="balance-value" id="totalBalance">0</div>
                     </div>
-                    
                     <div style="display:flex; justify-content:space-between; font-size:1rem; opacity:0.95; font-weight:600; margin-top:10px;">
                         <span id="userNameDisplay" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);">کاربر</span>
                         <span id="cardCurrency">تومان</span>
@@ -837,36 +743,23 @@
                     <span style="font-weight:bold;"><i class="fas fa-copy"></i> حالت کپی (خام برای بانک)</span>
                     <input type="checkbox" id="rawCopyCheck" style="width:24px; height:24px; margin:0;">
                 </div>
-                <button class="btn btn-outline" onclick="openPrioritySettings()">
-                    <i class="fas fa-list-ol"></i> مدیریت اولویت‌ها
-                </button>
-                <button class="btn btn-outline" onclick="changeUserName()">
-                    <i class="fas fa-user-edit"></i> تغییر نام کاربر
-                </button>
-                <button class="btn btn-outline" onclick="generateReportImage()">
-                    <i class="fas fa-file-image"></i> دانلود فاکتور و نمودار (PDF)
-                </button>
-                <button class="btn btn-outline" onclick="downloadBackup()">
-                    <i class="fas fa-download"></i> دانلود فایل بکاپ (JSON)
-                </button>
+                <button class="btn btn-outline" onclick="openPrioritySettings()"><i class="fas fa-list-ol"></i> مدیریت اولویت‌ها</button>
+                <button class="btn btn-outline" onclick="changeUserName()"><i class="fas fa-user-edit"></i> تغییر نام کاربر</button>
+                <button class="btn btn-outline" onclick="generateReportImage()"><i class="fas fa-file-image"></i> دانلود فاکتور (PDF)</button>
+                <button class="btn btn-outline" onclick="downloadBackup()"><i class="fas fa-download"></i> دانلود بکاپ (JSON)</button>
                 <label class="btn btn-outline" style="cursor:pointer; text-align:center;">
                     <i class="fas fa-upload"></i> بازیابی فایل بکاپ
                     <input type="file" id="restoreFile" style="display:none" onchange="restoreBackup(this)">
                 </label>
-                <button class="btn btn-outline" onclick="showHistory()">
-                    <i class="fas fa-history"></i> تاریخچه بکاپ‌ها
-                </button>
-                <button class="btn btn-outline" onclick="changePin()">
-                    <i class="fas fa-lock"></i> تغییر رمز عبور و مشخصات
-                </button>
-                <button class="btn btn-danger" onclick="resetAll()">
-                    <i class="fas fa-trash"></i> ریست فکتوری
-                </button>
+                <button class="btn btn-outline" onclick="showHistory()"><i class="fas fa-history"></i> تاریخچه بکاپ‌ها</button>
+                <button class="btn btn-outline" onclick="changePin()"><i class="fas fa-lock"></i> تغییر رمز و مشخصات</button>
+                <button class="btn btn-danger" onclick="resetAll()"><i class="fas fa-trash"></i> ریست فکتوری</button>
             </div>
         </div>
     </div>
 </div>
 
+<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
     <button class="nav-btn active" onclick="switchTab('dashboard')"><i class="fas fa-home"></i> داشبورد</button>
     <button class="nav-btn" onclick="switchTab('budget')"><i class="fas fa-chart-pie"></i> بودجه</button>
@@ -875,6 +768,88 @@
 </nav>
 
 <!-- MODALS -->
+
+<!-- Universal Input Modal -->
+<div id="universalInputModal" class="modal">
+    <div class="modal-content">
+        <h3 id="uInputTitle">ورود اطلاعات</h3>
+        <p id="uInputLabel" style="color:var(--text-sec); margin-bottom:15px;">مقدار را وارد کنید:</p>
+        <div id="uInputTextWrapper" style="display:none;">
+             <input type="text" id="uInputText" placeholder="...">
+        </div>
+        <div id="uInputMoneyWrapper" class="money-input-wrapper" style="display:none;">
+            <input type="text" id="uInputMoney" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
+            <span class="money-unit currency-text">تومان</span>
+        </div>
+        <div style="margin-top:25px; display:flex; gap:12px;">
+            <button class="btn btn-primary" style="flex:1" onclick="submitUniversalInput()">تایید</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+        </div>
+    </div>
+</div>
+
+<!-- Sub-Budget Manager (Modified Instruction 2) -->
+<div id="subBudgetModal" class="modal">
+    <div class="modal-content">
+        <h3>مدیریت زیرمجموعه‌ها</h3>
+        <p style="font-size:0.85rem; color:var(--text-sec); margin-bottom:15px;">
+            تعیین مبلغ دقیق برای هر زیرمجموعه از ردیف "<b><span id="subParentName"></span></b>".
+        </p>
+        <div class="alloc-info-box">
+             <span id="subTotalBudget">بودجه کل: 0</span>
+             <span id="subRemainBudget">باقی‌مانده: 0</span>
+        </div>
+        <div id="subBudgetList" style="max-height:300px; overflow-y:auto; padding-bottom:10px;"></div>
+        <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="addNewSubCategory()">+ افزودن زیرمجموعه</button>
+        <div style="margin-top:25px; display:flex; gap:12px;">
+            <button class="btn btn-primary" style="flex:1" onclick="saveSubBudgets()">ذخیره تغییرات</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">بستن</button>
+        </div>
+    </div>
+</div>
+
+<!-- Auto Allocation Settings -->
+<div id="autoAllocModal" class="modal">
+    <div class="modal-content">
+        <h3>تنظیمات پس‌انداز خودکار</h3>
+        <input type="hidden" id="autoAllocType"> <!-- goal or shop -->
+        <input type="hidden" id="autoAllocId">
+        
+        <label>نوع برداشت:</label>
+        <select id="aaType" onchange="toggleAutoAllocFields()">
+            <option value="none">غیرفعال (دستی)</option>
+            <option value="percent">درصدی از ورودی بودجه</option>
+            <option value="fixed">مبلغ ثابت در هر شارژ</option>
+        </select>
+
+        <div id="aaPercentField" style="display:none;">
+            <label>درصد کسر:</label>
+            <input type="number" id="aaPercent" placeholder="مثلا 10">
+        </div>
+
+        <div id="aaAmountField" style="display:none;">
+            <label>مبلغ کسر (تومان):</label>
+            <div class="money-input-wrapper">
+                <input type="text" id="aaAmount" onkeyup="formatCurrency(this)" inputmode="numeric">
+                <span class="money-unit currency-text">تومان</span>
+            </div>
+        </div>
+
+        <label>منبع کسر بودجه:</label>
+        <select id="aaSource"></select>
+
+        <label>حداقل موجودی منبع برای کسر:</label>
+        <div class="money-input-wrapper">
+            <input type="text" id="aaMin" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
+            <span class="money-unit currency-text">تومان</span>
+        </div>
+
+        <div style="margin-top:25px; display:flex; gap:12px;">
+            <button class="btn btn-primary" style="flex:1" onclick="saveAutoAlloc()">ذخیره تنظیمات</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+        </div>
+    </div>
+</div>
 
 <div id="recoveryModal" class="modal">
     <div class="modal-content">
@@ -898,10 +873,8 @@
         <h3><i class="fas fa-edit"></i> ویرایش آیتم</h3>
         <input type="hidden" id="editType">
         <input type="hidden" id="editIndex">
-
         <label>عنوان:</label>
         <input type="text" id="editName">
-        
         <div id="editAmountWrapper">
             <label>مبلغ / ارزش:</label>
             <div class="money-input-wrapper">
@@ -909,41 +882,14 @@
                 <span class="money-unit currency-text">تومان</span>
             </div>
         </div>
-
         <div id="editDateWrapper" style="display:none;">
             <label>تاریخ:</label>
             <div class="date-picker-row" id="editDateRow"></div>
         </div>
-
         <div id="editPercentWrapper" style="display:none;">
             <label>درصد:</label>
             <input type="number" id="editPercent" inputmode="numeric">
         </div>
-        
-        <!-- تنظیمات خودکار برای ویرایش هدف/خرید -->
-        <div id="editAutoWrapper" style="display:none; margin-top:15px; padding-top:15px; border-top:1px dashed #ccc;">
-            <h4>تنظیمات واریز خودکار</h4>
-            <label>نوع برداشت از بودجه:</label>
-            <select id="editAutoType" onchange="toggleEditAutoFields()">
-                <option value="none">غیرفعال (دستی)</option>
-                <option value="percent">درصدی (کسر درصدی از واریزی)</option>
-                <option value="fixed">مبلغ ثابت (کسر مبلغ ثابت)</option>
-            </select>
-            
-            <div id="editAutoValDiv" style="display:none;">
-                <label id="editAutoLabel">مقدار (درصد یا مبلغ):</label>
-                <input type="text" id="editAutoVal" inputmode="numeric" onkeyup="formatCurrency(this)">
-            </div>
-            
-            <div id="editAutoLimitDiv" style="display:none;">
-                <label>حداقل موجودی بودجه برای اجرا:</label>
-                <div class="money-input-wrapper">
-                     <input type="text" id="editAutoLimit" inputmode="numeric" onkeyup="formatCurrency(this)" placeholder="0">
-                     <span class="money-unit currency-text">تومان</span>
-                </div>
-            </div>
-        </div>
-
         <div style="margin-top:25px; display:flex; gap:12px;">
             <button class="btn btn-primary" style="flex:1" onclick="performEdit()">ذخیره تغییرات</button>
             <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
@@ -951,75 +897,6 @@
     </div>
 </div>
 
-<div id="subBudgetModal" class="modal">
-    <div class="modal-content">
-        <h3>مدیریت زیرمجموعه‌ها</h3>
-        <p id="subBudgetName" style="color:var(--primary); font-weight:bold;"></p>
-        <input type="hidden" id="subParentIndex">
-        
-        <div id="subList" style="margin-top:20px; max-height:300px; overflow-y:auto;"></div>
-        
-        <div style="margin-top:20px; padding-top:15px; border-top:1px solid #eee;">
-            <h4>افزودن زیرمجموعه جدید</h4>
-            <input type="text" id="newSubName" placeholder="نام زیرمجموعه (مثلا تاکسی)">
-            <input type="number" id="newSubPercent" placeholder="درصد سهم (مثلا 20)">
-            <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="addSubBudget()">افزودن</button>
-        </div>
-        
-        <button class="btn btn-outline" style="width:100%; margin-top:15px;" onclick="closeAllModals()">بستن</button>
-    </div>
-</div>
-
-<!-- مودال‌های جایگزین Prompt -->
-<div id="depositModal" class="modal">
-    <div class="modal-content">
-        <h3>واریز مستقیم به بودجه</h3>
-        <input type="hidden" id="depositIndex">
-        <label>مبلغ واریزی:</label>
-        <div class="money-input-wrapper">
-            <input type="text" id="depositVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
-            <span class="money-unit currency-text">تومان</span>
-        </div>
-        <div style="margin-top:25px; display:flex; gap:12px;">
-            <button class="btn btn-primary" style="flex:1" onclick="performDeposit()">ثبت واریز</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
-        </div>
-    </div>
-</div>
-
-<div id="pauseModal" class="modal">
-    <div class="modal-content">
-        <h3>تغییر وضعیت فعال/توقف</h3>
-        <input type="hidden" id="pauseIndex">
-        <p>آیا می‌خواهید درصد جدید تعیین کنید یا درصد قبلی بازگردد؟</p>
-        
-        <label>درصد جدید (اختیاری):</label>
-        <input type="number" id="pauseNewPercent" placeholder="درصد...">
-        
-        <div style="margin-top:25px; display:flex; flex-direction:column; gap:12px;">
-            <button class="btn btn-primary" onclick="performPause(true)">بازگشت درصد قبلی</button>
-            <button class="btn btn-outline" onclick="performPause(false)">استفاده از درصد جدید بالا</button>
-        </div>
-    </div>
-</div>
-
-<div id="directGoalModal" class="modal">
-    <div class="modal-content">
-        <h3>واریز مستقیم به هدف</h3>
-        <input type="hidden" id="directGoalIndex">
-        <label>مبلغ واریزی:</label>
-        <div class="money-input-wrapper">
-            <input type="text" id="directGoalVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
-            <span class="money-unit currency-text">تومان</span>
-        </div>
-        <div style="margin-top:25px; display:flex; gap:12px;">
-            <button class="btn btn-primary" style="flex:1" onclick="performDirectGoal()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
-        </div>
-    </div>
-</div>
-
-<!-- Other Standard Modals -->
 <div id="sectionHistoryModal" class="modal">
     <div class="modal-content">
         <h3>تاریخچه تغییرات (۱۰ مورد آخر)</h3>
@@ -1136,7 +1013,6 @@
     </div>
 </div>
 
-<!-- Goal Modal with Automation (Instruction 4) -->
 <div id="goalModal" class="modal">
     <div class="modal-content">
         <h3>هدف پس‌انداز جدید</h3>
@@ -1147,30 +1023,6 @@
             <input type="text" id="gTarget" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
             <span class="money-unit currency-text">تومان</span>
         </div>
-
-        <div style="margin-top:20px; padding:15px; background:rgba(79, 70, 229, 0.05); border-radius:12px;">
-            <h4 style="margin-top:0;">تنظیمات واریز خودکار</h4>
-            <label>نوع برداشت از بودجه:</label>
-            <select id="gAutoType" onchange="toggleAutoFields('g')">
-                <option value="none">غیرفعال (دستی)</option>
-                <option value="percent">درصدی (کسر درصدی از واریزی)</option>
-                <option value="fixed">مبلغ ثابت (کسر مبلغ ثابت)</option>
-            </select>
-            
-            <div id="gAutoValDiv" style="display:none;">
-                <label id="gAutoLabel">مقدار (درصد یا مبلغ):</label>
-                <input type="text" id="gAutoVal" inputmode="numeric" onkeyup="formatCurrency(this)">
-            </div>
-            
-            <div id="gAutoLimitDiv" style="display:none;">
-                <label>حداقل موجودی بودجه برای اجرا:</label>
-                <div class="money-input-wrapper">
-                     <input type="text" id="gAutoLimit" inputmode="numeric" onkeyup="formatCurrency(this)" placeholder="0">
-                     <span class="money-unit currency-text">تومان</span>
-                </div>
-            </div>
-        </div>
-
         <div style="margin-top:25px; display:flex; gap:12px;">
             <button class="btn btn-primary" style="flex:1" onclick="addGoal()">ثبت</button>
             <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
@@ -1178,7 +1030,6 @@
     </div>
 </div>
 
-<!-- Shop Modal with Automation (Instruction 6) -->
 <div id="shopModal" class="modal">
     <div class="modal-content">
         <h3>افزودن به لیست خرید</h3>
@@ -1189,30 +1040,6 @@
             <input type="text" id="sPrice" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
             <span class="money-unit currency-text">تومان</span>
         </div>
-
-        <div style="margin-top:20px; padding:15px; background:rgba(79, 70, 229, 0.05); border-radius:12px;">
-            <h4 style="margin-top:0;">تنظیمات واریز خودکار</h4>
-            <label>نوع برداشت از بودجه:</label>
-            <select id="sAutoType" onchange="toggleAutoFields('s')">
-                <option value="none">غیرفعال (دستی)</option>
-                <option value="percent">درصدی (کسر درصدی از واریزی)</option>
-                <option value="fixed">مبلغ ثابت (کسر مبلغ ثابت)</option>
-            </select>
-            
-            <div id="sAutoValDiv" style="display:none;">
-                <label id="sAutoLabel">مقدار (درصد یا مبلغ):</label>
-                <input type="text" id="sAutoVal" inputmode="numeric" onkeyup="formatCurrency(this)">
-            </div>
-            
-            <div id="sAutoLimitDiv" style="display:none;">
-                <label>حداقل موجودی بودجه برای اجرا:</label>
-                <div class="money-input-wrapper">
-                     <input type="text" id="sAutoLimit" inputmode="numeric" onkeyup="formatCurrency(this)" placeholder="0">
-                     <span class="money-unit currency-text">تومان</span>
-                </div>
-            </div>
-        </div>
-
         <div style="margin-top:25px; display:flex; gap:12px;">
             <button class="btn btn-primary" style="flex:1" onclick="addShop()">ثبت</button>
             <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
@@ -1220,22 +1047,27 @@
     </div>
 </div>
 
+<!-- Alloc Modal (Modified Instruction 1) -->
 <div id="allocModal" class="modal">
     <div class="modal-content">
         <h3>اختصاص بودجه</h3>
         <p style="font-size:0.9rem; color:var(--text-sec);">انتخاب کنید هزینه از کدام ردیف بودجه کسر شود:</p>
         <input type="hidden" id="allocType">
         <input type="hidden" id="allocId">
-
         <label>ردیف بودجه:</label>
         <select id="allocBudgetSelect"></select>
         
+        <!-- Instruction 1: Display Available Balance -->
+        <div id="allocInfo" class="alloc-info-box" style="display:none;">
+             <span>موجودی این ردیف:</span>
+             <b id="allocLimitDisplay" style="direction:ltr">0</b>
+        </div>
+
         <label>مبلغ اختصاصی:</label>
         <div class="money-input-wrapper">
             <input type="text" id="allocAmt" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
             <span class="money-unit currency-text">تومان</span>
         </div>
-        
         <div style="margin-top:25px; display:flex; gap:12px;">
             <button class="btn btn-primary" style="flex:1" onclick="performAllocation()">ثبت کسری</button>
             <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
@@ -1273,8 +1105,6 @@
 <div id="prioritySettingsModal" class="modal">
     <div class="modal-content">
         <h3>مدیریت اولویت‌ها</h3>
-        <p style="font-size:0.8rem; color:var(--text-sec); margin-bottom:15px;">اولویت ۱ (بسیار مهم) تا ۴ (کم‌اهمیت). در اصلاح خودکار، از اولویت‌های پایین‌تر کسر می‌شود.</p>
-        
         <div style="display:flex; gap:10px; margin-bottom:20px; background:#f1f5f9; padding:15px; border-radius:15px;">
             <div style="flex:1">
                 <small style="display:block; margin-bottom:5px;">بازه کم (تا %)</small>
@@ -1310,8 +1140,39 @@
     </div>
 </div>
 
+<!-- Print Area (Modified Instruction 4) -->
+<div id="printArea">
+    <div class="print-header">
+        <h1>گزارش جامع وضعیت مالی</h1>
+        <p id="printDate">تاریخ: ---</p>
+        <p>کاربر: <span id="printUser">---</span> | روزهای سپری شده: <span id="printDays">0</span></p>
+    </div>
+    <div class="print-summary">
+        <div>کل دارایی: <b id="printInc">0</b></div>
+        <div>کل بدهی: <b id="printDebt">0</b></div>
+        <div>خالص قابل خرج: <b id="printNet">0</b></div>
+    </div>
+    <div class="print-section-title">نمودار پیشرفت مالی (روزانه)</div>
+    <div class="print-chart-container">
+        <canvas id="printChart"></canvas>
+    </div>
+    <div class="print-section-title">تاریخچه روزانه اخیر</div>
+    <table class="print-table" style="font-size:0.8rem;">
+        <thead><tr><th>تاریخ</th><th>خالص (تومان)</th><th>هزینه شده</th></tr></thead>
+        <tbody id="printHistoryTable"></tbody>
+    </table>
+    <div class="print-section-title">جزئیات بودجه‌بندی</div>
+    <table class="print-table">
+        <thead><tr><th>ردیف</th><th>درصد</th><th>سهم (تومان)</th><th>خرج شده</th><th>مانده</th></tr></thead>
+        <tbody id="printBody"></tbody>
+    </table>
+    <div class="print-section-title">وضعیت بدهی‌ها</div>
+    <div id="printDebtsList" style="margin-top:5px; font-size:0.9rem;"></div>
+    <div class="print-section-title">وضعیت اهداف مالی</div>
+    <div id="printGoalsList" style="margin-top:5px; font-size:0.9rem;"></div>
+</div>
+
 <script>
-    // --- STATE & DATA ---
     const defaultState = {
         security: { hasPin: false, pin: "", isSetup: false, questionId: 0, answer: "", nationalId: "" },
         user: { name: "", theme: "light", currency: "toman", startDate: Date.now() },
@@ -1338,8 +1199,8 @@
         },
         priorityRanges: { low: 40, mid: 70 }, 
         distributedAmount: 0, 
-        goals: [], // {name, target, curr, autoType, autoVal, autoLimit}
-        shopping: [], // {name, price, autoType, autoVal, autoLimit}
+        goals: [],
+        shopping: [],
         history: [], 
         dailyLogs: [],
         sectionHistory: { dashboard: [], budget: [], tools: [] }
@@ -1358,74 +1219,56 @@
     let rate = 1; 
     let tempBudget = null; 
     let isGuestMode = false;
+    let tempSubIndex = -1;
+    let universalCallback = null;
 
-    // --- TOAST NOTIFICATION SYSTEM ---
     function showToast(message, icon="check-circle") {
         const container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
         toast.className = 'toast';
         toast.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
         container.appendChild(toast);
-        
-        requestAnimationFrame(() => {
-            toast.classList.add('show');
-        });
-        
+        requestAnimationFrame(() => toast.classList.add('show'));
         setTimeout(() => {
             toast.classList.remove('show');
             setTimeout(() => toast.remove(), 400);
         }, 3000);
     }
 
-    // --- STARTUP ---
-    window.onload = () => {
-        loadData();
-        checkAuth();
-        setupDatePickers();
-    };
+    window.onload = () => { loadData(); checkAuth(); setupDatePickers(); };
 
     function processDailyLog() {
         if(isGuestMode) return;
         const today = new Date().toLocaleDateString('fa-IR');
         if(!app.dailyLogs) app.dailyLogs = [];
-        
         const lastLog = app.dailyLogs.length > 0 ? app.dailyLogs[app.dailyLogs.length-1] : null;
-        
         if (!lastLog || lastLog.date !== today) {
             const income = app.wallets.reduce((a,b)=>a+b.value,0);
             const totalDebt = app.debts.reduce((a,b)=>a+b.value,0) + (app.checks || []).reduce((a,b)=>a+b.value,0);
             const net = income - totalDebt;
             const spent = app.budgets.reduce((a,b)=>a+b.spent,0);
-            
             app.dailyLogs.push({ date: today, net: net, spent: spent, timestamp: Date.now() });
             saveData();
         }
     }
 
-    // --- DATE PICKER SETUP ---
     function setupDatePickers() { }
-
     function createDatePickerHTML(prefix, defaultD=1, defaultM=1, defaultY=1403) {
-        return `
-            <select id="${prefix}Day" class="date-sel">${genOpts(1,31, defaultD)}</select>
-            <select id="${prefix}Month" class="date-sel">${genOpts(1,12, defaultM)}</select>
-            <select id="${prefix}Year" class="date-sel">${genYearOpts(defaultY)}</select>
-        `;
+        return `<select id="${prefix}Day" class="date-sel">${genOpts(1,31, defaultD)}</select>
+                <select id="${prefix}Month" class="date-sel">${genOpts(1,12, defaultM)}</select>
+                <select id="${prefix}Year" class="date-sel">${genYearOpts(defaultY)}</select>`;
     }
-
     function genOpts(min, max, sel) {
         let html = '';
         for(let i=min; i<=max; i++) html += `<option value="${i}" ${i==sel?'selected':''}>${i}</option>`;
         return html;
     }
-    
     function genYearOpts(sel) {
         const currentYear = 1403;
         let html = '';
         for(let i=0; i<=20; i++) html += `<option value="${currentYear+i}" ${(currentYear+i)==sel?'selected':''}>${currentYear+i}</option>`;
         return html;
     }
-
     function getDateString(prefix) {
         const d = document.getElementById(prefix+'Day').value;
         const m = document.getElementById(prefix+'Month').value;
@@ -1433,7 +1276,6 @@
         return `${y}/${m}/${d}`;
     }
 
-    // --- AUTH & LOCK SCREEN ---
     function checkAuth() {
         const modal = document.getElementById('authModal');
         const step1 = document.getElementById('authStep1');
@@ -1455,11 +1297,9 @@
             actions.style.display = 'block';
             forgotDiv.style.display = 'none';
             app.security.isSetup = false;
-
             const randIdx = Math.floor(Math.random() * securityQuestions.length);
             document.getElementById('setupSecurityQ').innerText = securityQuestions[randIdx];
             document.getElementById('setupSecurityQ').setAttribute('data-qid', randIdx);
-
         } else {
             title.innerText = app.user.name || "خوش آمدید";
             sub.innerText = "جهت ورود رمز خود را وارد کنید";
@@ -1474,14 +1314,11 @@
         const name = document.getElementById('setupNameInput').value.trim();
         const natId = document.getElementById('setupNatId').value.trim();
         const ans = document.getElementById('setupSecurityA').value.trim();
-
         if(!name || !natId || !ans) return alert("لطفا تمام فیلدها را پر کنید.");
-
         app.user.name = name;
         app.security.nationalId = natId;
         app.security.answer = ans;
         app.security.questionId = parseInt(document.getElementById('setupSecurityQ').getAttribute('data-qid'));
-        
         document.getElementById('authStep1').style.display = 'none';
         document.getElementById('authStep2').style.display = 'flex';
         document.getElementById('authTitle').innerText = "تعیین رمز عبور";
@@ -1505,7 +1342,6 @@
         updatePinDots();
         if (pinBuffer.length === 4) setTimeout(processPin, 100);
     }
-
     function updatePinDots() {
         for(let i=1; i<=4; i++) {
             const dot = document.getElementById(`pd${i}`);
@@ -1513,7 +1349,6 @@
             else dot.classList.remove('filled');
         }
     }
-
     function processPin() {
         if (!app.security.hasPin) {
             if(confirm("رمز شما: " + pinBuffer + "\nآیا این رمز تایید است؟")) {
@@ -1522,13 +1357,10 @@
                 app.security.isSetup = true;
                 if(!app.user.startDate) app.user.startDate = Date.now();
                 saveData(); 
-                
                 document.getElementById('authModal').style.display = 'none';
                 document.getElementById('appContent').style.display = 'block';
                 renderUI();
-            } else {
-                pinBuffer = ""; updatePinDots();
-            }
+            } else { pinBuffer = ""; updatePinDots(); }
         } else {
             if (pinBuffer === app.security.pin) {
                 document.getElementById('authModal').style.display = 'none';
@@ -1536,10 +1368,7 @@
                 processDailyLog(); 
                 updateDate();
                 renderUI();
-            } else {
-                showToast("رمز اشتباه است!", "times-circle");
-                pinBuffer = ""; updatePinDots();
-            }
+            } else { showToast("رمز اشتباه است!", "times-circle"); pinBuffer = ""; updatePinDots(); }
         }
     }
 
@@ -1550,11 +1379,9 @@
         document.getElementById('recoveryAnswerInput').value = '';
         openModal('recoveryModal');
     }
-
     function checkRecoveryAnswer() {
         const uNat = document.getElementById('recNatId').value.trim();
         const uAns = document.getElementById('recoveryAnswerInput').value.trim();
-        
         if(uNat === app.security.nationalId && uAns === app.security.answer) {
             alert("اطلاعات صحیح است. لطفا رمز جدید تعریف کنید.");
             app.security.hasPin = false;
@@ -1562,9 +1389,7 @@
             app.security.isSetup = true;
             saveData();
             location.reload();
-        } else {
-            alert("اطلاعات وارد شده اشتباه است.");
-        }
+        } else { alert("اطلاعات وارد شده اشتباه است."); }
     }
 
     function changePin() {
@@ -1576,13 +1401,45 @@
         }
     }
 
-    function changeUserName() {
-        const newName = prompt("نام جدید خود را وارد کنید:", app.user.name);
-        if(newName && newName.trim() !== "") {
-            app.user.name = newName;
-            saveData();
-            renderUI();
+    // --- REPLACING PROMPTS WITH MODERN INPUT ---
+    function openUniversalInput(title, label, isMoney, callback) {
+        document.getElementById('uInputTitle').innerText = title;
+        document.getElementById('uInputLabel').innerText = label;
+        const txtWrap = document.getElementById('uInputTextWrapper');
+        const monWrap = document.getElementById('uInputMoneyWrapper');
+        document.getElementById('uInputText').value = '';
+        document.getElementById('uInputMoney').value = '';
+
+        if(isMoney) {
+            txtWrap.style.display = 'none';
+            monWrap.style.display = 'block';
+        } else {
+            txtWrap.style.display = 'block';
+            monWrap.style.display = 'none';
         }
+        universalCallback = callback;
+        openModal('universalInputModal');
+    }
+
+    function submitUniversalInput() {
+        const txtWrap = document.getElementById('uInputTextWrapper');
+        let val;
+        if(txtWrap.style.display === 'none') {
+             val = parseFormatted(document.getElementById('uInputMoney').value);
+        } else {
+             val = document.getElementById('uInputText').value;
+        }
+        if(universalCallback) universalCallback(val);
+        closeAllModals();
+    }
+
+    function changeUserName() {
+        openUniversalInput('تغییر نام', 'نام جدید را وارد کنید:', false, (val) => {
+            if(val && val.trim() !== "") {
+                app.user.name = val;
+                saveData(); renderUI();
+            }
+        });
     }
 
     // --- FORMATTING HELPERS ---
@@ -1591,16 +1448,12 @@
         if (!val) { input.value = ''; return; }
         input.value = Number(val).toLocaleString('en-US');
     }
-
     function parseFormatted(val) {
         if(!val) return 0;
         if(typeof val === 'number') return val;
         return parseInt(val.replace(/,/g, ''));
     }
-
-    function format(n) { 
-        return (n * rate).toLocaleString('en-US'); 
-    }
+    function format(n) { return (n * rate).toLocaleString('en-US'); }
 
     // --- HISTORY SYSTEM ---
     function saveSectionSnap(section) {
@@ -1613,57 +1466,34 @@
         } else if(section === 'tools') {
             snap = JSON.stringify({ goals: app.goals, shopping: app.shopping });
         }
-        
         if(!app.sectionHistory[section]) app.sectionHistory[section] = [];
-        app.sectionHistory[section].unshift({
-            time: new Date().toLocaleTimeString('fa-IR'),
-            data: snap
-        });
-        
+        app.sectionHistory[section].unshift({ time: new Date().toLocaleTimeString('fa-IR'), data: snap });
         if(app.sectionHistory[section].length > 10) app.sectionHistory[section].pop();
         saveData();
     }
-
     function showSectionHistory(section) {
         const list = document.getElementById('sectionHistoryList');
         const hist = app.sectionHistory[section] || [];
-        
-        if(hist.length === 0) {
-            list.innerHTML = "<p style='text-align:center'>سابقه‌ای موجود نیست.</p>";
-        } else {
+        if(hist.length === 0) { list.innerHTML = "<p style='text-align:center'>سابقه‌ای موجود نیست.</p>"; } 
+        else {
             list.innerHTML = hist.map((h, i) => `
                 <div style="padding:12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="restoreSectionSnap('${section}', ${i})">
-                    <span>تغییر در ساعت ${h.time}</span>
-                    <i class="fas fa-undo" style="color:var(--primary)"></i>
-                </div>
-            `).join('');
+                    <span>تغییر در ساعت ${h.time}</span><i class="fas fa-undo" style="color:var(--primary)"></i>
+                </div>`).join('');
         }
         openModal('sectionHistoryModal');
     }
-
     function restoreSectionSnap(section, index) {
         if(!confirm("آیا مطمئن هستید؟")) return;
-        
         const snap = JSON.parse(app.sectionHistory[section][index].data);
-        
         if(section === 'dashboard') {
-            app.wallets = snap.wallets;
-            app.debts = snap.debts;
-            app.checks = snap.checks;
-            app.loans = snap.loans;
+            app.wallets = snap.wallets; app.debts = snap.debts; app.checks = snap.checks; app.loans = snap.loans;
         } else if(section === 'budget') {
-            app.budgets = snap.budgets;
-            app.priorities = snap.priorities;
-            app.distributedAmount = snap.distributedAmount || 0;
+            app.budgets = snap.budgets; app.priorities = snap.priorities; app.distributedAmount = snap.distributedAmount || 0;
         } else if(section === 'tools') {
-            app.goals = snap.goals;
-            app.shopping = snap.shopping;
+            app.goals = snap.goals; app.shopping = snap.shopping;
         }
-        
-        saveData();
-        renderUI();
-        closeAllModals();
-        showToast("بازیابی شد");
+        saveData(); renderUI(); closeAllModals(); showToast("بازیابی شد");
     }
 
     // --- CORE UI RENDER ---
@@ -1671,7 +1501,6 @@
         applyTheme();
         rate = app.user.currency === 'rial' ? 10 : 1;
         const curName = app.user.currency === 'toman' ? 'تومان' : 'ریال';
-        
         document.getElementById('currBtnText').innerText = curName;
         document.getElementById('cardCurrency').innerText = curName;
         document.querySelectorAll('.currency-text').forEach(el => el.innerText = curName);
@@ -1686,7 +1515,6 @@
         const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
         const checkDebt = (app.checks || []).reduce((a,b)=>a+b.value,0);
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
-        
         const totalDebt = fixedDebt + checkDebt;
         const net = income - totalDebt - manualDeductions;
 
@@ -1694,7 +1522,6 @@
         document.getElementById('totalDebtDisplay').innerText = format(totalDebt);
         document.getElementById('userNameDisplay').innerText = app.user.name;
 
-        // Populate Date Pickers
         document.getElementById('dDay').innerHTML = genOpts(1,31,1);
         document.getElementById('checkDateRow').innerHTML = createDatePickerHTML('c');
         document.getElementById('loanDateRow').innerHTML = createDatePickerHTML('l');
@@ -1708,7 +1535,6 @@
         renderShop();
     }
 
-    // --- RENDER FUNCTIONS ---
     function renderWallets() {
         const div = document.getElementById('walletList');
         div.innerHTML = app.wallets.map((w, i) => `
@@ -1721,8 +1547,7 @@
                         <button class="btn-small-icon btn-del" onclick="delWallet(${i})"><i class="fas fa-trash"></i></button>
                     </span>
                 </div>
-            </div>
-        `).join('');
+            </div>`).join('');
     }
 
     function renderDebts() {
@@ -1737,8 +1562,7 @@
                         <button class="btn-small-icon btn-del" onclick="delDebt(${i})"><i class="fas fa-trash"></i></button>
                     </span>
                 </div>
-            </div>
-        `).join('');
+            </div>`).join('');
     }
 
     function renderChecks() {
@@ -1754,8 +1578,7 @@
                         <button class="btn-small-icon btn-del" onclick="delCheck(${i})"><i class="fas fa-trash"></i></button>
                     </span>
                 </div>
-            </div>
-        `).join('');
+            </div>`).join('');
     }
 
     function renderLoans() {
@@ -1771,8 +1594,7 @@
                         <button class="btn-small-icon btn-del" onclick="delLoan(${i})"><i class="fas fa-trash"></i></button>
                     </span>
                 </div>
-            </div>
-        `).join('');
+            </div>`).join('');
     }
 
     function renderBudgets(net) {
@@ -1794,12 +1616,12 @@
         
         let totalP = 0;
         app.budgets.forEach(b => totalP += b.percent);
-        
         const badge = document.getElementById('totalPercentBadge');
         badge.innerText = totalP + '%';
         badge.style.background = totalP > 100 ? 'var(--danger)' : (totalP === 100 ? 'var(--success)' : 'var(--text-sec)');
 
         const baseAmount = app.distributedAmount;
+        const colors = ['#f87171', '#fbbf24', '#34d399', '#60a5fa', '#818cf8'];
 
         app.budgets.forEach((b, i) => {
             const shareFromPercent = Math.round((baseAmount * b.percent) / 100);
@@ -1810,10 +1632,27 @@
             let status = 'stat-green';
             if(percent > 50) status = 'stat-yellow';
             if(percent > 90) status = 'stat-red';
-            
             const pausedClass = b.isPaused ? 'paused' : '';
 
-            // دستور ۷: زیرمجموعه‌ها
+            // Sub-budget Visualization (Modified)
+            let subBars = "";
+            let subLegend = "";
+            if(b.subs && b.subs.length > 0) {
+                let subHtml = "";
+                let legHtml = "";
+                b.subs.forEach((s, idx) => {
+                    const c = colors[idx % colors.length];
+                    // Calculate visual percent based on totalShare
+                    const visualPercent = totalShare > 0 ? (s.amount / totalShare) * 100 : 0;
+                    if(s.amount > 0) {
+                         subHtml += `<div class="sub-budget-seg" style="width:${visualPercent}%; background:${c};" title="${s.name} (${format(s.amount)})"></div>`;
+                         legHtml += `<div class="sub-legend-item"><div class="sub-dot" style="background:${c}"></div> ${s.name}: ${format(s.amount)}</div>`;
+                    }
+                });
+                subBars = `<div class="sub-budget-bar">${subHtml}</div>`;
+                subLegend = `<div class="sub-budget-legend">${legHtml}</div>`;
+            }
+
             div.innerHTML += `
                 <div class="bento-item ${status} ${pausedClass}">
                     <div class="bento-header">
@@ -1828,6 +1667,8 @@
                         <span style="color:var(--danger)">خرج: ${format(b.spent)}</span>
                     </div>
                     <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(percent,100)}%"></div></div>
+                    ${subBars}
+                    ${subLegend}
                     <div style="text-align:left; font-weight:800; font-size:1.4rem; color:var(--primary); direction:ltr; letter-spacing:1px; margin: 5px 0;">
                         ${format(remain)}
                     </div>
@@ -1836,7 +1677,7 @@
                         <button class="action-chip action-btn-copy" onclick="copyTxt(${remain})"><i class="fas fa-copy"></i> کپی</button>
                         <button class="action-chip action-btn-add" onclick="injectBudget(${i})"><i class="fas fa-plus-circle"></i> واریز</button>
                         <button class="action-chip action-btn-pause" onclick="togglePause(${i})">${b.isPaused ? '<i class="fas fa-play"></i> فعال' : '<i class="fas fa-pause"></i> توقف'}</button>
-                        <button class="action-chip action-btn-subs" onclick="manageSubs(${i})"><i class="fas fa-sitemap"></i> زیرمجموعه‌ها</button>
+                        <button class="action-chip action-btn-sub" onclick="openSubBudgetManager(${i})"><i class="fas fa-layer-group"></i> مدیریت زیرمجموعه</button>
                     </div>
                 </div>
             `;
@@ -1849,239 +1690,112 @@
         const checkDebt = (app.checks || []).reduce((a,b)=>a+b.value,0);
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
         const totalDebt = fixedDebt + checkDebt;
-        let net = income - totalDebt - manualDeductions;
-
-        // دستور ۴ و ۶: پردازش برداشت خودکار برای اهداف و خرید
-        let autoDeducted = 0;
-        let logAuto = [];
-
-        // Check Goals
-        app.goals.forEach(g => {
-            if(g.autoType && g.autoType !== 'none' && g.autoVal) {
-                // Check limit
-                if(!g.autoLimit || net >= g.autoLimit) {
-                    let deduct = 0;
-                    if(g.autoType === 'percent') deduct = Math.round((net * g.autoVal) / 100);
-                    else if(g.autoType === 'fixed') deduct = g.autoVal;
-                    
-                    if(deduct > 0) {
-                        g.curr += deduct;
-                        autoDeducted += deduct;
-                        logAuto.push(`واریز خودکار به هدف ${g.name}: ${format(deduct)}`);
-                    }
-                }
-            }
-        });
-
-        // Check Shopping
-        app.shopping.forEach(s => {
-            // در اینجا چون قیمت خرید معمولا کل کالاست، شاید منطقی نباشد کم شود، 
-            // اما طبق دستور عمل می کنیم که قابلیت مشابه دارد. 
-            // فرض می کنیم اگر نوع برداشت دارد، یعنی پولی برایش کنار گذاشته شود.
-            // اما چون "شاپینگ لیست" موجودی ندارد، ما فقط از توزیع کم میکنیم؟ 
-            // برای سادگی و جلوگیری از باگ، فقط اگر هدف (Goal) باشد پول ذخیره می‌شود. 
-            // برای شاپینگ، چون مکانی برای ذخیره پول نیست، از این قابلیت صرف نظر میکنیم 
-            // یا باید شاپینگ هم دارای "Money Saved" باشد.
-            // *تصمیم:* شاپینگ فقط لیست است. اما طبق دستور ۶ باید قابلیت داشته باشد.
-            // پس اگر شاپینگ پول بگیرد، یعنی عملا تبدیل به هدف شده؟ 
-            // بهتر است این قابلیت فقط روی Goals باشد که فیلد curr دارند. 
-            // اما چون دستور صریح است، اگر برای شاپینگ فعال باشد، مبلغ کسر شده و به عنوان یک "هدف موقت" 
-            // یا مستقیم به "خرج شده" نمیتواند برود.
-            // بنابراین: اگر برای شاپینگ فعال شد، یک هدف همنام می‌سازیم و پول را آنجا می‌ریزیم 
-            // یا صرفا از بودجه کل کسر می‌کنیم تا کاربر بداند؟
-            // بهترین راه: نادیده گرفتن شاپینگ در این نسخه چون منطق دیتابیس ندارد، یا تبدیل آن به Goal.
-            // *راه حل:* فیلد curr به شاپینگ هم اضافه می‌کنیم تا باگ نخورد.
-            if(!s.curr) s.curr = 0; 
-            
-            if(s.autoType && s.autoType !== 'none' && s.autoVal) {
-                if(!s.autoLimit || net >= s.autoLimit) {
-                    let deduct = 0;
-                    if(s.autoType === 'percent') deduct = Math.round((net * s.autoVal) / 100);
-                    else if(s.autoType === 'fixed') deduct = s.autoVal;
-                    
-                    if(deduct > 0) {
-                        s.curr += deduct; // فیلد جدید
-                        autoDeducted += deduct;
-                        logAuto.push(`پس‌انداز خودکار برای خرید ${s.name}: ${format(deduct)}`);
-                    }
-                }
-            }
-        });
-
-        net -= autoDeducted;
-        if(net < 0) net = 0; // جلوگیری از منفی شدن
+        const net = income - totalDebt - manualDeductions;
+        const previousAmount = app.distributedAmount;
+        
+        // Auto Allocation Logic
+        if(net > previousAmount) {
+             const addedAmount = net - previousAmount;
+             processAutoTransfer(addedAmount, net);
+        }
 
         app.distributedAmount = net;
         saveData();
         renderUI();
-        
-        if(autoDeducted > 0) {
-            alert("برداشت‌های خودکار انجام شد:\n" + logAuto.join("\n"));
-        } else {
-            showToast("بودجه توزیع شد");
-        }
+        showToast("بودجه توزیع شد");
     }
 
-    // جایگزین Prompt برای واریز
+    function processAutoTransfer(addedAmount, currentNet) {
+        let totalDeducted = 0;
+        app.goals.forEach(g => {
+            if(g.autoConfig && g.autoConfig.type !== 'none') {
+                const conf = g.autoConfig;
+                let sourceBalance = 0;
+                let sourceObj = null;
+                if(conf.sourceId === 'main') {
+                    sourceBalance = currentNet; 
+                } else {
+                    sourceObj = app.budgets.find(b => b.id == conf.sourceId);
+                    if(sourceObj) {
+                        const baseShare = Math.round((currentNet * sourceObj.percent) / 100);
+                        sourceBalance = baseShare + (sourceObj.manualAdd || 0) - sourceObj.spent;
+                    }
+                }
+
+                if(sourceBalance >= (conf.minThreshold || 0)) {
+                    let amountToTransfer = 0;
+                    if(conf.type === 'percent') {
+                         amountToTransfer = Math.round((addedAmount * conf.percent) / 100);
+                    } else if(conf.type === 'fixed') {
+                        amountToTransfer = conf.amount;
+                    }
+
+                    if(amountToTransfer > 0) {
+                        g.curr += amountToTransfer;
+                        if (sourceObj) {
+                             sourceObj.spent += amountToTransfer;
+                             addToHistory(app.budgets.indexOf(sourceObj), amountToTransfer, "برداشت خودکار: " + g.name);
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     function injectBudget(index) {
-        document.getElementById('depositIndex').value = index;
-        document.getElementById('depositVal').value = '';
-        openModal('depositModal');
-    }
-    
-    function performDeposit() {
-        const index = document.getElementById('depositIndex').value;
-        const amt = parseFormatted(document.getElementById('depositVal').value);
-        
-        if(amt && !isNaN(amt)) {
-            saveSectionSnap('budget');
-            if(!app.budgets[index].manualAdd) app.budgets[index].manualAdd = 0;
-            app.budgets[index].manualAdd += amt;
-            app.distributedAmount -= amt;
-            saveData();
-            renderUI();
-            closeAllModals();
-            showToast("واریز شد");
-        }
+        openUniversalInput('واریز مستقیم', 'مبلغ واریزی مستقیم به این آیتم:', true, (val) => {
+             if(val && !isNaN(val)) {
+                saveSectionSnap('budget');
+                if(!app.budgets[index].manualAdd) app.budgets[index].manualAdd = 0;
+                app.budgets[index].manualAdd += val;
+                app.distributedAmount -= val;
+                saveData(); renderUI(); showToast("واریز شد");
+             }
+        });
     }
 
-    // جایگزین Prompt برای توقف
     function togglePause(index) {
+        saveSectionSnap('budget');
         const b = app.budgets[index];
         if(b.isPaused) {
-            document.getElementById('pauseIndex').value = index;
-            document.getElementById('pauseNewPercent').value = '';
-            openModal('pauseModal');
+            let restore = confirm(`آیا درصد قبلی (${b.savedPercent}%) اعمال شود؟\nتایید = بله\nلغو = خیر (وارد کردن درصد جدید)`);
+            b.isPaused = false;
+            if(restore) {
+                b.percent = b.savedPercent;
+                saveData(); renderUI();
+            } else {
+                openUniversalInput('درصد جدید', 'درصد جدید را وارد کنید:', false, (val) => {
+                    b.percent = parseInt(val) || 0;
+                    saveData(); renderUI();
+                });
+            }
         } else {
-            saveSectionSnap('budget');
             b.savedPercent = b.percent;
             b.percent = 0;
             b.isPaused = true;
-            saveData();
-            renderUI();
+            saveData(); renderUI();
             showToast("آیتم متوقف شد");
         }
     }
-    
-    function performPause(restore) {
-        const index = document.getElementById('pauseIndex').value;
-        const b = app.budgets[index];
-        saveSectionSnap('budget');
-        b.isPaused = false;
-        
-        if(restore) {
-            b.percent = b.savedPercent;
-        } else {
-            const newP = parseInt(document.getElementById('pauseNewPercent').value);
-            b.percent = isNaN(newP) ? 0 : newP;
-        }
-        
-        saveData();
-        renderUI();
-        closeAllModals();
-    }
 
-    // --- Sub-Budget Logic (Instruction 7) ---
-    function manageSubs(index) {
-        const b = app.budgets[index];
-        if(!b.subs) b.subs = [];
-        
-        document.getElementById('subBudgetName').innerText = `زیرمجموعه‌های: ${b.name}`;
-        document.getElementById('subParentIndex').value = index;
-        
-        renderSubList(index);
-        openModal('subBudgetModal');
+    // --- GOALS & AUTO ALLOC ---
+    function addGoal() {
+        const n = document.getElementById('gName').value;
+        const t = parseFormatted(document.getElementById('gTarget').value);
+        if(n && !isNaN(t)) { saveSectionSnap('tools'); app.goals.push({name:n, target:t, curr:0, autoConfig:{type:'none'}}); saveData(); renderUI(); closeAllModals(); }
     }
     
-    function renderSubList(pIndex) {
-        const b = app.budgets[pIndex];
-        const list = document.getElementById('subList');
-        
-        if(b.subs.length === 0) {
-            list.innerHTML = '<p style="text-align:center; color:#999;">هنوز زیرمجموعه‌ای تعریف نشده است.</p>';
-            return;
-        }
-        
-        // محاسبه مبلغ کل این بودجه
-        const baseAmount = app.distributedAmount;
-        const parentShare = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
-        
-        list.innerHTML = b.subs.map((sub, i) => {
-            const subShare = Math.round((parentShare * sub.percent) / 100);
-            return `
-            <div style="background:rgba(0,0,0,0.03); padding:10px; border-radius:10px; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between;">
-                <div>
-                    <div style="font-weight:bold;">${sub.name} ${sub.locked ? '<i class="fas fa-lock" style="font-size:0.7rem;"></i>' : ''}</div>
-                    <div style="font-size:0.8rem; color:var(--text-sec);">${sub.percent}% | ${format(subShare)} تومان</div>
-                </div>
-                <div style="display:flex; gap:5px;">
-                     <button class="btn-small-icon" onclick="toggleSubLock(${pIndex}, ${i})" style="color:${sub.locked?'var(--danger)':'var(--text-sec)'}">
-                        <i class="fas ${sub.locked ? 'fa-lock' : 'fa-lock-open'}"></i>
-                     </button>
-                     <button class="btn-small-icon btn-del" onclick="delSub(${pIndex}, ${i})"><i class="fas fa-trash"></i></button>
-                </div>
-            </div>
-            `;
-        }).join('');
-    }
-    
-    function addSubBudget() {
-        const pIndex = document.getElementById('subParentIndex').value;
-        const name = document.getElementById('newSubName').value;
-        const percent = parseInt(document.getElementById('newSubPercent').value);
-        
-        if(name && !isNaN(percent)) {
-            const b = app.budgets[pIndex];
-            if(!b.subs) b.subs = [];
-            
-            // Validate percent
-            let currentTotal = b.subs.reduce((a,x) => a + x.percent, 0);
-            if(currentTotal + percent > 100) {
-                alert("مجموع درصدها از ۱۰۰ بیشتر می‌شود.");
-                return;
-            }
-            
-            b.subs.push({ name: name, percent: percent, locked: false });
-            
-            // Auto balance remaining if needed? For now just add.
-            // Logic improvement: If others are unlocked, maybe distribute remaining?
-            // Simple logic: Just add.
-            
-            saveData();
-            renderSubList(pIndex);
-            document.getElementById('newSubName').value = '';
-            document.getElementById('newSubPercent').value = '';
-        }
-    }
-    
-    function toggleSubLock(pIndex, sIndex) {
-        app.budgets[pIndex].subs[sIndex].locked = !app.budgets[pIndex].subs[sIndex].locked;
-        saveData();
-        renderSubList(pIndex);
-    }
-    
-    function delSub(pIndex, sIndex) {
-        if(confirm("حذف؟")) {
-            app.budgets[pIndex].subs.splice(sIndex, 1);
-            saveData();
-            renderSubList(pIndex);
-        }
-    }
-
     function renderGoals() {
         const div = document.getElementById('goalList');
         div.innerHTML = app.goals.map((g, i) => {
             const p = Math.min(100, Math.round((g.curr / g.target)*100));
-            // نمایش وضعیت اتوماتیک
-            const autoBadge = (g.autoType && g.autoType !== 'none') 
-                ? `<span style="font-size:0.7rem; background:#e0e7ff; color:var(--primary); padding:2px 6px; border-radius:4px; margin-right:5px;">خودکار</span>` 
-                : '';
-            
+            const autoBadge = g.autoConfig && g.autoConfig.type !== 'none' ? '<i class="fas fa-robot" style="color:var(--primary)" title="برداشت خودکار فعال"></i>' : '';
             return `
                 <div style="padding:15px; border-bottom:1px solid #eee;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                          <b style="font-size:1.05rem;">${g.name} ${autoBadge}</b> 
                          <span style="font-size:0.9rem;">
+                            <button class="btn-small-icon btn-settings" onclick="openAutoAlloc('goal', ${i})"><i class="fas fa-cog"></i></button>
                             <button class="btn-small-icon btn-edit" onclick="openEdit('goal', ${i})"><i class="fas fa-edit"></i></button>
                             ${format(g.curr)} / ${format(g.target)}
                          </span>
@@ -2097,32 +1811,169 @@
         }).join('');
     }
 
+    function addGoalMoneyDirect(i) {
+        openUniversalInput('واریز مستقیم به هدف', 'مبلغ را وارد کنید:', true, (val) => {
+            if(val) { saveSectionSnap('tools'); app.goals[i].curr += parseInt(val); saveData(); renderUI(); }
+        });
+    }
+    function delGoal(i) { saveSectionSnap('tools'); app.goals.splice(i,1); saveData(); renderUI(); }
+
+    function addShop() {
+        const n = document.getElementById('sName').value;
+        const p = parseFormatted(document.getElementById('sPrice').value);
+        if(n) { saveSectionSnap('tools'); app.shopping.push({name:n, price: p || 0, autoConfig:{type:'none'}}); saveData(); renderUI(); closeAllModals(); }
+    }
     function renderShop() {
         const div = document.getElementById('shopList');
         div.innerHTML = app.shopping.map((s, i) => {
-            // Check if saved money exists
-            const saved = s.curr && s.curr > 0 ? `<span style="color:var(--success); font-size:0.8rem; margin-right:5px;">(پس‌انداز: ${format(s.curr)})</span>` : '';
-             const autoBadge = (s.autoType && s.autoType !== 'none') 
-                ? `<span style="font-size:0.7rem; background:#e0e7ff; color:var(--primary); padding:2px 6px; border-radius:4px; margin-right:5px;">خودکار</span>` 
-                : '';
-
+            const autoBadge = s.autoConfig && s.autoConfig.type !== 'none' ? '<i class="fas fa-robot" style="color:var(--primary)"></i>' : '';
             return `
             <div style="display:flex; justify-content:space-between; padding:15px; border-bottom:1px solid #eee; align-items:center; flex-wrap:wrap;">
                 <div style="flex:1;">
                     <span style="font-weight:bold; font-size:1.05rem;">${s.name} ${autoBadge}</span>
-                    ${s.price ? `<span style="font-size:0.9rem; color:var(--text-sec); display:block; margin-top:3px;">~${format(s.price)} ${saved}</span>` : ''}
+                    ${s.price ? `<span style="font-size:0.9rem; color:var(--text-sec); display:block; margin-top:3px;">~${format(s.price)}</span>` : ''}
                 </div>
                 <div style="display:flex; gap:8px; align-items:center;">
-                    <button class="btn btn-primary" style="font-size:0.8rem;" onclick="openAllocate('shop', ${i})">خرید</button>
+                    <button class="btn btn-primary" style="font-size:0.8rem;" onclick="openAllocate('shop', ${i})">خرید با بودجه</button>
+                    <button class="btn-small-icon btn-settings" onclick="openAutoAlloc('shop', ${i})"><i class="fas fa-cog"></i></button>
                     <button class="btn-small-icon btn-edit" onclick="openEdit('shop', ${i})"><i class="fas fa-edit"></i></button>
                     <i class="fas fa-check-circle" style="cursor:pointer; font-size:1.4rem; color:var(--success);" onclick="delShop(${i})"></i>
                 </div>
-            </div>
-            `;
+            </div>`;
         }).join('');
     }
+    function delShop(i) { saveSectionSnap('tools'); app.shopping.splice(i,1); saveData(); renderUI(); }
 
-    // --- EDIT SYSTEM (Instruction 2 & 5: Prefill) ---
+    // --- AUTO ALLOC UI LOGIC ---
+    function openAutoAlloc(type, id) {
+        document.getElementById('autoAllocType').value = type;
+        document.getElementById('autoAllocId').value = id;
+        
+        const item = type === 'goal' ? app.goals[id] : app.shopping[id];
+        const conf = item.autoConfig || { type: 'none' };
+        
+        document.getElementById('aaType').value = conf.type || 'none';
+        document.getElementById('aaPercent').value = conf.percent || '';
+        document.getElementById('aaAmount').value = conf.amount || '';
+        formatCurrency(document.getElementById('aaAmount'));
+        document.getElementById('aaMin').value = conf.minThreshold || '';
+        formatCurrency(document.getElementById('aaMin'));
+
+        const sel = document.getElementById('aaSource');
+        sel.innerHTML = app.budgets.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+        if(conf.sourceId) sel.value = conf.sourceId;
+
+        toggleAutoAllocFields();
+        openModal('autoAllocModal');
+    }
+
+    function toggleAutoAllocFields() {
+        const t = document.getElementById('aaType').value;
+        document.getElementById('aaPercentField').style.display = t === 'percent' ? 'block' : 'none';
+        document.getElementById('aaAmountField').style.display = t === 'fixed' ? 'block' : 'none';
+    }
+
+    function saveAutoAlloc() {
+        const type = document.getElementById('autoAllocType').value;
+        const id = document.getElementById('autoAllocId').value;
+        const conf = {
+            type: document.getElementById('aaType').value,
+            percent: parseFloat(document.getElementById('aaPercent').value) || 0,
+            amount: parseFormatted(document.getElementById('aaAmount').value),
+            minThreshold: parseFormatted(document.getElementById('aaMin').value),
+            sourceId: document.getElementById('aaSource').value
+        };
+
+        if(type === 'goal') app.goals[id].autoConfig = conf;
+        else app.shopping[id].autoConfig = conf;
+        
+        saveData(); renderUI(); closeAllModals(); showToast("تنظیمات خودکار ذخیره شد");
+    }
+
+    // --- SUB-BUDGET LOGIC (Instruction 2 Corrected) ---
+    function openSubBudgetManager(i) {
+        tempSubIndex = i;
+        const b = app.budgets[i];
+        document.getElementById('subParentName').innerText = b.name;
+        renderSubBudgets(b);
+        openModal('subBudgetModal');
+    }
+
+    function renderSubBudgets(budget) {
+        if(!budget.subs) budget.subs = [];
+        
+        // Calculate Total Parent Budget (Percent Share + Manual Add)
+        const baseAmount = app.distributedAmount;
+        const share = Math.round((baseAmount * budget.percent) / 100) + (budget.manualAdd || 0);
+        const allocated = budget.subs.reduce((acc, s) => acc + (s.amount || 0), 0);
+        const remain = share - allocated;
+
+        document.getElementById('subTotalBudget').innerText = "بودجه کل: " + format(share);
+        document.getElementById('subRemainBudget').innerText = "آزاد: " + format(remain);
+        if(remain < 0) document.getElementById('subRemainBudget').style.color = 'var(--danger)';
+        else document.getElementById('subRemainBudget').style.color = 'var(--success)';
+
+        const div = document.getElementById('subBudgetList');
+        div.innerHTML = budget.subs.map((s, idx) => `
+            <div class="sub-budget-row">
+                <input type="text" value="${s.name}" class="sub-name" data-idx="${idx}" style="flex:2; margin:0; font-size:0.9rem; padding:10px;">
+                <div style="flex:2; position:relative;">
+                    <div class="money-input-wrapper" style="margin:0;">
+                         <input type="text" value="${s.amount ? s.amount.toLocaleString() : 0}" class="sub-amount-input" onkeyup="formatCurrency(this)" data-idx="${idx}" style="margin:0; text-align:center; padding:10px; font-size:0.95rem;">
+                    </div>
+                </div>
+                <button class="btn-small-icon btn-copy" onclick="copySub(${s.amount || 0})" title="کپی مبلغ"><i class="fas fa-copy"></i></button>
+                <i class="fas fa-times" style="cursor:pointer; color:var(--danger); font-size:1.2rem; margin-right:5px;" onclick="deleteSub(${idx})"></i>
+            </div>
+        `).join('');
+    }
+
+    function addNewSubCategory() {
+        if(tempSubIndex === -1) return;
+        app.budgets[tempSubIndex].subs.push({name: "جدید", amount: 0});
+        renderSubBudgets(app.budgets[tempSubIndex]);
+    }
+    
+    function deleteSub(idx) {
+        app.budgets[tempSubIndex].subs.splice(idx, 1);
+        renderSubBudgets(app.budgets[tempSubIndex]);
+    }
+
+    function copySub(amt) {
+        copyTxt(amt);
+    }
+
+    function saveSubBudgets() {
+        const budget = app.budgets[tempSubIndex];
+        const baseAmount = app.distributedAmount;
+        const share = Math.round((baseAmount * budget.percent) / 100) + (budget.manualAdd || 0);
+
+        const nameInputs = document.querySelectorAll('.sub-name');
+        const amtInputs = document.querySelectorAll('.sub-amount-input');
+        
+        let totalAllocated = 0;
+        let newSubs = [];
+
+        amtInputs.forEach((inp, i) => {
+            const val = parseFormatted(inp.value);
+            totalAllocated += val;
+            newSubs.push({
+                name: nameInputs[i].value,
+                amount: val
+            });
+        });
+
+        if(totalAllocated > share) {
+            alert("خطا: مجموع مبالغ زیرمجموعه (" + format(totalAllocated) + ") از بودجه کل این ردیف (" + format(share) + ") بیشتر است!");
+            return;
+        }
+
+        app.budgets[tempSubIndex].subs = newSubs;
+        saveData(); renderUI(); closeAllModals(); showToast("زیرمجموعه‌ها ذخیره شدند");
+    }
+
+
+    // --- EDIT SYSTEM ---
     function openEdit(type, index) {
         document.getElementById('editType').value = type;
         document.getElementById('editIndex').value = index;
@@ -2131,22 +1982,17 @@
         let showPercent = false;
         let showAmount = true;
         let showDate = false;
-        let showAuto = false;
 
         if(type === 'wallet') item = app.wallets[index];
-        else if(type === 'debt') { 
-            item = app.debts[index]; 
-            showDate = true; 
-        }
+        else if(type === 'debt') { item = app.debts[index]; showDate = true; }
         else if(type === 'check') { item = app.checks[index]; showDate = true; }
         else if(type === 'loan') { item = app.loans[index]; showDate = true; }
         else if(type === 'budget') { item = app.budgets[index]; showPercent = true; showAmount = false; }
-        else if(type === 'goal') { item = app.goals[index]; showAuto = true; }
-        else if(type === 'shop') { item = app.shopping[index]; showAuto = true; }
+        else if(type === 'goal') { item = app.goals[index]; }
+        else if(type === 'shop') { item = app.shopping[index]; }
 
         document.getElementById('editName').value = item.name;
         
-        // Handle Amount Field
         if(showAmount) {
             document.getElementById('editAmountWrapper').style.display = 'block';
             let val = 0;
@@ -2154,13 +2000,13 @@
             else if(type === 'shop') val = item.price || 0;
             else val = item.value;
             
+            // Prefill and format immediately
             document.getElementById('editVal').value = val;
             formatCurrency(document.getElementById('editVal'));
         } else {
             document.getElementById('editAmountWrapper').style.display = 'none';
         }
 
-        // Handle Percent Field
         if(showPercent) {
             document.getElementById('editPercentWrapper').style.display = 'block';
             document.getElementById('editPercent').value = item.percent;
@@ -2168,7 +2014,6 @@
             document.getElementById('editPercentWrapper').style.display = 'none';
         }
 
-        // Handle Date Field
         if(showDate) {
             document.getElementById('editDateWrapper').style.display = 'block';
             const row = document.getElementById('editDateRow');
@@ -2182,55 +2027,13 @@
             document.getElementById('editDateWrapper').style.display = 'none';
         }
 
-        // Handle Auto Settings (Instruction 4 & 6)
-        if(showAuto) {
-            document.getElementById('editAutoWrapper').style.display = 'block';
-            document.getElementById('editAutoType').value = item.autoType || 'none';
-            toggleEditAutoFields(); // Show hide sub fields
-            
-            if(item.autoVal) {
-                document.getElementById('editAutoVal').value = item.autoVal;
-                // Only format if fixed amount
-                if(item.autoType === 'fixed') formatCurrency(document.getElementById('editAutoVal'));
-            } else {
-                document.getElementById('editAutoVal').value = '';
-            }
-
-            if(item.autoLimit) {
-                document.getElementById('editAutoLimit').value = item.autoLimit;
-                formatCurrency(document.getElementById('editAutoLimit'));
-            } else {
-                 document.getElementById('editAutoLimit').value = '';
-            }
-
-        } else {
-            document.getElementById('editAutoWrapper').style.display = 'none';
-        }
-
         openModal('editModal');
-    }
-
-    function toggleEditAutoFields() {
-        const type = document.getElementById('editAutoType').value;
-        const valDiv = document.getElementById('editAutoValDiv');
-        const limDiv = document.getElementById('editAutoLimitDiv');
-        const lbl = document.getElementById('editAutoLabel');
-        
-        if(type === 'none') {
-            valDiv.style.display = 'none';
-            limDiv.style.display = 'none';
-        } else {
-            valDiv.style.display = 'block';
-            limDiv.style.display = 'block';
-            lbl.innerText = type === 'percent' ? 'درصد کسر:' : 'مبلغ کسر (تومان):';
-        }
     }
 
     function performEdit() {
         const type = document.getElementById('editType').value;
         const index = parseInt(document.getElementById('editIndex').value);
         const newName = document.getElementById('editName').value;
-        
         if(!newName) return alert("نام نمی‌تواند خالی باشد");
 
         if(type.includes('budget')) saveSectionSnap('budget');
@@ -2253,107 +2056,73 @@
             app.loans[index].value = parseFormatted(document.getElementById('editVal').value);
             app.loans[index].date = getDateString('editD');
         } else if(type === 'budget') {
-            // ... (Logic for Budget Edit maintained as previously robust) ...
             const oldName = app.budgets[index].name;
             const newP = parseInt(document.getElementById('editPercent').value) || 0;
-            
             let total = 0;
             app.budgets.forEach((b, i) => { if(i !== index) total += b.percent; });
             
             if(total + newP > 100) {
                 tempBudget = JSON.parse(JSON.stringify(app.budgets[index]));
-                tempBudget.name = newName;
-                tempBudget.percent = newP;
-                
+                tempBudget.name = newName; tempBudget.percent = newP;
                 const safeMax = 100 - total;
                 document.getElementById('maxAllowedPercent').innerText = safeMax + '%';
                 const slider = document.getElementById('percentSlider');
                 slider.max = safeMax; slider.value = 0;
                 document.getElementById('sliderValDisplay').innerText = 0;
                 tempBudget.isEdit = true; tempBudget.editIndex = index;
-                openModal('fixPercentModal');
-                return; 
+                openModal('fixPercentModal'); return; 
             }
             app.budgets[index].name = newName;
             app.budgets[index].percent = newP;
             if(oldName !== newName && app.priorities[oldName]) {
-                app.priorities[newName] = app.priorities[oldName];
-                delete app.priorities[oldName];
+                app.priorities[newName] = app.priorities[oldName]; delete app.priorities[oldName];
             }
         } else if(type === 'goal') {
             app.goals[index].name = newName;
             app.goals[index].target = parseFormatted(document.getElementById('editVal').value);
-            // Auto Settings Save
-            app.goals[index].autoType = document.getElementById('editAutoType').value;
-            if(app.goals[index].autoType !== 'none') {
-                 let rawVal = document.getElementById('editAutoVal').value;
-                 app.goals[index].autoVal = app.goals[index].autoType === 'percent' ? parseInt(rawVal) : parseFormatted({value:rawVal});
-                 app.goals[index].autoLimit = parseFormatted(document.getElementById('editAutoLimit').value);
-            }
         } else if(type === 'shop') {
             app.shopping[index].name = newName;
             app.shopping[index].price = parseFormatted(document.getElementById('editVal').value);
-             // Auto Settings Save
-            app.shopping[index].autoType = document.getElementById('editAutoType').value;
-             if(app.shopping[index].autoType !== 'none') {
-                 let rawVal = document.getElementById('editAutoVal').value;
-                 app.shopping[index].autoVal = app.shopping[index].autoType === 'percent' ? parseInt(rawVal) : parseFormatted({value:rawVal});
-                 app.shopping[index].autoLimit = parseFormatted(document.getElementById('editAutoLimit').value);
-            }
         }
-
-        saveData();
-        renderUI();
-        closeAllModals();
-        showToast("تغییرات ذخیره شد");
+        saveData(); renderUI(); closeAllModals(); showToast("تغییرات ذخیره شد");
     }
 
-    // --- TEMPLATE LOGIC ---
+    // --- OTHER ACTIONS ---
     function applyTemplate(type) {
         if(!confirm("بودجه‌بندی فعلی پاک شده و قالب جدید اعمال می‌شود. ادامه می‌دهید؟")) return;
         saveSectionSnap('budget'); 
-        
         let newBudgets = [];
         if(type === 'default') {
             newBudgets = JSON.parse(JSON.stringify(defaultState.budgets));
         } else if(type === 'student') {
             newBudgets = [
-                {id: 1, name: "رفت‌وآمد", percent: 30, spent: 0, history: [], manualAdd: 0, subs: []},
-                {id: 2, name: "غذا (سلف/بیرون)", percent: 25, spent: 0, history: [], manualAdd: 0, subs: []},
-                {id: 3, name: "اینترنت و شارژ", percent: 15, spent: 0, history: [], manualAdd: 0, subs: []},
-                {id: 4, name: "کتاب و جزوه", percent: 10, spent: 0, history: [], manualAdd: 0, subs: []},
-                {id: 5, name: "تفریح دوستانه", percent: 15, spent: 0, history: [], manualAdd: 0, subs: []},
-                {id: 6, name: "پس‌انداز اضطراری", percent: 5, spent: 0, history: [], manualAdd: 0, subs: []}
+                {id: 1, name: "رفت‌وآمد", percent: 30, spent: 0, history: [], manualAdd: 0, subs:[]},
+                {id: 2, name: "غذا (سلف/بیرون)", percent: 25, spent: 0, history: [], manualAdd: 0, subs:[]},
+                {id: 3, name: "اینترنت و شارژ", percent: 15, spent: 0, history: [], manualAdd: 0, subs:[]},
+                {id: 4, name: "کتاب و جزوه", percent: 10, spent: 0, history: [], manualAdd: 0, subs:[]},
+                {id: 5, name: "تفریح دوستانه", percent: 15, spent: 0, history: [], manualAdd: 0, subs:[]},
+                {id: 6, name: "پس‌انداز اضطراری", percent: 5, spent: 0, history: [], manualAdd: 0, subs:[]}
             ];
         } else if(type === 'married') {
             newBudgets = [
-                {id: 1, name: "اجاره خانه", percent: 35, spent: 0, history: [], manualAdd: 0, subs: []},
-                {id: 2, name: "خورد و خوراک منزل", percent: 25, spent: 0, history: [], manualAdd: 0, subs: []},
-                {id: 3, name: "قبوض و شارژ", percent: 10, spent: 0, history: [], manualAdd: 0, subs: []},
-                {id: 4, name: "درمان و بهداشت", percent: 10, spent: 0, history: [], manualAdd: 0, subs: []},
-                {id: 5, name: "پوشاک", percent: 5, spent: 0, history: [], manualAdd: 0, subs: []},
-                {id: 6, name: "پس‌انداز آینده", percent: 10, spent: 0, history: [], manualAdd: 0, subs: []},
-                {id: 7, name: "تفریح", percent: 5, spent: 0, history: [], manualAdd: 0, subs: []}
+                {id: 1, name: "اجاره خانه", percent: 35, spent: 0, history: [], manualAdd: 0, subs:[]},
+                {id: 2, name: "خورد و خوراک منزل", percent: 25, spent: 0, history: [], manualAdd: 0, subs:[]},
+                {id: 3, name: "قبوض و شارژ", percent: 10, spent: 0, history: [], manualAdd: 0, subs:[]},
+                {id: 4, name: "درمان و بهداشت", percent: 10, spent: 0, history: [], manualAdd: 0, subs:[]},
+                {id: 5, name: "پوشاک", percent: 5, spent: 0, history: [], manualAdd: 0, subs:[]},
+                {id: 6, name: "پس‌انداز آینده", percent: 10, spent: 0, history: [], manualAdd: 0, subs:[]},
+                {id: 7, name: "تفریح", percent: 5, spent: 0, history: [], manualAdd: 0, subs:[]}
             ];
-        } else if(type === 'clear') {
-            newBudgets = [];
-        }
-        
+        } else if(type === 'clear') { newBudgets = []; }
         app.budgets = newBudgets;
         app.budgets.forEach(b => { if(!app.priorities[b.name]) app.priorities[b.name] = 4; });
-        saveData();
-        renderUI();
+        saveData(); renderUI();
     }
 
-    // --- ACTIONS ---
     function addWallet() {
         const n = document.getElementById('wName').value;
         const v = parseFormatted(document.getElementById('wVal').value);
-        if(n && !isNaN(v)) { 
-            saveSectionSnap('dashboard');
-            app.wallets.push({name:n, value:v}); 
-            saveData(); renderUI(); closeAllModals(); 
-        }
+        if(n && !isNaN(v)) { saveSectionSnap('dashboard'); app.wallets.push({name:n, value:v}); saveData(); renderUI(); closeAllModals(); }
     }
     function delWallet(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard'); app.wallets.splice(i,1); saveData(); renderUI(); } }
 
@@ -2369,12 +2138,7 @@
         const n = document.getElementById('cName').value;
         const v = parseFormatted(document.getElementById('cVal').value);
         const d = getDateString('c');
-        if(n && !isNaN(v)) { 
-            saveSectionSnap('dashboard');
-            if(!app.checks) app.checks = [];
-            app.checks.push({name:n, value:v, date:d}); 
-            saveData(); renderUI(); closeAllModals(); 
-        }
+        if(n && !isNaN(v)) { saveSectionSnap('dashboard'); if(!app.checks) app.checks = []; app.checks.push({name:n, value:v, date:d}); saveData(); renderUI(); closeAllModals(); }
     }
     function delCheck(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard'); app.checks.splice(i,1); saveData(); renderUI(); } }
 
@@ -2382,51 +2146,34 @@
         const n = document.getElementById('lName').value;
         const v = parseFormatted(document.getElementById('lVal').value);
         const d = getDateString('l');
-        if(n && !isNaN(v)) {
-            saveSectionSnap('dashboard');
-            if(!app.loans) app.loans = [];
-            app.loans.push({name:n, value:v, date:d});
-            saveData(); renderUI(); closeAllModals();
-        }
+        if(n && !isNaN(v)) { saveSectionSnap('dashboard'); if(!app.loans) app.loans = []; app.loans.push({name:n, value:v, date:d}); saveData(); renderUI(); closeAllModals(); }
     }
     function delLoan(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard'); app.loans.splice(i,1); saveData(); renderUI(); } }
 
-    // --- BUDGET ADDITION & AUTO CORRECTION ---
     function addNewBudget() {
         const n = document.getElementById('bName').value;
         const p = parseInt(document.getElementById('bPercent').value);
-        
         if(!n || isNaN(p)) return alert("لطفا مقادیر صحیح وارد کنید");
-
         let currentTotal = 0;
         app.budgets.forEach(b => currentTotal += b.percent);
-
         if (currentTotal + p > 100) {
-            tempBudget = { name: n, percent: p, id: Date.now(), spent: 0, history: [], manualAdd: 0, isEdit: false, subs: [] };
-            
+            tempBudget = { name: n, percent: p, id: Date.now(), spent: 0, history: [], manualAdd: 0, isEdit: false, subs:[] };
             const max = 100 - currentTotal;
             const safeMax = max > 0 ? max : 0;
-            
             document.getElementById('maxAllowedPercent').innerText = safeMax + '%';
-            
             const slider = document.getElementById('percentSlider');
-            slider.max = safeMax;
-            slider.value = 0;
+            slider.max = safeMax; slider.value = 0;
             document.getElementById('sliderValDisplay').innerText = 0;
-            
             openModal('fixPercentModal');
         } else {
             saveSectionSnap('budget');
-            app.budgets.push({id:Date.now(), name:n, percent:p, spent:0, history:[], manualAdd: 0, subs: []});
+            app.budgets.push({id:Date.now(), name:n, percent:p, spent:0, history:[], manualAdd: 0, subs:[]});
             if (!app.priorities[n]) app.priorities[n] = 4;
             saveData(); renderUI(); closeAllModals();
         }
     }
 
-    function updateSliderVal() {
-        document.getElementById('sliderValDisplay').innerText = document.getElementById('percentSlider').value;
-    }
-
+    function updateSliderVal() { document.getElementById('sliderValDisplay').innerText = document.getElementById('percentSlider').value; }
     function useSliderPercent() {
         if(!tempBudget) return;
         saveSectionSnap('budget');
@@ -2439,10 +2186,8 @@
             app.budgets.push(tempBudget);
             if (!app.priorities[tempBudget.name]) app.priorities[tempBudget.name] = 4;
         }
-        saveData(); renderUI(); closeAllModals();
-        tempBudget = null;
+        saveData(); renderUI(); closeAllModals(); tempBudget = null;
     }
-
     function autoCorrectBudget() {
         if(!tempBudget) return;
         saveSectionSnap('budget');
@@ -2451,52 +2196,33 @@
             if(tempBudget.isEdit && i === tempBudget.editIndex) return; 
             currentTotal += b.percent;
         });
-        
         const needed = tempBudget.percent;
         const allowZero = document.getElementById('allowZeroCheck').checked;
         let overflow = (currentTotal + needed) - 100;
-        
         if(overflow <= 0) {
             if(tempBudget.isEdit) {
                  app.budgets[tempBudget.editIndex].name = tempBudget.name;
                  app.budgets[tempBudget.editIndex].percent = needed;
-            } else {
-                app.budgets.push(tempBudget);
-            }
-            saveData(); renderUI(); closeAllModals();
-            return;
+            } else { app.budgets.push(tempBudget); }
+            saveData(); renderUI(); closeAllModals(); return;
         }
-
         let sortedItems = app.budgets.map((b, index) => {
             if(tempBudget.isEdit && index === tempBudget.editIndex) return null; 
-            return {
-                index: index,
-                priority: app.priorities[b.name] || 4, 
-                percent: b.percent
-            };
+            return { index: index, priority: app.priorities[b.name] || 4, percent: b.percent };
         }).filter(x => x !== null).sort((a, b) => b.priority - a.priority); 
-
         for (let item of sortedItems) {
             if (overflow <= 0) break;
             let currentP = item.percent;
             let deductible = currentP;
-            if(!allowZero && currentP > 0) deductible = currentP - 1; 
-            if (deductible >= overflow) {
-                app.budgets[item.index].percent -= overflow;
-                overflow = 0;
-            } else {
-                app.budgets[item.index].percent -= deductible;
-                overflow -= deductible;
-            }
+            if(!allowZero && currentP > 0) { deductible = currentP - 1; }
+            if (deductible >= overflow) { app.budgets[item.index].percent -= overflow; overflow = 0; } 
+            else { app.budgets[item.index].percent -= deductible; overflow -= deductible; }
         }
-
         if(overflow > 0) {
             alert("امکان اصلاح خودکار کامل وجود ندارد. فضا کافی نیست.");
              const lastSnap = JSON.parse(app.sectionHistory['budget'][0].data);
-             app.budgets = lastSnap.budgets;
-             return;
+             app.budgets = lastSnap.budgets; return;
         }
-
         if(tempBudget.isEdit) {
              app.budgets[tempBudget.editIndex].name = tempBudget.name;
              app.budgets[tempBudget.editIndex].percent = needed;
@@ -2504,12 +2230,9 @@
             app.budgets.push(tempBudget);
             if (!app.priorities[tempBudget.name]) app.priorities[tempBudget.name] = 4;
         }
-
-        saveData(); renderUI(); closeAllModals();
-        tempBudget = null;
+        saveData(); renderUI(); closeAllModals(); tempBudget = null;
     }
 
-    // --- PRIORITY SETTINGS ---
     function openPrioritySettings() {
         const list = document.getElementById('priorityList');
         if(!app.priorities) app.priorities = defaultState.priorities;
@@ -2520,7 +2243,6 @@
         const allNames = new Set();
         app.budgets.forEach(b => allNames.add(b.name));
         Object.keys(app.priorities).forEach(k => allNames.add(k));
-
         allNames.forEach(name => {
             let p = app.priorities[name] || 4;
             const div = document.createElement('div');
@@ -2532,26 +2254,16 @@
                     <option value="2" ${p==2?'selected':''}>۲ (مهم)</option>
                     <option value="3" ${p==3?'selected':''}>۳ (متوسط)</option>
                     <option value="4" ${p==4?'selected':''}>۴ (کم)</option>
-                </select>
-            `;
+                </select>`;
             frag.appendChild(div);
         });
-        list.innerHTML = '';
-        list.appendChild(frag);
-        openModal('prioritySettingsModal');
+        list.innerHTML = ''; list.appendChild(frag); openModal('prioritySettingsModal');
     }
-
     function savePriorityRanges() {
         const l = parseInt(document.getElementById('pRangeLow').value);
         const m = parseInt(document.getElementById('pRangeMid').value);
-        if(!isNaN(l) && !isNaN(m)) {
-            app.priorityRanges.low = l;
-            app.priorityRanges.mid = m;
-            saveData();
-            showToast("بازه ها ذخیره شدند");
-        }
+        if(!isNaN(l) && !isNaN(m)) { app.priorityRanges.low = l; app.priorityRanges.mid = m; saveData(); showToast("بازه ها ذخیره شدند"); }
     }
-
     function savePriorities() {
         saveSectionSnap('budget');
         const selects = document.querySelectorAll('.priority-select');
@@ -2560,9 +2272,7 @@
             const val = parseInt(sel.value);
             app.priorities[name] = val;
         });
-        saveData();
-        closeAllModals();
-        showToast("اولویت‌ها ذخیره شدند");
+        saveData(); closeAllModals(); showToast("اولویت‌ها ذخیره شدند");
     }
 
     function delBudget(i) { if(confirm('حذف ردیف؟')) { saveSectionSnap('budget'); app.budgets.splice(i,1); saveData(); renderUI(); } }
@@ -2573,196 +2283,106 @@
         const v = parseFormatted(document.getElementById('expAmt').value);
         const r = document.getElementById('expReason').value || 'بدون توضیح';
         if(!isNaN(v) && activeIdx > -1) { 
-            saveSectionSnap('budget');
-            app.budgets[activeIdx].spent += v;
+            saveSectionSnap('budget'); app.budgets[activeIdx].spent += v;
             addToHistory(activeIdx, v, r);
-            saveData(); renderUI(); closeAllModals(); 
-            showToast("هزینه ثبت شد");
+            saveData(); renderUI(); closeAllModals(); showToast("هزینه ثبت شد");
         }
     }
-
     function addToHistory(bIdx, amount, reason) {
         if(!app.budgets[bIdx].history) app.budgets[bIdx].history = [];
-        app.budgets[bIdx].history.push({
-            amount: amount,
-            reason: reason,
-            date: new Date().toLocaleDateString('fa-IR'),
-            time: new Date().toLocaleTimeString('fa-IR')
-        });
+        app.budgets[bIdx].history.push({ amount: amount, reason: reason, date: new Date().toLocaleDateString('fa-IR'), time: new Date().toLocaleTimeString('fa-IR') });
     }
-
     function openItemHistory(i) {
         const hList = document.getElementById('itemHistList');
         const hist = app.budgets[i].history || [];
-        if(hist.length === 0) {
-            hList.innerHTML = '<p style="text-align:center;">موردی یافت نشد.</p>';
-        } else {
+        if(hist.length === 0) { hList.innerHTML = '<p style="text-align:center;">موردی یافت نشد.</p>'; }
+        else {
             hList.innerHTML = hist.slice().reverse().map(h => `
                 <div style="border-bottom:1px solid #eee; padding:10px 0;">
                     <div style="display:flex; justify-content:space-between; font-weight:bold;">
-                        <span>${h.reason}</span>
-                        <span style="color:var(--danger)">${format(h.amount)}</span>
+                        <span>${h.reason}</span><span style="color:var(--danger)">${format(h.amount)}</span>
                     </div>
-                    <div style="font-size:0.75rem; color:var(--text-sec); margin-top:3px;">
-                        ${h.date} - ${h.time}
-                    </div>
-                </div>
-            `).join('');
+                    <div style="font-size:0.75rem; color:var(--text-sec); margin-top:3px;">${h.date} - ${h.time}</div>
+                </div>`).join('');
         }
         openModal('itemHistModal');
     }
 
-    // Toggle fields for new goal modal
-    function toggleAutoFields(prefix) {
-        const type = document.getElementById(prefix + 'AutoType').value;
-        const valDiv = document.getElementById(prefix + 'AutoValDiv');
-        const limDiv = document.getElementById(prefix + 'AutoLimitDiv');
-        const lbl = document.getElementById(prefix + 'AutoLabel');
-        
-        if(type === 'none') {
-            valDiv.style.display = 'none';
-            limDiv.style.display = 'none';
-        } else {
-            valDiv.style.display = 'block';
-            limDiv.style.display = 'block';
-            lbl.innerText = type === 'percent' ? 'درصد کسر:' : 'مبلغ کسر (تومان):';
-        }
-    }
-
-    function addGoal() {
-        const n = document.getElementById('gName').value;
-        const t = parseFormatted(document.getElementById('gTarget').value);
-        
-        // Auto Data
-        const aType = document.getElementById('gAutoType').value;
-        let aVal = 0;
-        let aLim = 0;
-        
-        if(aType !== 'none') {
-             let raw = document.getElementById('gAutoVal').value;
-             aVal = aType === 'percent' ? parseInt(raw) : parseFormatted({value:raw});
-             aLim = parseFormatted(document.getElementById('gAutoLimit').value);
-        }
-
-        if(n && !isNaN(t)) { 
-            saveSectionSnap('tools'); 
-            app.goals.push({name:n, target:t, curr:0, autoType: aType, autoVal: aVal, autoLimit: aLim}); 
-            saveData(); renderUI(); closeAllModals(); 
-        }
-    }
-
-    function addGoalMoneyDirect(i) {
-        document.getElementById('directGoalIndex').value = i;
-        document.getElementById('directGoalVal').value = '';
-        openModal('directGoalModal');
-    }
-    
-    function performDirectGoal() {
-        const i = document.getElementById('directGoalIndex').value;
-        const v = parseFormatted(document.getElementById('directGoalVal').value);
-        if(v) { 
-            saveSectionSnap('tools'); 
-            app.goals[i].curr += v; 
-            saveData(); renderUI(); closeAllModals();
-        }
-    }
-
-    function delGoal(i) { saveSectionSnap('tools'); app.goals.splice(i,1); saveData(); renderUI(); }
-
-    function addShop() {
-        const n = document.getElementById('sName').value;
-        const p = parseFormatted(document.getElementById('sPrice').value);
-        
-        // Auto Data
-        const aType = document.getElementById('sAutoType').value;
-        let aVal = 0;
-        let aLim = 0;
-        if(aType !== 'none') {
-             let raw = document.getElementById('sAutoVal').value;
-             aVal = aType === 'percent' ? parseInt(raw) : parseFormatted({value:raw});
-             aLim = parseFormatted(document.getElementById('sAutoLimit').value);
-        }
-
-        if(n) { 
-            saveSectionSnap('tools'); 
-            app.shopping.push({name:n, price: p || 0, curr: 0, autoType: aType, autoVal: aVal, autoLimit: aLim}); 
-            saveData(); renderUI(); closeAllModals(); 
-        }
-    }
-    function delShop(i) { saveSectionSnap('tools'); app.shopping.splice(i,1); saveData(); renderUI(); }
-
-    // --- ALLOCATION LOGIC ---
+    // --- ALLOCATION LOGIC (Modified Instruction 1) ---
     function openAllocate(type, id) {
         document.getElementById('allocType').value = type;
         document.getElementById('allocId').value = id;
-        
         const sel = document.getElementById('allocBudgetSelect');
-        sel.innerHTML = app.budgets.map((b, i) => `<option value="${i}">${b.name}</option>`).join('');
+        sel.innerHTML = `<option value="">انتخاب کنید...</option>` + app.budgets.map((b, i) => `<option value="${i}">${b.name}</option>`).join('');
         
-        if(type === 'shop' && app.shopping[id].price) {
-            document.getElementById('allocAmt').value = app.shopping[id].price.toLocaleString();
-        } else {
-            document.getElementById('allocAmt').value = '';
-        }
+        // Listener to limit amount
+        sel.onchange = function() {
+            const idx = sel.value;
+            const infoBox = document.getElementById('allocInfo');
+            if(idx === "") {
+                infoBox.style.display = 'none';
+                return;
+            }
+            const b = app.budgets[idx];
+            const baseAmount = app.distributedAmount;
+            const share = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
+            const remain = share - b.spent;
+            
+            infoBox.style.display = 'flex';
+            const displayEl = document.getElementById('allocLimitDisplay');
+            displayEl.innerText = format(remain);
+            displayEl.dataset.max = remain;
+        };
+
+        if(type === 'shop' && app.shopping[id].price) { document.getElementById('allocAmt').value = app.shopping[id].price.toLocaleString(); } 
+        else { document.getElementById('allocAmt').value = ''; }
+        
+        // Reset view
+        document.getElementById('allocInfo').style.display = 'none';
         openModal('allocModal');
     }
 
     function performAllocation() {
         const type = document.getElementById('allocType').value;
         const id = parseInt(document.getElementById('allocId').value);
-        const bIdx = parseInt(document.getElementById('allocBudgetSelect').value);
-        const amt = parseFormatted(document.getElementById('allocAmt').value);
-
-        if(isNaN(amt) || amt <= 0) return alert("مبلغ نامعتبر");
-
-        saveSectionSnap('budget'); 
-        saveSectionSnap('tools'); 
-
-        app.budgets[bIdx].spent += amt;
+        const bIdxStr = document.getElementById('allocBudgetSelect').value;
+        if(bIdxStr === "") return alert("لطفا یک ردیف بودجه انتخاب کنید");
         
-        let reason = "";
-        if(type === 'goal') {
-            app.goals[id].curr += amt;
-            reason = "اختصاص به هدف: " + app.goals[id].name;
-        } else {
-            reason = "خرید کالا: " + app.shopping[id].name;
-        }
+        const bIdx = parseInt(bIdxStr);
+        const amt = parseFormatted(document.getElementById('allocAmt').value);
+        
+        // Instruction 1: Check Limit
+        const max = parseFloat(document.getElementById('allocLimitDisplay').dataset.max) || 0;
+        
+        if(isNaN(amt) || amt <= 0) return alert("مبلغ نامعتبر");
+        if(amt > max) return alert("خطا: مبلغ وارد شده از موجودی این ردیف بودجه بیشتر است!");
 
+        saveSectionSnap('budget'); saveSectionSnap('tools'); 
+        app.budgets[bIdx].spent += amt;
+        let reason = "";
+        if(type === 'goal') { app.goals[id].curr += amt; reason = "اختصاص به هدف: " + app.goals[id].name; } 
+        else { reason = "خرید کالا: " + app.shopping[id].name; }
         addToHistory(bIdx, amt, reason);
-        saveData();
-        renderUI();
-        closeAllModals();
-        showToast("تراکنش ثبت شد");
+        saveData(); renderUI(); closeAllModals(); showToast("تراکنش ثبت شد");
     }
 
-    // --- TOOLS ---
     function toggleCurrency() {
         app.user.currency = app.user.currency === 'toman' ? 'rial' : 'toman';
         const btn = document.getElementById('currBtn');
-        if(app.user.currency === 'rial') btn.classList.add('active');
-        else btn.classList.remove('active');
+        if(app.user.currency === 'rial') btn.classList.add('active'); else btn.classList.remove('active');
         saveData(); renderUI();
     }
-    
     function toggleTheme() {
-        if(document.body.getAttribute('data-theme') === 'dark') {
-            document.body.removeAttribute('data-theme'); app.user.theme = 'light';
-        } else {
-            document.body.setAttribute('data-theme', 'dark'); app.user.theme = 'dark';
-        }
+        if(document.body.getAttribute('data-theme') === 'dark') { document.body.removeAttribute('data-theme'); app.user.theme = 'light'; } 
+        else { document.body.setAttribute('data-theme', 'dark'); app.user.theme = 'dark'; }
         saveData();
     }
-    function applyTheme() {
-        if(app.user.theme === 'dark') document.body.setAttribute('data-theme', 'dark');
-    }
+    function applyTheme() { if(app.user.theme === 'dark') document.body.setAttribute('data-theme', 'dark'); }
 
-    // --- INVOICE & REPORT ---
     function generateReportImage() {
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
-        const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
-        const checkDebt = (app.checks || []).reduce((a,b)=>a+b.value,0);
+        const totalDebt = app.debts.reduce((a,b)=>a+b.value,0) + (app.checks || []).reduce((a,b)=>a+b.value,0);
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
-        const totalDebt = fixedDebt + checkDebt;
         const net = income - totalDebt - manualDeductions;
         const days = app.user.startDate ? Math.floor((Date.now() - app.user.startDate)/(1000*60*60*24))+1 : 0;
 
@@ -2776,49 +2396,39 @@
         if(app.dailyLogs && app.dailyLogs.length > 0) {
             const ctx = document.getElementById('printChart').getContext('2d');
             if(window.myPrintChart) window.myPrintChart.destroy();
-            
             const logs = app.dailyLogs.slice(-15);
             window.myPrintChart = new Chart(ctx, {
                 type: 'line',
-                data: {
-                    labels: logs.map(l => l.date),
-                    datasets: [{
-                        label: 'خالص دارایی (تومان)',
-                        data: logs.map(l => l.net),
-                        borderColor: '#4338ca',
-                        backgroundColor: 'rgba(67, 56, 202, 0.1)',
-                        fill: true
-                    }]
-                },
+                data: { labels: logs.map(l => l.date), datasets: [{ label: 'خالص دارایی (تومان)', data: logs.map(l => l.net), borderColor: '#4338ca', backgroundColor: 'rgba(67, 56, 202, 0.1)', fill: true }] },
                 options: { responsive: true, maintainAspectRatio: false }
             });
-
             const hTab = document.getElementById('printHistoryTable');
             hTab.innerHTML = logs.map(l => `<tr><td>${l.date}</td><td>${format(l.net)}</td><td>${format(l.spent)}</td></tr>`).join('');
         }
-
         const tb = document.getElementById('printBody');
         tb.innerHTML = '';
         app.budgets.forEach(b => {
             const baseAmount = app.distributedAmount;
             const s = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
             tb.innerHTML += `<tr><td>${b.name}</td><td>${b.percent}%</td><td>${format(s)}</td><td>${format(b.spent)}</td><td>${format(s-b.spent)}</td></tr>`;
+            
+            // Instruction 4: Print Sub-budgets
+            if(b.subs && b.subs.length > 0) {
+               let subStr = b.subs.map(sub => `${sub.name}: ${format(sub.amount)}`).join(' | ');
+               tb.innerHTML += `<tr><td colspan="5" style="background:#f9f9f9; font-size:0.8rem; text-align:right; color:#666;">زیرمجموعه‌ها: ${subStr}</td></tr>`;
+            }
         });
-
         const dList = document.getElementById('printDebtsList');
         let debtHtml = "";
         app.debts.forEach(d => debtHtml += `<div>${d.name}: ${format(d.value)}</div>`);
         app.checks.forEach(c => debtHtml += `<div>چک (${c.name}): ${format(c.value)} - ${c.date}</div>`);
         dList.innerHTML = debtHtml || "ندارد";
-
         const gList = document.getElementById('printGoalsList');
         let goalHtml = "";
         app.goals.forEach(g => goalHtml += `<div>${g.name}: ${format(g.curr)} / ${format(g.target)}</div>`);
         gList.innerHTML = goalHtml || "ندارد";
-
         const el = document.getElementById('printArea');
         el.style.top = "0";
-        
         setTimeout(() => {
             html2canvas(el).then(c => {
                 const a = document.createElement('a');
@@ -2830,70 +2440,43 @@
 
     function downloadBackup() {
         const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(app));
-        const a = document.createElement('a');
-        a.href = str; a.download = "backup.json"; a.click();
-        
-        if(!isGuestMode) {
-            app.history.unshift({date: Date.now(), name: "بکاپ دستی"});
-            if(app.history.length > 5) app.history.pop();
-            saveData();
-        }
+        const a = document.createElement('a'); a.href = str; a.download = "backup.json"; a.click();
+        if(!isGuestMode) { app.history.unshift({date: Date.now(), name: "بکاپ دستی"}); if(app.history.length > 5) app.history.pop(); saveData(); }
     }
-
     function restoreBackup(input) {
         const file = input.files[0];
         const reader = new FileReader();
         reader.onload = (e) => {
             try {
                 app = JSON.parse(e.target.result);
-                // Schema Update Safeguard
                 if(!app.priorities) app.priorities = defaultState.priorities;
                 if(!app.sectionHistory) app.sectionHistory = { dashboard: [], budget: [], tools: [] };
                 app.budgets.forEach(b => { 
-                    if(!b.history) b.history = [];
-                    if(b.manualAdd === undefined) b.manualAdd = 0;
-                    if(b.isPaused === undefined) b.isPaused = false;
-                    if(b.savedPercent === undefined) b.savedPercent = 0;
-                    if(!b.subs) b.subs = [];
+                    if(!b.history) b.history = []; if(b.manualAdd === undefined) b.manualAdd = 0; if(b.isPaused === undefined) b.isPaused = false; if(b.savedPercent === undefined) b.savedPercent = 0; if(!b.subs) b.subs = [];
                 });
                 if(app.distributedAmount === undefined) app.distributedAmount = 0;
                 if(!app.security.nationalId) app.security.nationalId = "";
-
-                saveData();
-                location.reload();
+                saveData(); location.reload();
             } catch(err) { alert("فایل نامعتبر"); }
         };
         reader.readAsText(file);
     }
-
     function showHistory() {
         const d = document.getElementById('histList');
-        d.innerHTML = app.history.map(h => 
-            `<div style="padding:10px; border-bottom:1px solid #eee;">${h.name} - ${new Date(h.date).toLocaleDateString('fa-IR')}</div>`
-        ).join('');
+        d.innerHTML = app.history.map(h => `<div style="padding:10px; border-bottom:1px solid #eee;">${h.name} - ${new Date(h.date).toLocaleDateString('fa-IR')}</div>`).join('');
         openModal('histModal');
     }
-
-    function resetAll() {
-        if(confirm("هشدار: تمام اطلاعات شما پاک خواهد شد. آیا مطمئن هستید؟")) { 
-            localStorage.removeItem('amir_fin_v9'); 
-            location.reload(); 
-        }
-    }
-
-    // --- HELPERS & SAVE ---
+    function resetAll() { if(confirm("هشدار: تمام اطلاعات شما پاک خواهد شد. آیا مطمئن هستید؟")) { localStorage.removeItem('amir_fin_v9'); location.reload(); } }
     function copyTxt(n) {
         const raw = document.getElementById('rawCopyCheck').checked;
         const txt = raw ? (n*rate).toString() : format(n);
-        navigator.clipboard.writeText(txt);
-        showToast("کپی شد: " + txt);
+        navigator.clipboard.writeText(txt); showToast("کپی شد: " + txt);
     }
     
     function loadData() {
         const d = localStorage.getItem('amir_fin_v9');
         if(d) {
             app = JSON.parse(d);
-            // Compatibility Checks
             if(!app.checks) app.checks = [];
             if(!app.loans) app.loans = [];
             if(!app.priorities) app.priorities = defaultState.priorities;
@@ -2904,60 +2487,33 @@
             if(app.security.isSetup === undefined) app.security.isSetup = app.security.hasPin;
             if(!app.dailyLogs) app.dailyLogs = [];
             if(!app.user.startDate) app.user.startDate = Date.now();
-
             app.budgets.forEach(b => { 
-                if(!b.history) b.history = []; 
-                if(b.manualAdd === undefined) b.manualAdd = 0;
-                if(b.isPaused === undefined) b.isPaused = false;
-                if(b.savedPercent === undefined) b.savedPercent = 0;
-                if(!b.subs) b.subs = [];
+                if(!b.history) b.history = []; if(b.manualAdd === undefined) b.manualAdd = 0; if(b.isPaused === undefined) b.isPaused = false; if(b.savedPercent === undefined) b.savedPercent = 0; if(!b.subs) b.subs = [];
             });
-            
-            // Goals Update
-            app.goals.forEach(g => {
-                if(!g.autoType) g.autoType = 'none';
-            });
-            app.shopping.forEach(s => {
-                if(!s.autoType) s.autoType = 'none';
-                if(!s.curr) s.curr = 0;
-            });
+            app.goals.forEach(g => { if(!g.autoConfig) g.autoConfig = {type:'none'}; });
+            app.shopping.forEach(s => { if(!s.autoConfig) s.autoConfig = {type:'none'}; });
         }
     }
-    function saveData() {
-        if(!isGuestMode) { 
-            localStorage.setItem('amir_fin_v9', JSON.stringify(app));
-        }
-    }
-    function updateDate() {
-        document.getElementById('headerDate').innerText = new Date().toLocaleDateString('fa-IR');
-    }
+    function saveData() { if(!isGuestMode) { localStorage.setItem('amir_fin_v9', JSON.stringify(app)); } }
+    function updateDate() { document.getElementById('headerDate').innerText = new Date().toLocaleDateString('fa-IR'); }
 
-    // --- UI NAVIGATION ---
     function switchTab(id) {
         document.querySelectorAll('.tab-pane').forEach(e => e.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(e => e.classList.remove('active'));
         document.getElementById('view-'+id).classList.add('active');
-        const btns = document.querySelectorAll('.nav-btn');
-        btns.forEach(b => {
-            if(b.getAttribute('onclick').includes(id)) b.classList.add('active');
-        });
+        document.querySelectorAll('.nav-btn').forEach(b => { if(b.getAttribute('onclick').includes(id)) b.classList.add('active'); });
     }
     function openModal(id) { 
         if(id === 'prioritySettingsModal') { openPrioritySettings(); }
         const m = document.getElementById(id);
-        
-        // Reset inputs on open (except hidden/checkbox/special)
         const inputs = m.querySelectorAll('input');
         inputs.forEach(i => {
-            const safeIds = ['pRangeLow', 'pRangeMid', 'editAutoType', 'gAutoType', 'sAutoType', 'depositIndex', 'pauseIndex', 'editIndex', 'editType', 'subParentIndex', 'directGoalIndex', 'allocId', 'allocType', 'expBudgetId'];
-            if(i.type !== 'hidden' && i.type !== 'checkbox' && i.type !== 'range' && !safeIds.includes(i.id)) i.value = '';
+            if(i.type !== 'hidden' && i.type !== 'checkbox' && i.type !== 'range' && i.id !== 'pRangeLow' && i.id !== 'pRangeMid' && !i.classList.contains('sub-name') && !i.classList.contains('sub-amount-input') && i.id !== 'aaPercent' && i.id !== 'aaAmount' && i.id !== 'aaMin' && i.id !== 'editName' && i.id !== 'editVal' && i.id !== 'editPercent') i.value = '';
         });
-        
         m.classList.add('active'); 
     }
     function closeAllModals() { document.querySelectorAll('.modal').forEach(e => e.classList.remove('active')); }
-</script>
 
+</script>
 </body>
 </html>
-```
