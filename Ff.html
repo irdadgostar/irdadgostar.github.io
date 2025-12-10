@@ -7,7 +7,7 @@
 
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
-    <!-- آیکون‌ها (Font Awesome) -->
+    <!-- آیکون‌ها -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- نمودار -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -19,15 +19,12 @@
             --bg-body: #f1f5f9;
             --glass-bg: rgba(255, 255, 255, 0.95);
             --glass-border: 1px solid rgba(255, 255, 255, 0.8);
-            --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            --shadow-card: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
             
-            /* رنگ‌های مدرن مالی */
-            --primary: #2563eb;       /* Blue 600 - رنگ رسمی تر */
-            --primary-dark: #1e40af;  /* Blue 800 */
-            --primary-light: #60a5fa; /* Blue 400 */
-            --text-main: #0f172a;     /* Slate 900 */
-            --text-sec: #64748b;      /* Slate 500 */
+            --primary: #3b82f6;      
+            --primary-dark: #2563eb;
+            --text-main: #1e293b;     
+            --text-sec: #64748b;      
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
@@ -37,14 +34,13 @@
 
         [data-theme="dark"] {
             --bg-body: #0f172a;
-            --glass-bg: rgba(30, 41, 59, 0.90);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --glass-bg: rgba(30, 41, 59, 0.95);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.05);
             --text-main: #f8fafc;
             --text-sec: #94a3b8;
-            --primary: #3b82f6;
-            --primary-dark: #60a5fa;
-            --shadow-light: 0 4px 6px rgba(0,0,0,0.3);
-            --shadow-card: 0 10px 20px rgba(0,0,0,0.4);
+            --primary: #60a5fa;
+            --primary-dark: #3b82f6;
+            --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
         }
 
         * {
@@ -66,7 +62,7 @@
 
         /* --- کامپوننت‌های عمومی --- */
         .container {
-            max-width: 600px; /* موبایل فرست */
+            max-width: 600px;
             margin: 0 auto;
             padding: 20px;
             padding-bottom: 40px;
@@ -76,11 +72,9 @@
             background: var(--glass-bg);
             border: var(--glass-border);
             border-radius: var(--card-radius);
-            box-shadow: var(--shadow-card);
+            box-shadow: var(--shadow);
             padding: 24px;
             margin-bottom: 24px;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             transition: transform 0.2s, box-shadow 0.2s;
         }
         
@@ -89,19 +83,12 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
             padding-bottom: 12px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
+        [data-theme="dark"] .header-row { border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-        .header-row h3 { 
-            margin: 0; 
-            font-size: 1.1rem; 
-            color: var(--text-main); 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            font-weight: 800; 
-        }
+        .header-row h3 { margin: 0; font-size: 1.1rem; color: var(--text-main); display: flex; align-items: center; gap: 10px; font-weight: 800; }
 
         /* دکمه‌ها - مدرن */
         .btn {
@@ -113,28 +100,30 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             border: none;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
         }
 
         .btn-primary { 
             background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
             color: white; 
         }
-        .btn-primary:active { transform: scale(0.97); }
+        .btn-primary:active { transform: scale(0.96); }
 
         .btn-outline { 
             background: transparent; 
             border: 2px solid var(--text-sec); 
             color: var(--text-sec); 
             box-shadow: none;
+            opacity: 0.8;
         }
         .btn-outline:hover { 
             border-color: var(--primary); 
             color: var(--primary); 
-            background: rgba(37, 99, 235, 0.05);
+            background: rgba(59, 130, 246, 0.05);
+            opacity: 1;
         }
 
         .btn-danger { 
@@ -153,49 +142,27 @@
             color: var(--text-main);
             display: flex; align-items: center; justify-content: center;
             cursor: pointer;
-            box-shadow: var(--shadow-light);
+            box-shadow: var(--shadow);
             transition: all 0.2s;
         }
         .btn-icon:hover { 
             background: var(--primary); 
             color: white; 
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
         }
         
         .btn-small-icon {
             width: 34px; height: 34px;
             border-radius: 10px;
             display: inline-flex; align-items: center; justify-content: center;
-            cursor: pointer; margin-right: 6px;
+            cursor: pointer; margin-right: 5px;
             font-size: 0.9rem;
             transition: all 0.2s;
         }
-        .btn-edit { color: var(--warning); background: rgba(245, 158, 11, 0.15); border: none; }
-        .btn-del { color: var(--danger); background: rgba(239, 68, 68, 0.15); border: none; }
-        .btn-inject { color: var(--success); background: rgba(16, 185, 129, 0.15); border: none; }
-        .btn-pause { color: var(--text-sec); background: rgba(148, 163, 184, 0.2); border: none; }
-
-        .currency-toggle-btn {
-            background: var(--glass-bg);
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
-        }
-        .currency-toggle-btn.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-        }
-
+        .btn-edit { color: var(--warning); background: rgba(245, 158, 11, 0.1); border: none; }
+        .btn-del { color: var(--danger); background: rgba(239, 68, 68, 0.1); border: none; }
+        
         /* ورودی‌ها - مدرن */
         input, select {
             background: var(--bg-body);
@@ -207,25 +174,24 @@
             width: 100%;
             margin-bottom: 16px;
             transition: all 0.2s;
-            font-weight: 500;
         }
         input:focus, select:focus { 
             border-color: var(--primary); 
             background: var(--glass-bg);
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); 
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); 
         }
         
         /* Slider Style */
         input[type=range] {
-            -webkit-appearance: none; width: 100%; margin: 15px 0; background: transparent; box-shadow: none; border: none; padding: 0;
+            -webkit-appearance: none; width: 100%; margin: 15px 0; background: transparent; box-shadow: none; border: none;
         }
         input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none; height: 28px; width: 28px; border-radius: 50%;
-            background: var(--primary); cursor: pointer; margin-top: -12px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2); border: 3px solid white;
+            -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%;
+            background: var(--primary); cursor: pointer; margin-top: -10px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2); border: 2px solid white;
         }
         input[type=range]::-webkit-slider-runnable-track {
-            width: 100%; height: 6px; cursor: pointer; background: #cbd5e1; border-radius: 3px;
+            width: 100%; height: 6px; cursor: pointer; background: #e2e8f0; border-radius: 3px;
         }
 
         .date-picker-row {
@@ -246,7 +212,7 @@
             margin-bottom: 15px;
         }
         .money-input-wrapper input {
-            padding-left: 80px; 
+            padding-left: 70px; 
             margin-bottom: 0;
             direction: ltr;
             text-align: right;
@@ -260,107 +226,97 @@
             top: 50%;
             transform: translateY(-50%);
             color: var(--primary);
-            font-size: 0.9rem;
-            font-weight: 800;
+            font-size: 0.85rem;
+            font-weight: bold;
             pointer-events: none;
-            background: rgba(37, 99, 235, 0.1);
-            padding: 6px 10px;
+            background: rgba(59, 130, 246, 0.1);
+            padding: 4px 10px;
             border-radius: 8px;
         }
 
-        /* --- صفحه ورود (Lock Screen & Auth) - دستور ۱ و ۲ --- */
+        /* --- صفحه ورود (Lock Screen) - اصلاح شده (دستور ۱) --- */
         .pin-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-body); z-index: 10000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 30px; /* دستور ۱: فاصله از حاشیه‌ها */
+            background: var(--bg-body); 
+            z-index: 9999;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; /* مرکزچین عمودی و افقی */
+            padding: 20px;
             overflow-y: auto;
         }
         
         .auth-card {
             background: var(--glass-bg);
-            border: var(--glass-border);
+            border: 1px solid rgba(255,255,255,0.5);
             border-radius: 32px;
             padding: 40px 30px;
             width: 100%;
-            max-width: 420px;
+            max-width: 380px; /* جلوگیری از کشیدگی */
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
             position: relative;
+            margin: auto; /* اطمینان از وسط چین بودن */
         }
 
         .auth-avatar {
-            width: 90px; height: 90px;
+            width: 80px; height: 80px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             display: flex; align-items: center; justify-content: center;
-            font-size: 2.2rem;
-            margin-bottom: 25px;
-            box-shadow: 0 15px 30px rgba(37, 99, 235, 0.3);
+            font-size: 2rem;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
         }
 
-        .pin-dots { display: flex; gap: 18px; margin: 30px 0; justify-content: center; }
+        .pin-dots { display: flex; gap: 12px; margin: 30px 0; justify-content: center; }
         .pin-dot { 
-            width: 16px; height: 16px; border-radius: 50%; 
-            background: #cbd5e1; transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 12px; height: 12px; border-radius: 50%; 
+            background: #cbd5e1; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
         }
         .pin-dot.filled { 
             background: var(--primary); 
             transform: scale(1.4); 
-            box-shadow: 0 0 15px rgba(37, 99, 235, 0.6); 
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); 
         }
         
         .numpad {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; direction: ltr; 
-            width: 100%; max-width: 320px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; direction: ltr; 
+            width: 100%; max-width: 280px; margin: 0 auto;
         }
         .num-key {
-            width: 70px; height: 70px; border-radius: 24px;
-            background: var(--bg-body); 
-            border: none;
-            box-shadow: 4px 4px 10px rgba(0,0,0,0.05), -4px -4px 10px rgba(255,255,255,0.8);
-            font-size: 1.5rem; font-weight: 700; color: var(--text-main);
+            width: 60px; height: 60px; border-radius: 50%;
+            background: transparent; border: 1px solid rgba(0,0,0,0.1);
+            font-size: 1.5rem; font-weight: 600; color: var(--text-main);
             cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: all 0.15s;
+            transition: all 0.2s;
             margin: 0 auto;
         }
-        .num-key:active { 
-            transform: scale(0.92); 
-            box-shadow: inset 4px 4px 8px rgba(0,0,0,0.05), inset -4px -4px 8px rgba(255,255,255,0.8);
-        }
-        .num-key.del { color: var(--danger); background: rgba(239, 68, 68, 0.05); }
+        [data-theme="dark"] .num-key { border-color: rgba(255,255,255,0.1); }
+        
+        .num-key:active { background: var(--primary); border-color: var(--primary); color: white; transform: scale(0.9); }
+        .num-key.del { color: var(--danger); font-size: 1.2rem; }
+        .num-key.del:active { background: var(--danger); color: white; }
 
         .auth-link {
             margin-top: 30px;
             color: var(--text-sec);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             text-decoration: none;
             cursor: pointer;
-            border-bottom: 1px dashed var(--text-sec);
-            padding-bottom: 4px;
-        }
-        
-        .guest-btn {
-            margin-top: 25px;
-            background: transparent;
-            border: 2px solid var(--warning);
-            color: var(--warning);
-            padding: 12px 24px;
-            border-radius: 14px;
-            cursor: pointer;
-            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 8px;
             transition: 0.2s;
-            width: 100%;
         }
-        .guest-btn:hover { background: var(--warning); color: white; }
+        .auth-link:hover { color: var(--primary); background: rgba(59,130,246,0.05); }
 
-        /* --- کارت اعتباری (HERO) - دستور ۶ --- */
+        /* --- کارت اعتباری (HERO) - اصلاح شده (دستور ۶) --- */
         .hero-card {
-            perspective: 1200px;
+            perspective: 1000px;
             height: 230px;
             margin-bottom: 30px;
             cursor: pointer;
@@ -371,8 +327,8 @@
             text-align: center;
             transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             transform-style: preserve-3d;
-            border-radius: 28px;
-            box-shadow: 0 25px 50px -12px rgba(37, 99, 235, 0.4);
+            border-radius: 26px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
         }
         .hero-card.flipped .card-inner { transform: rotateY(180deg); }
         
@@ -380,56 +336,59 @@
             position: absolute;
             width: 100%; height: 100%;
             backface-visibility: hidden;
-            border-radius: 28px;
-            padding: 30px;
+            border-radius: 26px;
+            padding: 25px;
             color: white;
             display: flex; flex-direction: column; justify-content: space-between;
             overflow: hidden;
+            /* رنگ‌بندی مدرن شبیه کارت‌های ایرانی */
+            background: linear-gradient(110deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        .card-front {
-            background: linear-gradient(115deg, #1e3a8a, #2563eb, #60a5fa);
-            /* بافت مدرن */
-            background-image: 
-                radial-gradient(at 10% 10%, rgba(255,255,255,0.2) 0%, transparent 40%),
-                radial-gradient(at 90% 90%, rgba(0,0,0,0.3) 0%, transparent 40%);
+        
+        /* پترن‌های روی کارت */
+        .card-front::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5; pointer-events: none;
         }
-        /* چیپ و وای فای */
+        
+        /* چیپ کارت */
         .card-chip {
-            width: 45px; height: 32px;
+            width: 45px; height: 35px;
             background: linear-gradient(135deg, #fcd34d, #d97706);
             border-radius: 6px;
             position: relative;
-            overflow: hidden;
-            box-shadow: inset 0 1px 4px rgba(0,0,0,0.2);
-            border: 1px solid rgba(0,0,0,0.1);
-        }
-        .card-chip::before {
-            content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.4), 0 2px 5px rgba(0,0,0,0.2);
+            display: flex; align-items: center; justify-content: center;
         }
         .card-chip::after {
-            content: ''; position: absolute; left: 50%; top: 0; width: 1px; height: 100%; background: rgba(0,0,0,0.3);
+            content: ''; position: absolute; width: 30px; height: 20px;
+            border: 1px solid rgba(0,0,0,0.1); border-radius: 4px;
         }
         
-        .balance-label { font-size: 0.9rem; opacity: 0.8; text-align: right; display: block; font-weight: 400; letter-spacing: 0.5px; }
-        .balance-value { 
-            font-size: 2.5rem; 
-            font-weight: 800; 
-            margin: 5px 0; 
-            direction: ltr; 
-            text-shadow: 0 4px 10px rgba(0,0,0,0.3); 
-            letter-spacing: 2px; 
-            font-family: 'Courier New', monospace; /* فونت عددی بانکی */
-        }
+        /* لوگوی وای فای */
+        .nfc-icon { font-size: 1.5rem; opacity: 0.7; transform: rotate(90deg); }
 
         .card-back {
-            background: #0f172a;
+            background: #334155;
             transform: rotateY(180deg);
             align-items: center; justify-content: center;
-            border: 1px solid rgba(255,255,255,0.1);
-            background-image: repeating-linear-gradient(45deg, #1e293b 0, #1e293b 10px, #0f172a 10px, #0f172a 20px);
         }
 
-        /* --- BENTO GRID (بودجه) --- */
+        .balance-label { font-size: 0.85rem; opacity: 0.8; text-align: right; display: block; font-weight: 300; margin-bottom: 5px; }
+        .balance-value { 
+            font-size: 2.2rem; font-weight: 800; direction: ltr; 
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3); letter-spacing: 2px; 
+            font-family: 'Courier New', Courier, monospace; 
+        }
+        .card-footer {
+            display: flex; justify-content: space-between; align-items: flex-end;
+        }
+        .card-holder { font-size: 0.95rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- BENTO GRID (بودجه) - دکمه‌های آیکون‌دار (دستور ۴) --- */
         .budget-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
@@ -444,42 +403,30 @@
             padding: 20px;
             position: relative;
             display: flex; flex-direction: column; gap: 12px;
-            box-shadow: var(--shadow-card);
-            transition: all 0.25s;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
         }
-        .bento-item:hover { transform: translateY(-5px); box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1); }
-        .bento-item.paused {
-            opacity: 0.7;
-            filter: grayscale(1);
-            border: 2px dashed var(--text-sec);
-        }
+        .bento-item:hover { transform: translateY(-5px); box-shadow: 0 15px 35px -5px rgba(0,0,0,0.1); }
+        .bento-item.paused { opacity: 0.7; filter: grayscale(1); border: 2px dashed var(--text-sec); }
         
-        .bento-header { display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 1.1rem; color: var(--text-main); }
+        .bento-header { display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 1.1rem; }
         
-        .progress-bar {
-            height: 14px; background: rgba(0,0,0,0.06); border-radius: 7px; overflow: hidden; margin: 5px 0;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .progress-fill { height: 100%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 7px; }
+        .progress-bar { height: 10px; background: rgba(0,0,0,0.06); border-radius: 5px; overflow: hidden; margin: 5px 0; }
+        .progress-fill { height: 100%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 5px; }
         
-        .stat-green .progress-fill { background: linear-gradient(90deg, var(--success), #34d399); }
-        .stat-yellow .progress-fill { background: linear-gradient(90deg, var(--warning), #fbbf24); }
-        .stat-red .progress-fill { background: linear-gradient(90deg, var(--danger), #f87171); }
+        .stat-green .progress-fill { background: var(--success); box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
+        .stat-yellow .progress-fill { background: var(--warning); box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
+        .stat-red .progress-fill { background: var(--danger); box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
 
         .bento-actions {
-            margin-top: 8px;
-            display: flex; gap: 8px; flex-wrap: wrap;
+            display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-top: 5px;
         }
-        /* اصلاح دکمه‌های آیکون دار (دستور ۴) */
         .action-chip {
-            flex: 1; padding: 10px 6px; font-size: 0.9rem; border-radius: 12px;
-            border: 1px solid rgba(0,0,0,0.08); background: rgba(255,255,255,0.7); color: var(--text-main);
-            cursor: pointer; text-align: center; font-weight: bold; white-space: nowrap;
-            display: flex; align-items: center; justify-content: center; gap: 6px;
-            transition: 0.2s;
-            min-width: 45%;
+            padding: 10px 0; font-size: 1.1rem; border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.05); background: rgba(255,255,255,0.6); 
+            color: var(--text-sec); cursor: pointer; text-align: center; 
+            transition: 0.2s; display: flex; justify-content: center; align-items: center;
         }
-        .action-chip i { font-size: 1rem; }
         .action-chip:hover { background: var(--primary); color: white; border-color: var(--primary); }
 
         /* --- Template Chips --- */
@@ -487,41 +434,40 @@
             display: flex; gap: 10px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 15px; scrollbar-width: none;
         }
         .template-chip {
-            white-space: nowrap; padding: 10px 18px; border-radius: 30px;
-            background: var(--glass-bg); border: 2px solid var(--primary); color: var(--primary);
-            font-size: 0.9rem; font-weight: bold; cursor: pointer; transition: 0.2s;
+            white-space: nowrap; padding: 10px 18px; border-radius: 20px;
+            background: var(--glass-bg); border: 1px solid var(--primary); color: var(--primary);
+            font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
-        .template-chip:hover { background: var(--primary); color: white; transform: scale(1.05); }
+        .template-chip:hover { background: var(--primary); color: white; transform: translateY(-2px); }
 
         /* --- BOTTOM NAV --- */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; width: 100%;
             height: var(--nav-height);
-            background: rgba(255, 255, 255, 0.85);
+            background: var(--glass-bg);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(0,0,0,0.05);
+            border-top: var(--glass-border);
             display: flex; justify-content: space-around; align-items: center;
             z-index: 1000;
             box-shadow: 0 -10px 40px rgba(0,0,0,0.05);
-            padding-bottom: 15px; /* Safe area for iPhone */
+            padding-bottom: 15px;
         }
-        [data-theme="dark"] .bottom-nav { background: rgba(15, 23, 42, 0.85); border-top: 1px solid rgba(255,255,255,0.05); }
-
         .nav-btn {
             background: none; border: none;
             display: flex; flex-direction: column; align-items: center; gap: 6px;
-            color: var(--text-sec); font-size: 0.8rem; cursor: pointer;
-            width: 70px; font-weight: 600; opacity: 0.7; transition: 0.3s;
+            color: var(--text-sec); font-size: 0.7rem; cursor: pointer;
+            width: 70px; font-weight: 600; opacity: 0.6; transition: 0.3s;
         }
-        .nav-btn i { font-size: 1.6rem; margin-bottom: 2px; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .nav-btn i { font-size: 1.6rem; margin-bottom: 2px; transition: transform 0.2s; }
         .nav-btn.active { color: var(--primary); opacity: 1; }
-        .nav-btn.active i { transform: translateY(-8px); filter: drop-shadow(0 4px 6px rgba(37, 99, 235, 0.4)); }
+        .nav-btn.active i { transform: translateY(-5px); filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.4)); }
 
-        /* --- MODALS (دستور ۵) --- */
+        /* --- MODALS (دستور ۵: مدرن) --- */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6);
-            z-index: 2000;
+            z-index: 10000; /* Priority over normal content */
             display: none; 
             justify-content: center; 
             align-items: flex-end;
@@ -529,33 +475,62 @@
             opacity: 0;
             transition: opacity 0.3s;
         }
-        .modal.active { 
-            display: flex; 
-            opacity: 1;
-        }
+        .modal.active { display: flex; opacity: 1; }
         .modal-content {
             background: var(--bg-body);
             width: 100%; max-width: 600px;
-            padding: 35px 25px;
-            border-radius: 35px 35px 0 0;
+            padding: 30px 25px;
+            border-radius: 30px 30px 0 0;
             border-top: 1px solid rgba(255,255,255,0.5);
-            box-shadow: 0 -20px 80px rgba(0,0,0,0.3);
+            box-shadow: 0 -20px 60px rgba(0,0,0,0.3);
             max-height: 90vh; overflow-y: auto;
             transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1);
         }
-        .modal.active .modal-content {
-            transform: translateY(0);
+        .modal.active .modal-content { transform: translateY(0); }
+
+        /* --- TOAST NOTIFICATION (دستور ۵: پیغام مدرن) --- */
+        .toast-container {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 12000; pointer-events: none; width: 90%; max-width: 400px;
+            display: flex; flex-direction: column; gap: 10px;
         }
-        /* دستور ۵: مدرن سازی پنجره ها */
-        .modal-content h3 {
-            text-align: center; color: var(--primary); margin-bottom: 25px; font-size: 1.3rem; border-bottom: 2px solid rgba(0,0,0,0.05); padding-bottom: 15px;
+        .toast {
+            background: rgba(30, 41, 59, 0.95); color: white;
+            padding: 16px; border-radius: 16px;
+            display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            opacity: 0; transform: translateY(-20px) scale(0.9);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            pointer-events: auto;
         }
+        .toast.show { opacity: 1; transform: translateY(0) scale(1); }
+        .toast-icon { 
+            width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.2); 
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        
+        /* --- CUSTOM CONFIRM MODAL (دستور ۵) --- */
+        .custom-confirm {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 11000;
+            display: none; justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        .confirm-box {
+            background: var(--bg-body); width: 90%; max-width: 350px;
+            padding: 25px; border-radius: 24px; text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            transform: scale(0.8); opacity: 0; transition: all 0.3s;
+        }
+        .custom-confirm.active { display: flex; }
+        .custom-confirm.active .confirm-box { transform: scale(1); opacity: 1; }
 
         /* --- TAB CONTENT --- */
-        .tab-pane { display: none; padding-bottom: 20px; animation: fadeIn 0.5s ease; }
+        .tab-pane { display: none; padding-bottom: 20px; animation: fadeIn 0.4s ease; }
         .tab-pane.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- REPORT (PRINT) --- */
         #printArea {
@@ -574,29 +549,46 @@
 
         /* History Chip */
         .history-btn {
-            font-size: 0.8rem; background: rgba(37, 99, 235, 0.1); color: var(--primary); padding: 6px 14px; border-radius: 20px; cursor: pointer; margin-left: 10px; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; font-weight: normal;
+            font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 5px 12px; border-radius: 20px; cursor: pointer; margin-left: 10px; display: inline-flex; align-items: center; gap: 5px; transition: 0.2s;
         }
         .history-btn:hover { background: var(--primary); color: white; }
 
         .auth-input-group { width: 100%; margin-bottom: 20px; text-align: center; }
-        .auth-label { display: block; text-align: right; font-size: 0.9rem; color: var(--text-sec); margin-bottom: 8px; margin-right: 5px; font-weight: bold; }
+        .auth-label { display: block; text-align: right; font-size: 0.85rem; color: var(--text-sec); margin-bottom: 5px; margin-right: 5px; }
 
     </style>
 </head>
 <body>
 
-<!-- 1. LOCK SCREEN (دستور ۱: فاصله و استایل مناسب) -->
-<!-- 2. RECOVERY INSIDE LOCK SCREEN (دستور ۲: ادغام برای رفع باگ) -->
+<!-- TOAST CONTAINER -->
+<div id="toastContainer" class="toast-container"></div>
 
-<div id="authModal" class="pin-screen" style="display: flex;">
+<!-- CUSTOM CONFIRM MODAL -->
+<div id="confirmModal" class="custom-confirm">
+    <div class="confirm-box">
+        <div style="width:60px; height:60px; background:rgba(239, 68, 68, 0.1); color:var(--danger); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 15px auto; font-size:1.8rem;">
+            <i class="fas fa-exclamation"></i>
+        </div>
+        <h3 style="margin:0 0 10px 0;">آیا مطمئن هستید؟</h3>
+        <p id="confirmMsg" style="color:var(--text-sec); font-size:0.9rem; margin-bottom:20px;">این عملیات قابل بازگشت نیست.</p>
+        <div style="display:flex; gap:10px;">
+            <button id="btnConfirmYes" class="btn btn-primary" style="flex:1;">بله، انجام بده</button>
+            <button id="btnConfirmNo" class="btn btn-outline" style="flex:1;">انصراف</button>
+        </div>
+    </div>
+</div>
+
+<!-- 1. LOCK SCREEN (بازنویسی شده طبق دستور ۱ و ۲) -->
+
+<div id="authModal" class="pin-screen">
     <div class="auth-card">
         <div class="auth-avatar" id="authIcon">
             <i class="fas fa-fingerprint"></i>
         </div>
         <h2 id="authTitle" style="margin: 0 0 10px 0; color: var(--primary);">خوش آمدید</h2>
-        <p id="authSub" style="font-size: 0.95rem; color: var(--text-sec); margin-bottom: 25px;">سیستم مدیریت مالی هوشمند</p>
+        <p id="authSub" style="font-size: 0.9rem; color: var(--text-sec); margin-bottom: 25px;">سیستم مدیریت مالی هوشمند</p>
 
-        <!-- View: Setup (ثبت نام) -->
+        <!-- Step 1: Registration / Info -->
         <div id="authStep1" style="display:none; width:100%;">
             <div class="auth-input-group">
                 <label class="auth-label">نام و نام خانوادگی:</label>
@@ -606,13 +598,13 @@
                 <input type="text" id="setupNatId" inputmode="numeric" placeholder="کد ملی خود را وارد کنید">
 
                 <label class="auth-label">سوال امنیتی (تصادفی):</label>
-                <div style="background: rgba(37, 99, 235, 0.08); padding: 12px; border-radius: 12px; margin-bottom: 15px; color: var(--primary); font-weight: bold; font-size: 0.95rem;" id="setupSecurityQ">---</div>
+                <div style="background: rgba(59, 130, 246, 0.05); padding: 12px; border-radius: 12px; margin-bottom: 12px; color: var(--primary); font-weight: bold; font-size: 0.9rem;" id="setupSecurityQ">---</div>
                 <input type="text" id="setupSecurityA" placeholder="پاسخ را بنویسید">
             </div>
             <button class="btn btn-primary" style="width:100%;" onclick="goToPinSetup()">تایید و تعیین رمز</button>
         </div>
 
-        <!-- View: Login (پین کد) -->
+        <!-- Step 2: PIN Entry -->
         <div id="authStep2" style="display:none; width:100%; flex-direction: column; align-items: center;">
             <div class="pin-dots">
                 <div class="pin-dot" id="pd1"></div>
@@ -637,32 +629,28 @@
             </div>
         </div>
 
-        <!-- View: Recovery (بازیابی رمز - دستور ۲) -->
-        <div id="authRecovery" style="display:none; width:100%;">
-            <h3 style="color: var(--primary); font-size: 1rem; margin-bottom: 15px;">بازیابی حساب کاربری</h3>
-            <div class="auth-input-group">
-                <label class="auth-label">کد ملی:</label>
-                <input type="text" id="recNatId" inputmode="numeric" placeholder="کد ملی...">
-                
-                <label class="auth-label">سوال امنیتی:</label>
-                <div id="recSecQuestion" style="background: rgba(37,99,235,0.08); padding: 10px; border-radius: 10px; margin-bottom: 10px; color: var(--primary); font-size: 0.9rem;">---</div>
-                
-                <label class="auth-label">پاسخ:</label>
-                <input type="text" id="recSecAns" placeholder="پاسخ شما...">
-            </div>
-            <div style="display: flex; gap: 10px;">
+        <!-- Step 3: Recovery (تغییر دستور ۲: ادغام در لاک اسکرین) -->
+        <div id="authStepRecovery" style="display:none; width:100%; text-align:right;">
+             <h4 style="margin-top:0;">بازیابی رمز عبور</h4>
+             <label class="auth-label">کد ملی:</label>
+             <input type="text" id="recNatId" inputmode="numeric" placeholder="کد ملی...">
+             <label class="auth-label">سوال امنیتی:</label>
+             <p id="recoveryQuestionText" style="font-size:0.9rem; color:var(--primary); background:rgba(59,130,246,0.1); padding:10px; border-radius:10px; margin:5px 0 15px 0;">---</p>
+             <label class="auth-label">پاسخ:</label>
+             <input type="text" id="recoveryAnswerInput" placeholder="پاسخ...">
+             <div style="display:flex; gap:10px; margin-top:10px;">
                  <button class="btn btn-primary" style="flex:1" onclick="checkRecoveryAnswer()">تایید</button>
-                 <button class="btn btn-outline" style="flex:1" onclick="toggleRecovery(false)">بازگشت</button>
-            </div>
+                 <button class="btn btn-outline" style="flex:1" onclick="backToLogin()">بازگشت</button>
+             </div>
         </div>
 
         <!-- Actions -->
         <div id="authActions" style="width:100%; margin-top:20px;">
-            <div id="forgotPassDiv" class="auth-link" onclick="toggleRecovery(true)" style="display:none;">
-                <i class="fas fa-key"></i> رمز عبور را فراموش کردم
+            <div id="forgotPassDiv" class="auth-link" onclick="showRecovery()">
+                رمز عبور را فراموش کردم
             </div>
-            <button class="guest-btn" onclick="enterGuestMode()" style="width:100%;">
-                <i class="fas fa-user-secret"></i> ورود آزاد (مهمان)
+            <button class="btn btn-outline" onclick="enterGuestMode()" style="width:100%; border:none; margin-top:10px; color:var(--warning);">
+                <i class="fas fa-user-secret"></i> ورود به عنوان مهمان
             </button>
         </div>
     </div>
@@ -675,67 +663,67 @@
     <!-- Header -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-top: 10px;">
         <div>
-            <h2 style="margin:0; color:var(--primary); font-weight:900;">مدیریت مالی</h2>
-            <div style="display:flex; align-items:center; gap:8px;">
-                <span style="font-size:0.9rem; color:var(--text-sec); font-weight: bold;" id="headerDate">---</span>
-                <span style="font-size:0.8rem; background:rgba(16,185,129,0.15); color:var(--success); padding:3px 8px; border-radius:8px; font-weight:bold;" id="daysPassedLabel">روز ۰</span>
+            <h2 style="margin:0; color:var(--primary); font-weight:900; letter-spacing:-1px;">مدیریت مالی</h2>
+            <div style="display:flex; align-items:center; gap:5px;">
+                <span style="font-size:0.85rem; color:var(--text-sec);" id="headerDate">---</span>
+                <span style="font-size:0.75rem; background:rgba(16,185,129,0.1); color:var(--success); padding:2px 8px; border-radius:8px; font-weight:bold;" id="daysPassedLabel">روز ۰</span>
             </div>
         </div>
-        <div style="display:flex; gap:10px;">
-            <button class="currency-toggle-btn" id="currBtn" onclick="toggleCurrency()" title="تغییر واحد پول">
-                <i class="fas fa-coins"></i>
-                <span id="currBtnText">تومان</span>
+        <div style="display:flex; gap:8px;">
+            <button class="btn-icon" onclick="toggleCurrency()" title="تغییر واحد پول" style="width:40px; height:40px;">
+                <b id="currBtnText" style="font-size:0.75rem;">تومان</b>
             </button>
-            <button class="btn-icon" onclick="toggleTheme()" title="تم شب/روز">
-                <i class="fas fa-moon"></i>
+            <button class="btn-icon" onclick="toggleTheme()" title="تم شب/روز" style="width:40px; height:40px;">
+                <i class="fas fa-adjust"></i>
             </button>
         </div>
     </div>
 
     <!-- TAB 1: DASHBOARD -->
     <div id="view-dashboard" class="tab-pane active">
-        <!-- Hero Card (دستور ۶: مدرن و شبیه کارت بانکی) -->
+        <!-- Hero Card (دستور ۶: طرح کارت بانکی) -->
         <div class="hero-card" onclick="this.classList.toggle('flipped')">
             <div class="card-inner">
                 <div class="card-front">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                         <div class="card-chip"></div>
-                        <i class="fas fa-wifi" style="opacity:0.8; font-size: 1.5rem; transform: rotate(90deg);"></i>
+                        <i class="fas fa-wifi nfc-icon"></i>
                     </div>
-                    <div>
-                        <span class="balance-label">موجودی خالص (قابل تقسیم)</span>
+                    
+                    <div style="text-align:left; margin-top:10px;">
+                        <span class="balance-label">موجودی قابل مصرف</span>
                         <div class="balance-value" id="totalBalance">0</div>
                     </div>
-                    <div style="display:flex; justify-content:space-between; font-size:1rem; opacity:0.95; font-weight:600; align-items: flex-end;">
-                        <span id="userNameDisplay" style="text-transform: uppercase; letter-spacing: 1px;">کاربر</span>
-                        <div style="display: flex; flex-direction: column; align-items: flex-end;">
-                             <span style="font-size: 0.7rem; opacity: 0.7;">VALID THRU</span>
-                             <span>12/28</span>
+                    
+                    <div class="card-footer">
+                        <div>
+                            <span class="balance-label" style="text-align:right; font-size:0.7rem;">دارنده کارت</span>
+                            <span class="card-holder" id="userNameDisplay">کاربر</span>
                         </div>
-                        <i class="fab fa-cc-visa" style="font-size: 2.2rem; margin-bottom: -5px;"></i>
+                        <div style="display:flex; flex-direction:column; align-items:flex-end;">
+                            <span style="font-size:0.7rem; opacity:0.8;">واحد پول</span>
+                            <span style="font-weight:bold;" id="cardCurrency">تومان</span>
+                        </div>
                     </div>
                 </div>
                 <div class="card-back">
-                    <div style="background: black; height: 40px; width: 100%; position: absolute; top: 20px; left: 0;"></div>
-                    <div style="width: 100%; padding: 0 20px; margin-top: 40px;">
-                        <h3 style="margin:0;">خلاصه وضعیت</h3>
-                        <p style="margin:5px 0; opacity:0.8; font-size: 0.9rem;">مجموع بدهی‌های ثابت و چک:</p>
-                        <div style="font-size:1.8rem; color:var(--danger); font-weight:bold; direction:ltr; background: white; padding: 5px 15px; border-radius: 5px; color: #333; margin: 10px auto; width: fit-content;" id="totalDebtDisplay">0</div>
-                        <p style="font-size:0.8rem; margin-top:15px; opacity:0.6;">CVV2: ***</p>
-                    </div>
+                    <h3 style="margin:0; color:white;">خلاصه وضعیت</h3>
+                    <p style="margin:5px 0; opacity:0.8;">مجموع بدهی‌های کسر شده:</p>
+                    <div style="font-size:2.2rem; color:#fca5a5; font-weight:bold; direction:ltr;" id="totalDebtDisplay">0</div>
+                    <p style="font-size:0.8rem; margin-top:20px; opacity:0.6; padding-top:10px; border-top:1px solid rgba(255,255,255,0.1);">اطلاعات محرمانه مالی</p>
                 </div>
             </div>
         </div>
 
         <div class="header-row">
-            <h3>داشبورد <span class="history-btn" onclick="showSectionHistory('dashboard')"><i class="fas fa-history"></i> سابقه</span></h3>
+            <h3><i class="fas fa-tachometer-alt"></i> داشبورد <span class="history-btn" onclick="showSectionHistory('dashboard')"><i class="fas fa-history"></i> سابقه</span></h3>
         </div>
 
         <!-- Wallets -->
         <div class="glass-panel">
             <div class="header-row">
-                <h3><i class="fas fa-wallet" style="color: var(--primary);"></i> منابع مالی (کیف پول)</h3>
-                <button class="btn btn-primary" onclick="openModal('walletModal')"><i class="fas fa-plus"></i> افزودن</button>
+                <h3><i class="fas fa-wallet" style="color:var(--primary)"></i> کیف پول‌ها</h3>
+                <button class="btn btn-primary" onclick="openModal('walletModal')"><i class="fas fa-plus"></i></button>
             </div>
             <div id="walletList"></div>
         </div>
@@ -743,8 +731,8 @@
         <!-- Fixed Debts -->
         <div class="glass-panel">
             <div class="header-row">
-                <h3><i class="fas fa-file-invoice-dollar" style="color: var(--danger);"></i> اقساط ثابت</h3>
-                <button class="btn btn-primary" onclick="openModal('debtModal')"><i class="fas fa-plus"></i> افزودن</button>
+                <h3><i class="fas fa-file-invoice" style="color:var(--danger)"></i> اقساط ثابت</h3>
+                <button class="btn btn-primary" onclick="openModal('debtModal')"><i class="fas fa-plus"></i></button>
             </div>
             <div id="debtList"></div>
         </div>
@@ -752,8 +740,8 @@
         <!-- Checks & Debts -->
         <div class="glass-panel">
             <div class="header-row">
-                <h3><i class="fas fa-money-check-alt" style="color: var(--warning);"></i> چک و بدهی</h3>
-                <button class="btn btn-primary" onclick="openModal('checkModal')"><i class="fas fa-plus"></i> افزودن</button>
+                <h3><i class="fas fa-money-check" style="color:var(--warning)"></i> چک و بدهی</h3>
+                <button class="btn btn-primary" onclick="openModal('checkModal')"><i class="fas fa-plus"></i></button>
             </div>
             <div id="checkList"></div>
         </div>
@@ -761,28 +749,27 @@
 
     <!-- TAB 2: BUDGET -->
     <div id="view-budget" class="tab-pane">
-        <div class="glass-panel" style="text-align:center; padding: 30px;">
-            <span style="color:var(--text-sec); font-size:0.95rem; font-weight: 600;">بودجه کل توزیع شده:</span>
+        <div class="glass-panel" style="text-align:center; padding: 30px 20px;">
+            <span style="color:var(--text-sec); font-size:0.9rem; font-weight:bold;">بودجه قابل توزیع</span>
             <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top:8px;">
                 <div id="distributable" style="font-size:2rem; font-weight:900; color:var(--primary); direction:ltr;">0</div>
-                <small id="totalPercentBadge" style="background:var(--text-sec); color:white; padding:4px 10px; border-radius:10px; font-weight:bold; font-size: 0.9rem;">0%</small>
+                <small id="totalPercentBadge" style="background:var(--text-sec); color:white; padding:4px 10px; border-radius:10px; font-weight:bold;">0%</small>
             </div>
             <button id="btnDistribute" class="btn btn-primary" style="margin-top:20px; width:100%; display:none;" onclick="triggerDistribution()">
-                <i class="fas fa-sync-alt"></i> توزیع موجودی جدید
+                <i class="fas fa-sync-alt"></i> بروزرسانی بودجه
             </button>
         </div>
 
         <div class="header-row" style="margin: 0 5px 20px 5px; flex-direction: column; align-items: flex-start; border:none;">
             <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom:15px;">
-                <h3 style="display:flex; align-items:center;">مدیریت ردیف‌ها <span class="history-btn" onclick="showSectionHistory('budget')"><i class="fas fa-history"></i> سابقه</span></h3>
+                <h3 style="display:flex; align-items:center;"><i class="fas fa-chart-pie"></i> مدیریت ردیف‌ها <span class="history-btn" onclick="showSectionHistory('budget')"><i class="fas fa-history"></i></span></h3>
                 <button class="btn btn-primary" onclick="openModal('addBudgetModal')"><i class="fas fa-plus"></i> جدید</button>
             </div>
             <div class="template-row" style="width: 100%;">
-                <span style="font-size:0.9rem; line-height:38px; margin-left:10px; font-weight:bold; color:var(--text-sec);">قالب‌ها:</span>
                 <div class="template-chip" onclick="applyTemplate('default')">پیش‌فرض</div>
                 <div class="template-chip" onclick="applyTemplate('student')">دانشجویی</div>
                 <div class="template-chip" onclick="applyTemplate('married')">متاهلی</div>
-                <div class="template-chip" onclick="applyTemplate('clear')">پاکسازی</div>
+                <div class="template-chip" onclick="applyTemplate('clear')">خالی</div>
             </div>
         </div>
 
@@ -792,14 +779,14 @@
     <!-- TAB 3: TOOLS -->
     <div id="view-tools" class="tab-pane">
         <div class="header-row" style="padding:0 5px;">
-             <h3>ابزارها <span class="history-btn" onclick="showSectionHistory('tools')"><i class="fas fa-history"></i> سابقه</span></h3>
+             <h3><i class="fas fa-toolbox"></i> ابزارها <span class="history-btn" onclick="showSectionHistory('tools')"><i class="fas fa-history"></i></span></h3>
         </div>
 
         <!-- Goals -->
         <div class="glass-panel">
             <div class="header-row">
-                <h3><i class="fas fa-bullseye" style="color:var(--primary)"></i> اهداف پس‌انداز</h3>
-                <button class="btn btn-primary" onclick="openModal('goalModal')"><i class="fas fa-plus"></i> هدف</button>
+                <h3><i class="fas fa-bullseye" style="color:var(--success)"></i> اهداف مالی</h3>
+                <button class="btn btn-primary" onclick="openModal('goalModal')"><i class="fas fa-plus"></i></button>
             </div>
             <div id="goalList"></div>
         </div>
@@ -807,8 +794,8 @@
         <!-- Shopping -->
         <div class="glass-panel">
             <div class="header-row">
-                <h3><i class="fas fa-shopping-cart" style="color:var(--success)"></i> لیست خرید</h3>
-                <button class="btn btn-primary" onclick="openModal('shopModal')"><i class="fas fa-plus"></i> کالا</button>
+                <h3><i class="fas fa-shopping-basket" style="color:var(--primary)"></i> لیست خرید</h3>
+                <button class="btn btn-primary" onclick="openModal('shopModal')"><i class="fas fa-plus"></i></button>
             </div>
             <div id="shopList"></div>
         </div>
@@ -816,8 +803,8 @@
         <!-- Loans Given -->
         <div class="glass-panel">
             <div class="header-row">
-                <h3><i class="fas fa-hand-holding-usd" style="color:var(--warning)"></i> طلب‌ها (قرض داده شده)</h3>
-                <button class="btn btn-primary" onclick="openModal('loanModal')"><i class="fas fa-plus"></i> ثبت</button>
+                <h3><i class="fas fa-hand-holding-usd" style="color:var(--warning)"></i> طلب‌ها (قرض)</h3>
+                <button class="btn btn-primary" onclick="openModal('loanModal')"><i class="fas fa-plus"></i></button>
             </div>
             <div id="loanList"></div>
         </div>
@@ -826,33 +813,33 @@
     <!-- TAB 4: SETTINGS -->
     <div id="view-settings" class="tab-pane">
         <div class="glass-panel">
-            <div class="header-row"><h3>تنظیمات سیستم</h3></div>
+            <div class="header-row"><h3><i class="fas fa-cogs"></i> تنظیمات</h3></div>
             
-            <div style="display:flex; flex-direction:column; gap:20px;">
+            <div style="display:flex; flex-direction:column; gap:15px;">
                 
                 <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:rgba(0,0,0,0.03); border-radius:16px;">
-                    <span style="font-weight:bold; color: var(--text-main);"><i class="fas fa-copy" style="color: var(--primary);"></i> حالت کپی (خام برای بانک)</span>
-                    <input type="checkbox" id="rawCopyCheck" style="width:24px; height:24px; margin:0; accent-color: var(--primary);">
+                    <span style="font-weight:bold;"><i class="fas fa-copy"></i> کپی مبلغ خام (بدون کاما)</span>
+                    <input type="checkbox" id="rawCopyCheck" style="width:24px; height:24px; margin:0;">
                 </div>
 
                 <button class="btn btn-outline" onclick="openPrioritySettings()">
-                    <i class="fas fa-list-ol"></i> مدیریت اولویت‌ها (اصلاح شده)
+                    <i class="fas fa-sort-amount-down"></i> اولویت‌بندی بودجه
                 </button>
 
                 <button class="btn btn-outline" onclick="changeUserName()">
-                    <i class="fas fa-user-edit"></i> تغییر نام کاربر
+                    <i class="fas fa-user-edit"></i> ویرایش نام کاربر
                 </button>
 
                 <button class="btn btn-outline" onclick="generateReportImage()">
-                    <i class="fas fa-file-image"></i> دانلود فاکتور و نمودار کامل (PDF)
+                    <i class="fas fa-file-pdf"></i> گزارش تصویری و نمودار
                 </button>
                 
                 <button class="btn btn-outline" onclick="downloadBackup()">
-                    <i class="fas fa-download"></i> دانلود فایل بکاپ (JSON)
+                    <i class="fas fa-cloud-download-alt"></i> پشتیبان‌گیری
                 </button>
                 
                 <label class="btn btn-outline" style="cursor:pointer; text-align:center;">
-                    <i class="fas fa-upload"></i> بازیابی فایل بکاپ
+                    <i class="fas fa-cloud-upload-alt"></i> بازیابی اطلاعات
                     <input type="file" id="restoreFile" style="display:none" onchange="restoreBackup(this)">
                 </label>
 
@@ -861,11 +848,11 @@
                 </button>
 
                 <button class="btn btn-outline" onclick="changePin()">
-                    <i class="fas fa-lock"></i> تغییر رمز عبور و مشخصات
+                    <i class="fas fa-key"></i> تغییر رمز عبور
                 </button>
 
                 <button class="btn btn-danger" onclick="resetAll()">
-                    <i class="fas fa-trash"></i> ریست فکتوری
+                    <i class="fas fa-trash-alt"></i> حذف کل اطلاعات
                 </button>
             </div>
         </div>
@@ -876,33 +863,33 @@
 
 <nav class="bottom-nav">
     <button class="nav-btn active" onclick="switchTab('dashboard')">
-        <i class="fas fa-home"></i> داشبورد
+        <i class="fas fa-home"></i> خانه
     </button>
     <button class="nav-btn" onclick="switchTab('budget')">
         <i class="fas fa-chart-pie"></i> بودجه
     </button>
     <button class="nav-btn" onclick="switchTab('tools')">
-        <i class="fas fa-tools"></i> ابزارها
+        <i class="fas fa-briefcase"></i> ابزار
     </button>
     <button class="nav-btn" onclick="switchTab('settings')">
         <i class="fas fa-cog"></i> تنظیمات
     </button>
 </nav>
 
-<!-- MODALS (دستور ۵: زیبا و مدرن) -->
+<!-- MODALS -->
 
-<!-- Edit Modal (دستور ۳ و ۵: پر شدن مقادیر) -->
+<!-- Edit Modal (دستور ۳: پر شدن مقادیر) -->
 <div id="editModal" class="modal">
     <div class="modal-content">
-        <h3>ویرایش آیتم</h3>
+        <h3><i class="fas fa-edit"></i> ویرایش آیتم</h3>
         <input type="hidden" id="editType">
         <input type="hidden" id="editIndex">
 
-        <label class="auth-label">عنوان:</label>
+        <label>عنوان:</label>
         <input type="text" id="editName">
         
         <div id="editAmountWrapper">
-            <label class="auth-label">مبلغ / ارزش:</label>
+            <label>مبلغ / ارزش:</label>
             <div class="money-input-wrapper">
                 <input type="text" id="editVal" onkeyup="formatCurrency(this)" inputmode="numeric">
                 <span class="money-unit currency-text">تومان</span>
@@ -910,12 +897,12 @@
         </div>
 
         <div id="editDateWrapper" style="display:none;">
-            <label class="auth-label">تاریخ:</label>
+            <label>تاریخ:</label>
             <div class="date-picker-row" id="editDateRow"></div>
         </div>
 
         <div id="editPercentWrapper" style="display:none;">
-            <label class="auth-label">درصد:</label>
+            <label>درصد:</label>
             <input type="number" id="editPercent" inputmode="numeric">
         </div>
 
@@ -929,8 +916,8 @@
 <!-- Section History Modal -->
 <div id="sectionHistoryModal" class="modal">
     <div class="modal-content">
-        <h3>تاریخچه تغییرات (۱۰ مورد آخر)</h3>
-        <p style="font-size:0.85rem; color:var(--text-sec)">با کلیک روی هر مورد، وضعیت به آن زمان باز می‌گردد.</p>
+        <h3>تاریخچه تغییرات</h3>
+        <p style="font-size:0.85rem; color:var(--text-sec)">۱۰ تغییر آخر این بخش:</p>
         <div id="sectionHistoryList" style="max-height:300px; overflow-y:auto; margin-top:15px;"></div>
         <button class="btn btn-outline" style="width:100%; margin-top:20px;" onclick="closeAllModals()">بستن</button>
     </div>
@@ -940,16 +927,16 @@
 <div id="walletModal" class="modal">
     <div class="modal-content">
         <h3>افزودن کیف پول</h3>
-        <label class="auth-label">نام کیف پول:</label>
-        <input type="text" id="wName" placeholder="مثلاً: کارت ملی">
-        <label class="auth-label">مبلغ موجودی:</label>
+        <label>نام منبع:</label>
+        <input type="text" id="wName" placeholder="مثلاً: کارت حقوق">
+        <label>مبلغ موجودی:</label>
         <div class="money-input-wrapper">
             <input type="text" id="wVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
             <span class="money-unit currency-text">تومان</span>
         </div>
         <div style="margin-top:25px; display:flex; gap:12px;">
-            <button class="btn btn-primary" style="flex:1" onclick="addWallet()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+            <button class="btn btn-primary" style="flex:1" onclick="addWallet()">افزودن</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">انصراف</button>
         </div>
     </div>
 </div>
@@ -958,20 +945,20 @@
 <div id="debtModal" class="modal">
     <div class="modal-content">
         <h3>افزودن قسط ثابت</h3>
-        <label class="auth-label">عنوان قسط:</label>
-        <input type="text" id="dName" placeholder="مثلاً: وام مسکن">
-        <label class="auth-label">مبلغ قسط:</label>
+        <label>عنوان قسط:</label>
+        <input type="text" id="dName" placeholder="مثلاً: اجاره خانه">
+        <label>مبلغ قسط:</label>
         <div class="money-input-wrapper">
             <input type="text" id="dVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
             <span class="money-unit currency-text">تومان</span>
         </div>
-        <label class="auth-label">تاریخ پرداخت (روز):</label>
+        <label>روز پرداخت در ماه:</label>
         <div class="date-picker-row">
             <select id="dDay" style="direction: rtl;"></select>
         </div>
         <div style="margin-top:25px; display:flex; gap:12px;">
-            <button class="btn btn-primary" style="flex:1" onclick="addDebt()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+            <button class="btn btn-primary" style="flex:1" onclick="addDebt()">افزودن</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">انصراف</button>
         </div>
     </div>
 </div>
@@ -980,18 +967,18 @@
 <div id="checkModal" class="modal">
     <div class="modal-content">
         <h3>افزودن چک / بدهی</h3>
-        <label class="auth-label">عنوان:</label>
-        <input type="text" id="cName" placeholder="مثلاً: چک صیادی">
-        <label class="auth-label">مبلغ:</label>
+        <label>عنوان:</label>
+        <input type="text" id="cName" placeholder="مثلاً: بدهی به حسن">
+        <label>مبلغ:</label>
         <div class="money-input-wrapper">
             <input type="text" id="cVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
             <span class="money-unit currency-text">تومان</span>
         </div>
-        <label class="auth-label">تاریخ سررسید:</label>
+        <label>تاریخ سررسید:</label>
         <div class="date-picker-row" id="checkDateRow"></div>
         <div style="margin-top:25px; display:flex; gap:12px;">
-            <button class="btn btn-primary" style="flex:1" onclick="addCheck()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+            <button class="btn btn-primary" style="flex:1" onclick="addCheck()">افزودن</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">انصراف</button>
         </div>
     </div>
 </div>
@@ -1000,18 +987,18 @@
 <div id="loanModal" class="modal">
     <div class="modal-content">
         <h3>ثبت طلب (قرض داده شده)</h3>
-        <label class="auth-label">نام شخص/عنوان:</label>
-        <input type="text" id="lName" placeholder="مثلاً: علی رضایی">
-        <label class="auth-label">مبلغ قرض:</label>
+        <label>نام شخص:</label>
+        <input type="text" id="lName" placeholder="مثلاً: علی">
+        <label>مبلغ قرض:</label>
         <div class="money-input-wrapper">
             <input type="text" id="lVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
             <span class="money-unit currency-text">تومان</span>
         </div>
-        <label class="auth-label">تاریخ وصول:</label>
+        <label>تاریخ بازپرداخت:</label>
         <div class="date-picker-row" id="loanDateRow"></div>
         <div style="margin-top:25px; display:flex; gap:12px;">
-            <button class="btn btn-primary" style="flex:1" onclick="addLoan()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+            <button class="btn btn-primary" style="flex:1" onclick="addLoan()">افزودن</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">انصراف</button>
         </div>
     </div>
 </div>
@@ -1020,13 +1007,13 @@
 <div id="addBudgetModal" class="modal">
     <div class="modal-content">
         <h3>افزودن ردیف بودجه</h3>
-        <label class="auth-label">عنوان:</label>
-        <input type="text" id="bName" placeholder="مثلاً: پوشاک">
-        <label class="auth-label">درصد سهم:</label>
+        <label>عنوان:</label>
+        <input type="text" id="bName" placeholder="مثلاً: هزینه ماشین">
+        <label>درصد سهم از درآمد:</label>
         <input type="number" id="bPercent" inputmode="numeric" placeholder="مثلاً: 10">
         <div style="margin-top:25px; display:flex; gap:12px;">
-            <button class="btn btn-primary" style="flex:1" onclick="addNewBudget()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+            <button class="btn btn-primary" style="flex:1" onclick="addNewBudget()">افزودن</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">انصراف</button>
         </div>
     </div>
 </div>
@@ -1036,16 +1023,16 @@
     <div class="modal-content">
         <h3>ثبت هزینه جدید</h3>
         <input type="hidden" id="expBudgetId">
-        <label class="auth-label">مبلغ هزینه:</label>
+        <label>مبلغ هزینه:</label>
         <div class="money-input-wrapper">
             <input type="text" id="expAmt" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
             <span class="money-unit currency-text">تومان</span>
         </div>
-        <label class="auth-label">بابت (توضیح):</label>
+        <label>بابت (توضیح):</label>
         <input type="text" id="expReason" placeholder="...">
         <div style="margin-top:25px; display:flex; gap:12px;">
-            <button class="btn btn-primary" style="flex:1" onclick="submitExp()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+            <button class="btn btn-primary" style="flex:1" onclick="submitExp()">ثبت هزینه</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">انصراف</button>
         </div>
     </div>
 </div>
@@ -1054,16 +1041,16 @@
 <div id="goalModal" class="modal">
     <div class="modal-content">
         <h3>هدف پس‌انداز جدید</h3>
-        <label class="auth-label">نام هدف:</label>
-        <input type="text" id="gName" placeholder="مثلاً: لپ‌تاپ">
-        <label class="auth-label">مبلغ هدف:</label>
+        <label>نام هدف:</label>
+        <input type="text" id="gName" placeholder="مثلاً: خرید گوشی">
+        <label>مبلغ مورد نیاز:</label>
         <div class="money-input-wrapper">
             <input type="text" id="gTarget" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
             <span class="money-unit currency-text">تومان</span>
         </div>
         <div style="margin-top:25px; display:flex; gap:12px;">
-            <button class="btn btn-primary" style="flex:1" onclick="addGoal()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+            <button class="btn btn-primary" style="flex:1" onclick="addGoal()">ثبت هدف</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">انصراف</button>
         </div>
     </div>
 </div>
@@ -1072,16 +1059,16 @@
 <div id="shopModal" class="modal">
     <div class="modal-content">
         <h3>افزودن به لیست خرید</h3>
-        <label class="auth-label">نام کالا:</label>
-        <input type="text" id="sName" placeholder="مثلاً: روغن زیتون">
-        <label class="auth-label">قیمت حدودی (اختیاری):</label>
+        <label>نام کالا:</label>
+        <input type="text" id="sName" placeholder="مثلاً: برنج">
+        <label>قیمت حدودی (اختیاری):</label>
         <div class="money-input-wrapper">
             <input type="text" id="sPrice" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
             <span class="money-unit currency-text">تومان</span>
         </div>
         <div style="margin-top:25px; display:flex; gap:12px;">
-            <button class="btn btn-primary" style="flex:1" onclick="addShop()">ثبت</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+            <button class="btn btn-primary" style="flex:1" onclick="addShop()">افزودن</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">انصراف</button>
         </div>
     </div>
 </div>
@@ -1089,23 +1076,23 @@
 <!-- Allocate Modal -->
 <div id="allocModal" class="modal">
     <div class="modal-content">
-        <h3>اختصاص بودجه</h3>
-        <p style="font-size:0.9rem; color:var(--text-sec); text-align:center;">انتخاب کنید هزینه از کدام ردیف بودجه کسر شود:</p>
-        <input type="hidden" id="allocType"> <!-- goal or shop -->
+        <h3>پرداخت از بودجه</h3>
+        <p style="font-size:0.9rem; color:var(--text-sec);">انتخاب کنید هزینه از کدام ردیف بودجه کسر شود:</p>
+        <input type="hidden" id="allocType">
         <input type="hidden" id="allocId">
 
-        <label class="auth-label">ردیف بودجه:</label>
+        <label>ردیف بودجه:</label>
         <select id="allocBudgetSelect"></select>
         
-        <label class="auth-label">مبلغ اختصاصی:</label>
+        <label>مبلغ قابل پرداخت:</label>
         <div class="money-input-wrapper">
             <input type="text" id="allocAmt" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
             <span class="money-unit currency-text">تومان</span>
         </div>
         
         <div style="margin-top:25px; display:flex; gap:12px;">
-            <button class="btn btn-primary" style="flex:1" onclick="performAllocation()">ثبت کسری</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+            <button class="btn btn-primary" style="flex:1" onclick="performAllocation()">پرداخت</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">انصراف</button>
         </div>
     </div>
 </div>
@@ -1124,19 +1111,19 @@
                 <input type="range" id="percentSlider" min="0" value="0" oninput="updateSliderVal()">
                 <span id="sliderValDisplay">0</span>%
             </div>
-            <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="useSliderPercent()">ثبت درصد انتخابی</button>
+            <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="useSliderPercent()">ثبت این درصد</button>
         </div>
 
         <div style="margin:20px 0; padding:15px; background:rgba(0,0,0,0.05); border-radius:12px;">
             <p><b>حالت دوم:</b> اصلاح هوشمند سیستم</p>
-            <p style="font-size:0.9rem;">سیستم بر اساس اولویت‌بندی‌ها، درصدهای اولویت پایین‌تر را کاهش می‌دهد.</p>
+            <p style="font-size:0.9rem;">سیستم بر اساس اولویت‌ها، از ردیف‌های کم‌اهمیت کسر می‌کند.</p>
             
             <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
                 <input type="checkbox" id="allowZeroCheck" style="width:auto; margin:0; box-shadow:none;">
                 <label for="allowZeroCheck" style="font-size:0.9rem;">اجازه صفر شدن آیتم‌ها</label>
             </div>
             
-            <button class="btn btn-primary" style="width:100%" onclick="autoCorrectBudget()">اصلاح خودکار و ثبت</button>
+            <button class="btn btn-primary" style="width:100%" onclick="autoCorrectBudget()">اصلاح خودکار</button>
         </div>
 
         <button class="btn btn-danger" style="width:100%" onclick="closeAllModals()">انصراف</button>
@@ -1147,9 +1134,9 @@
 <div id="prioritySettingsModal" class="modal">
     <div class="modal-content">
         <h3>مدیریت اولویت‌ها</h3>
-        <p style="font-size:0.8rem; color:var(--text-sec); margin-bottom:15px; text-align:center;">اولویت ۱ (بسیار مهم) تا ۴ (کم‌اهمیت). در اصلاح خودکار، از اولویت‌های پایین‌تر کسر می‌شود.</p>
+        <p style="font-size:0.8rem; color:var(--text-sec); margin-bottom:15px;">اولویت ۱ (بسیار مهم) تا ۴ (کم‌اهمیت).</p>
         
-        <div style="display:flex; gap:10px; margin-bottom:20px; background:rgba(0,0,0,0.04); padding:15px; border-radius:16px;">
+        <div style="display:flex; gap:10px; margin-bottom:20px; background:rgba(0,0,0,0.05); padding:15px; border-radius:15px;">
             <div style="flex:1">
                 <small style="display:block; margin-bottom:5px;">بازه کم (تا %)</small>
                 <input type="number" id="pRangeLow" inputmode="numeric" placeholder="40" style="margin:0;">
@@ -1161,13 +1148,11 @@
         </div>
         <button class="btn btn-outline" style="width:100%; margin-bottom:15px; font-size:0.85rem;" onclick="savePriorityRanges()">ذخیره بازه‌ها</button>
 
-        <div id="priorityList" style="max-height:300px; overflow-y:auto; padding-bottom:20px;">
-            <!-- Generated via JS safely -->
-        </div>
+        <div id="priorityList" style="max-height:300px; overflow-y:auto; padding-bottom:20px;"></div>
 
         <div style="margin-top:25px; display:flex; gap:12px;">
-            <button class="btn btn-primary" style="flex:1" onclick="savePriorities()">ذخیره همه اولویت‌ها</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+            <button class="btn btn-primary" style="flex:1" onclick="savePriorities()">ذخیره همه</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">انصراف</button>
         </div>
     </div>
 </div>
@@ -1175,7 +1160,7 @@
 <!-- Item History Modal -->
 <div id="itemHistModal" class="modal">
     <div class="modal-content">
-        <h3>تاریخچه تراکنش‌ها</h3>
+        <h3>تراکنش‌های اخیر</h3>
         <div id="itemHistList" style="max-height:300px; overflow-y:auto; margin-top:15px; font-size:0.9rem;"></div>
         <button class="btn btn-outline" style="width:100%; margin-top:20px;" onclick="closeAllModals()">بستن</button>
     </div>
@@ -1187,59 +1172,6 @@
         <h3>تاریخچه بکاپ‌ها</h3>
         <div id="histList" style="max-height:300px; overflow-y:auto; margin-top:15px; font-size:0.9rem;"></div>
         <button class="btn btn-outline" style="width:100%; margin-top:20px;" onclick="closeAllModals()">بستن</button>
-    </div>
-</div>
-
-<!-- REPORT TEMPLATE -->
-<div id="printArea">
-    <div class="print-header">
-        <h1>گزارش جامع وضعیت مالی</h1>
-        <p id="printDate">تاریخ: ---</p>
-        <p>کاربر: <span id="printUser">---</span> | روزهای سپری شده: <span id="printDays">0</span></p>
-    </div>
-
-    <div class="print-summary">
-        <div>کل دارایی: <b id="printInc">0</b></div>
-        <div>کل بدهی: <b id="printDebt">0</b></div>
-        <div>خالص قابل خرج: <b id="printNet">0</b></div>
-    </div>
-
-    <!-- Chart Container for PDF -->
-    <div class="print-section-title">نمودار پیشرفت مالی (روزانه)</div>
-    <div class="print-chart-container">
-        <canvas id="printChart"></canvas>
-    </div>
-
-    <div class="print-section-title">تاریخچه روزانه اخیر</div>
-    <table class="print-table" style="font-size:0.8rem;">
-        <thead>
-            <tr><th>تاریخ</th><th>خالص (تومان)</th><th>هزینه شده</th></tr>
-        </thead>
-        <tbody id="printHistoryTable"></tbody>
-    </table>
-
-    <div class="print-section-title">جزئیات بودجه‌بندی</div>
-    <table class="print-table">
-        <thead>
-            <tr>
-                <th>ردیف</th>
-                <th>درصد</th>
-                <th>سهم (تومان)</th>
-                <th>خرج شده</th>
-                <th>مانده</th>
-            </tr>
-        </thead>
-        <tbody id="printBody"></tbody>
-    </table>
-
-    <div class="print-section-title">وضعیت بدهی‌ها</div>
-    <div id="printDebtsList" style="margin-top:5px; font-size:0.9rem;"></div>
-
-    <div class="print-section-title">وضعیت اهداف مالی</div>
-    <div id="printGoalsList" style="margin-top:5px; font-size:0.9rem;"></div>
-
-    <div style="margin-top:30px; text-align:center; font-size:12px; color:#666; border-top:1px solid #000; padding-top:10px;">
-        تولید شده توسط سامانه مدیریت مالی شخصی V14 Ultimate
     </div>
 </div>
 
@@ -1318,9 +1250,7 @@
     }
 
     // --- DATE PICKER SETUP ---
-    function setupDatePickers() {
-        // Generic init
-    }
+    function setupDatePickers() { }
 
     function createDatePickerHTML(prefix, defaultD=1, defaultM=1, defaultY=1403) {
         return `
@@ -1350,23 +1280,20 @@
         return `${y}/${m}/${d}`;
     }
 
-    // --- AUTH & LOCK SCREEN (دستور ۱ و ۲) ---
+    // --- AUTH & LOCK SCREEN ---
     function checkAuth() {
         const modal = document.getElementById('authModal');
         const step1 = document.getElementById('authStep1');
         const step2 = document.getElementById('authStep2');
-        const recView = document.getElementById('authRecovery');
         const actions = document.getElementById('authActions');
         const title = document.getElementById('authTitle');
         const sub = document.getElementById('authSub');
         const forgotDiv = document.getElementById('forgotPassDiv');
 
         modal.style.display = 'flex';
-        recView.style.display = 'none'; // Ensure recovery is hidden on start
         pinBuffer = "";
         updatePinDots();
 
-        // If not setup, show Registration Form
         if (!app.security.hasPin || !app.security.isSetup) {
             title.innerText = "راه‌اندازی اولیه";
             sub.innerText = "لطفاً اطلاعات هویتی و امنیتی خود را وارد کنید";
@@ -1376,13 +1303,11 @@
             forgotDiv.style.display = 'none';
             app.security.isSetup = false;
 
-            // Set Random Question
             const randIdx = Math.floor(Math.random() * securityQuestions.length);
             document.getElementById('setupSecurityQ').innerText = securityQuestions[randIdx];
             document.getElementById('setupSecurityQ').setAttribute('data-qid', randIdx);
 
         } else {
-            // Login Mode
             title.innerText = app.user.name || "خوش آمدید";
             sub.innerText = "جهت ورود رمز خود را وارد کنید";
             step1.style.display = 'none';
@@ -1397,7 +1322,7 @@
         const natId = document.getElementById('setupNatId').value.trim();
         const ans = document.getElementById('setupSecurityA').value.trim();
 
-        if(!name || !natId || !ans) return alert("لطفا تمام فیلدها را پر کنید.");
+        if(!name || !natId || !ans) return showToast("لطفا تمام فیلدها را پر کنید.", "error");
 
         app.user.name = name;
         app.security.nationalId = natId;
@@ -1410,8 +1335,8 @@
         document.getElementById('authSub').innerText = "یک رمز ۴ رقمی وارد کنید";
     }
 
-    function enterGuestMode() {
-        if(confirm("در حالت ورود آزاد، هیچ اطلاعاتی ذخیره نمی‌شود. آیا ادامه می‌دهید؟")) {
+    async function enterGuestMode() {
+        if(await confirmAction("در حالت مهمان اطلاعات ذخیره نمی‌شود. ادامه می‌دهید؟")) {
             isGuestMode = true;
             app = JSON.parse(JSON.stringify(defaultState));
             app.user.name = "مهمان گرامی";
@@ -1436,10 +1361,9 @@
         }
     }
 
-    function processPin() {
-        // Setup Mode
+    async function processPin() {
         if (!app.security.hasPin) {
-            if(confirm("رمز شما: " + pinBuffer + "\nآیا این رمز تایید است؟")) {
+            if(await confirmAction("رمز شما: " + pinBuffer + "\nآیا تایید است؟")) {
                 app.security.pin = pinBuffer;
                 app.security.hasPin = true;
                 app.security.isSetup = true;
@@ -1453,7 +1377,6 @@
                 pinBuffer = ""; updatePinDots();
             }
         } else {
-            // Login Mode
             if (pinBuffer === app.security.pin) {
                 document.getElementById('authModal').style.display = 'none';
                 document.getElementById('appContent').style.display = 'block';
@@ -1461,60 +1384,63 @@
                 updateDate();
                 renderUI();
             } else {
-                alert("رمز اشتباه است!");
+                showToast("رمز اشتباه است!", "error");
                 pinBuffer = ""; updatePinDots();
             }
         }
     }
 
-    // --- RECOVERY (دستور ۲: ادغام داخل صفحه قفل) ---
-    function toggleRecovery(show) {
-        const step2 = document.getElementById('authStep2');
-        const actions = document.getElementById('authActions');
-        const rec = document.getElementById('authRecovery');
-        const title = document.getElementById('authTitle');
-        const sub = document.getElementById('authSub');
+    // --- RECOVERY (اصلاح دستور دوم) ---
+    function showRecovery() {
+        // Show recovery inside the Lock Screen flow
+        document.getElementById('authStep2').style.display = 'none';
+        document.getElementById('authActions').style.display = 'none';
+        document.getElementById('authTitle').style.display = 'none';
+        document.getElementById('authSub').style.display = 'none';
+        document.getElementById('authIcon').style.display = 'none';
+        
+        document.getElementById('authStepRecovery').style.display = 'block';
+        
+        const qId = app.security.questionId || 0;
+        document.getElementById('recoveryQuestionText').innerText = securityQuestions[qId];
+        document.getElementById('recNatId').value = '';
+        document.getElementById('recoveryAnswerInput').value = '';
+    }
 
-        if(show) {
-            // نمایش فرم ریکاوری داخل صفحه قفل
-            step2.style.display = 'none';
-            actions.style.display = 'none';
-            rec.style.display = 'block';
-            title.innerText = "بازیابی";
-            sub.style.display = 'none';
-            
-            const qId = app.security.questionId || 0;
-            document.getElementById('recSecQuestion').innerText = securityQuestions[qId];
-            document.getElementById('recNatId').value = '';
-            document.getElementById('recSecAns').value = '';
-        } else {
-            // بازگشت به پین کد
-            step2.style.display = 'flex';
-            actions.style.display = 'block';
-            rec.style.display = 'none';
-            title.innerText = app.user.name;
-            sub.style.display = 'block';
-        }
+    function backToLogin() {
+        document.getElementById('authStepRecovery').style.display = 'none';
+        document.getElementById('authStep2').style.display = 'flex';
+        document.getElementById('authActions').style.display = 'block';
+        document.getElementById('authTitle').style.display = 'block';
+        document.getElementById('authSub').style.display = 'block';
+        document.getElementById('authIcon').style.display = 'flex';
+        pinBuffer = ""; updatePinDots();
     }
 
     function checkRecoveryAnswer() {
         const uNat = document.getElementById('recNatId').value.trim();
-        const uAns = document.getElementById('recSecAns').value.trim();
+        const uAns = document.getElementById('recoveryAnswerInput').value.trim();
         
         if(uNat === app.security.nationalId && uAns === app.security.answer) {
-            alert("اطلاعات صحیح است. لطفا رمز جدید تعریف کنید.");
+            showToast("هویت تایید شد. رمز جدید تعیین کنید.", "success");
             app.security.hasPin = false;
             app.security.pin = "";
-            app.security.isSetup = true; 
+            app.security.isSetup = true;
             saveData();
-            location.reload();
+            
+            document.getElementById('authStepRecovery').style.display = 'none';
+            document.getElementById('authStep2').style.display = 'flex';
+            document.getElementById('authTitle').style.display = 'block';
+            document.getElementById('authTitle').innerText = "تنظیم رمز جدید";
+            document.getElementById('authSub').style.display = 'block';
+            document.getElementById('authIcon').style.display = 'flex';
         } else {
-            alert("اطلاعات وارد شده اشتباه است.");
+            showToast("اطلاعات اشتباه است.", "error");
         }
     }
 
-    function changePin() {
-        if(confirm("آیا می‌خواهید رمز و مشخصات را بازنشانی کنید؟")) {
+    async function changePin() {
+        if(await confirmAction("آیا می‌خواهید رمز و مشخصات را بازنشانی کنید؟")) {
             app.security.hasPin = false;
             app.security.isSetup = false;
             saveData();
@@ -1548,6 +1474,48 @@
         return (n * rate).toLocaleString('en-US'); 
     }
 
+    // --- TOAST & CONFIRM SYSTEM (دستور ۵) ---
+    function showToast(msg, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        
+        let icon = '<i class="fas fa-info"></i>';
+        if(type === 'success') icon = '<i class="fas fa-check" style="color:#4ade80"></i>';
+        if(type === 'error') icon = '<i class="fas fa-times" style="color:#f87171"></i>';
+        if(type === 'copy') icon = '<i class="fas fa-copy" style="color:#60a5fa"></i>';
+
+        toast.innerHTML = `<div class="toast-icon">${icon}</div><span>${msg}</span>`;
+        container.appendChild(toast);
+        
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 400);
+        }, 3000);
+    }
+
+    function confirmAction(message) {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('confirmModal');
+            const msgEl = document.getElementById('confirmMsg');
+            const btnYes = document.getElementById('btnConfirmYes');
+            const btnNo = document.getElementById('btnConfirmNo');
+
+            msgEl.innerText = message;
+            modal.classList.add('active');
+
+            const cleanup = () => {
+                modal.classList.remove('active');
+                btnYes.onclick = null;
+                btnNo.onclick = null;
+            };
+
+            btnYes.onclick = () => { cleanup(); resolve(true); };
+            btnNo.onclick = () => { cleanup(); resolve(false); };
+        });
+    }
+
     // --- HISTORY SYSTEM ---
     function saveSectionSnap(section) {
         if(isGuestMode) return;
@@ -1570,7 +1538,7 @@
         saveData();
     }
 
-    function showSectionHistory(section) {
+    async function showSectionHistory(section) {
         const list = document.getElementById('sectionHistoryList');
         const hist = app.sectionHistory[section] || [];
         
@@ -1578,17 +1546,22 @@
             list.innerHTML = "<p style='text-align:center'>سابقه‌ای موجود نیست.</p>";
         } else {
             list.innerHTML = hist.map((h, i) => `
-                <div style="padding:12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="restoreSectionSnap('${section}', ${i})">
+                <div style="padding:12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" id="histItem${i}">
                     <span>تغییر در ساعت ${h.time}</span>
                     <i class="fas fa-undo" style="color:var(--primary)"></i>
                 </div>
             `).join('');
+            
+            // Add click listeners manually to support async confirm
+            hist.forEach((h, i) => {
+                document.getElementById(`histItem${i}`).onclick = () => restoreSectionSnap(section, i);
+            });
         }
         openModal('sectionHistoryModal');
     }
 
-    function restoreSectionSnap(section, index) {
-        if(!confirm("آیا مطمئن هستید؟")) return;
+    async function restoreSectionSnap(section, index) {
+        if(!await confirmAction("آیا از بازگردانی وضعیت اطمینان دارید؟")) return;
         
         const snap = JSON.parse(app.sectionHistory[section][index].data);
         
@@ -1609,6 +1582,7 @@
         saveData();
         renderUI();
         closeAllModals();
+        showToast("وضعیت بازیابی شد", "success");
     }
 
     // --- CORE UI RENDER ---
@@ -1618,7 +1592,7 @@
         const curName = app.user.currency === 'toman' ? 'تومان' : 'ریال';
         
         document.getElementById('currBtnText').innerText = curName;
-        // document.getElementById('cardCurrency').innerText = curName; // Removed in V2 design
+        document.getElementById('cardCurrency').innerText = curName;
         document.querySelectorAll('.currency-text').forEach(el => el.innerText = curName);
 
         if(app.user.startDate) {
@@ -1657,12 +1631,12 @@
     function renderWallets() {
         const div = document.getElementById('walletList');
         div.innerHTML = app.wallets.map((w, i) => `
-            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(0,0,0,0.05); padding:15px; align-items:center;">
-                <span style="font-weight:600;">${w.name}</span>
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(0,0,0,0.05); padding:15px 0; align-items:center;">
+                <span style="font-weight:600; font-size:1rem;">${w.name}</span>
                 <div style="display:flex; align-items:center;">
                     <b style="font-size:1.1rem; color:var(--primary); margin-left:10px;">${format(w.value)}</b>
                     <span>
-                        <button class="btn-small-icon btn-edit" onclick="openEdit('wallet', ${i})"><i class="fas fa-edit"></i></button>
+                        <button class="btn-small-icon btn-edit" onclick="openEdit('wallet', ${i})"><i class="fas fa-pen"></i></button>
                         <button class="btn-small-icon btn-del" onclick="delWallet(${i})"><i class="fas fa-trash"></i></button>
                     </span>
                 </div>
@@ -1673,12 +1647,15 @@
     function renderDebts() {
         const div = document.getElementById('debtList');
         div.innerHTML = app.debts.map((d, i) => `
-            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(0,0,0,0.05); padding:15px; align-items:center;">
-                <span>${d.name} <small style="color:var(--text-sec); font-size:0.8rem;">(دهم ${d.day} ماه)</small></span>
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(0,0,0,0.05); padding:15px 0; align-items:center;">
+                <div style="display:flex; flex-direction:column;">
+                    <span style="font-weight:600;">${d.name}</span>
+                    <small style="color:var(--text-sec); font-size:0.8rem;">دهم ${d.day} ماه</small>
+                </div>
                 <div style="display:flex; align-items:center;">
-                    <b style="color:var(--danger); margin-left:10px;">${format(d.value)}</b>
+                    <b style="color:var(--danger); font-size:1.1rem; margin-left:10px;">${format(d.value)}</b>
                     <span>
-                        <button class="btn-small-icon btn-edit" onclick="openEdit('debt', ${i})"><i class="fas fa-edit"></i></button>
+                        <button class="btn-small-icon btn-edit" onclick="openEdit('debt', ${i})"><i class="fas fa-pen"></i></button>
                         <button class="btn-small-icon btn-del" onclick="delDebt(${i})"><i class="fas fa-trash"></i></button>
                     </span>
                 </div>
@@ -1690,12 +1667,15 @@
         const div = document.getElementById('checkList');
         if(!app.checks) app.checks = [];
         div.innerHTML = app.checks.map((c, i) => `
-            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(0,0,0,0.05); padding:15px; align-items:center;">
-                <div>${c.name} <br><small style="color:var(--text-sec);">${c.date}</small></div>
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(0,0,0,0.05); padding:15px 0; align-items:center;">
+                <div style="display:flex; flex-direction:column;">
+                    <span style="font-weight:600;">${c.name}</span>
+                    <small style="color:var(--text-sec); font-size:0.8rem;">${c.date}</small>
+                </div>
                 <div style="display:flex; align-items:center;">
-                    <b style="color:var(--danger); margin-left:10px;">${format(c.value)}</b>
+                    <b style="color:var(--danger); font-size:1.1rem; margin-left:10px;">${format(c.value)}</b>
                     <span>
-                        <button class="btn-small-icon btn-edit" onclick="openEdit('check', ${i})"><i class="fas fa-edit"></i></button>
+                        <button class="btn-small-icon btn-edit" onclick="openEdit('check', ${i})"><i class="fas fa-pen"></i></button>
                         <button class="btn-small-icon btn-del" onclick="delCheck(${i})"><i class="fas fa-trash"></i></button>
                     </span>
                 </div>
@@ -1707,12 +1687,15 @@
         const div = document.getElementById('loanList');
         if(!app.loans) app.loans = [];
         div.innerHTML = app.loans.map((l, i) => `
-            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(0,0,0,0.05); padding:15px; align-items:center;">
-                <div>${l.name} <br><small style="color:var(--text-sec);">وصول: ${l.date}</small></div>
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(0,0,0,0.05); padding:15px 0; align-items:center;">
+                <div style="display:flex; flex-direction:column;">
+                    <span style="font-weight:600;">${l.name}</span>
+                    <small style="color:var(--text-sec); font-size:0.8rem;">وصول: ${l.date}</small>
+                </div>
                 <div style="display:flex; align-items:center;">
-                    <b style="color:var(--success); margin-left:10px;">${format(l.value)}</b>
+                    <b style="color:var(--success); font-size:1.1rem; margin-left:10px;">${format(l.value)}</b>
                     <span>
-                        <button class="btn-small-icon btn-edit" onclick="openEdit('loan', ${i})"><i class="fas fa-edit"></i></button>
+                        <button class="btn-small-icon btn-edit" onclick="openEdit('loan', ${i})"><i class="fas fa-pen"></i></button>
                         <button class="btn-small-icon btn-del" onclick="delLoan(${i})"><i class="fas fa-trash"></i></button>
                     </span>
                 </div>
@@ -1758,14 +1741,15 @@
             
             const pausedClass = b.isPaused ? 'paused' : '';
 
-            // دستور ۴: استفاده از آیکون‌های مدرن
+            // آیکون‌ها برای دستور ۴ (جایگزینی متن با آیکون)
             div.innerHTML += `
                 <div class="bento-item ${status} ${pausedClass}">
                     <div class="bento-header">
-                        <span>${b.name} (${b.percent}%) ${b.isPaused ? '<small>(توقف)</small>' : ''} <i class="fas fa-edit" style="font-size:0.9rem; cursor:pointer; margin-right:5px; color:var(--text-sec);" onclick="openEdit('budget', ${i})"></i></span>
-                        <div style="display:flex; gap:8px;">
-                            <i class="fas fa-list-alt" style="opacity:0.5; cursor:pointer;" onclick="openItemHistory(${i})" title="تاریخچه"></i>
-                            <i class="fas fa-trash" style="opacity:0.3; cursor:pointer;" onclick="delBudget(${i})"></i>
+                        <span>${b.name} (${b.percent}%) ${b.isPaused ? '<small class="text-sec" style="font-size:0.7rem">(توقف)</small>' : ''}</span>
+                        <div style="display:flex; gap:5px;">
+                            <button class="btn-small-icon" style="width:28px; height:28px;" onclick="openEdit('budget', ${i})"><i class="fas fa-pen text-sec"></i></button>
+                            <button class="btn-small-icon" style="width:28px; height:28px;" onclick="openItemHistory(${i})"><i class="fas fa-history text-sec"></i></button>
+                            <button class="btn-small-icon" style="width:28px; height:28px;" onclick="delBudget(${i})"><i class="fas fa-trash text-sec"></i></button>
                         </div>
                     </div>
                     <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-top:5px; color:var(--text-sec);">
@@ -1773,22 +1757,14 @@
                         <span style="color:var(--danger)">خرج: ${format(b.spent)}</span>
                     </div>
                     <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(percent,100)}%"></div></div>
-                    <div style="text-align:left; font-weight:900; font-size:1.3rem; color:var(--primary); direction:ltr; letter-spacing:1px; font-family:'Courier New', monospace;">
+                    <div style="text-align:left; font-weight:900; font-size:1.3rem; color:var(--primary); direction:ltr; letter-spacing:1px; margin-bottom:5px;">
                         ${format(remain)}
                     </div>
                     <div class="bento-actions">
-                        <button class="action-chip" onclick="openExp(${i})" ${b.isPaused ? 'disabled' : ''}>
-                            <i class="fas fa-minus-circle" style="color:var(--danger)"></i> هزینه
-                        </button>
-                        <button class="action-chip" onclick="copyTxt(${remain})">
-                            <i class="fas fa-copy" style="color:var(--primary)"></i> کپی
-                        </button>
-                        <button class="action-chip btn-inject" onclick="injectBudget(${i})">
-                            <i class="fas fa-plus-circle" style="color:var(--success)"></i> واریز
-                        </button>
-                        <button class="action-chip btn-pause" onclick="togglePause(${i})">
-                            <i class="fas fa-${b.isPaused ? 'play' : 'pause'}-circle"></i> ${b.isPaused ? 'شروع' : 'توقف'}
-                        </button>
+                        <div class="action-chip" onclick="openExp(${i})" ${b.isPaused ? 'style="opacity:0.5; pointer-events:none"' : ''} title="هزینه"><i class="fas fa-minus-circle" style="color:#ef4444;"></i></div>
+                        <div class="action-chip" onclick="copyTxt(${remain})" title="کپی"><i class="fas fa-copy" style="color:#3b82f6;"></i></div>
+                        <div class="action-chip" onclick="injectBudget(${i})" title="واریز"><i class="fas fa-plus-circle" style="color:#10b981;"></i></div>
+                        <div class="action-chip" onclick="togglePause(${i})" title="توقف/شروع"><i class="fas ${b.isPaused ? 'fa-play' : 'fa-pause'}" style="color:var(--text-sec);"></i></div>
                     </div>
                 </div>
             `;
@@ -1806,7 +1782,7 @@
         app.distributedAmount = net;
         saveData();
         renderUI();
-        alert("بودجه توزیع شد.");
+        showToast("بودجه جدید توزیع شد", "success");
     }
 
     function injectBudget(index) {
@@ -1821,14 +1797,15 @@
             
             saveData();
             renderUI();
+            showToast("مبلغ اضافه شد", "success");
         }
     }
 
-    function togglePause(index) {
+    async function togglePause(index) {
         saveSectionSnap('budget');
         const b = app.budgets[index];
         if(b.isPaused) {
-            let restore = confirm(`آیا درصد قبلی (${b.savedPercent}%) اعمال شود؟\nتایید = بله\nلغو = خیر (وارد کردن درصد جدید)`);
+            let restore = await confirmAction(`آیا درصد قبلی (${b.savedPercent}%) برگردد؟\nبله: درصد قدیم | خیر: درصد جدید`);
             b.isPaused = false;
             if(restore) {
                 b.percent = b.savedPercent;
@@ -1840,7 +1817,7 @@
             b.savedPercent = b.percent;
             b.percent = 0;
             b.isPaused = true;
-            alert("آیتم متوقف شد و سهم آن آزاد گردید.");
+            showToast("آیتم متوقف شد", "info");
         }
         saveData();
         renderUI();
@@ -1851,19 +1828,19 @@
         div.innerHTML = app.goals.map((g, i) => {
             const p = Math.min(100, Math.round((g.curr / g.target)*100));
             return `
-                <div style="padding:20px; border-bottom:1px solid rgba(0,0,0,0.05);">
+                <div style="padding:15px 0; border-bottom:1px solid rgba(0,0,0,0.05);">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                         <b style="font-size:1.1rem; color:var(--primary);">${g.name}</b> 
-                         <span style="font-size:0.9rem; font-weight:bold;">
-                            <button class="btn-small-icon btn-edit" onclick="openEdit('goal', ${i})"><i class="fas fa-edit"></i></button>
+                         <b style="font-size:1.05rem;">${g.name}</b> 
+                         <span style="font-size:0.9rem;">
+                            <button class="btn-small-icon btn-edit" onclick="openEdit('goal', ${i})"><i class="fas fa-pen"></i></button>
                             ${format(g.curr)} / ${format(g.target)}
                          </span>
                     </div>
-                    <div class="progress-bar" style="height:12px; margin-top:10px;"><div class="progress-fill" style="width:${p}%; background:var(--warning);"></div></div>
-                    <div style="display:flex; gap:10px; margin-top:12px;">
-                         <button class="btn btn-primary" style="font-size:0.8rem; padding:8px 14px; flex:1;" onclick="openAllocate('goal', ${i})">🔗 اختصاص بودجه</button>
-                         <button class="btn btn-outline" style="font-size:0.8rem; padding:8px 14px; flex:1;" onclick="addGoalMoneyDirect(${i})">+ مستقیم</button>
-                         <button class="btn btn-danger" style="font-size:0.8rem; padding:8px 14px;" onclick="delGoal(${i})">×</button>
+                    <div class="progress-bar"><div class="progress-fill" style="width:${p}%; background:var(--warning);"></div></div>
+                    <div style="display:flex; gap:8px; margin-top:10px;">
+                         <button class="btn btn-primary" style="font-size:0.8rem; padding:6px 14px;" onclick="openAllocate('goal', ${i})">🔗 اختصاص بودجه</button>
+                         <button class="btn btn-outline" style="font-size:0.8rem; padding:6px 14px;" onclick="addGoalMoneyDirect(${i})">+ مستقیم</button>
+                         <button class="btn btn-danger" style="font-size:0.8rem; padding:6px 14px;" onclick="delGoal(${i})">×</button>
                     </div>
                 </div>
             `;
@@ -1873,21 +1850,21 @@
     function renderShop() {
         const div = document.getElementById('shopList');
         div.innerHTML = app.shopping.map((s, i) => `
-            <div style="display:flex; justify-content:space-between; padding:20px; border-bottom:1px solid rgba(0,0,0,0.05); align-items:center; flex-wrap:wrap;">
+            <div style="display:flex; justify-content:space-between; padding:15px 0; border-bottom:1px solid rgba(0,0,0,0.05); align-items:center; flex-wrap:wrap;">
                 <div style="flex:1;">
-                    <span style="font-weight:bold; font-size:1.1rem;">${s.name}</span>
-                    ${s.price ? `<span style="font-size:0.95rem; color:var(--text-sec); display:block; margin-top:5px; font-weight:500;">~${format(s.price)}</span>` : ''}
+                    <span style="font-weight:bold; font-size:1.05rem;">${s.name}</span>
+                    ${s.price ? `<span style="font-size:0.9rem; color:var(--text-sec); display:block; margin-top:3px;">~${format(s.price)}</span>` : ''}
                 </div>
-                <div style="display:flex; gap:10px; align-items:center;">
-                    <button class="btn btn-primary" style="font-size:0.85rem;" onclick="openAllocate('shop', ${i})">خرید با بودجه</button>
-                    <button class="btn-small-icon btn-edit" onclick="openEdit('shop', ${i})"><i class="fas fa-edit"></i></button>
-                    <i class="fas fa-check-circle" style="cursor:pointer; font-size:1.8rem; color:var(--success); transition:0.2s;" onclick="delShop(${i})"></i>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button class="btn btn-primary" style="font-size:0.8rem; padding:6px 14px;" onclick="openAllocate('shop', ${i})">خرید با بودجه</button>
+                    <button class="btn-small-icon btn-edit" onclick="openEdit('shop', ${i})"><i class="fas fa-pen"></i></button>
+                    <i class="fas fa-check-circle text-success" style="cursor:pointer; font-size:1.6rem; color:var(--success);" onclick="delShop(${i})"></i>
                 </div>
             </div>
         `).join('');
     }
 
-    // --- EDIT SYSTEM (دستور ۳: پر کردن دقیق فیلدها) ---
+    // --- EDIT SYSTEM (دستور ۳: پر شدن دقیق فیلدها) ---
     function openEdit(type, index) {
         document.getElementById('editType').value = type;
         document.getElementById('editIndex').value = index;
@@ -1897,35 +1874,32 @@
         let showAmount = true;
         let showDate = false;
 
-        // Fetch Item based on type
         if(type === 'wallet') item = app.wallets[index];
-        else if(type === 'debt') { item = app.debts[index]; showDate = true; }
+        else if(type === 'debt') { 
+            item = app.debts[index]; 
+            showDate = true; 
+        }
         else if(type === 'check') { item = app.checks[index]; showDate = true; }
         else if(type === 'loan') { item = app.loans[index]; showDate = true; }
         else if(type === 'budget') { item = app.budgets[index]; showPercent = true; showAmount = false; }
         else if(type === 'goal') { item = app.goals[index]; }
         else if(type === 'shop') { item = app.shopping[index]; }
 
-        // Set Name
         document.getElementById('editName').value = item.name;
         
-        // Set Amount
         if(showAmount) {
             document.getElementById('editAmountWrapper').style.display = 'block';
             let val = 0;
             if(type === 'goal') val = item.target;
             else if(type === 'shop') val = item.price || 0;
             else val = item.value;
-            
-            // Set exact value and trigger formatter
-            const input = document.getElementById('editVal');
-            input.value = val;
-            formatCurrency(input);
+            // پر شدن دقیق با مقدار عددی
+            document.getElementById('editVal').value = val;
+            formatCurrency(document.getElementById('editVal')); // اعمال فرمت برای نمایش زیبا
         } else {
             document.getElementById('editAmountWrapper').style.display = 'none';
         }
 
-        // Set Percent
         if(showPercent) {
             document.getElementById('editPercentWrapper').style.display = 'block';
             document.getElementById('editPercent').value = item.percent;
@@ -1933,28 +1907,14 @@
             document.getElementById('editPercentWrapper').style.display = 'none';
         }
 
-        // Set Date
         if(showDate) {
             document.getElementById('editDateWrapper').style.display = 'block';
             const row = document.getElementById('editDateRow');
-            
             if(type === 'debt') {
-                // For Debt, it's just day of month
                 row.innerHTML = `<select id="editDDay" class="date-sel" style="width:100%">${genOpts(1,31, item.day)}</select>`;
             } else {
-                // For Check/Loan, it's full date string "YYYY/MM/DD"
-                // Default fallback
-                let y=1403, m=1, d=1;
-                
-                if(item.date && item.date.includes('/')) {
-                    const parts = item.date.split('/');
-                    if(parts.length === 3) {
-                        y = parseInt(parts[0]);
-                        m = parseInt(parts[1]);
-                        d = parseInt(parts[2]);
-                    }
-                }
-                row.innerHTML = createDatePickerHTML('editD', d, m, y);
+                const parts = item.date ? item.date.split('/') : [1403, 1, 1];
+                row.innerHTML = createDatePickerHTML('editD', parseInt(parts[2]), parseInt(parts[1]), parseInt(parts[0]));
             }
         } else {
             document.getElementById('editDateWrapper').style.display = 'none';
@@ -1968,7 +1928,7 @@
         const index = parseInt(document.getElementById('editIndex').value);
         const newName = document.getElementById('editName').value;
         
-        if(!newName) return alert("نام نمی‌تواند خالی باشد");
+        if(!newName) return showToast("نام نمی‌تواند خالی باشد", "error");
 
         if(type.includes('budget')) saveSectionSnap('budget');
         else if(type.includes('goal') || type.includes('shop')) saveSectionSnap('tools');
@@ -2020,7 +1980,6 @@
             app.budgets[index].name = newName;
             app.budgets[index].percent = newP;
             
-            // Update priority mapping if name changed
             if(oldName !== newName && app.priorities[oldName]) {
                 app.priorities[newName] = app.priorities[oldName];
                 delete app.priorities[oldName];
@@ -2036,12 +1995,12 @@
         saveData();
         renderUI();
         closeAllModals();
+        showToast("تغییرات ذخیره شد", "success");
     }
 
-
     // --- TEMPLATE LOGIC ---
-    function applyTemplate(type) {
-        if(!confirm("بودجه‌بندی فعلی پاک شده و قالب جدید اعمال می‌شود. ادامه می‌دهید؟")) return;
+    async function applyTemplate(type) {
+        if(!await confirmAction("بودجه‌بندی فعلی پاک شده و قالب جدید اعمال می‌شود. ادامه می‌دهید؟")) return;
         saveSectionSnap('budget'); 
         
         let newBudgets = [];
@@ -2071,34 +2030,34 @@
         }
         
         app.budgets = newBudgets;
-        // Fix priorities for new items
         app.budgets.forEach(b => {
              if(!app.priorities[b.name]) app.priorities[b.name] = 4;
         });
 
         saveData();
         renderUI();
+        showToast("قالب اعمال شد", "success");
     }
 
-    // --- ACTIONS ---
+    // --- ACTIONS (Async for Confirm) ---
     function addWallet() {
         const n = document.getElementById('wName').value;
         const v = parseFormatted(document.getElementById('wVal').value);
         if(n && !isNaN(v)) { 
             saveSectionSnap('dashboard');
             app.wallets.push({name:n, value:v}); 
-            saveData(); renderUI(); closeAllModals(); 
+            saveData(); renderUI(); closeAllModals(); showToast("کیف پول افزوده شد", "success");
         }
     }
-    function delWallet(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard'); app.wallets.splice(i,1); saveData(); renderUI(); } }
+    async function delWallet(i) { if(await confirmAction('حذف کیف پول؟')) { saveSectionSnap('dashboard'); app.wallets.splice(i,1); saveData(); renderUI(); } }
 
     function addDebt() {
         const n = document.getElementById('dName').value;
         const v = parseFormatted(document.getElementById('dVal').value);
         const d = document.getElementById('dDay').value;
-        if(n && !isNaN(v)) { saveSectionSnap('dashboard'); app.debts.push({name:n, value:v, day:d}); saveData(); renderUI(); closeAllModals(); }
+        if(n && !isNaN(v)) { saveSectionSnap('dashboard'); app.debts.push({name:n, value:v, day:d}); saveData(); renderUI(); closeAllModals(); showToast("قسط ثبت شد", "success"); }
     }
-    function delDebt(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard'); app.debts.splice(i,1); saveData(); renderUI(); } }
+    async function delDebt(i) { if(await confirmAction('حذف قسط؟')) { saveSectionSnap('dashboard'); app.debts.splice(i,1); saveData(); renderUI(); } }
 
     function addCheck() {
         const n = document.getElementById('cName').value;
@@ -2108,10 +2067,10 @@
             saveSectionSnap('dashboard');
             if(!app.checks) app.checks = [];
             app.checks.push({name:n, value:v, date:d}); 
-            saveData(); renderUI(); closeAllModals(); 
+            saveData(); renderUI(); closeAllModals(); showToast("چک/بدهی ثبت شد", "success");
         }
     }
-    function delCheck(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard'); app.checks.splice(i,1); saveData(); renderUI(); } }
+    async function delCheck(i) { if(await confirmAction('حذف مورد؟')) { saveSectionSnap('dashboard'); app.checks.splice(i,1); saveData(); renderUI(); } }
 
     function addLoan() {
         const n = document.getElementById('lName').value;
@@ -2121,17 +2080,17 @@
             saveSectionSnap('dashboard');
             if(!app.loans) app.loans = [];
             app.loans.push({name:n, value:v, date:d});
-            saveData(); renderUI(); closeAllModals();
+            saveData(); renderUI(); closeAllModals(); showToast("طلب ثبت شد", "success");
         }
     }
-    function delLoan(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard'); app.loans.splice(i,1); saveData(); renderUI(); } }
+    async function delLoan(i) { if(await confirmAction('حذف طلب؟')) { saveSectionSnap('dashboard'); app.loans.splice(i,1); saveData(); renderUI(); } }
 
     // --- BUDGET ADDITION & AUTO CORRECTION ---
     function addNewBudget() {
         const n = document.getElementById('bName').value;
         const p = parseInt(document.getElementById('bPercent').value);
         
-        if(!n || isNaN(p)) return alert("لطفا مقادیر صحیح وارد کنید");
+        if(!n || isNaN(p)) return showToast("مقادیر نامعتبر", "error");
 
         let currentTotal = 0;
         app.budgets.forEach(b => currentTotal += b.percent);
@@ -2154,7 +2113,7 @@
             saveSectionSnap('budget');
             app.budgets.push({id:Date.now(), name:n, percent:p, spent:0, history:[], manualAdd: 0});
             if (!app.priorities[n]) app.priorities[n] = 4;
-            saveData(); renderUI(); closeAllModals();
+            saveData(); renderUI(); closeAllModals(); showToast("ردیف بودجه اضافه شد", "success");
         }
     }
 
@@ -2177,7 +2136,7 @@
             if (!app.priorities[tempBudget.name]) app.priorities[tempBudget.name] = 4;
         }
         
-        saveData(); renderUI(); closeAllModals();
+        saveData(); renderUI(); closeAllModals(); showToast("درصد اصلاح شده ثبت شد", "success");
         tempBudget = null;
     }
 
@@ -2207,7 +2166,6 @@
             return;
         }
 
-        // Sort by Priority (4 = Low Priority -> cut first)
         let sortedItems = app.budgets.map((b, index) => {
             if(tempBudget.isEdit && index === tempBudget.editIndex) return null; 
             return {
@@ -2223,7 +2181,7 @@
             let currentP = item.percent;
             let deductible = currentP;
             if(!allowZero && currentP > 0) {
-                deductible = currentP - 1; // keep at least 1% if allowZero is false
+                deductible = currentP - 1; 
             }
             
             if (deductible >= overflow) {
@@ -2236,8 +2194,7 @@
         }
 
         if(overflow > 0) {
-            alert("امکان اصلاح خودکار کامل وجود ندارد. فضا کافی نیست.");
-             // Rollback
+             showToast("اصلاح خودکار ممکن نیست (فضا کم است).", "error");
              const lastSnap = JSON.parse(app.sectionHistory['budget'][0].data);
              app.budgets = lastSnap.budgets;
              return;
@@ -2251,7 +2208,7 @@
             if (!app.priorities[tempBudget.name]) app.priorities[tempBudget.name] = 4;
         }
 
-        saveData(); renderUI(); closeAllModals();
+        saveData(); renderUI(); closeAllModals(); showToast("اصلاح هوشمند انجام شد", "success");
         tempBudget = null;
     }
 
@@ -2277,7 +2234,7 @@
             div.style.cssText = "display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(0,0,0,0.05); padding:12px;";
             div.innerHTML = `
                 <span style="font-size:0.9rem;">${name}</span>
-                <select class="priority-select" data-name="${name}" style="width:130px; margin:0; padding:8px; font-size:0.85rem;">
+                <select class="priority-select" data-name="${name}" style="width:140px; margin:0; padding:8px; font-size:0.85rem;">
                     <option value="1" ${p==1?'selected':''}>۱ (خیلی مهم)</option>
                     <option value="2" ${p==2?'selected':''}>۲ (مهم)</option>
                     <option value="3" ${p==3?'selected':''}>۳ (متوسط)</option>
@@ -2299,7 +2256,7 @@
             app.priorityRanges.low = l;
             app.priorityRanges.mid = m;
             saveData();
-            alert("بازه ها ذخیره شدند.");
+            showToast("بازه اولویت ذخیره شد", "success");
         }
     }
 
@@ -2313,21 +2270,22 @@
         });
         saveData();
         closeAllModals();
-        alert("اولویت‌ها با موفقیت بروزرسانی و ذخیره شدند.");
+        showToast("اولویت‌ها ذخیره شدند", "success");
     }
 
-    function delBudget(i) { if(confirm('حذف ردیف؟')) { saveSectionSnap('budget'); app.budgets.splice(i,1); saveData(); renderUI(); } }
+    async function delBudget(i) { if(await confirmAction('حذف ردیف بودجه؟')) { saveSectionSnap('budget'); app.budgets.splice(i,1); saveData(); renderUI(); } }
 
     let activeIdx = -1;
     function openExp(i) { activeIdx = i; openModal('expModal'); }
     function submitExp() {
         const v = parseFormatted(document.getElementById('expAmt').value);
-        const r = document.getElementById('expReason').value || 'بدون توضیح';
+        const r = document.getElementById('expReason').value || 'هزینه جاری';
         if(!isNaN(v) && activeIdx > -1) { 
             saveSectionSnap('budget');
             app.budgets[activeIdx].spent += v;
             addToHistory(activeIdx, v, r);
             saveData(); renderUI(); closeAllModals(); 
+            showToast("هزینه ثبت شد", "success");
         }
     }
 
@@ -2348,12 +2306,12 @@
             hList.innerHTML = '<p style="text-align:center;">موردی یافت نشد.</p>';
         } else {
             hList.innerHTML = hist.slice().reverse().map(h => `
-                <div style="border-bottom:1px solid rgba(0,0,0,0.05); padding:12px 0;">
+                <div style="border-bottom:1px solid #eee; padding:10px 0;">
                     <div style="display:flex; justify-content:space-between; font-weight:bold;">
                         <span>${h.reason}</span>
                         <span style="color:var(--danger)">${format(h.amount)}</span>
                     </div>
-                    <div style="font-size:0.75rem; color:var(--text-sec); margin-top:5px;">
+                    <div style="font-size:0.75rem; color:var(--text-sec); margin-top:3px;">
                         ${h.date} - ${h.time}
                     </div>
                 </div>
@@ -2365,20 +2323,20 @@
     function addGoal() {
         const n = document.getElementById('gName').value;
         const t = parseFormatted(document.getElementById('gTarget').value);
-        if(n && !isNaN(t)) { saveSectionSnap('tools'); app.goals.push({name:n, target:t, curr:0}); saveData(); renderUI(); closeAllModals(); }
+        if(n && !isNaN(t)) { saveSectionSnap('tools'); app.goals.push({name:n, target:t, curr:0}); saveData(); renderUI(); closeAllModals(); showToast("هدف ایجاد شد", "success"); }
     }
     function addGoalMoneyDirect(i) {
         const v = prompt("مبلغ واریزی مستقیم:");
-        if(v) { saveSectionSnap('tools'); app.goals[i].curr += parseInt(v); saveData(); renderUI(); }
+        if(v) { saveSectionSnap('tools'); app.goals[i].curr += parseInt(v); saveData(); renderUI(); showToast("مبلغ افزوده شد", "success"); }
     }
-    function delGoal(i) { saveSectionSnap('tools'); app.goals.splice(i,1); saveData(); renderUI(); }
+    async function delGoal(i) { if(await confirmAction('حذف هدف؟')) { saveSectionSnap('tools'); app.goals.splice(i,1); saveData(); renderUI(); } }
 
     function addShop() {
         const n = document.getElementById('sName').value;
         const p = parseFormatted(document.getElementById('sPrice').value);
-        if(n) { saveSectionSnap('tools'); app.shopping.push({name:n, price: p || 0}); saveData(); renderUI(); closeAllModals(); }
+        if(n) { saveSectionSnap('tools'); app.shopping.push({name:n, price: p || 0}); saveData(); renderUI(); closeAllModals(); showToast("به لیست خرید اضافه شد", "success"); }
     }
-    function delShop(i) { saveSectionSnap('tools'); app.shopping.splice(i,1); saveData(); renderUI(); }
+    async function delShop(i) { if(await confirmAction('خرید انجام شد / حذف؟')) { saveSectionSnap('tools'); app.shopping.splice(i,1); saveData(); renderUI(); } }
 
     // --- ALLOCATION LOGIC ---
     function openAllocate(type, id) {
@@ -2403,7 +2361,7 @@
         const bIdx = parseInt(document.getElementById('allocBudgetSelect').value);
         const amt = parseFormatted(document.getElementById('allocAmt').value);
 
-        if(isNaN(amt) || amt <= 0) return alert("مبلغ نامعتبر");
+        if(isNaN(amt) || amt <= 0) return showToast("مبلغ نامعتبر", "error");
 
         saveSectionSnap('budget'); 
         saveSectionSnap('tools'); 
@@ -2422,15 +2380,12 @@
         saveData();
         renderUI();
         closeAllModals();
-        alert("تراکنش با موفقیت ثبت شد.");
+        showToast("تراکنش ثبت شد", "success");
     }
 
     // --- TOOLS ---
     function toggleCurrency() {
         app.user.currency = app.user.currency === 'toman' ? 'rial' : 'toman';
-        const btn = document.getElementById('currBtn');
-        if(app.user.currency === 'rial') btn.classList.add('active');
-        else btn.classList.remove('active');
         saveData(); renderUI();
     }
     
@@ -2463,7 +2418,6 @@
         document.getElementById('printDebt').innerText = format(totalDebt);
         document.getElementById('printNet').innerText = format(net);
 
-        // Chart
         if(app.dailyLogs && app.dailyLogs.length > 0) {
             const ctx = document.getElementById('printChart').getContext('2d');
             if(window.myPrintChart) window.myPrintChart.destroy();
@@ -2474,17 +2428,16 @@
                 data: {
                     labels: logs.map(l => l.date),
                     datasets: [{
-                        label: 'خالص دارایی (تومان)',
+                        label: 'خالص دارایی',
                         data: logs.map(l => l.net),
-                        borderColor: '#2563eb',
-                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
                         fill: true
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // Table
             const hTab = document.getElementById('printHistoryTable');
             hTab.innerHTML = logs.map(l => `<tr><td>${l.date}</td><td>${format(l.net)}</td><td>${format(l.spent)}</td></tr>`).join('');
         }
@@ -2510,12 +2463,14 @@
 
         const el = document.getElementById('printArea');
         el.style.top = "0";
+        showToast("در حال تولید گزارش...", "info");
         
         setTimeout(() => {
             html2canvas(el).then(c => {
                 const a = document.createElement('a');
                 a.download = `Financial_Report_${days}Days.png`; a.href = c.toDataURL(); a.click();
                 el.style.top = "-9999px";
+                showToast("دانلود شد", "success");
             });
         }, 1000);
     }
@@ -2530,6 +2485,7 @@
             if(app.history.length > 5) app.history.pop();
             saveData();
         }
+        showToast("بکاپ دانلود شد", "success");
     }
 
     function restoreBackup(input) {
@@ -2549,12 +2505,11 @@
                 });
                 if(app.distributedAmount === undefined) app.distributedAmount = 0;
                 
-                // Security updates
                 if(!app.security.nationalId) app.security.nationalId = "";
 
                 saveData();
                 location.reload();
-            } catch(err) { alert("فایل نامعتبر"); }
+            } catch(err) { showToast("فایل نامعتبر است", "error"); }
         };
         reader.readAsText(file);
     }
@@ -2567,8 +2522,8 @@
         openModal('histModal');
     }
 
-    function resetAll() {
-        if(confirm("هشدار: تمام اطلاعات شما پاک خواهد شد. آیا مطمئن هستید؟")) { 
+    async function resetAll() {
+        if(await confirmAction("هشدار: تمام اطلاعات شما پاک خواهد شد. آیا مطمئن هستید؟")) { 
             localStorage.removeItem('amir_fin_v9'); 
             location.reload(); 
         }
@@ -2579,14 +2534,14 @@
         const raw = document.getElementById('rawCopyCheck').checked;
         const txt = raw ? (n*rate).toString() : format(n);
         navigator.clipboard.writeText(txt);
-        alert("کپی شد: " + txt);
+        showToast("کپی شد: " + txt, "copy");
     }
     
     function loadData() {
         const d = localStorage.getItem('amir_fin_v9');
         if(d) {
             app = JSON.parse(d);
-            // Compatibility
+            // Compatibility Checks
             if(!app.checks) app.checks = [];
             if(!app.loans) app.loans = [];
             if(!app.priorities) app.priorities = defaultState.priorities;
@@ -2631,9 +2586,9 @@
         }
         const m = document.getElementById(id);
         const inputs = m.querySelectorAll('input');
-        // Clear inputs unless specific ID or range/hidden
+        // Clear inputs, exclude sliders/checkboxes
         inputs.forEach(i => {
-            if(i.type !== 'hidden' && i.type !== 'checkbox' && i.type !== 'range' && i.id !== 'pRangeLow' && i.id !== 'pRangeMid' && i.id !== 'editVal' && i.id !== 'editName' && i.id !== 'editPercent') i.value = '';
+            if(i.type !== 'hidden' && i.type !== 'checkbox' && i.type !== 'range' && i.id !== 'pRangeLow' && i.id !== 'pRangeMid') i.value = '';
         });
         m.classList.add('active'); 
     }
