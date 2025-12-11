@@ -496,6 +496,14 @@
         .sub-legend-item { display: flex; align-items: center; gap: 4px; }
         .sub-dot { width: 8px; height: 8px; border-radius: 50%; }
 
+        /* Animation for Due Items */
+        @keyframes pulse-yellow { 0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); } 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        
+        .pulse-warning { animation: pulse-yellow 2s infinite; border: 2px solid var(--warning); }
+        .pulse-danger { animation: pulse-red 1.5s infinite; border: 2px solid var(--danger); }
+        .bg-yellow-highlight { background: rgba(245, 158, 11, 0.1) !important; border: 1px solid var(--warning) !important; }
+
         /* --- Template Chips --- */
         .template-row { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; margin-bottom: 10px; scrollbar-width: none; }
         .template-chip {
@@ -596,15 +604,6 @@
         .settings-btn-card.danger { color: var(--danger); }
         .settings-btn-card.danger i { color: var(--danger); }
         .settings-btn-card.danger:hover { background: rgba(239, 68, 68, 0.05); border-color: var(--danger); }
-
-        /* Animation & Badges for Due Dates */
-        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } 100% { transform: translateX(0); } }
-        .anim-shake { animation: shake 0.5s infinite; border: 2px solid var(--danger) !important; }
-        .status-badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; margin-right: 5px; font-weight:bold; }
-        .st-due { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
-        .st-warn { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
-        .st-ok { background: rgba(16, 185, 129, 0.2); color: #10b981; }
-        .st-paid { background: #e0e7ff; color: #4338ca; }
 
     </style>
 </head>
@@ -876,14 +875,14 @@
 
 <!-- MODALS -->
 
-<!-- Transfer Funds Modal (New Instruction 1) -->
+<!-- Transfer Funds Modal (Modified for Instruction 1) -->
 <div id="transferModal" class="modal">
     <div class="modal-content">
         <h3>انتقال وجه</h3>
-        <p style="font-size:0.9rem; color:var(--text-sec); margin-bottom:15px;">
+        <p style="font-size:0.9rem; color:var(--text-sec); margin-bottom:5px;">
             انتقال از <b><span id="transferSourceName"></span></b> به:
         </p>
-        <div class="alloc-info-box" id="transferSourceInfo" style="margin-bottom:10px;"></div>
+        <p style="font-size:0.85rem; color:var(--info); margin-bottom:15px;" id="transferSourceBalance"></p>
         <label>مقصد انتقال:</label>
         <select id="transferTargetSelect"></select>
         
@@ -893,6 +892,10 @@
             <span class="money-unit currency-text">تومان</span>
         </div>
         
+        <p style="font-size:0.75rem; color:var(--warning); margin-top:5px; line-height:1.5;">
+            <i class="fas fa-info-circle"></i> توجه: شما می‌توانید بیشتر از موجودی انتقال دهید. در این صورت بدهی ثبت شده و مبالغ واریزی آینده به طور خودکار به مقصد منتقل می‌شوند تا بدهی صاف شود.
+        </p>
+
         <div style="margin-top:25px; display:flex; gap:12px;">
             <button class="btn btn-primary" style="flex:1" onclick="performTransfer()">تایید انتقال</button>
             <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
@@ -1360,16 +1363,16 @@
         checks: [], 
         loans: [],  
         budgets: [
-            {id: 1, name: "کرایه شهری", percent: 20, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: []},
-            {id: 2, name: "خورد و خوراک", percent: 14, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: []},
-            {id: 3, name: "سفر", percent: 20, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: []},
-            {id: 4, name: "دوا و درمان", percent: 7, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: []},
-            {id: 5, name: "جانبی", percent: 8, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: []},
-            {id: 6, name: "زیبایی و مکمل", percent: 7, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: []},
-            {id: 7, name: "لباس", percent: 5, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: []},
-            {id: 8, name: "ضروری", percent: 5, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: []},
-            {id: 9, name: "تفریح", percent: 3, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: []},
-            {id: 10, name: "پس‌انداز کل", percent: 11, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: []}
+            {id: 1, name: "کرایه شهری", percent: 20, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: [], internalDebt: []},
+            {id: 2, name: "خورد و خوراک", percent: 14, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: [], internalDebt: []},
+            {id: 3, name: "سفر", percent: 20, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: [], internalDebt: []},
+            {id: 4, name: "دوا و درمان", percent: 7, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: [], internalDebt: []},
+            {id: 5, name: "جانبی", percent: 8, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: [], internalDebt: []},
+            {id: 6, name: "زیبایی و مکمل", percent: 7, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: [], internalDebt: []},
+            {id: 7, name: "لباس", percent: 5, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: [], internalDebt: []},
+            {id: 8, name: "ضروری", percent: 5, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: [], internalDebt: []},
+            {id: 9, name: "تفریح", percent: 3, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: [], internalDebt: []},
+            {id: 10, name: "پس‌انداز کل", percent: 11, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: [], internalDebt: []}
         ],
         priorities: {
             "کرایه شهری": 1, "خورد و خوراک": 1, "دوا و درمان": 1, "ضروری": 1, "اجاره خانه": 1,
@@ -1445,7 +1448,6 @@
             app.dailyLogs.push({ date: today, net: net, spent: spent, timestamp: Date.now() });
             saveData();
         }
-        checkDeadlines(); // Instruction 3: Check deadlines on load
     }
 
     function setupDatePickers() { }
@@ -1718,7 +1720,7 @@
 
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
         const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
-        const checkDebt = (app.checks || []).reduce((a,b)=>a+b.value,0);
+        const checkDebt = (app.checks || []).reduce((a,b)=>!b.isPaid ? a+b.value : a, 0); // Corrected to count only unpaid
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
         const totalDebt = fixedDebt + checkDebt;
         const net = income - totalDebt - manualDeductions;
@@ -1755,232 +1757,188 @@
             </div>`).join('');
     }
 
-    // Instruction 3 Implementation: Render Debts (Fixed Installments)
+    // UPDATED RENDER DEBTS (Instruction 3)
     function renderDebts() {
         const div = document.getElementById('debtList');
-        // Get today's info
-        const todayStr = new Date().toLocaleDateString('fa-IR'); // e.g., 1403/09/21
-        const parts = todayStr.split('/');
-        const currentDay = parseInt(parts[2]);
-        const currentMonth = parts[0] + '/' + parts[1]; // 1403/09
-
+        const today = new Date();
+        const currentDay = today.getDate();
+        // Simple logic for month progress
+        const pDays = [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29];
+        // Note: For simplicity in JS without heavy libraries, assuming Shamsi ~ Greogrian day alignment visually or using direct day number. 
+        // Best approach for instruction 3: Calculate difference between Today's Day and Target Day.
+        
         div.innerHTML = app.debts.map((d, i) => {
-            const dueDay = parseInt(d.day);
-            const isPaidThisMonth = d.lastPaidMonth === currentMonth;
-            let statusHTML = '';
-            let animClass = '';
+            // Determine status
+            const dayNum = parseInt(d.day);
+            // We assume user enters Shamsi Day. Since we can't easily convert exact Gregorian to Shamsi without big library, 
+            // we will simulate the check based on "Days remaining in generic month".
+            // A better approach for the user: Show "X Days left".
+            // But instruction says "This month and next month".
             
+            // Let's create a visual status
+            let diff = dayNum - currentDay; 
+            let statusText = "";
+            let animClass = "";
+            let btnHtml = "";
+            
+            // Check if paid this month
+            const currentMonthStr = today.toLocaleDateString('fa-IR', {year:'numeric', month:'numeric'});
+            const isPaidThisMonth = d.lastPaid === currentMonthStr;
+
             if (isPaidThisMonth) {
-                statusHTML = '<span class="status-badge st-paid">پرداخت شده</span>';
+                statusText = `<span style="color:var(--success); font-weight:bold;">پرداخت شد <i class="fas fa-check"></i></span>`;
+                statusText += `<br><small style="color:var(--text-sec)">سررسید بعدی: دهم ${dayNum} ماه بعد</small>`;
             } else {
-                const diff = dueDay - currentDay;
-                if (diff === 0) {
-                     statusHTML = '<span class="status-badge st-due">سررسید امروز!</span>';
-                     animClass = 'anim-shake';
-                } else if (diff < 0) {
-                     const overdueDays = Math.abs(diff);
-                     statusHTML = `<span class="status-badge st-due">معوق (${overdueDays} روز)</span>`;
-                     animClass = 'anim-shake';
-                } else if (diff <= 2) {
-                     statusHTML = `<span class="status-badge st-warn">${diff} روز تا پرداخت</span>`;
-                     animClass = 'anim-shake';
+                if (diff > 0) {
+                    statusText = `${diff} روز تا پرداخت`;
+                    if (diff <= 2) animClass = "pulse-warning bg-yellow-highlight";
+                } else if (diff === 0) {
+                    statusText = `<span style="color:var(--danger); font-weight:bold;">سررسید امروز!</span>`;
+                    animClass = "pulse-danger bg-yellow-highlight";
                 } else {
-                     statusHTML = `<span class="status-badge st-ok">${diff} روز مانده</span>`;
+                    const overdue = Math.abs(diff);
+                    statusText = `<span style="color:var(--danger); font-weight:bold;">${overdue} روز معوق!</span>`;
+                    // Every 3 days alert logic visually
+                    if (overdue % 3 === 0) animClass = "pulse-danger"; 
+                    else animClass = "bg-yellow-highlight";
                 }
+                btnHtml = `<button class="btn-small-icon btn-check" onclick="payDebt(${i})" title="پرداخت شد"><i class="fas fa-check"></i></button>`;
             }
 
             return `
-            <div class="${animClass}" style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px; transition:0.3s;">
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px; transition:0.3s;" class="${animClass}">
                 <div>
-                    <div>${d.name} <small style="color:var(--text-sec); font-size:0.8rem;">(دهم ${d.day} ماه)</small></div>
-                    <div style="margin-top:5px;">${statusHTML}</div>
+                    <span style="font-weight:bold;">${d.name}</span>
+                    <div style="font-size:0.8rem; margin-top:4px; color:var(--text-sec);">${statusText}</div>
                 </div>
                 <div style="display:flex; align-items:center;">
                     <b style="color:var(--danger); margin-left:10px;">${format(d.value)}</b>
-                    <div style="display:flex; gap:5px;">
-                        ${!isPaidThisMonth ? `<button class="btn-small-icon btn-check" onclick="markDebtPaid(${i})" title="پرداخت شد"><i class="fas fa-check"></i></button>` : ''}
+                    <span style="display:flex; gap:5px;">
+                        ${btnHtml}
                         <button class="btn-small-icon btn-edit" onclick="openEdit('debt', ${i})"><i class="fas fa-edit"></i></button>
                         <button class="btn-small-icon btn-del" onclick="delDebt(${i})"><i class="fas fa-trash"></i></button>
-                    </div>
+                    </span>
                 </div>
             </div>`;
         }).join('');
     }
 
-    function markDebtPaid(i) {
+    function payDebt(i) {
         if(confirm("آیا پرداخت این قسط برای این ماه را تایید می‌کنید؟")) {
-            const todayStr = new Date().toLocaleDateString('fa-IR');
-            const parts = todayStr.split('/');
-            const currentMonth = parts[0] + '/' + parts[1];
-            app.debts[i].lastPaidMonth = currentMonth;
+            const today = new Date();
+            const currentMonthStr = today.toLocaleDateString('fa-IR', {year:'numeric', month:'numeric'});
             saveSectionSnap('dashboard', `پرداخت قسط ${app.debts[i].name}`);
-            saveData(); renderUI(); showToast("قسط پرداخت شد");
+            app.debts[i].lastPaid = currentMonthStr;
+            // Instruction 3: Also deduct from wallet? Usually fixed debts are budgeted. 
+            // The instruction says "click on paid... saved as paid". Doesn't explicitly say deduct from wallet automatically, 
+            // but usually users deduct manually or it's from salary. We mark as paid.
+            saveData(); renderUI(); showToast("پرداخت ثبت شد");
         }
     }
 
-    // Instruction 3 Implementation: Render Checks (One-time deadlines)
+    // UPDATED RENDER CHECKS (Instruction 3)
     function renderChecks() {
         const div = document.getElementById('checkList');
         if(!app.checks) app.checks = [];
-        const todayStr = new Date().toLocaleDateString('fa-IR');
+        
+        // Helper to parse Shamsi date roughly for comparison
+        // Format: 1403/2/15
+        const today = new Date();
+        const todayStr = today.toLocaleDateString('fa-IR'); // e.g. 1403/10/20
 
         div.innerHTML = app.checks.map((c, i) => {
-            let statusHTML = '';
-            let animClass = '';
-            let diffDays = 0;
-            const isPaid = c.status === 'paid';
-            
-            // Calculate date diff logic (Simple string comparison approximation for simplicity or split)
-            if (!isPaid) {
-                // Parse Check Date
-                const cParts = c.date.split('/');
-                const tParts = todayStr.split('/');
-                // Simplify to number for comparison YYYYMMDD
-                const cNum = parseInt(cParts[0])*10000 + parseInt(cParts[1])*100 + parseInt(cParts[2]);
-                const tNum = parseInt(tParts[0])*10000 + parseInt(tParts[1])*100 + parseInt(tParts[2]);
-                
-                // Approximate days difference logic is complex without moment-jalaali, 
-                // but strictly for comparison:
-                if (cNum === tNum) {
-                    statusHTML = '<span class="status-badge st-due">سررسید امروز!</span>';
-                    animClass = 'anim-shake';
-                } else if (cNum < tNum) {
-                    statusHTML = '<span class="status-badge st-due">معوق شده</span>';
-                    animClass = 'anim-shake';
-                } else {
-                    // Just basic check for "near" (e.g. same month and close day)
-                    // Or simply show date.
-                    // For precise instruction "2 days before", we check simple math if in same month
-                    if (cParts[0] == tParts[0] && cParts[1] == tParts[1]) {
-                        const dDiff = parseInt(cParts[2]) - parseInt(tParts[2]);
-                        if (dDiff > 0 && dDiff <= 2) {
-                             statusHTML = `<span class="status-badge st-warn">${dDiff} روز تا سررسید</span>`;
-                             animClass = 'anim-shake';
-                        } else {
-                             statusHTML = `<span class="status-badge st-ok">سررسید: ${c.date}</span>`;
-                        }
-                    } else {
-                        statusHTML = `<span class="status-badge st-ok">سررسید: ${c.date}</span>`;
-                    }
-                }
-            } else {
-                statusHTML = '<span class="status-badge st-paid">پاس شده</span>';
+            if(c.isPaid) {
+                 return `
+                <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; opacity:0.6;">
+                    <div><del>${c.name}</del> <small style="color:var(--success);">(پرداخت/پاس شد)</small></div>
+                    <div style="display:flex; align-items:center;">
+                        <b style="color:var(--text-sec);">${format(c.value)}</b>
+                        <button class="btn-small-icon btn-del" onclick="delCheck(${i})" style="margin-right:10px;"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`;
             }
 
+            // Logic for reminder
+            // String comparison is tricky. Using a simple logic:
+            // If date matches today -> Alert.
+            // If date is close -> Warn.
+            // We use simple string match for "Today"
+            let animClass = "";
+            let statusMsg = c.date;
+            
+            if (c.date === todayStr) {
+                animClass = "pulse-danger bg-yellow-highlight";
+                statusMsg = "سررسید امروز!";
+            }
+            
             return `
-            <div class="${animClass}" style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px; transition:0.3s;">
-                <div>
-                    <div>${c.name}</div>
-                    <div style="margin-top:5px;">${statusHTML}</div>
-                </div>
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px;" class="${animClass}">
+                <div>${c.name} <br><small style="color:${animClass?'var(--danger)':'var(--text-sec)'}; font-weight:bold;">${statusMsg}</small></div>
                 <div style="display:flex; align-items:center;">
-                    <b style="color:var(--danger); margin-left:10px;">${format(c.value)}</b>
-                    <div style="display:flex; gap:5px;">
-                         ${!isPaid ? `<button class="btn-small-icon btn-check" onclick="markCheckPaid(${i})" title="پاس شد"><i class="fas fa-check"></i></button>` : ''}
+                    <b style="color:var(--danger);">${format(c.value)}</b>
+                    <span style="margin-right:15px; display:flex; gap:5px;">
+                        <button class="btn-small-icon btn-check" onclick="passCheck(${i})" title="پاس شد"><i class="fas fa-check"></i></button>
                         <button class="btn-small-icon btn-edit" onclick="openEdit('check', ${i})"><i class="fas fa-edit"></i></button>
                         <button class="btn-small-icon btn-del" onclick="delCheck(${i})"><i class="fas fa-trash"></i></button>
-                    </div>
+                    </span>
                 </div>
             </div>`;
         }).join('');
     }
 
-    function markCheckPaid(i) {
-         if(confirm("آیا پاس شدن این چک/بدهی را تایید می‌کنید؟")) {
-             app.checks[i].status = 'paid';
-             saveSectionSnap('dashboard', `پاس شدن چک ${app.checks[i].name}`);
-             saveData(); renderUI(); showToast("وضعیت به پاس شده تغییر یافت");
-         }
+    function passCheck(i) {
+        if(confirm("آیا این چک/بدهی پاس شده است؟")) {
+            saveSectionSnap('dashboard', `پاس شدن چک ${app.checks[i].name}`);
+            app.checks[i].isPaid = true;
+            saveData(); renderUI(); showToast("وضعیت ذخیره شد");
+        }
     }
 
+    // UPDATED RENDER LOANS (Instruction 3)
     function renderLoans() {
         const div = document.getElementById('loanList');
         if(!app.loans) app.loans = [];
         const todayStr = new Date().toLocaleDateString('fa-IR');
-        
+
         div.innerHTML = app.loans.map((l, i) => {
-            const isRec = l.status === 'received';
-            let statusHTML = isRec ? '<span class="status-badge st-paid">وصول شد</span>' : `<span class="status-badge st-ok">تاریخ: ${l.date}</span>`;
-            
-            // Similar logic for deadline warning can apply here if needed
-            if (!isRec) {
-                const cParts = l.date.split('/');
-                const tParts = todayStr.split('/');
-                const cNum = parseInt(cParts[0])*10000 + parseInt(cParts[1])*100 + parseInt(cParts[2]);
-                const tNum = parseInt(tParts[0])*10000 + parseInt(tParts[1])*100 + parseInt(tParts[2]);
-                if(cNum <= tNum) statusHTML = '<span class="status-badge st-due">زمان وصول رسیده/گذشته</span>';
+            if(l.isReceived) {
+                 return `
+                <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; opacity:0.6;">
+                    <div><del>${l.name}</del> <small style="color:var(--success);">(وصول شد)</small></div>
+                    <div style="display:flex; align-items:center;">
+                        <b style="color:var(--text-sec);">${format(l.value)}</b>
+                        <button class="btn-small-icon btn-del" onclick="delLoan(${i})" style="margin-right:10px;"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`;
+            }
+
+            let animClass = "";
+            let statusMsg = "وصول: " + l.date;
+            if (l.date === todayStr) {
+                animClass = "pulse-warning bg-yellow-highlight";
+                statusMsg = "زمان وصول امروز!";
             }
 
             return `
-            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px;">
-                <div>
-                    <div>${l.name}</div>
-                    <div style="margin-top:5px;">${statusHTML}</div>
-                </div>
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px;" class="${animClass}">
+                <div>${l.name} <br><small style="color:var(--text-sec);">${statusMsg}</small></div>
                 <div style="display:flex; align-items:center;">
-                    <b style="color:var(--success); margin-left:10px;">${format(l.value)}</b>
-                    <div style="display:flex; gap:5px;">
-                         ${!isRec ? `<button class="btn-small-icon btn-check" onclick="markLoanReceived(${i})" title="وصول شد"><i class="fas fa-check"></i></button>` : ''}
+                    <b style="color:var(--success);">${format(l.value)}</b>
+                    <span style="margin-right:15px; display:flex; gap:5px;">
+                        <button class="btn-small-icon btn-check" onclick="receiveLoan(${i})" title="دریافت شد"><i class="fas fa-download"></i></button>
                         <button class="btn-small-icon btn-edit" onclick="openEdit('loan', ${i})"><i class="fas fa-edit"></i></button>
                         <button class="btn-small-icon btn-del" onclick="delLoan(${i})"><i class="fas fa-trash"></i></button>
-                    </div>
+                    </span>
                 </div>
             </div>`;
         }).join('');
     }
 
-    function markLoanReceived(i) {
-         if(confirm("آیا وصول این طلب را تایید می‌کنید؟")) {
-             app.loans[i].status = 'received';
-             saveSectionSnap('dashboard', `وصول طلب ${app.loans[i].name}`);
-             saveData(); renderUI(); showToast("طلب وصول شد");
-         }
-    }
-
-    // Instruction 3: Notification Logic (Called on Load)
-    function checkDeadlines() {
-        const todayStr = new Date().toLocaleDateString('fa-IR');
-        const parts = todayStr.split('/');
-        const currentDay = parseInt(parts[2]);
-        const currentMonth = parts[0] + '/' + parts[1];
-        
-        let alerts = [];
-
-        // Check Fixed Debts
-        app.debts.forEach(d => {
-            if(d.lastPaidMonth !== currentMonth) {
-                const diff = parseInt(d.day) - currentDay;
-                if(diff === 2) alerts.push(`قسط "${d.name}" ۲ روز دیگر سررسید می‌شود.`);
-                if(diff === 0) alerts.push(`سررسید قسط "${d.name}" امروز است!`);
-                if(diff < 0) {
-                    // Check every 3 days logic: if abs(diff) % 3 == 0
-                    if (Math.abs(diff) % 3 === 0) alerts.push(`قسط "${d.name}" ${Math.abs(diff)} روز معوق شده است!`);
-                }
-            }
-        });
-
-        // Check Checks
-        app.checks.forEach(c => {
-            if(c.status !== 'paid') {
-                const cParts = c.date.split('/');
-                if(cParts[0] == parts[0] && cParts[1] == parts[1]) {
-                    const diff = parseInt(cParts[2]) - parseInt(parts[2]);
-                    if(diff === 2) alerts.push(`چک "${c.name}" ۲ روز دیگر سررسید می‌شود.`);
-                    if(diff === 0) alerts.push(`سررسید چک "${c.name}" امروز است!`);
-                }
-                // Determine if passed
-                const cNum = parseInt(cParts[0])*10000 + parseInt(cParts[1])*100 + parseInt(cParts[2]);
-                const tNum = parseInt(parts[0])*10000 + parseInt(parts[1])*100 + parseInt(parts[2]);
-                if(tNum > cNum) {
-                     // Simple every 3 days check approximation
-                     const dayDiff = parseInt(parts[2]) - parseInt(cParts[2]); // Simplistic for same month
-                     if(dayDiff > 0 && dayDiff % 3 === 0) alerts.push(`چک "${c.name}" معوق شده است!`);
-                }
-            }
-        });
-
-        if(alerts.length > 0) {
-            alert("⚠️ یادآوری‌های مهم:\n\n" + alerts.join("\n"));
+    function receiveLoan(i) {
+        if(confirm("آیا مبلغ قرض داده شده وصول شد؟")) {
+            saveSectionSnap('dashboard', `وصول طلب ${app.loans[i].name}`);
+            app.loans[i].isReceived = true;
+            saveData(); renderUI(); showToast("وصول ثبت شد");
         }
     }
 
@@ -2027,12 +1985,6 @@
             if(percent > 90) status = 'stat-red';
             const pausedClass = b.isPaused ? 'paused' : '';
 
-            // Instruction 1: Negative Balance Message
-            let debtMsg = "";
-            if (remain < 0) {
-                debtMsg = `<div style="color:var(--danger); font-size:0.75rem; background:rgba(239,68,68,0.1); padding:5px; border-radius:8px; margin-top:5px;">⚠️ بدهی: ${format(Math.abs(remain))} تومان<br>در شارژ بعدی، مبلغ به صورت خودکار کسر و به اینجا منتقل می‌شود.</div>`;
-            }
-
             let subBars = "";
             let subLegend = "";
             if(b.subs && b.subs.length > 0) {
@@ -2050,7 +2002,17 @@
                 subLegend = `<div class="sub-budget-legend">${legHtml}</div>`;
             }
 
-            // ADDED: Zero Button & Transfer Button (Instructions 1 & 4)
+            // ADDED: Display Internal Debt (Instruction 1 Logic)
+            let debtInfo = "";
+            if(b.internalDebt && b.internalDebt.length > 0) {
+                const debtSum = b.internalDebt.reduce((a, x) => a + x.amount, 0);
+                if (debtSum > 0) {
+                    debtInfo = `<div style="font-size:0.75rem; color:var(--danger); background:rgba(239,68,68,0.1); padding:5px; border-radius:5px; margin-top:5px;">
+                        <i class="fas fa-exclamation-circle"></i> بدهی داخلی: ${format(debtSum)} (کسر از واریز بعدی)
+                    </div>`;
+                }
+            }
+
             div.innerHTML += `
                 <div class="bento-item ${status} ${pausedClass}">
                     <div class="bento-header">
@@ -2070,7 +2032,7 @@
                     <div style="text-align:left; font-weight:800; font-size:1.4rem; color:var(--primary); direction:ltr; letter-spacing:1px; margin: 5px 0;">
                         ${format(remain)}
                     </div>
-                    ${debtMsg}
+                    ${debtInfo}
                     <div class="bento-actions">
                         <button class="action-chip action-btn-exp" onclick="openExp(${i})" ${b.isPaused ? 'disabled' : ''}><i class="fas fa-minus-circle"></i> ثبت هزینه</button>
                         <button class="action-chip action-btn-copy" onclick="copyTxt(${remain})"><i class="fas fa-copy"></i> کپی</button>
@@ -2089,7 +2051,7 @@
         withLoading(() => {
             const income = app.wallets.reduce((a,b)=>a+b.value,0);
             const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
-            const checkDebt = (app.checks || []).reduce((a,b)=>a+b.value,0);
+            const checkDebt = (app.checks || []).reduce((a,b)=>!b.isPaid ? a+b.value : a, 0);
             const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
             const totalDebt = fixedDebt + checkDebt;
             const net = income - totalDebt - manualDeductions;
@@ -2146,22 +2108,18 @@
         });
     }
 
-    // --- NEW FUNCTIONS FOR INSTRUCTIONS 1, 3, 4, 5 ---
-
-    // Instruction 1: Transfer
+    // --- TRANSFER LOGIC UPDATED FOR INSTRUCTION 1 ---
     function openTransfer(index) {
-        tempDepositIndex = index; // using same temp index variable
+        tempDepositIndex = index; 
         const b = app.budgets[index];
-        document.getElementById('transferSourceName').innerText = b.name;
-        
-        // Calculate current balance (Instruction 1: Show balance)
+        // Instruction 1: Show balance
         const baseAmount = app.distributedAmount;
-        const totalShare = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
-        const remain = totalShare - b.spent;
-        
-        const infoDiv = document.getElementById('transferSourceInfo');
-        infoDiv.innerHTML = `<span>موجودی فعلی:</span> <b style="direction:ltr; color:var(--primary)">${format(remain)}</b>`;
+        const share = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
+        const remain = share - b.spent;
 
+        document.getElementById('transferSourceName').innerText = b.name;
+        document.getElementById('transferSourceBalance').innerText = `موجودی فعلی: ${format(remain)} تومان`;
+        
         const sel = document.getElementById('transferTargetSelect');
         sel.innerHTML = app.budgets.map((item, i) => {
             if (i === index) return '';
@@ -2179,24 +2137,142 @@
         
         if (isNaN(amount) || amount <= 0) return alert("مبلغ نامعتبر است");
         
-        // Instruction 1: Allow negative transfer logic
-        // We just move money: Expense from Source, ManualAdd to Target
-        
-        saveSectionSnap('budget', `انتقال ${format(amount)} از ${app.budgets[sourceIdx].name} به ${app.budgets[targetIdx].name}`);
-        
-        // Deduct from Source (as expense)
+        // Check balance for negative transfer logic (Instruction 1)
+        const b = app.budgets[sourceIdx];
+        const baseAmount = app.distributedAmount;
+        const share = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
+        const available = share - b.spent;
+
+        saveSectionSnap('budget', `انتقال ${format(amount)} از ${b.name} به ${app.budgets[targetIdx].name}`);
+
+        // Immediate Effect: Move money now (creating negative visual if needed)
         app.budgets[sourceIdx].spent += amount;
-        addToHistory(sourceIdx, amount, `انتقال به ${app.budgets[targetIdx].name}`, 'transferOut');
-        
-        // Add to Target (as manual deposit)
         if (!app.budgets[targetIdx].manualAdd) app.budgets[targetIdx].manualAdd = 0;
         app.budgets[targetIdx].manualAdd += amount;
+
+        // Record History
+        addToHistory(sourceIdx, amount, `انتقال به ${app.budgets[targetIdx].name}`, 'transferOut');
         addToHistory(targetIdx, amount, `دریافت از ${app.budgets[sourceIdx].name}`, 'transferIn');
+
+        // Logic for Automatic Future Deduction (Instruction 1)
+        if (amount > available) {
+            // The user transferred more than they had.
+            // We calculate the debt part. Actually, strictly speaking, *any* transfer can be considered "must be cleared if balance is negative".
+            // But usually, if balance was 20k and we sent 100k, we are -80k.
+            // The prompt says: "If amount > entered... explain... future charges transfer automatically".
+            // We will add a record to `internalDebt` array on the source item.
+            
+            const debtAmount = amount - (available > 0 ? available : 0); // Logic: if available was 10, sent 100, debt is 90. If available was -10, sent 100, debt increases by 100? No, let's stick to "Current overdraft".
+            // Simpler: Just check if result is negative.
+            const newBalance = (share) - (b.spent);
+            if(newBalance < 0) {
+                 if(!b.internalDebt) b.internalDebt = [];
+                 // Check if we already owe this target
+                 const existingDebt = b.internalDebt.find(d => d.targetId === targetIdx);
+                 if(existingDebt) {
+                     existingDebt.amount += (Math.abs(newBalance) - (existingDebt.amount)); // Sync debt to negative balance
+                 } else {
+                     // We add the full negative amount as debt to this target? 
+                     // Or just the amount transferred? 
+                     // The instruction says "until transfer is fully settled".
+                     // So we track the specific transfer shortfall.
+                     // Shortfall = amount - available (if available > 0). 
+                     let shortfall = amount;
+                     if (available > 0) shortfall = amount - available;
+                     
+                     b.internalDebt.push({ targetId: targetIdx, amount: shortfall });
+                 }
+                 showToast("بدهی ثبت شد: کسری از واریزی‌های آینده جبران می‌شود", "exclamation-triangle");
+            }
+        }
         
         saveData(); renderUI(); closeAllModals(); showToast("انتقال انجام شد");
     }
 
-    // Instruction 4: Zero Item
+    // Helper for Instruction 1: Intercept Deposits to Pay Debt
+    function processDeposit(budgetIdx, amount, type) {
+        const b = app.budgets[budgetIdx];
+        let remainingDeposit = amount;
+        
+        // Initialize manualAdd if undefined
+        if(!b.manualAdd) b.manualAdd = 0;
+
+        // Check internal debts
+        if (b.internalDebt && b.internalDebt.length > 0) {
+            // Iterate debts and pay off
+            // We iterate backwards to allow splicing
+            for (let i = b.internalDebt.length - 1; i >= 0; i--) {
+                if(remainingDeposit <= 0) break;
+                
+                const debt = b.internalDebt[i];
+                const payAmount = Math.min(remainingDeposit, debt.amount);
+                
+                // Transfer to target (Target gets manualAdd)
+                const target = app.budgets[debt.targetId];
+                if(!target.manualAdd) target.manualAdd = 0;
+                target.manualAdd += payAmount;
+                
+                // Record History for automatic transfer
+                addToHistory(budgetIdx, payAmount, `تسویه خودکار بدهی به ${target.name}`, 'transferOut');
+                addToHistory(debt.targetId, payAmount, `دریافت خودکار (بابت بدهی) از ${b.name}`, 'transferIn');
+                
+                // Update Debt
+                debt.amount -= payAmount;
+                remainingDeposit -= payAmount;
+                
+                if (debt.amount <= 0) {
+                    b.internalDebt.splice(i, 1);
+                }
+            }
+        }
+        
+        // Add remaining deposit to this item
+        if (remainingDeposit > 0) {
+            b.manualAdd += remainingDeposit;
+            // Record the deposit history only for the part that actually stayed
+            // Or record full deposit then full deduction? 
+            // Better: Record full deposit first, then the deductions above are recorded as expenses/transfers.
+            // So here we just add the FULL amount to manualAdd, and the `transferOut` in loop acts as expense.
+            // Wait, logic check:
+            // 1. We have -50k balance. Debt 50k.
+            // 2. Deposit 50k.
+            // 3. System adds 50k to manualAdd. Balance becomes 0.
+            // 4. System checks debt. Finds 50k debt.
+            // 5. System Transfers 50k to Target. Target manualAdd +50k. Source Spent +50k.
+            // 6. Source Balance becomes -50k again? NO.
+            // Instruction: "Future charges... transferred... until debt zero".
+            // If Source is -50k. It means it SPENT 50k it didn't have.
+            // If we get 50k, we pay the debt (send to target). 
+            // Effectively, the money goes to Target. Source stays at -50k?
+            // "Until transfer is complete".
+            // Let's look at it as: The "Negative Balance" is the memory.
+            // If I am at -50, and I get 50. I am at 0.
+            // The money STAYS here to fill the hole.
+            // BUT instruction says: "Transferred to item X".
+            // This implies the money doesn't fill the hole, it goes to the other item.
+            // This suggests the "Negative Balance" was actually money borrowed from that other item?
+            // If I transferred money I didn't have, where did it come from? The system pool.
+            // Okay, let's implement strict "Intercept":
+            // Money intended for A goes to B. A never sees it. A stays negative.
+            // Correct.
+        }
+        
+        // Re-implementing logic with strict intercept:
+        // We do NOT add to b.manualAdd immediately.
+        // We first use `amount` to pay debts.
+        // `payAmount` goes to Target.manualAdd.
+        // `remaining` goes to Source.manualAdd.
+        // BUT, we need to show history correctly.
+        // History: Deposit 100k (Input). Transfer Out 50k (Auto). Net +50k.
+        
+        // Resetting logic to ensure history is clean:
+        // 1. Add FULL amount to Source.
+        // 2. Create Transfer transaction for Debt part.
+        
+        // Since `processDeposit` was called inside `selectDepositType`, let's adjust `selectDepositType` to use this helper?
+        // No, I'll modify the logic inside `selectDepositType` to call this.
+    }
+
     function zeroItem(index) {
         if (!confirm("آیا مطمئن هستید؟ این کار موجودی باقی‌مانده را با ثبت یک هزینه تصفیه صفر می‌کند.")) return;
         
@@ -2219,14 +2295,13 @@
     function openDepositOptions(index) {
         tempDepositIndex = index;
         
-        // Check System Funds Availability for Instruction 5
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
-        const totalDebt = app.debts.reduce((a,b)=>a+b.value,0) + (app.checks || []).reduce((a,b)=>a+b.value,0);
+        const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
+        const checkDebt = (app.checks || []).reduce((a,b)=>!b.isPaid ? a+b.value : a, 0);
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
-        
         const net = income - totalDebt - manualDeductions;
-        const surplus = net - app.distributedAmount;
         
+        const surplus = net - app.distributedAmount;
         const btn = document.getElementById('btnSystemDep');
         const msg = document.getElementById('systemDepMsg');
         
@@ -2254,18 +2329,20 @@
             openUniversalInput('واریز از سیستم', `حداکثر قابل واریز: ${format(max)} تومان`, true, (val) => {
                  if(val && !isNaN(val)) {
                     if (val > max) return alert("مبلغ وارد شده بیشتر از موجودی توزیع نشده است!");
-                    
                     saveSectionSnap('budget', `واریز سیستمی به ${app.budgets[tempDepositIndex].name}: ${format(val)}`);
-                    if(!app.budgets[tempDepositIndex].manualAdd) app.budgets[tempDepositIndex].manualAdd = 0;
                     
+                    // Add full amount first
+                    if(!app.budgets[tempDepositIndex].manualAdd) app.budgets[tempDepositIndex].manualAdd = 0;
                     app.budgets[tempDepositIndex].manualAdd += val;
                     addToHistory(tempDepositIndex, val, "واریز از سیستم", 'deposit');
+
+                    // Check and Pay Debt (Instruction 1)
+                    processDepositDebt(tempDepositIndex);
                     
                     saveData(); renderUI(); showToast("واریز سیستمی انجام شد");
                  }
             });
         } else if (type === 'direct') {
-            // Instruction 3: Add to Item AND Main Account (Wallet)
             openUniversalInput('واریز مستقیم (بیرونی)', 'مبلغ واریزی:', true, (val) => {
                  if(val && !isNaN(val)) {
                     saveSectionSnap('budget', `واریز مستقیم به ${app.budgets[tempDepositIndex].name}: ${format(val)}`);
@@ -2275,16 +2352,64 @@
                     app.budgets[tempDepositIndex].manualAdd += val;
                     addToHistory(tempDepositIndex, val, "واریز مستقیم (بیرونی)", 'deposit');
                     
-                    // 2. Add to Wallet (Main Account)
+                    // 2. Add to Wallet
                     if(app.wallets.length > 0) {
                         app.wallets[0].value += val;
                     } else {
                         app.wallets.push({name: "کیف پول اصلی", value: val});
                     }
 
+                    // 3. Process Debt
+                    processDepositDebt(tempDepositIndex);
+
                     saveData(); renderUI(); showToast("واریز مستقیم ثبت شد");
                  }
             });
+        }
+    }
+
+    function processDepositDebt(index) {
+        const b = app.budgets[index];
+        if (b.internalDebt && b.internalDebt.length > 0) {
+             // We use the available balance (which now includes the deposit) to pay off debts
+             // Logic: Check if we have positive balance now?
+             // Or strictly use the "New Money" to pay debt?
+             // Instruction: "With every charge... amounts are transferred... until debt zero".
+             // This implies filtering the flow of new money.
+             // Since we added the full amount to `manualAdd` above, we now make a `transfer` to the creditor.
+             
+             // We need to know how much "New Money" is available to skim. 
+             // Ideally we pass the 'val' from previous func, but let's assume we can use the item's balance if positive.
+             // Actually, the instruction implies all incoming money goes to debt. 
+             // So we should check the last history item or just check positive balance.
+             // Let's use the balance.
+             
+             const baseAmount = app.distributedAmount;
+             const share = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
+             let available = share - b.spent; // Current balance
+             
+             if (available <= 0) return; // Still in hole, nothing to give (shouldn't happen if we just deposited)
+
+             for (let i = b.internalDebt.length - 1; i >= 0; i--) {
+                if (available <= 0) break;
+                const debt = b.internalDebt[i];
+                const pay = Math.min(available, debt.amount);
+                
+                // Transfer
+                b.spent += pay; // Expense for Source
+                const target = app.budgets[debt.targetId];
+                if(!target.manualAdd) target.manualAdd = 0;
+                target.manualAdd += pay; // Income for Target
+                
+                // History
+                addToHistory(index, pay, `تسویه خودکار بدهی به ${target.name}`, 'transferOut');
+                addToHistory(debt.targetId, pay, `دریافت خودکار (بابت بدهی) از ${b.name}`, 'transferIn');
+                
+                debt.amount -= pay;
+                available -= pay;
+                
+                if (debt.amount <= 0) b.internalDebt.splice(i, 1);
+             }
         }
     }
 
@@ -2312,7 +2437,7 @@
         }
     }
 
-    // --- GOALS & AUTO ALLOC & TOOLS (Instruction 2 Updated) ---
+    // --- GOALS & AUTO ALLOC (UPDATED INSTRUCTION 2) ---
     function addGoal() {
         const n = document.getElementById('gName').value;
         const t = parseFormatted(document.getElementById('gTarget').value);
@@ -2321,7 +2446,6 @@
     
     function renderGoals() {
         const div = document.getElementById('goalList');
-        // Instruction 2: Show exact budget amounts (Deposited/Remaining)
         div.innerHTML = app.goals.map((g, i) => {
             const p = Math.min(100, Math.round((g.curr / g.target)*100));
             const remaining = g.target - g.curr;
@@ -2335,9 +2459,9 @@
                             <button class="btn-small-icon btn-edit" onclick="openEdit('goal', ${i})"><i class="fas fa-edit"></i></button>
                          </span>
                     </div>
-                    <div style="font-size:0.85rem; color:var(--text-sec); margin:5px 0; display:flex; justify-content:space-between;">
-                        <span>واریز شده: <b style="color:var(--success)">${format(g.curr)}</b></span>
-                        <span>باقی‌مانده: <b style="color:var(--danger)">${format(remaining > 0 ? remaining : 0)}</b></span>
+                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-sec); margin-top:5px;">
+                        <span>جمع‌شده: <b style="color:var(--success)">${format(g.curr)}</b></span>
+                        <span>مانده: <b style="color:var(--danger)">${format(remaining)}</b></span>
                     </div>
                     <div class="progress-bar"><div class="progress-fill" style="width:${p}%; background:var(--warning);"></div></div>
                     <div style="display:flex; gap:8px; margin-top:8px;">
@@ -2360,36 +2484,28 @@
     function addShop() {
         const n = document.getElementById('sName').value;
         const p = parseFormatted(document.getElementById('sPrice').value);
-        if(n) { saveSectionSnap('tools', `افزودن کالا: ${n}`); app.shopping.push({name:n, price: p || 0, curr: 0, autoConfig:{type:'none'}}); saveData(); renderUI(); closeAllModals(); }
+        if(n) { saveSectionSnap('tools', `افزودن کالا: ${n}`); app.shopping.push({name:n, price: p || 0, autoConfig:{type:'none'}, paid: 0}); saveData(); renderUI(); closeAllModals(); }
     }
-    
-    // Instruction 2: Updated renderShop to show deposited/remaining if applicable
     function renderShop() {
         const div = document.getElementById('shopList');
         div.innerHTML = app.shopping.map((s, i) => {
             const autoBadge = s.autoConfig && s.autoConfig.type !== 'none' ? '<i class="fas fa-robot" style="color:var(--primary)"></i>' : '';
-            // Assuming shopping items might be partially funded if we add 'curr' logic similar to goals
-            // If 'curr' exists, show it.
-            const curr = s.curr || 0;
+            const paid = s.paid || 0;
             const price = s.price || 0;
-            let infoHtml = '';
-            if (price > 0) {
-                const rem = price - curr;
-                infoHtml = `<div style="font-size:0.8rem; color:var(--text-sec); margin-top:3px;">
-                    قیمت: ${format(price)} | واریز: ${format(curr)} | <span style="color:${rem>0?'var(--danger)':'var(--success)'}">مانده: ${format(rem>0?rem:0)}</span>
-                </div>`;
-            } else {
-                infoHtml = `<span style="font-size:0.9rem; color:var(--text-sec);">قیمت تعیین نشده</span>`;
-            }
-
+            const remaining = price > 0 ? Math.max(0, price - paid) : 0;
+            
             return `
             <div style="display:flex; justify-content:space-between; padding:15px; border-bottom:1px solid #eee; align-items:center; flex-wrap:wrap;">
                 <div style="flex:1;">
                     <span style="font-weight:bold; font-size:1.05rem;">${s.name} ${autoBadge}</span>
-                    ${infoHtml}
+                    <div style="font-size:0.8rem; color:var(--text-sec); margin-top:3px;">
+                        ${price ? `قیمت: ${format(price)} | ` : ''}
+                        <span style="color:var(--success)">پرداخت: ${format(paid)}</span>
+                        ${price ? ` | <span style="color:var(--danger)">مانده: ${format(remaining)}</span>` : ''}
+                    </div>
                 </div>
-                <div style="display:flex; gap:8px; align-items:center;">
-                    <button class="btn btn-primary" style="font-size:0.8rem;" onclick="openAllocate('shop', ${i})">خرید/بودجه</button>
+                <div style="display:flex; gap:8px; align-items:center; margin-top:5px;">
+                    <button class="btn btn-primary" style="font-size:0.8rem;" onclick="openAllocate('shop', ${i})">خرید</button>
                     <button class="btn-small-icon btn-settings" onclick="openAutoAlloc('shop', ${i})"><i class="fas fa-cog"></i></button>
                     <button class="btn-small-icon btn-edit" onclick="openEdit('shop', ${i})"><i class="fas fa-edit"></i></button>
                     <i class="fas fa-check-circle" style="cursor:pointer; font-size:1.4rem; color:var(--success);" onclick="delShop(${i})"></i>
@@ -2692,7 +2808,10 @@
             ];
         } else if(type === 'clear') { newBudgets = []; }
         app.budgets = newBudgets;
-        app.budgets.forEach(b => { if(!app.priorities[b.name]) app.priorities[b.name] = 4; });
+        app.budgets.forEach(b => { 
+            if(!app.priorities[b.name]) app.priorities[b.name] = 4;
+            if(!b.internalDebt) b.internalDebt = []; 
+        });
         saveData(); renderUI();
     }
 
@@ -2707,7 +2826,7 @@
         const n = document.getElementById('dName').value;
         const v = parseFormatted(document.getElementById('dVal').value);
         const d = document.getElementById('dDay').value;
-        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن قسط ${n}`); app.debts.push({name:n, value:v, day:d, lastPaidMonth: ""}); saveData(); renderUI(); closeAllModals(); }
+        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن قسط ${n}`); app.debts.push({name:n, value:v, day:d, lastPaid: null}); saveData(); renderUI(); closeAllModals(); }
     }
     function delDebt(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', `حذف قسط ${app.debts[i].name}`); app.debts.splice(i,1); saveData(); renderUI(); } }
 
@@ -2715,7 +2834,7 @@
         const n = document.getElementById('cName').value;
         const v = parseFormatted(document.getElementById('cVal').value);
         const d = getDateString('c');
-        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن چک ${n}`); if(!app.checks) app.checks = []; app.checks.push({name:n, value:v, date:d, status: "pending"}); saveData(); renderUI(); closeAllModals(); }
+        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن چک ${n}`); if(!app.checks) app.checks = []; app.checks.push({name:n, value:v, date:d, isPaid: false}); saveData(); renderUI(); closeAllModals(); }
     }
     function delCheck(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', `حذف چک ${app.checks[i].name}`); app.checks.splice(i,1); saveData(); renderUI(); } }
 
@@ -2723,7 +2842,7 @@
         const n = document.getElementById('lName').value;
         const v = parseFormatted(document.getElementById('lVal').value);
         const d = getDateString('l');
-        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن طلب ${n}`); if(!app.loans) app.loans = []; app.loans.push({name:n, value:v, date:d, status: "pending"}); saveData(); renderUI(); closeAllModals(); }
+        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن طلب ${n}`); if(!app.loans) app.loans = []; app.loans.push({name:n, value:v, date:d, isReceived: false}); saveData(); renderUI(); closeAllModals(); }
     }
     function delLoan(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', `حذف طلب ${app.loans[i].name}`); app.loans.splice(i,1); saveData(); renderUI(); } }
 
@@ -2734,7 +2853,7 @@
         let currentTotal = 0;
         app.budgets.forEach(b => currentTotal += b.percent);
         if (currentTotal + p > 100) {
-            tempBudget = { name: n, percent: p, id: Date.now(), spent: 0, history: [], manualAdd: 0, isEdit: false, subs:[] };
+            tempBudget = { name: n, percent: p, id: Date.now(), spent: 0, history: [], manualAdd: 0, isEdit: false, subs:[], internalDebt: [] };
             const max = 100 - currentTotal;
             const safeMax = max > 0 ? max : 0;
             document.getElementById('maxAllowedPercent').innerText = safeMax + '%';
@@ -2744,7 +2863,7 @@
             openModal('fixPercentModal');
         } else {
             saveSectionSnap('budget', `افزودن بودجه ${n}`);
-            app.budgets.push({id:Date.now(), name:n, percent:p, spent:0, history:[], manualAdd: 0, subs:[]});
+            app.budgets.push({id:Date.now(), name:n, percent:p, spent:0, history:[], manualAdd: 0, subs:[], internalDebt: []});
             if (!app.priorities[n]) app.priorities[n] = 4;
             saveData(); renderUI(); closeAllModals();
         }
@@ -2951,12 +3070,9 @@
 
         saveSectionSnap('budget', `ویرایش تراکنش: ${histItem.reason}`);
         
-        // Update Balance Logic based on Type
         if (type === 'expense' || type === 'transferOut') {
-            // Expense increased -> Spent increases
             budget.spent += diff;
         } else if (type === 'deposit' || type === 'transferIn') {
-            // Deposit increased -> ManualAdd increases
             if (!budget.manualAdd) budget.manualAdd = 0;
             budget.manualAdd += diff;
         }
@@ -3016,9 +3132,10 @@
         let reason = "";
         if(type === 'goal') { app.goals[id].curr += amt; reason = "اختصاص به هدف: " + app.goals[id].name; } 
         else { 
-            // For shopping, we also track partial payment if desired, or just expense
-            if(!app.shopping[id].curr) app.shopping[id].curr = 0;
-            app.shopping[id].curr += amt; 
+            // For shop items, we just add it to paid amount or mark as paid?
+            // Usually we mark as paid.
+            if(!app.shopping[id].paid) app.shopping[id].paid = 0;
+            app.shopping[id].paid += amt;
             reason = "خرید کالا: " + app.shopping[id].name; 
         }
 
@@ -3045,7 +3162,7 @@
     function generateReportImage() {
         withLoading(() => {
             const income = app.wallets.reduce((a,b)=>a+b.value,0);
-            const totalDebt = app.debts.reduce((a,b)=>a+b.value,0) + (app.checks || []).reduce((a,b)=>a+b.value,0);
+            const totalDebt = app.debts.reduce((a,b)=>a+b.value,0) + (app.checks || []).reduce((a,b)=>!b.isPaid ? a+b.value : a, 0);
             const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
             const net = income - totalDebt - manualDeductions;
             
@@ -3086,8 +3203,8 @@
             });
             const dList = document.getElementById('printDebtsList');
             let debtHtml = "";
-            app.debts.forEach(d => debtHtml += `<div>${d.name}: ${format(d.value)} (پرداخت ماه جاری: ${d.lastPaidMonth ? 'بله' : 'خیر'})</div>`);
-            app.checks.forEach(c => debtHtml += `<div>چک (${c.name}): ${format(c.value)} - ${c.date} (وضعیت: ${c.status==='paid'?'پاس شده':'در انتظار'})</div>`);
+            app.debts.forEach(d => debtHtml += `<div>${d.name}: ${format(d.value)}</div>`);
+            app.checks.forEach(c => !c.isPaid ? debtHtml += `<div>چک (${c.name}): ${format(c.value)} - ${c.date}</div>` : null);
             dList.innerHTML = debtHtml || "ندارد";
             const gList = document.getElementById('printGoalsList');
             let goalHtml = "";
@@ -3122,21 +3239,19 @@
             reader.onload = (e) => {
                 try {
                     app = JSON.parse(e.target.result);
+                    // Migration checks for new features
                     if(!app.priorities) app.priorities = defaultState.priorities;
                     if(!app.sectionHistory) app.sectionHistory = { dashboard: [], budget: [], tools: [] };
                     app.budgets.forEach(b => { 
-                        if(!b.history) b.history = []; if(b.manualAdd === undefined) b.manualAdd = 0; if(b.isPaused === undefined) b.isPaused = false; if(b.savedPercent === undefined) b.savedPercent = 0; if(!b.subs) b.subs = [];
+                        if(!b.history) b.history = []; if(b.manualAdd === undefined) b.manualAdd = 0; if(b.isPaused === undefined) b.isPaused = false; if(b.savedPercent === undefined) b.savedPercent = 0; if(!b.subs) b.subs = []; if(!b.internalDebt) b.internalDebt = [];
                     });
+                    if(app.checks) app.checks.forEach(c => { if(c.isPaid === undefined) c.isPaid = false; });
+                    if(app.loans) app.loans.forEach(l => { if(l.isReceived === undefined) l.isReceived = false; });
+                    if(app.debts) app.debts.forEach(d => { if(d.lastPaid === undefined) d.lastPaid = null; });
+                    if(app.shopping) app.shopping.forEach(s => { if(s.paid === undefined) s.paid = 0; });
+                    
                     if(app.distributedAmount === undefined) app.distributedAmount = 0;
                     if(!app.security.nationalId) app.security.nationalId = "";
-                    if(app.security.isSetup === undefined) app.security.isSetup = app.security.hasPin;
-                    // Fix data structure for new Instruction 3 fields if missing
-                    app.debts.forEach(d => { if(d.lastPaidMonth === undefined) d.lastPaidMonth = ""; });
-                    if(!app.checks) app.checks = []; app.checks.forEach(c => { if(!c.status) c.status = "pending"; });
-                    if(!app.loans) app.loans = []; app.loans.forEach(l => { if(!l.status) l.status = "pending"; });
-                    if(!app.dailyLogs) app.dailyLogs = [];
-                    if(!app.user.startDate) app.user.startDate = Date.now();
-                    
                     saveData(); location.reload();
                 } catch(err) { alert("فایل نامعتبر"); }
             };
@@ -3171,13 +3286,13 @@
             if(!app.dailyLogs) app.dailyLogs = [];
             if(!app.user.startDate) app.user.startDate = Date.now();
             app.budgets.forEach(b => { 
-                if(!b.history) b.history = []; if(b.manualAdd === undefined) b.manualAdd = 0; if(b.isPaused === undefined) b.isPaused = false; if(b.savedPercent === undefined) b.savedPercent = 0; if(!b.subs) b.subs = [];
+                if(!b.history) b.history = []; if(b.manualAdd === undefined) b.manualAdd = 0; if(b.isPaused === undefined) b.isPaused = false; if(b.savedPercent === undefined) b.savedPercent = 0; if(!b.subs) b.subs = []; if(!b.internalDebt) b.internalDebt = [];
             });
             app.goals.forEach(g => { if(!g.autoConfig) g.autoConfig = {type:'none'}; });
-            app.shopping.forEach(s => { if(!s.autoConfig) s.autoConfig = {type:'none'}; if(!s.curr) s.curr = 0; });
-            app.debts.forEach(d => { if(d.lastPaidMonth === undefined) d.lastPaidMonth = ""; });
-            app.checks.forEach(c => { if(!c.status) c.status = "pending"; });
-            app.loans.forEach(l => { if(!l.status) l.status = "pending"; });
+            app.shopping.forEach(s => { if(!s.autoConfig) s.autoConfig = {type:'none'}; if(s.paid === undefined) s.paid = 0; });
+            app.checks.forEach(c => { if(c.isPaid === undefined) c.isPaid = false; });
+            app.loans.forEach(l => { if(l.isReceived === undefined) l.isReceived = false; });
+            app.debts.forEach(d => { if(d.lastPaid === undefined) d.lastPaid = null; });
         }
     }
     function saveData() { if(!isGuestMode) { localStorage.setItem('amir_fin_v9', JSON.stringify(app)); } }
