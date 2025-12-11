@@ -1,8 +1,9 @@
+<!DOCTYPE html> 
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مدیریت مالی حرفه‌ای | V20 Ultimate (Complete)</title>
+    <title>مدیریت مالی حرفه‌ای</title>
 
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
@@ -98,24 +99,6 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 0.8; } 50% { opacity: 1; transform: scale(1.05); } }
-
-        /* --- Animations for Alerts (New Instruction) --- */
-        @keyframes anim-pulse {
-            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); border-color: var(--warning); }
-            70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); border-color: var(--warning); }
-            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); border-color: transparent; }
-        }
-        @keyframes anim-shake {
-            0% { transform: translateX(0); border-color: var(--danger); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-            100% { transform: translateX(0); border-color: var(--danger); }
-        }
-        
-        .alert-pulse { animation: anim-pulse 2s infinite; border: 2px solid var(--warning); }
-        .alert-shake { animation: anim-shake 0.5s ease-in-out infinite alternate; border: 2px solid var(--danger); background: rgba(239, 68, 68, 0.05); }
-        .alert-overdue { border: 2px dashed var(--danger); background: rgba(239, 68, 68, 0.1); }
 
         /* --- Toast Notification --- */
         .toast-container {
@@ -263,6 +246,8 @@
         .btn-settings { color: var(--primary); background: rgba(79, 70, 229, 0.15); }
         .btn-copy { color: var(--text-sec); background: rgba(100, 116, 139, 0.15); }
         .btn-copy:hover { background: var(--text-main); color: white; }
+        .btn-check { color: var(--success); background: rgba(16, 185, 129, 0.15); }
+        .btn-check:hover { background: var(--success); color: white; }
         
         .currency-toggle-btn {
             background: var(--glass-bg);
@@ -612,6 +597,15 @@
         .settings-btn-card.danger i { color: var(--danger); }
         .settings-btn-card.danger:hover { background: rgba(239, 68, 68, 0.05); border-color: var(--danger); }
 
+        /* Animation & Badges for Due Dates */
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } 100% { transform: translateX(0); } }
+        .anim-shake { animation: shake 0.5s infinite; border: 2px solid var(--danger) !important; }
+        .status-badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; margin-right: 5px; font-weight:bold; }
+        .st-due { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .st-warn { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .st-ok { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .st-paid { background: #e0e7ff; color: #4338ca; }
+
     </style>
 </head>
 <body>
@@ -747,7 +741,7 @@
 
         <div class="glass-panel">
             <div class="header-row">
-                <h3><i class="fas fa-file-invoice-dollar"></i> اقساط ثابت (ماهانه)</h3>
+                <h3><i class="fas fa-file-invoice-dollar"></i> اقساط ثابت</h3>
                 <button class="btn btn-primary" onclick="openModal('debtModal')"><i class="fas fa-plus"></i> افزودن</button>
             </div>
             <div id="debtList"></div>
@@ -889,11 +883,7 @@
         <p style="font-size:0.9rem; color:var(--text-sec); margin-bottom:15px;">
             انتقال از <b><span id="transferSourceName"></span></b> به:
         </p>
-        <div style="background: rgba(79, 70, 229, 0.05); padding: 12px; border-radius: 12px; margin-bottom: 15px; border: 1px dashed var(--primary); display: flex; justify-content: space-between; align-items: center;">
-             <span style="color:var(--primary); font-size:0.9rem;">موجودی فعلی:</span>
-             <b id="transferCurrentBalance" style="direction:ltr; color:var(--primary);">0</b>
-        </div>
-        
+        <div class="alloc-info-box" id="transferSourceInfo" style="margin-bottom:10px;"></div>
         <label>مقصد انتقال:</label>
         <select id="transferTargetSelect"></select>
         
@@ -915,11 +905,6 @@
     <div class="modal-content">
         <h3>انتخاب روش واریز</h3>
         <p style="font-size:0.9rem; color:var(--text-sec); margin-bottom:20px;">لطفاً نوع واریز به این ردیف بودجه را مشخص کنید:</p>
-        
-        <div id="deficitWarning" style="display:none; background:rgba(245,158,11,0.1); border:1px solid var(--warning); padding:10px; border-radius:10px; margin-bottom:15px; color:var(--warning); font-size:0.85rem;">
-            <i class="fas fa-exclamation-triangle"></i> توجه: موجودی این آیتم منفی است. واریز جدید ابتدا صرف جبران بدهی خواهد شد.
-        </div>
-
         <button id="btnSystemDep" class="btn btn-primary" style="width:100%; margin-bottom:5px; display:flex; justify-content:space-between;" onclick="selectDepositType('system')">
             <span>واریز از حساب سیستم (توزیع نشده)</span>
             <i class="fas fa-exchange-alt"></i>
@@ -1460,6 +1445,7 @@
             app.dailyLogs.push({ date: today, net: net, spent: spent, timestamp: Date.now() });
             saveData();
         }
+        checkDeadlines(); // Instruction 3: Check deadlines on load
     }
 
     function setupDatePickers() { }
@@ -1712,74 +1698,6 @@
         }, 1000);
     }
 
-    // --- ALERTS AND DUE DATES HELPERS (Instruction 3) ---
-    function getDueStatus(dateStr, isMonthly, dayOfMonth) {
-        const today = new Date();
-        // Convert Persian date to approx check or use day of month
-        let diffDays = 0;
-        let isPast = false;
-        
-        if (isMonthly) {
-            // For monthly, check against dayOfMonth
-            // Very simple Persian calendar approx: 1st to 31st
-            // We assume today's day matches the Persian day for simplicity in JS without heavy libraries, 
-            // or we accept that user enters the day number (1-31).
-            // A more robust way is getting current Persian day.
-            // Using Intl.DateTimeFormat for Persian Calendar:
-            const parts = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {day: 'numeric'}).formatToParts(today);
-            const currentPDay = parseInt(parts.find(p=>p.type==='day').value);
-            
-            // Logic: if today is 28 and due is 30 -> 2 days left.
-            // if today is 30 and due is 2 -> past due (or next month).
-            // We focus on current month payment.
-            diffDays = dayOfMonth - currentPDay;
-            // If diff is negative, it means date passed in this month.
-        } else {
-            // Parse yyyy/mm/dd
-            const parts = dateStr.split('/');
-            const y = parseInt(parts[0]);
-            const m = parseInt(parts[1]);
-            const d = parseInt(parts[2]);
-            
-            // Convert current date to Persian parts
-            const pFormatter = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {year:'numeric', month:'numeric', day:'numeric'});
-            const pParts = pFormatter.formatToParts(today);
-            const curY = parseInt(pParts.find(p=>p.type==='year').value);
-            const curM = parseInt(pParts.find(p=>p.type==='month').value);
-            const curD = parseInt(pParts.find(p=>p.type==='day').value);
-
-            // Simple approximations for diff (Not 100% accurate without Julian calc but good for visual)
-            // Weight: Year=365, Month=30, Day=1
-            const valDue = y*365 + m*30 + d;
-            const valCur = curY*365 + curM*30 + curD;
-            diffDays = valDue - valCur;
-        }
-
-        let cssClass = '';
-        let msg = '';
-        
-        if (diffDays === 0) {
-            cssClass = 'alert-shake'; // Today
-            msg = 'سررسید امروز!';
-        } else if (diffDays > 0 && diffDays <= 2) {
-            cssClass = 'alert-pulse'; // Near
-            msg = `${diffDays} روز تا سررسید`;
-        } else if (diffDays < 0) {
-            // Past due
-            const daysPast = Math.abs(diffDays);
-            if (daysPast % 3 === 0 || daysPast < 3) { // Show warning every 3 days or initially
-                cssClass = 'alert-overdue'; 
-                msg = `${daysPast} روز گذشته!`;
-            }
-        }
-        return { cssClass, msg };
-    }
-
-    function getCurrentPersianMonth() {
-        const pParts = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {year:'numeric', month:'numeric'}).formatToParts(new Date());
-        return pParts.find(p=>p.type==='year').value + "/" + pParts.find(p=>p.type==='month').value;
-    }
-
     // --- CORE UI RENDER ---
     function renderUI() {
         applyTheme();
@@ -1800,13 +1718,7 @@
 
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
         const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
-        const checkDebt = (app.checks || []).reduce((a,b)=> {
-            // Subtract paid checks from total debt calc? Usually paid checks are gone or deducted. 
-            // We assume if paid, it's out of flow or already accounted. 
-            // For simplicity, we only count UNPAID debt in the dashboard summary.
-            return a + (b.isPaid ? 0 : b.value);
-        }, 0);
-        
+        const checkDebt = (app.checks || []).reduce((a,b)=>a+b.value,0);
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
         const totalDebt = fixedDebt + checkDebt;
         const net = income - totalDebt - manualDeductions;
@@ -1843,106 +1755,233 @@
             </div>`).join('');
     }
 
-    // Instruction 3 & 4: Debts Animation & Payment
+    // Instruction 3 Implementation: Render Debts (Fixed Installments)
     function renderDebts() {
         const div = document.getElementById('debtList');
-        const currentMonthKey = getCurrentPersianMonth();
-        
+        // Get today's info
+        const todayStr = new Date().toLocaleDateString('fa-IR'); // e.g., 1403/09/21
+        const parts = todayStr.split('/');
+        const currentDay = parseInt(parts[2]);
+        const currentMonth = parts[0] + '/' + parts[1]; // 1403/09
+
         div.innerHTML = app.debts.map((d, i) => {
-            const status = getDueStatus(null, true, d.day);
-            const isPaidThisMonth = d.lastPaidMonth === currentMonthKey;
-            const payBtn = isPaidThisMonth 
-                ? `<span style="color:var(--success); font-weight:bold; font-size:0.8rem;"><i class="fas fa-check"></i> پرداخت شد</span>`
-                : `<button class="btn btn-success" style="font-size:0.75rem; padding:5px 10px;" onclick="payDebt(${i}, '${currentMonthKey}')">پرداخت</button>`;
+            const dueDay = parseInt(d.day);
+            const isPaidThisMonth = d.lastPaidMonth === currentMonth;
+            let statusHTML = '';
+            let animClass = '';
             
+            if (isPaidThisMonth) {
+                statusHTML = '<span class="status-badge st-paid">پرداخت شده</span>';
+            } else {
+                const diff = dueDay - currentDay;
+                if (diff === 0) {
+                     statusHTML = '<span class="status-badge st-due">سررسید امروز!</span>';
+                     animClass = 'anim-shake';
+                } else if (diff < 0) {
+                     const overdueDays = Math.abs(diff);
+                     statusHTML = `<span class="status-badge st-due">معوق (${overdueDays} روز)</span>`;
+                     animClass = 'anim-shake';
+                } else if (diff <= 2) {
+                     statusHTML = `<span class="status-badge st-warn">${diff} روز تا پرداخت</span>`;
+                     animClass = 'anim-shake';
+                } else {
+                     statusHTML = `<span class="status-badge st-ok">${diff} روز مانده</span>`;
+                }
+            }
+
             return `
-            <div class="${status.cssClass}" style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px; transition:0.3s; margin-bottom:5px;">
-                <div style="display:flex; flex-direction:column;">
-                    <span>${d.name} <small style="color:var(--text-sec); font-size:0.8rem;">(دهم ${d.day} ماه)</small></span>
-                    ${status.msg ? `<span style="color:var(--danger); font-size:0.75rem; font-weight:bold;">${status.msg}</span>` : ''}
+            <div class="${animClass}" style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px; transition:0.3s;">
+                <div>
+                    <div>${d.name} <small style="color:var(--text-sec); font-size:0.8rem;">(دهم ${d.day} ماه)</small></div>
+                    <div style="margin-top:5px;">${statusHTML}</div>
                 </div>
-                <div style="display:flex; align-items:center; gap:10px;">
-                    ${payBtn}
-                    <b style="color:var(--danger);">${format(d.value)}</b>
-                    <span style="display:flex;">
+                <div style="display:flex; align-items:center;">
+                    <b style="color:var(--danger); margin-left:10px;">${format(d.value)}</b>
+                    <div style="display:flex; gap:5px;">
+                        ${!isPaidThisMonth ? `<button class="btn-small-icon btn-check" onclick="markDebtPaid(${i})" title="پرداخت شد"><i class="fas fa-check"></i></button>` : ''}
                         <button class="btn-small-icon btn-edit" onclick="openEdit('debt', ${i})"><i class="fas fa-edit"></i></button>
                         <button class="btn-small-icon btn-del" onclick="delDebt(${i})"><i class="fas fa-trash"></i></button>
-                    </span>
+                    </div>
                 </div>
             </div>`;
         }).join('');
     }
-    
-    function payDebt(i, monthKey) {
-        if(confirm("آیا پرداخت این قسط برای ماه جاری تایید است؟")) {
-            app.debts[i].lastPaidMonth = monthKey;
+
+    function markDebtPaid(i) {
+        if(confirm("آیا پرداخت این قسط برای این ماه را تایید می‌کنید؟")) {
+            const todayStr = new Date().toLocaleDateString('fa-IR');
+            const parts = todayStr.split('/');
+            const currentMonth = parts[0] + '/' + parts[1];
+            app.debts[i].lastPaidMonth = currentMonth;
             saveSectionSnap('dashboard', `پرداخت قسط ${app.debts[i].name}`);
             saveData(); renderUI(); showToast("قسط پرداخت شد");
         }
     }
 
-    // Instruction 3 & 4: Checks Animation & Payment
+    // Instruction 3 Implementation: Render Checks (One-time deadlines)
     function renderChecks() {
         const div = document.getElementById('checkList');
         if(!app.checks) app.checks = [];
+        const todayStr = new Date().toLocaleDateString('fa-IR');
+
         div.innerHTML = app.checks.map((c, i) => {
-            if(c.isPaid) return ''; // Option: hide paid checks or show differently. Let's show them faded.
+            let statusHTML = '';
+            let animClass = '';
+            let diffDays = 0;
+            const isPaid = c.status === 'paid';
             
-            const status = getDueStatus(c.date, false, 0);
+            // Calculate date diff logic (Simple string comparison approximation for simplicity or split)
+            if (!isPaid) {
+                // Parse Check Date
+                const cParts = c.date.split('/');
+                const tParts = todayStr.split('/');
+                // Simplify to number for comparison YYYYMMDD
+                const cNum = parseInt(cParts[0])*10000 + parseInt(cParts[1])*100 + parseInt(cParts[2]);
+                const tNum = parseInt(tParts[0])*10000 + parseInt(tParts[1])*100 + parseInt(tParts[2]);
+                
+                // Approximate days difference logic is complex without moment-jalaali, 
+                // but strictly for comparison:
+                if (cNum === tNum) {
+                    statusHTML = '<span class="status-badge st-due">سررسید امروز!</span>';
+                    animClass = 'anim-shake';
+                } else if (cNum < tNum) {
+                    statusHTML = '<span class="status-badge st-due">معوق شده</span>';
+                    animClass = 'anim-shake';
+                } else {
+                    // Just basic check for "near" (e.g. same month and close day)
+                    // Or simply show date.
+                    // For precise instruction "2 days before", we check simple math if in same month
+                    if (cParts[0] == tParts[0] && cParts[1] == tParts[1]) {
+                        const dDiff = parseInt(cParts[2]) - parseInt(tParts[2]);
+                        if (dDiff > 0 && dDiff <= 2) {
+                             statusHTML = `<span class="status-badge st-warn">${dDiff} روز تا سررسید</span>`;
+                             animClass = 'anim-shake';
+                        } else {
+                             statusHTML = `<span class="status-badge st-ok">سررسید: ${c.date}</span>`;
+                        }
+                    } else {
+                        statusHTML = `<span class="status-badge st-ok">سررسید: ${c.date}</span>`;
+                    }
+                }
+            } else {
+                statusHTML = '<span class="status-badge st-paid">پاس شده</span>';
+            }
+
             return `
-            <div class="${status.cssClass}" style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px; margin-bottom:5px;">
-                <div style="display:flex; flex-direction:column;">
-                    <span>${c.name}</span>
-                    <small style="color:var(--text-sec);">${c.date}</small>
-                    ${status.msg ? `<span style="color:var(--danger); font-size:0.75rem; font-weight:bold;">${status.msg}</span>` : ''}
+            <div class="${animClass}" style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px; transition:0.3s;">
+                <div>
+                    <div>${c.name}</div>
+                    <div style="margin-top:5px;">${statusHTML}</div>
                 </div>
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <button class="btn btn-success" style="font-size:0.75rem; padding:5px 10px;" onclick="payCheck(${i})">پرداخت</button>
-                    <b style="color:var(--danger);">${format(c.value)}</b>
-                    <span style="display:flex;">
+                <div style="display:flex; align-items:center;">
+                    <b style="color:var(--danger); margin-left:10px;">${format(c.value)}</b>
+                    <div style="display:flex; gap:5px;">
+                         ${!isPaid ? `<button class="btn-small-icon btn-check" onclick="markCheckPaid(${i})" title="پاس شد"><i class="fas fa-check"></i></button>` : ''}
                         <button class="btn-small-icon btn-edit" onclick="openEdit('check', ${i})"><i class="fas fa-edit"></i></button>
                         <button class="btn-small-icon btn-del" onclick="delCheck(${i})"><i class="fas fa-trash"></i></button>
-                    </span>
+                    </div>
                 </div>
             </div>`;
         }).join('');
-        
-        // Render Paid Checks separately or just leave them out to clean up.
-        // Let's add a small section for paid checks if any exist
-        const paidChecks = app.checks.filter(c => c.isPaid);
-        if(paidChecks.length > 0) {
-            div.innerHTML += `<div style="margin-top:15px; font-size:0.8rem; color:var(--text-sec); text-align:center;">--- چک‌های پاس شده ---</div>`;
-            div.innerHTML += paidChecks.map(c => `
-                <div style="opacity:0.6; display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;">
-                    <span>${c.name} <i class="fas fa-check-circle" style="color:var(--success)"></i></span>
-                    <span>${format(c.value)}</span>
-                </div>
-            `).join('');
-        }
     }
 
-    function payCheck(i) {
-        if(confirm("آیا چک پاس شد؟")) {
-            app.checks[i].isPaid = true;
-            saveSectionSnap('dashboard', `پاس شدن چک ${app.checks[i].name}`);
-            saveData(); renderUI(); showToast("چک پاس شد");
-        }
+    function markCheckPaid(i) {
+         if(confirm("آیا پاس شدن این چک/بدهی را تایید می‌کنید؟")) {
+             app.checks[i].status = 'paid';
+             saveSectionSnap('dashboard', `پاس شدن چک ${app.checks[i].name}`);
+             saveData(); renderUI(); showToast("وضعیت به پاس شده تغییر یافت");
+         }
     }
 
     function renderLoans() {
         const div = document.getElementById('loanList');
         if(!app.loans) app.loans = [];
-        div.innerHTML = app.loans.map((l, i) => `
-            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center;">
-                <div>${l.name} <br><small style="color:var(--text-sec);">وصول: ${l.date}</small></div>
+        const todayStr = new Date().toLocaleDateString('fa-IR');
+        
+        div.innerHTML = app.loans.map((l, i) => {
+            const isRec = l.status === 'received';
+            let statusHTML = isRec ? '<span class="status-badge st-paid">وصول شد</span>' : `<span class="status-badge st-ok">تاریخ: ${l.date}</span>`;
+            
+            // Similar logic for deadline warning can apply here if needed
+            if (!isRec) {
+                const cParts = l.date.split('/');
+                const tParts = todayStr.split('/');
+                const cNum = parseInt(cParts[0])*10000 + parseInt(cParts[1])*100 + parseInt(cParts[2]);
+                const tNum = parseInt(tParts[0])*10000 + parseInt(tParts[1])*100 + parseInt(tParts[2]);
+                if(cNum <= tNum) statusHTML = '<span class="status-badge st-due">زمان وصول رسیده/گذشته</span>';
+            }
+
+            return `
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px;">
+                <div>
+                    <div>${l.name}</div>
+                    <div style="margin-top:5px;">${statusHTML}</div>
+                </div>
                 <div style="display:flex; align-items:center;">
-                    <b style="color:var(--success);">${format(l.value)}</b>
-                    <span style="margin-right:15px; display:flex;">
+                    <b style="color:var(--success); margin-left:10px;">${format(l.value)}</b>
+                    <div style="display:flex; gap:5px;">
+                         ${!isRec ? `<button class="btn-small-icon btn-check" onclick="markLoanReceived(${i})" title="وصول شد"><i class="fas fa-check"></i></button>` : ''}
                         <button class="btn-small-icon btn-edit" onclick="openEdit('loan', ${i})"><i class="fas fa-edit"></i></button>
                         <button class="btn-small-icon btn-del" onclick="delLoan(${i})"><i class="fas fa-trash"></i></button>
-                    </span>
+                    </div>
                 </div>
-            </div>`).join('');
+            </div>`;
+        }).join('');
+    }
+
+    function markLoanReceived(i) {
+         if(confirm("آیا وصول این طلب را تایید می‌کنید؟")) {
+             app.loans[i].status = 'received';
+             saveSectionSnap('dashboard', `وصول طلب ${app.loans[i].name}`);
+             saveData(); renderUI(); showToast("طلب وصول شد");
+         }
+    }
+
+    // Instruction 3: Notification Logic (Called on Load)
+    function checkDeadlines() {
+        const todayStr = new Date().toLocaleDateString('fa-IR');
+        const parts = todayStr.split('/');
+        const currentDay = parseInt(parts[2]);
+        const currentMonth = parts[0] + '/' + parts[1];
+        
+        let alerts = [];
+
+        // Check Fixed Debts
+        app.debts.forEach(d => {
+            if(d.lastPaidMonth !== currentMonth) {
+                const diff = parseInt(d.day) - currentDay;
+                if(diff === 2) alerts.push(`قسط "${d.name}" ۲ روز دیگر سررسید می‌شود.`);
+                if(diff === 0) alerts.push(`سررسید قسط "${d.name}" امروز است!`);
+                if(diff < 0) {
+                    // Check every 3 days logic: if abs(diff) % 3 == 0
+                    if (Math.abs(diff) % 3 === 0) alerts.push(`قسط "${d.name}" ${Math.abs(diff)} روز معوق شده است!`);
+                }
+            }
+        });
+
+        // Check Checks
+        app.checks.forEach(c => {
+            if(c.status !== 'paid') {
+                const cParts = c.date.split('/');
+                if(cParts[0] == parts[0] && cParts[1] == parts[1]) {
+                    const diff = parseInt(cParts[2]) - parseInt(parts[2]);
+                    if(diff === 2) alerts.push(`چک "${c.name}" ۲ روز دیگر سررسید می‌شود.`);
+                    if(diff === 0) alerts.push(`سررسید چک "${c.name}" امروز است!`);
+                }
+                // Determine if passed
+                const cNum = parseInt(cParts[0])*10000 + parseInt(cParts[1])*100 + parseInt(cParts[2]);
+                const tNum = parseInt(parts[0])*10000 + parseInt(parts[1])*100 + parseInt(parts[2]);
+                if(tNum > cNum) {
+                     // Simple every 3 days check approximation
+                     const dayDiff = parseInt(parts[2]) - parseInt(cParts[2]); // Simplistic for same month
+                     if(dayDiff > 0 && dayDiff % 3 === 0) alerts.push(`چک "${c.name}" معوق شده است!`);
+                }
+            }
+        });
+
+        if(alerts.length > 0) {
+            alert("⚠️ یادآوری‌های مهم:\n\n" + alerts.join("\n"));
+        }
     }
 
     function renderBudgets(net) {
@@ -1986,11 +2025,13 @@
             let status = 'stat-green';
             if(percent > 50) status = 'stat-yellow';
             if(percent > 90) status = 'stat-red';
-            // If remain is negative (Instruction 1 implication)
-            const isNegative = remain < 0;
-            if(isNegative) status = 'stat-red';
-
             const pausedClass = b.isPaused ? 'paused' : '';
+
+            // Instruction 1: Negative Balance Message
+            let debtMsg = "";
+            if (remain < 0) {
+                debtMsg = `<div style="color:var(--danger); font-size:0.75rem; background:rgba(239,68,68,0.1); padding:5px; border-radius:8px; margin-top:5px;">⚠️ بدهی: ${format(Math.abs(remain))} تومان<br>در شارژ بعدی، مبلغ به صورت خودکار کسر و به اینجا منتقل می‌شود.</div>`;
+            }
 
             let subBars = "";
             let subLegend = "";
@@ -2026,9 +2067,10 @@
                     <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(percent,100)}%"></div></div>
                     ${subBars}
                     ${subLegend}
-                    <div style="text-align:left; font-weight:800; font-size:1.4rem; color:${isNegative ? 'var(--danger)' : 'var(--primary)'}; direction:ltr; letter-spacing:1px; margin: 5px 0;">
+                    <div style="text-align:left; font-weight:800; font-size:1.4rem; color:var(--primary); direction:ltr; letter-spacing:1px; margin: 5px 0;">
                         ${format(remain)}
                     </div>
+                    ${debtMsg}
                     <div class="bento-actions">
                         <button class="action-chip action-btn-exp" onclick="openExp(${i})" ${b.isPaused ? 'disabled' : ''}><i class="fas fa-minus-circle"></i> ثبت هزینه</button>
                         <button class="action-chip action-btn-copy" onclick="copyTxt(${remain})"><i class="fas fa-copy"></i> کپی</button>
@@ -2106,19 +2148,19 @@
 
     // --- NEW FUNCTIONS FOR INSTRUCTIONS 1, 3, 4, 5 ---
 
-    // Instruction 1: Transfer with Balance Check
+    // Instruction 1: Transfer
     function openTransfer(index) {
         tempDepositIndex = index; // using same temp index variable
         const b = app.budgets[index];
-        const baseAmount = app.distributedAmount;
-        const share = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
-        const remain = share - b.spent;
-
         document.getElementById('transferSourceName').innerText = b.name;
-        document.getElementById('transferCurrentBalance').innerText = format(remain) + ' تومان';
-        // Check for overdraft state in Source
-        if(remain < 0) document.getElementById('transferCurrentBalance').style.color = 'var(--danger)';
-        else document.getElementById('transferCurrentBalance').style.color = 'var(--primary)';
+        
+        // Calculate current balance (Instruction 1: Show balance)
+        const baseAmount = app.distributedAmount;
+        const totalShare = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
+        const remain = totalShare - b.spent;
+        
+        const infoDiv = document.getElementById('transferSourceInfo');
+        infoDiv.innerHTML = `<span>موجودی فعلی:</span> <b style="direction:ltr; color:var(--primary)">${format(remain)}</b>`;
 
         const sel = document.getElementById('transferTargetSelect');
         sel.innerHTML = app.budgets.map((item, i) => {
@@ -2137,17 +2179,9 @@
         
         if (isNaN(amount) || amount <= 0) return alert("مبلغ نامعتبر است");
         
-        // Instruction 1 Logic:
-        const b = app.budgets[sourceIdx];
-        const baseAmount = app.distributedAmount;
-        const share = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
-        const remain = share - b.spent;
+        // Instruction 1: Allow negative transfer logic
+        // We just move money: Expense from Source, ManualAdd to Target
         
-        let warningMsg = "";
-        if (amount > remain) {
-            warningMsg = "\nتوجه: موجودی این ردیف منفی شد. با هر بار شارژ، مبالغ دریافتی ابتدا صرف تصفیه این منفی خواهد شد.";
-        }
-
         saveSectionSnap('budget', `انتقال ${format(amount)} از ${app.budgets[sourceIdx].name} به ${app.budgets[targetIdx].name}`);
         
         // Deduct from Source (as expense)
@@ -2159,9 +2193,7 @@
         app.budgets[targetIdx].manualAdd += amount;
         addToHistory(targetIdx, amount, `دریافت از ${app.budgets[sourceIdx].name}`, 'transferIn');
         
-        saveData(); renderUI(); closeAllModals(); 
-        showToast("انتقال انجام شد" + (warningMsg ? " (منفی)" : ""));
-        if(warningMsg) alert(warningMsg);
+        saveData(); renderUI(); closeAllModals(); showToast("انتقال انجام شد");
     }
 
     // Instruction 4: Zero Item
@@ -2179,33 +2211,22 @@
             addToHistory(index, remain, "تصفیه حساب (صفر کردن)", 'expense');
             saveData(); renderUI(); showToast("حساب صفر شد");
         } else {
-            alert("موجودی برای صفر کردن وجود ندارد یا منفی است.");
+            alert("موجودی برای صفر کردن وجود ندارد.");
         }
     }
 
-    // Updated Deposit Logic (Instruction 1 & 5)
+    // Updated Deposit Logic (Instruction 3 & 5)
     function openDepositOptions(index) {
         tempDepositIndex = index;
         
-        const b = app.budgets[index];
-        const baseAmount = app.distributedAmount;
-        const share = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
-        const remain = share - b.spent;
-        
-        // Check for deficit
-        if (remain < 0) {
-            document.getElementById('deficitWarning').style.display = 'block';
-        } else {
-            document.getElementById('deficitWarning').style.display = 'none';
-        }
-
+        // Check System Funds Availability for Instruction 5
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
         const totalDebt = app.debts.reduce((a,b)=>a+b.value,0) + (app.checks || []).reduce((a,b)=>a+b.value,0);
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
         
         const net = income - totalDebt - manualDeductions;
-        
         const surplus = net - app.distributedAmount;
+        
         const btn = document.getElementById('btnSystemDep');
         const msg = document.getElementById('systemDepMsg');
         
@@ -2244,6 +2265,7 @@
                  }
             });
         } else if (type === 'direct') {
+            // Instruction 3: Add to Item AND Main Account (Wallet)
             openUniversalInput('واریز مستقیم (بیرونی)', 'مبلغ واریزی:', true, (val) => {
                  if(val && !isNaN(val)) {
                     saveSectionSnap('budget', `واریز مستقیم به ${app.budgets[tempDepositIndex].name}: ${format(val)}`);
@@ -2290,19 +2312,19 @@
         }
     }
 
-    // --- GOALS & TOOLS (Instruction 2) ---
+    // --- GOALS & AUTO ALLOC & TOOLS (Instruction 2 Updated) ---
     function addGoal() {
         const n = document.getElementById('gName').value;
         const t = parseFormatted(document.getElementById('gTarget').value);
         if(n && !isNaN(t)) { saveSectionSnap('tools', `افزودن هدف: ${n}`); app.goals.push({name:n, target:t, curr:0, autoConfig:{type:'none'}}); saveData(); renderUI(); closeAllModals(); }
     }
     
-    // Instruction 2: Explicitly show amount deposited and remaining
     function renderGoals() {
         const div = document.getElementById('goalList');
+        // Instruction 2: Show exact budget amounts (Deposited/Remaining)
         div.innerHTML = app.goals.map((g, i) => {
             const p = Math.min(100, Math.round((g.curr / g.target)*100));
-            const remain = g.target - g.curr;
+            const remaining = g.target - g.curr;
             const autoBadge = g.autoConfig && g.autoConfig.type !== 'none' ? '<i class="fas fa-robot" style="color:var(--primary)" title="برداشت خودکار فعال"></i>' : '';
             return `
                 <div style="padding:15px; border-bottom:1px solid #eee;">
@@ -2313,9 +2335,9 @@
                             <button class="btn-small-icon btn-edit" onclick="openEdit('goal', ${i})"><i class="fas fa-edit"></i></button>
                          </span>
                     </div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-sec); margin:5px 0;">
-                        <span>جمع‌شده: ${format(g.curr)}</span>
-                        <span>مانده: ${remain > 0 ? format(remain) : 0}</span>
+                    <div style="font-size:0.85rem; color:var(--text-sec); margin:5px 0; display:flex; justify-content:space-between;">
+                        <span>واریز شده: <b style="color:var(--success)">${format(g.curr)}</b></span>
+                        <span>باقی‌مانده: <b style="color:var(--danger)">${format(remaining > 0 ? remaining : 0)}</b></span>
                     </div>
                     <div class="progress-bar"><div class="progress-fill" style="width:${p}%; background:var(--warning);"></div></div>
                     <div style="display:flex; gap:8px; margin-top:8px;">
@@ -2341,37 +2363,36 @@
         if(n) { saveSectionSnap('tools', `افزودن کالا: ${n}`); app.shopping.push({name:n, price: p || 0, curr: 0, autoConfig:{type:'none'}}); saveData(); renderUI(); closeAllModals(); }
     }
     
-    // Instruction 2: Shop Progress
+    // Instruction 2: Updated renderShop to show deposited/remaining if applicable
     function renderShop() {
         const div = document.getElementById('shopList');
         div.innerHTML = app.shopping.map((s, i) => {
             const autoBadge = s.autoConfig && s.autoConfig.type !== 'none' ? '<i class="fas fa-robot" style="color:var(--primary)"></i>' : '';
-            const hasPrice = s.price && s.price > 0;
-            const progress = hasPrice ? Math.min(100, Math.round(( (s.curr||0) / s.price)*100)) : 0;
-            const remain = hasPrice ? s.price - (s.curr||0) : 0;
-            
+            // Assuming shopping items might be partially funded if we add 'curr' logic similar to goals
+            // If 'curr' exists, show it.
+            const curr = s.curr || 0;
+            const price = s.price || 0;
+            let infoHtml = '';
+            if (price > 0) {
+                const rem = price - curr;
+                infoHtml = `<div style="font-size:0.8rem; color:var(--text-sec); margin-top:3px;">
+                    قیمت: ${format(price)} | واریز: ${format(curr)} | <span style="color:${rem>0?'var(--danger)':'var(--success)'}">مانده: ${format(rem>0?rem:0)}</span>
+                </div>`;
+            } else {
+                infoHtml = `<span style="font-size:0.9rem; color:var(--text-sec);">قیمت تعیین نشده</span>`;
+            }
+
             return `
-            <div style="display:flex; flex-direction:column; padding:15px; border-bottom:1px solid #eee;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div style="flex:1;">
-                        <span style="font-weight:bold; font-size:1.05rem;">${s.name} ${autoBadge}</span>
-                        ${hasPrice ? `<span style="font-size:0.9rem; color:var(--text-sec); display:block; margin-top:3px;">قیمت: ${format(s.price)}</span>` : ''}
-                    </div>
-                    <div style="display:flex; gap:8px; align-items:center;">
-                        <button class="btn-small-icon btn-settings" onclick="openAutoAlloc('shop', ${i})"><i class="fas fa-cog"></i></button>
-                        <button class="btn-small-icon btn-edit" onclick="openEdit('shop', ${i})"><i class="fas fa-edit"></i></button>
-                        <i class="fas fa-check-circle" style="cursor:pointer; font-size:1.4rem; color:var(--success);" onclick="delShop(${i})"></i>
-                    </div>
+            <div style="display:flex; justify-content:space-between; padding:15px; border-bottom:1px solid #eee; align-items:center; flex-wrap:wrap;">
+                <div style="flex:1;">
+                    <span style="font-weight:bold; font-size:1.05rem;">${s.name} ${autoBadge}</span>
+                    ${infoHtml}
                 </div>
-                ${hasPrice ? `
-                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-sec); margin-top:5px;">
-                        <span>موجودی: ${format(s.curr||0)}</span>
-                        <span>مانده: ${format(remain)}</span>
-                    </div>
-                    <div class="progress-bar"><div class="progress-fill" style="width:${progress}%; background:var(--info);"></div></div>
-                ` : ''}
-                <div style="margin-top:10px;">
-                    <button class="btn btn-primary" style="font-size:0.8rem; width:100%;" onclick="openAllocate('shop', ${i})">پس‌انداز/خرید با بودجه</button>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button class="btn btn-primary" style="font-size:0.8rem;" onclick="openAllocate('shop', ${i})">خرید/بودجه</button>
+                    <button class="btn-small-icon btn-settings" onclick="openAutoAlloc('shop', ${i})"><i class="fas fa-cog"></i></button>
+                    <button class="btn-small-icon btn-edit" onclick="openEdit('shop', ${i})"><i class="fas fa-edit"></i></button>
+                    <i class="fas fa-check-circle" style="cursor:pointer; font-size:1.4rem; color:var(--success);" onclick="delShop(${i})"></i>
                 </div>
             </div>`;
         }).join('');
@@ -2686,7 +2707,7 @@
         const n = document.getElementById('dName').value;
         const v = parseFormatted(document.getElementById('dVal').value);
         const d = document.getElementById('dDay').value;
-        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن قسط ${n}`); app.debts.push({name:n, value:v, day:d}); saveData(); renderUI(); closeAllModals(); }
+        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن قسط ${n}`); app.debts.push({name:n, value:v, day:d, lastPaidMonth: ""}); saveData(); renderUI(); closeAllModals(); }
     }
     function delDebt(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', `حذف قسط ${app.debts[i].name}`); app.debts.splice(i,1); saveData(); renderUI(); } }
 
@@ -2694,7 +2715,7 @@
         const n = document.getElementById('cName').value;
         const v = parseFormatted(document.getElementById('cVal').value);
         const d = getDateString('c');
-        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن چک ${n}`); if(!app.checks) app.checks = []; app.checks.push({name:n, value:v, date:d}); saveData(); renderUI(); closeAllModals(); }
+        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن چک ${n}`); if(!app.checks) app.checks = []; app.checks.push({name:n, value:v, date:d, status: "pending"}); saveData(); renderUI(); closeAllModals(); }
     }
     function delCheck(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', `حذف چک ${app.checks[i].name}`); app.checks.splice(i,1); saveData(); renderUI(); } }
 
@@ -2702,7 +2723,7 @@
         const n = document.getElementById('lName').value;
         const v = parseFormatted(document.getElementById('lVal').value);
         const d = getDateString('l');
-        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن طلب ${n}`); if(!app.loans) app.loans = []; app.loans.push({name:n, value:v, date:d}); saveData(); renderUI(); closeAllModals(); }
+        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن طلب ${n}`); if(!app.loans) app.loans = []; app.loans.push({name:n, value:v, date:d, status: "pending"}); saveData(); renderUI(); closeAllModals(); }
     }
     function delLoan(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', `حذف طلب ${app.loans[i].name}`); app.loans.splice(i,1); saveData(); renderUI(); } }
 
@@ -2990,16 +3011,15 @@
         const max = parseFloat(document.getElementById('allocLimitDisplay').dataset.max) || 0;
         
         if(isNaN(amt) || amt <= 0) return alert("مبلغ نامعتبر");
-        // We allow overdraft? Usually no.
-        // if(amt > max) return alert("خطا: مبلغ وارد شده از موجودی این ردیف بودجه بیشتر است!");
+        if(amt > max) return alert("خطا: مبلغ وارد شده از موجودی این ردیف بودجه بیشتر است!");
 
         let reason = "";
         if(type === 'goal') { app.goals[id].curr += amt; reason = "اختصاص به هدف: " + app.goals[id].name; } 
         else { 
-            reason = "خرید کالا: " + app.shopping[id].name; 
-            // Update shopping accumulation (New for Instruction 2)
+            // For shopping, we also track partial payment if desired, or just expense
             if(!app.shopping[id].curr) app.shopping[id].curr = 0;
-            app.shopping[id].curr += amt;
+            app.shopping[id].curr += amt; 
+            reason = "خرید کالا: " + app.shopping[id].name; 
         }
 
         saveSectionSnap('budget', reason); 
@@ -3066,8 +3086,8 @@
             });
             const dList = document.getElementById('printDebtsList');
             let debtHtml = "";
-            app.debts.forEach(d => debtHtml += `<div>${d.name}: ${format(d.value)}</div>`);
-            app.checks.forEach(c => debtHtml += `<div>چک (${c.name}): ${format(c.value)} - ${c.date}</div>`);
+            app.debts.forEach(d => debtHtml += `<div>${d.name}: ${format(d.value)} (پرداخت ماه جاری: ${d.lastPaidMonth ? 'بله' : 'خیر'})</div>`);
+            app.checks.forEach(c => debtHtml += `<div>چک (${c.name}): ${format(c.value)} - ${c.date} (وضعیت: ${c.status==='paid'?'پاس شده':'در انتظار'})</div>`);
             dList.innerHTML = debtHtml || "ندارد";
             const gList = document.getElementById('printGoalsList');
             let goalHtml = "";
@@ -3109,6 +3129,14 @@
                     });
                     if(app.distributedAmount === undefined) app.distributedAmount = 0;
                     if(!app.security.nationalId) app.security.nationalId = "";
+                    if(app.security.isSetup === undefined) app.security.isSetup = app.security.hasPin;
+                    // Fix data structure for new Instruction 3 fields if missing
+                    app.debts.forEach(d => { if(d.lastPaidMonth === undefined) d.lastPaidMonth = ""; });
+                    if(!app.checks) app.checks = []; app.checks.forEach(c => { if(!c.status) c.status = "pending"; });
+                    if(!app.loans) app.loans = []; app.loans.forEach(l => { if(!l.status) l.status = "pending"; });
+                    if(!app.dailyLogs) app.dailyLogs = [];
+                    if(!app.user.startDate) app.user.startDate = Date.now();
+                    
                     saveData(); location.reload();
                 } catch(err) { alert("فایل نامعتبر"); }
             };
@@ -3146,10 +3174,10 @@
                 if(!b.history) b.history = []; if(b.manualAdd === undefined) b.manualAdd = 0; if(b.isPaused === undefined) b.isPaused = false; if(b.savedPercent === undefined) b.savedPercent = 0; if(!b.subs) b.subs = [];
             });
             app.goals.forEach(g => { if(!g.autoConfig) g.autoConfig = {type:'none'}; });
-            app.shopping.forEach(s => { 
-                if(!s.autoConfig) s.autoConfig = {type:'none'}; 
-                if(!s.curr) s.curr = 0;
-            });
+            app.shopping.forEach(s => { if(!s.autoConfig) s.autoConfig = {type:'none'}; if(!s.curr) s.curr = 0; });
+            app.debts.forEach(d => { if(d.lastPaidMonth === undefined) d.lastPaidMonth = ""; });
+            app.checks.forEach(c => { if(!c.status) c.status = "pending"; });
+            app.loans.forEach(l => { if(!l.status) l.status = "pending"; });
         }
     }
     function saveData() { if(!isGuestMode) { localStorage.setItem('amir_fin_v9', JSON.stringify(app)); } }
