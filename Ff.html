@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مدیریت مالی حرفه‌ای | V19 Ultimate (Edited)</title>
+    <title>مدیریت مالی حرفه‌ای | V20 Ultimate (Complete Edition)</title>
 
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
@@ -246,6 +246,8 @@
         .btn-settings { color: var(--primary); background: rgba(79, 70, 229, 0.15); }
         .btn-copy { color: var(--text-sec); background: rgba(100, 116, 139, 0.15); }
         .btn-copy:hover { background: var(--text-main); color: white; }
+        .btn-pay { color: var(--success); background: rgba(16, 185, 129, 0.15); }
+        .btn-pay:hover { background: var(--success); color: white; }
         
         .currency-toggle-btn {
             background: var(--glass-bg);
@@ -595,6 +597,23 @@
         .settings-btn-card.danger i { color: var(--danger); }
         .settings-btn-card.danger:hover { background: rgba(239, 68, 68, 0.05); border-color: var(--danger); }
 
+        /* Animation Classes (Instruction 3) */
+        @keyframes pulse-alert { 
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } 
+        }
+        .anim-alert { 
+            animation: pulse-alert 2s infinite; 
+            border: 1px solid var(--danger) !important; 
+        }
+        .status-badge {
+            font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; margin-right: 5px; display: inline-block; vertical-align: middle;
+        }
+        .status-soon { background: var(--warning); color: #fff; }
+        .status-overdue { background: var(--danger); color: #fff; }
+        .paid-check { opacity: 0.5; text-decoration: line-through; filter: grayscale(1); }
+
     </style>
 </head>
 <body>
@@ -730,7 +749,7 @@
 
         <div class="glass-panel">
             <div class="header-row">
-                <h3><i class="fas fa-file-invoice-dollar"></i> اقساط ثابت</h3>
+                <h3><i class="fas fa-file-invoice-dollar"></i> اقساط ثابت (Instruction 3,4)</h3>
                 <button class="btn btn-primary" onclick="openModal('debtModal')"><i class="fas fa-plus"></i> افزودن</button>
             </div>
             <div id="debtList"></div>
@@ -738,7 +757,7 @@
 
         <div class="glass-panel">
             <div class="header-row">
-                <h3><i class="fas fa-money-check-alt"></i> چک و بدهی</h3>
+                <h3><i class="fas fa-money-check-alt"></i> چک و بدهی (Instruction 3,4)</h3>
                 <button class="btn btn-primary" onclick="openModal('checkModal')"><i class="fas fa-plus"></i> افزودن</button>
             </div>
             <div id="checkList"></div>
@@ -865,12 +884,16 @@
 
 <!-- MODALS -->
 
-<!-- Transfer Funds Modal (New Instruction 1) -->
+<!-- Transfer Funds Modal (Instruction 1) -->
 <div id="transferModal" class="modal">
     <div class="modal-content">
         <h3>انتقال وجه</h3>
-        <p style="font-size:0.9rem; color:var(--text-sec); margin-bottom:15px;">
+        <p style="font-size:0.9rem; color:var(--text-sec); margin-bottom:5px;">
             انتقال از <b><span id="transferSourceName"></span></b> به:
+        </p>
+        <!-- Instruction 1: Show current balance -->
+        <p style="font-size:0.85rem; color:var(--primary); margin-bottom:15px; background:rgba(79,70,229,0.1); padding:8px; border-radius:10px;">
+             موجودی فعلی: <b id="transferSourceBalance" style="direction:ltr; display:inline-block;"></b>
         </p>
         <label>مقصد انتقال:</label>
         <select id="transferTargetSelect"></select>
@@ -888,7 +911,7 @@
     </div>
 </div>
 
-<!-- Deposit Selection Modal (Updated Instruction 3 & 5) -->
+<!-- Deposit Selection Modal -->
 <div id="depositOptionsModal" class="modal">
     <div class="modal-content">
         <h3>انتخاب روش واریز</h3>
@@ -909,7 +932,7 @@
     </div>
 </div>
 
-<!-- History Edit Modal (New Instruction 2) -->
+<!-- History Edit Modal (Instruction 2) -->
 <div id="historyEditModal" class="modal">
     <div class="modal-content">
         <h3>ویرایش تراکنش</h3>
@@ -1418,7 +1441,7 @@
         }, duration);
     }
 
-    window.onload = () => { loadData(); checkAuth(); setupDatePickers(); };
+    window.onload = () => { loadData(); checkAuth(); setupDatePickers(); checkOverdueWarnings(); };
 
     function processDailyLog() {
         if(isGuestMode) return;
@@ -1432,6 +1455,35 @@
             const spent = app.budgets.reduce((a,b)=>a+b.spent,0);
             app.dailyLogs.push({ date: today, net: net, spent: spent, timestamp: Date.now() });
             saveData();
+        }
+    }
+
+    // Instruction 3: Check warnings every 3 days (simulated on load)
+    function checkOverdueWarnings() {
+        if(isGuestMode) return;
+        let hasOverdue = false;
+        // Check fixed debts
+        const currentMonth = parseInt(new Date().toLocaleDateString('fa-IR').split('/')[1]);
+        const currentDay = parseInt(new Date().toLocaleDateString('fa-IR').split('/')[2]);
+        
+        app.debts.forEach(d => {
+            if(d.lastPaidMonth !== currentMonth && currentDay > d.day) hasOverdue = true;
+        });
+
+        // Check checks/loans
+        const todayStr = new Date().toLocaleDateString('fa-IR');
+        app.checks.forEach(c => {
+             if(!c.isPaid && compareDates(c.date, todayStr) < 0) hasOverdue = true;
+        });
+
+        // Simplified "Every 3 days" logic: Just use localstorage to track last warning time
+        const lastWarn = localStorage.getItem('lastOverdueWarning');
+        const now = Date.now();
+        if(hasOverdue) {
+            if(!lastWarn || (now - parseInt(lastWarn)) > (3 * 24 * 60 * 60 * 1000)) {
+                setTimeout(() => showToast("شما اقساط/بدهی عقب افتاده دارید!", "exclamation-triangle"), 2000);
+                localStorage.setItem('lastOverdueWarning', now.toString());
+            }
         }
     }
 
@@ -1457,6 +1509,16 @@
         const m = document.getElementById(prefix+'Month').value;
         const y = document.getElementById(prefix+'Year').value;
         return `${y}/${m}/${d}`;
+    }
+
+    // Helper for Date Comparison (YYYY/MM/DD)
+    function compareDates(date1, date2) {
+        if(!date1 || !date2) return 0;
+        const d1 = date1.split('/').map(Number);
+        const d2 = date2.split('/').map(Number);
+        if(d1[0] !== d2[0]) return d1[0] - d2[0];
+        if(d1[1] !== d2[1]) return d1[1] - d2[1];
+        return d1[2] - d2[2];
     }
 
     function checkAuth() {
@@ -1638,7 +1700,7 @@
     }
     function format(n) { return (n * rate).toLocaleString('en-US'); }
 
-    // --- HISTORY SYSTEM (UPDATED) ---
+    // --- HISTORY SYSTEM ---
     function saveSectionSnap(section, description = "تغییر بدون توضیح") {
         if(isGuestMode) return;
         let snap = null;
@@ -1704,8 +1766,10 @@
         }
 
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
+        // Exclude paid checks from total debt calc for display if desired, 
+        // but typically 'Debt' is what is outstanding.
         const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
-        const checkDebt = (app.checks || []).reduce((a,b)=>a+b.value,0);
+        const checkDebt = (app.checks || []).filter(c => !c.isPaid).reduce((a,b)=>a+b.value,0);
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
         const totalDebt = fixedDebt + checkDebt;
         const net = income - totalDebt - manualDeductions;
@@ -1744,33 +1808,118 @@
 
     function renderDebts() {
         const div = document.getElementById('debtList');
-        div.innerHTML = app.debts.map((d, i) => `
-            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center;">
-                <span>${d.name} <small style="color:var(--text-sec); font-size:0.8rem;">(دهم ${d.day} ماه)</small></span>
+        const currentMonth = parseInt(new Date().toLocaleDateString('fa-IR').split('/')[1]);
+        const currentDay = parseInt(new Date().toLocaleDateString('fa-IR').split('/')[2]);
+
+        div.innerHTML = app.debts.map((d, i) => {
+            // Instruction 3 & 4 Logic
+            const isPaidThisMonth = d.lastPaidMonth === currentMonth;
+            let statusBadge = '';
+            let animClass = '';
+            let btnAction = `<button class="btn-small-icon btn-pay" onclick="payDebt(${i})" title="پرداخت شد"><i class="fas fa-check"></i></button>`;
+
+            if (isPaidThisMonth) {
+                statusBadge = '<span class="status-badge" style="background:var(--success); color:white">پرداخت شده</span>';
+                btnAction = ''; // Hide button if paid
+            } else {
+                const diff = d.day - currentDay;
+                if (diff < 0) {
+                     statusBadge = '<span class="status-badge status-overdue">عقب افتاده!</span>';
+                     animClass = 'anim-alert';
+                } else if (diff <= 2) {
+                     statusBadge = '<span class="status-badge status-soon">سررسید نزدیک</span>';
+                     if(diff === 0) animClass = 'anim-alert';
+                }
+            }
+
+            return `
+            <div class="${animClass}" style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px;">
+                <div>
+                    <span>${d.name} ${statusBadge}</span>
+                    <div style="color:var(--text-sec); font-size:0.8rem;">سررسید: ${d.day} هر ماه</div>
+                </div>
                 <div style="display:flex; align-items:center;">
                     <b style="color:var(--danger);">${format(d.value)}</b>
                     <span style="margin-right:15px; display:flex;">
+                        ${btnAction}
                         <button class="btn-small-icon btn-edit" onclick="openEdit('debt', ${i})"><i class="fas fa-edit"></i></button>
                         <button class="btn-small-icon btn-del" onclick="delDebt(${i})"><i class="fas fa-trash"></i></button>
                     </span>
                 </div>
-            </div>`).join('');
+            </div>`;
+        }).join('');
+    }
+
+    function payDebt(i) {
+        if(confirm("آیا پرداخت این قسط برای ماه جاری تایید می‌شود؟")) {
+            const currentMonth = parseInt(new Date().toLocaleDateString('fa-IR').split('/')[1]);
+            saveSectionSnap('dashboard', `پرداخت قسط ${app.debts[i].name}`);
+            app.debts[i].lastPaidMonth = currentMonth;
+            saveData(); renderUI(); showToast("قسط پرداخت شد");
+        }
     }
 
     function renderChecks() {
         const div = document.getElementById('checkList');
         if(!app.checks) app.checks = [];
-        div.innerHTML = app.checks.map((c, i) => `
-            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center;">
-                <div>${c.name} <br><small style="color:var(--text-sec);">${c.date}</small></div>
+        
+        const todayStr = new Date().toLocaleDateString('fa-IR');
+        
+        div.innerHTML = app.checks.map((c, i) => {
+            // Instruction 3 & 4 Logic
+            let animClass = '';
+            let statusBadge = '';
+            let rowClass = '';
+            
+            if (c.isPaid) {
+                rowClass = 'paid-check';
+                statusBadge = '<span class="status-badge" style="background:var(--text-sec); color:white">پاس شد</span>';
+            } else {
+                const diff = compareDates(c.date, todayStr); // if date > today (future), diff > 0
+                // We need diff in days roughly. Since compareDates isn't exact days, lets use simple string logic or approximation
+                // Better approach:
+                // If c.date < today -> Overdue (diff < 0)
+                // If c.date == today -> Due (diff == 0)
+                // If close -> Soon.
+                
+                if (diff < 0) {
+                    statusBadge = '<span class="status-badge status-overdue">عقب افتاده!</span>';
+                    animClass = 'anim-alert';
+                } else if (diff === 0) {
+                    statusBadge = '<span class="status-badge status-overdue">امروز!</span>';
+                    animClass = 'anim-alert';
+                } else {
+                    // Check if strictly close (same month, day diff <= 2)
+                    const d1 = c.date.split('/').map(Number);
+                    const d2 = todayStr.split('/').map(Number);
+                    if(d1[0] === d2[0] && d1[1] === d2[1] && (d1[2] - d2[2]) <= 2) {
+                         statusBadge = '<span class="status-badge status-soon">سررسید نزدیک</span>';
+                    }
+                }
+            }
+
+            return `
+            <div class="${animClass} ${rowClass}" style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px;">
+                <div>
+                    ${c.name} ${statusBadge}
+                    <br><small style="color:var(--text-sec);">${c.date}</small>
+                </div>
                 <div style="display:flex; align-items:center;">
                     <b style="color:var(--danger);">${format(c.value)}</b>
                     <span style="margin-right:15px; display:flex;">
+                        <button class="btn-small-icon btn-pay" onclick="toggleCheckPaid(${i})" title="تغییر وضعیت"><i class="fas fa-check-double"></i></button>
                         <button class="btn-small-icon btn-edit" onclick="openEdit('check', ${i})"><i class="fas fa-edit"></i></button>
                         <button class="btn-small-icon btn-del" onclick="delCheck(${i})"><i class="fas fa-trash"></i></button>
                     </span>
                 </div>
-            </div>`).join('');
+            </div>`;
+        }).join('');
+    }
+
+    function toggleCheckPaid(i) {
+        saveSectionSnap('dashboard', `تغییر وضعیت چک ${app.checks[i].name}`);
+        app.checks[i].isPaid = !app.checks[i].isPaid;
+        saveData(); renderUI();
     }
 
     function renderLoans() {
@@ -1825,6 +1974,7 @@
             const shareFromPercent = Math.round((baseAmount * b.percent) / 100);
             const totalShare = shareFromPercent + (b.manualAdd || 0);
             const remain = totalShare - b.spent;
+            // Allow more than 100% or negative logic visually
             const percent = totalShare > 0 ? (b.spent / totalShare) * 100 : 0;
             
             let status = 'stat-green';
@@ -1849,7 +1999,6 @@
                 subLegend = `<div class="sub-budget-legend">${legHtml}</div>`;
             }
 
-            // ADDED: Zero Button & Transfer Button (Instructions 1 & 4)
             div.innerHTML += `
                 <div class="bento-item ${status} ${pausedClass}">
                     <div class="bento-header">
@@ -1893,7 +2042,6 @@
             const net = income - totalDebt - manualDeductions;
             const previousAmount = app.distributedAmount;
             
-            // Auto Allocation Logic
             if(net > previousAmount) {
                 const addedAmount = net - previousAmount;
                 processAutoTransfer(addedAmount, net);
@@ -1944,13 +2092,17 @@
         });
     }
 
-    // --- NEW FUNCTIONS FOR INSTRUCTIONS 1, 3, 4, 5 ---
-
-    // Instruction 1: Transfer
+    // Instruction 1: Transfer with Balance Display
     function openTransfer(index) {
-        tempDepositIndex = index; // using same temp index variable
+        tempDepositIndex = index;
         const b = app.budgets[index];
+        // Calculate current balance for display
+        const baseAmount = app.distributedAmount;
+        const totalShare = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
+        const remain = totalShare - b.spent;
+
         document.getElementById('transferSourceName').innerText = b.name;
+        document.getElementById('transferSourceBalance').innerText = format(remain) + " تومان";
         
         const sel = document.getElementById('transferTargetSelect');
         sel.innerHTML = app.budgets.map((item, i) => {
@@ -1969,8 +2121,7 @@
         
         if (isNaN(amount) || amount <= 0) return alert("مبلغ نامعتبر است");
         
-        // Calculate available logic not strictly enforced but good practice
-        // We just move money: Expense from Source, ManualAdd to Target
+        // Instruction 1: Allows transferring more than balance (Logic handles negative balance naturally)
         
         saveSectionSnap('budget', `انتقال ${format(amount)} از ${app.budgets[sourceIdx].name} به ${app.budgets[targetIdx].name}`);
         
@@ -1986,7 +2137,6 @@
         saveData(); renderUI(); closeAllModals(); showToast("انتقال انجام شد");
     }
 
-    // Instruction 4: Zero Item
     function zeroItem(index) {
         if (!confirm("آیا مطمئن هستید؟ این کار موجودی باقی‌مانده را با ثبت یک هزینه تصفیه صفر می‌کند.")) return;
         
@@ -2005,27 +2155,15 @@
         }
     }
 
-    // Updated Deposit Logic (Instruction 3 & 5)
     function openDepositOptions(index) {
         tempDepositIndex = index;
-        
-        // Check System Funds Availability for Instruction 5
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
         const totalDebt = app.debts.reduce((a,b)=>a+b.value,0) + (app.checks || []).reduce((a,b)=>a+b.value,0);
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
-        const currentTotalAllocated = app.distributedAmount + manualDeductions; // This logic in previous code was tricky
         
-        // Correct logic based on Code Base:
-        // Net = Income - Debt - ManualAdds.
-        // Distributed = what has been processed.
-        // If Net > Distributed, there is surplus.
-        
-        const net = income - totalDebt - manualDeductions; // Note: manualDeductions are already subtracted in Net definition?
-        // Let's look at renderUI: Net = Income - Debt - ManualDeductions.
-        // So Net IS the distributable amount remaining for percentages.
-        // If Net > DistributedAmount, it means we have new money.
-        
+        const net = income - totalDebt - manualDeductions;
         const surplus = net - app.distributedAmount;
+        
         const btn = document.getElementById('btnSystemDep');
         const msg = document.getElementById('systemDepMsg');
         
@@ -2034,7 +2172,6 @@
             btn.classList.remove('btn-outline');
             btn.classList.add('btn-primary');
             msg.innerHTML = `موجودی قابل واریز: <b style="color:var(--success)">${format(surplus)}</b> تومان`;
-            // Store max for validation
             btn.dataset.max = surplus;
         } else {
             btn.disabled = true;
@@ -2058,21 +2195,6 @@
                     saveSectionSnap('budget', `واریز سیستمی به ${app.budgets[tempDepositIndex].name}: ${format(val)}`);
                     if(!app.budgets[tempDepositIndex].manualAdd) app.budgets[tempDepositIndex].manualAdd = 0;
                     
-                    // Logic: Add to item manualAdd.
-                    // IMPORTANT: We must also increase distributedAmount so that this money is not counted as "New Money" for percentage distribution next time.
-                    // Because: Net (calculated in render) reduces when manualAdd increases.
-                    // Wait: Net = Income - Debt - ManualAdds.
-                    // If ManualAdd increases, Net decreases.
-                    // DistributedAmount stays same.
-                    // So Surplus (Net - Distributed) decreases. Correct.
-                    // We don't need to touch DistributedAmount here?
-                    // Let's trace:
-                    // Income 100. Manual 0. Net 100. Dist 0. Surplus 100.
-                    // Action: System Deposit 20.
-                    // Manual 20. Net = 100 - 20 = 80.
-                    // Dist is still 0. Surplus = 80.
-                    // Correct! The money moved from Surplus to Item.
-                    
                     app.budgets[tempDepositIndex].manualAdd += val;
                     addToHistory(tempDepositIndex, val, "واریز از سیستم", 'deposit');
                     
@@ -2080,29 +2202,19 @@
                  }
             });
         } else if (type === 'direct') {
-            // Instruction 3: Add to Item AND Main Account (Wallet)
             openUniversalInput('واریز مستقیم (بیرونی)', 'مبلغ واریزی:', true, (val) => {
                  if(val && !isNaN(val)) {
                     saveSectionSnap('budget', `واریز مستقیم به ${app.budgets[tempDepositIndex].name}: ${format(val)}`);
                     if(!app.budgets[tempDepositIndex].manualAdd) app.budgets[tempDepositIndex].manualAdd = 0;
                     
-                    // 1. Add to item
                     app.budgets[tempDepositIndex].manualAdd += val;
                     addToHistory(tempDepositIndex, val, "واریز مستقیم (بیرونی)", 'deposit');
                     
-                    // 2. Add to Wallet (Main Account)
                     if(app.wallets.length > 0) {
                         app.wallets[0].value += val;
                     } else {
                         app.wallets.push({name: "کیف پول اصلی", value: val});
                     }
-
-                    // 3. Prevent Redistribution (Instruction 3)
-                    // If we add to Wallet, Income increases -> Net Increases.
-                    // If ManualAdd increases, Net Decreases.
-                    // Net Change = +Val (Income) - Val (Manual) = 0.
-                    // So Net remains same. Distributed remains same.
-                    // No recalculation triggered. Perfect logic.
 
                     saveData(); renderUI(); showToast("واریز مستقیم ثبت شد");
                  }
@@ -2141,10 +2253,12 @@
         if(n && !isNaN(t)) { saveSectionSnap('tools', `افزودن هدف: ${n}`); app.goals.push({name:n, target:t, curr:0, autoConfig:{type:'none'}}); saveData(); renderUI(); closeAllModals(); }
     }
     
+    // Instruction 2: Show Deposited and Remaining Explicitly
     function renderGoals() {
         const div = document.getElementById('goalList');
         div.innerHTML = app.goals.map((g, i) => {
             const p = Math.min(100, Math.round((g.curr / g.target)*100));
+            const remain = g.target - g.curr;
             const autoBadge = g.autoConfig && g.autoConfig.type !== 'none' ? '<i class="fas fa-robot" style="color:var(--primary)" title="برداشت خودکار فعال"></i>' : '';
             return `
                 <div style="padding:15px; border-bottom:1px solid #eee;">
@@ -2153,8 +2267,11 @@
                          <span style="font-size:0.9rem;">
                             <button class="btn-small-icon btn-settings" onclick="openAutoAlloc('goal', ${i})"><i class="fas fa-cog"></i></button>
                             <button class="btn-small-icon btn-edit" onclick="openEdit('goal', ${i})"><i class="fas fa-edit"></i></button>
-                            ${format(g.curr)} / ${format(g.target)}
                          </span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-sec); margin-top:5px;">
+                        <span>واریز شده: <b style="color:var(--success)">${format(g.curr)}</b></span>
+                        <span>مانده: <b style="color:var(--danger)">${format(remain)}</b></span>
                     </div>
                     <div class="progress-bar"><div class="progress-fill" style="width:${p}%; background:var(--warning);"></div></div>
                     <div style="display:flex; gap:8px; margin-top:8px;">
@@ -2187,7 +2304,7 @@
             <div style="display:flex; justify-content:space-between; padding:15px; border-bottom:1px solid #eee; align-items:center; flex-wrap:wrap;">
                 <div style="flex:1;">
                     <span style="font-weight:bold; font-size:1.05rem;">${s.name} ${autoBadge}</span>
-                    ${s.price ? `<span style="font-size:0.9rem; color:var(--text-sec); display:block; margin-top:3px;">~${format(s.price)}</span>` : ''}
+                    ${s.price ? `<span style="font-size:0.9rem; color:var(--text-sec); display:block; margin-top:3px;">قیمت حدودی: ~${format(s.price)}</span>` : ''}
                 </div>
                 <div style="display:flex; gap:8px; align-items:center;">
                     <button class="btn btn-primary" style="font-size:0.8rem;" onclick="openAllocate('shop', ${i})">خرید با بودجه</button>
@@ -2344,7 +2461,6 @@
         app.budgets[tempSubIndex].subs = finalData;
         saveData(); renderUI(); closeAllModals(); showToast("زیرمجموعه‌ها ذخیره شدند");
     }
-
 
     // --- EDIT SYSTEM ---
     function openEdit(type, index) {
@@ -2677,21 +2793,20 @@
         }
     }
     
-    // Updated History (Instruction 2)
     function addToHistory(bIdx, amount, reason, type = 'expense') {
         if(!app.budgets[bIdx].history) app.budgets[bIdx].history = [];
         app.budgets[bIdx].history.push({ 
-            id: Date.now() + Math.random(), // Unique ID for editing
+            id: Date.now() + Math.random(), 
             amount: amount, 
             reason: reason, 
-            type: type, // 'expense', 'deposit', 'transferOut', 'transferIn'
+            type: type, 
             date: new Date().toLocaleDateString('fa-IR'), 
             time: new Date().toLocaleTimeString('fa-IR') 
         });
     }
 
     function openItemHistory(i) {
-        tempDepositIndex = i; // Reuse index variable for identifying budget
+        tempDepositIndex = i; 
         const hList = document.getElementById('itemHistList');
         const hist = app.budgets[i].history || [];
         if(hist.length === 0) { hList.innerHTML = '<p style="text-align:center;">موردی یافت نشد.</p>'; }
@@ -2716,7 +2831,6 @@
         openModal('itemHistModal');
     }
 
-    // Instruction 2: History Editing Logic
     function editHistoryItem(budgetIdx, histId) {
         closeAllModals();
         const budget = app.budgets[budgetIdx];
@@ -2752,26 +2866,13 @@
 
         saveSectionSnap('budget', `ویرایش تراکنش: ${histItem.reason}`);
         
-        // Update Balance Logic based on Type
         if (type === 'expense' || type === 'transferOut') {
-            // Expense increased -> Spent increases
             budget.spent += diff;
         } else if (type === 'deposit' || type === 'transferIn') {
-            // Deposit increased -> ManualAdd increases
             if (!budget.manualAdd) budget.manualAdd = 0;
             budget.manualAdd += diff;
-            
-            // Note: If we change a deposit that came from System or Direct, 
-            // strictly per Instruction 2 "Editable... stored in transaction",
-            // we update the Item's balance. 
-            // We do NOT necessarily have to trace back to Wallet/System for edits unless specified, 
-            // but for consistency with "Edit Everything", updating the item balance is key.
-            // If it was "Direct Deposit", wallet balance desync is possible if we don't update wallet, 
-            // but tracing back to specific wallet transaction is complex without a relational DB. 
-            // Instruction 2 emphasizes updating the ITEM transaction. 
         }
 
-        // Update History Record
         histItem.amount = newAmount;
         histItem.reason = newReason;
         histItem.date = newDate;
@@ -2891,8 +2992,8 @@
             });
             const dList = document.getElementById('printDebtsList');
             let debtHtml = "";
-            app.debts.forEach(d => debtHtml += `<div>${d.name}: ${format(d.value)}</div>`);
-            app.checks.forEach(c => debtHtml += `<div>چک (${c.name}): ${format(c.value)} - ${c.date}</div>`);
+            app.debts.forEach(d => debtHtml += `<div>${d.name}: ${format(d.value)} ${d.lastPaidMonth ? '(پرداخت شده)' : ''}</div>`);
+            app.checks.forEach(c => debtHtml += `<div>چک (${c.name}): ${format(c.value)} - ${c.date} ${c.isPaid ? '(پاس شد)' : ''}</div>`);
             dList.innerHTML = debtHtml || "ندارد";
             const gList = document.getElementById('printGoalsList');
             let goalHtml = "";
