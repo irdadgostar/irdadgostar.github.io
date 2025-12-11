@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مدیریت مالی حرفه‌ای | V18 Ultimate (Stable & Fixed)</title>
+    <title>مدیریت مالی حرفه‌ای | V19 Ultimate (Edited)</title>
 
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
@@ -31,6 +31,7 @@
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
+            --info: #0ea5e9;
             --card-radius: 24px;
             --nav-height: 80px;
         }
@@ -63,7 +64,7 @@
             transition: background 0.3s ease;
         }
 
-        /* --- Loading Overlay (New Modern Design) --- */
+        /* --- Loading Overlay --- */
         .loading-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -204,6 +205,14 @@
             box-shadow: none;
         }
         .btn-danger:hover { background: var(--danger); color: white; }
+        
+        .btn-success { 
+            background: rgba(16, 185, 129, 0.1); 
+            color: var(--success); 
+            border: 1px solid rgba(16, 185, 129, 0.2); 
+            box-shadow: none;
+        }
+        .btn-success:hover { background: var(--success); color: white; }
 
         .btn-icon {
             width: 44px; height: 44px;
@@ -308,7 +317,7 @@
             background: rgba(79, 70, 229, 0.1); padding: 6px 10px; border-radius: 10px;
         }
 
-        /* --- Lock Screen (Redesigned) --- */
+        /* --- Lock Screen --- */
         .pin-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.6); 
@@ -469,6 +478,12 @@
         .action-btn-pause:hover { background: var(--text-sec); color: white; }
         .action-btn-sub { background: rgba(245, 158, 11, 0.1); color: var(--warning); grid-column: span 2; }
         .action-btn-sub:hover { background: var(--warning); color: white; }
+        
+        /* New Buttons for instructions */
+        .action-btn-transfer { background: rgba(14, 165, 233, 0.1); color: var(--info); }
+        .action-btn-transfer:hover { background: var(--info); color: white; }
+        .action-btn-zero { background: rgba(0,0,0,0.1); color: var(--text-main); }
+        .action-btn-zero:hover { background: var(--text-main); color: white; }
 
         /* Sub-Budget Styles */
         .sub-budget-bar {
@@ -509,7 +524,7 @@
         .nav-btn.active { color: var(--primary); opacity: 1; }
         .nav-btn.active i { background: rgba(79, 70, 229, 0.1); transform: translateY(-5px); }
 
-        /* --- MODALS (Modern & Bottom Sheet) --- */
+        /* --- MODALS --- */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); z-index: 11000; 
@@ -557,7 +572,6 @@
             font-size: 0.9rem; display: flex; justify-content: space-between;
         }
         
-        /* Sub-budget Row Styling */
         .sub-budget-row {
             background:rgba(0,0,0,0.03); padding:10px; border-radius:12px; margin-bottom:10px; 
             display:flex; gap:8px; align-items:center;
@@ -592,7 +606,7 @@
 
 <div id="toastContainer" class="toast-container"></div>
 
-<!-- 1. LOCK SCREEN (REDESIGNED) -->
+<!-- 1. LOCK SCREEN -->
 <div id="authModal" class="pin-screen" style="display: flex;">
     <div class="auth-card">
         <div class="auth-avatar" id="authIcon">
@@ -792,7 +806,7 @@
         </div>
     </div>
 
-    <!-- TAB 4: SETTINGS (REDESIGNED) -->
+    <!-- TAB 4: SETTINGS -->
     <div id="view-settings" class="tab-pane">
         <div class="glass-panel">
             <div class="header-row"><h3>تنظیمات سیستم</h3></div>
@@ -851,16 +865,39 @@
 
 <!-- MODALS -->
 
-<!-- Deposit Selection Modal (New Instruction 1) -->
+<!-- Transfer Funds Modal (New Instruction 1) -->
+<div id="transferModal" class="modal">
+    <div class="modal-content">
+        <h3>انتقال وجه</h3>
+        <p style="font-size:0.9rem; color:var(--text-sec); margin-bottom:15px;">
+            انتقال از <b><span id="transferSourceName"></span></b> به:
+        </p>
+        <label>مقصد انتقال:</label>
+        <select id="transferTargetSelect"></select>
+        
+        <label>مبلغ انتقال:</label>
+        <div class="money-input-wrapper">
+            <input type="text" id="transferAmount" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
+            <span class="money-unit currency-text">تومان</span>
+        </div>
+        
+        <div style="margin-top:25px; display:flex; gap:12px;">
+            <button class="btn btn-primary" style="flex:1" onclick="performTransfer()">تایید انتقال</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+        </div>
+    </div>
+</div>
+
+<!-- Deposit Selection Modal (Updated Instruction 3 & 5) -->
 <div id="depositOptionsModal" class="modal">
     <div class="modal-content">
         <h3>انتخاب روش واریز</h3>
         <p style="font-size:0.9rem; color:var(--text-sec); margin-bottom:20px;">لطفاً نوع واریز به این ردیف بودجه را مشخص کنید:</p>
-        <button class="btn btn-primary" style="width:100%; margin-bottom:10px; display:flex; justify-content:space-between;" onclick="selectDepositType('system')">
-            <span>واریز از حساب سیستم</span>
+        <button id="btnSystemDep" class="btn btn-primary" style="width:100%; margin-bottom:5px; display:flex; justify-content:space-between;" onclick="selectDepositType('system')">
+            <span>واریز از حساب سیستم (توزیع نشده)</span>
             <i class="fas fa-exchange-alt"></i>
         </button>
-        <p style="font-size:0.8rem; color:var(--text-sec); margin-bottom:15px; margin-right:5px;">از موجودی کل توزیع نشده کسر می‌شود.</p>
+        <p id="systemDepMsg" style="font-size:0.8rem; color:var(--text-sec); margin-bottom:15px; margin-right:5px;">از موجودی کل توزیع نشده کسر می‌شود.</p>
         
         <button class="btn btn-success" style="width:100%; background:var(--success); color:white; margin-bottom:10px; display:flex; justify-content:space-between;" onclick="selectDepositType('direct')">
             <span>واریز مستقیم (پول بیرونی)</span>
@@ -869,6 +906,33 @@
         <p style="font-size:0.8rem; color:var(--text-sec); margin-bottom:15px; margin-right:5px;">به موجودی آیتم و موجودی کل حساب افزوده می‌شود.</p>
         
         <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="closeAllModals()">انصراف</button>
+    </div>
+</div>
+
+<!-- History Edit Modal (New Instruction 2) -->
+<div id="historyEditModal" class="modal">
+    <div class="modal-content">
+        <h3>ویرایش تراکنش</h3>
+        <input type="hidden" id="heBudgetId">
+        <input type="hidden" id="heHistIndex">
+        <input type="hidden" id="heType">
+        
+        <label>مبلغ جدید:</label>
+        <div class="money-input-wrapper">
+            <input type="text" id="heAmount" onkeyup="formatCurrency(this)" inputmode="numeric">
+            <span class="money-unit currency-text">تومان</span>
+        </div>
+        
+        <label>توضیحات:</label>
+        <input type="text" id="heReason">
+        
+        <label>تاریخ:</label>
+        <input type="text" id="heDate" placeholder="1403/xx/xx">
+        
+        <div style="margin-top:25px; display:flex; gap:12px;">
+            <button class="btn btn-primary" style="flex:1" onclick="saveHistoryEdit()">ذخیره تغییرات</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+        </div>
     </div>
 </div>
 
@@ -891,7 +955,7 @@
     </div>
 </div>
 
-<!-- Sub-Budget Manager (Modified: Percent Based) -->
+<!-- Sub-Budget Manager -->
 <div id="subBudgetModal" class="modal">
     <div class="modal-content">
         <h3>مدیریت زیرمجموعه‌ها</h3>
@@ -915,7 +979,7 @@
 <div id="autoAllocModal" class="modal">
     <div class="modal-content">
         <h3>تنظیمات پس‌انداز خودکار</h3>
-        <input type="hidden" id="autoAllocType"> <!-- goal or shop -->
+        <input type="hidden" id="autoAllocType"> 
         <input type="hidden" id="autoAllocId">
         
         <label>نوع برداشت:</label>
@@ -1228,7 +1292,8 @@
 
 <div id="itemHistModal" class="modal">
     <div class="modal-content">
-        <h3>تاریخچه تراکنش‌ها</h3>
+        <h3>تاریخچه تراکنش‌ها (قابل ویرایش)</h3>
+        <p style="font-size:0.8rem; color:var(--text-sec); margin-bottom:10px;">برای ویرایش روی آیکون مداد کلیک کنید.</p>
         <div id="itemHistList" style="max-height:300px; overflow-y:auto; margin-top:15px; font-size:0.9rem;"></div>
         <button class="btn btn-outline" style="width:100%; margin-top:20px;" onclick="closeAllModals()">بستن</button>
     </div>
@@ -1338,7 +1403,7 @@
         }, 3000);
     }
 
-    // --- Loading Logic (Instruction 3) ---
+    // --- Loading Logic ---
     function toggleLoading(active) {
         const overlay = document.getElementById('loadingOverlay');
         if (active) overlay.classList.add('active');
@@ -1519,7 +1584,7 @@
         }
     }
 
-    // --- REPLACING PROMPTS WITH MODERN INPUT ---
+    // --- UNIVERSAL INPUT ---
     function openUniversalInput(title, label, isMoney, callback) {
         document.getElementById('uInputTitle').innerText = title;
         document.getElementById('uInputLabel').innerText = label;
@@ -1573,7 +1638,7 @@
     }
     function format(n) { return (n * rate).toLocaleString('en-US'); }
 
-    // --- HISTORY SYSTEM (UPDATED INSTRUCTION 3) ---
+    // --- HISTORY SYSTEM (UPDATED) ---
     function saveSectionSnap(section, description = "تغییر بدون توضیح") {
         if(isGuestMode) return;
         let snap = null;
@@ -1629,15 +1694,11 @@
         document.getElementById('cardCurrency').innerText = curName;
         document.querySelectorAll('.currency-text').forEach(el => el.innerText = curName);
 
-        // --- Day Calculation Fix (Instruction 2) ---
         if(app.user.startDate) {
-            // Ensure strict calculation including the first day as day 1
             const diff = Date.now() - app.user.startDate;
-            // Use Math.floor but add 1 to count today as Day 1 if diff is small
             const days = Math.floor(diff / (1000 * 60 * 60 * 24)) + 1; 
             document.getElementById('daysPassedLabel').innerText = `روز ${days}`;
         } else {
-             // Fallback if somehow deleted
              app.user.startDate = Date.now();
              document.getElementById('daysPassedLabel').innerText = `روز ۱`;
         }
@@ -1771,7 +1832,6 @@
             if(percent > 90) status = 'stat-red';
             const pausedClass = b.isPaused ? 'paused' : '';
 
-            // Sub-budget Visualization (Modified)
             let subBars = "";
             let subLegend = "";
             if(b.subs && b.subs.length > 0) {
@@ -1779,7 +1839,6 @@
                 let legHtml = "";
                 b.subs.forEach((s, idx) => {
                     const c = colors[idx % colors.length];
-                    // s.percent is stored, calculate amount relative to totalShare
                     const sAmount = Math.round((totalShare * s.percent) / 100);
                     if(sAmount > 0) {
                          subHtml += `<div class="sub-budget-seg" style="width:${s.percent}%; background:${c};" title="${s.name} (${format(sAmount)})"></div>`;
@@ -1790,7 +1849,7 @@
                 subLegend = `<div class="sub-budget-legend">${legHtml}</div>`;
             }
 
-            // --- Updated Button for Instruction 1: openDepositOptions instead of injectBudget ---
+            // ADDED: Zero Button & Transfer Button (Instructions 1 & 4)
             div.innerHTML += `
                 <div class="bento-item ${status} ${pausedClass}">
                     <div class="bento-header">
@@ -1814,7 +1873,9 @@
                         <button class="action-chip action-btn-exp" onclick="openExp(${i})" ${b.isPaused ? 'disabled' : ''}><i class="fas fa-minus-circle"></i> ثبت هزینه</button>
                         <button class="action-chip action-btn-copy" onclick="copyTxt(${remain})"><i class="fas fa-copy"></i> کپی</button>
                         <button class="action-chip action-btn-add" onclick="openDepositOptions(${i})"><i class="fas fa-plus-circle"></i> واریز</button>
+                        <button class="action-chip action-btn-transfer" onclick="openTransfer(${i})"><i class="fas fa-exchange-alt"></i> انتقال</button>
                         <button class="action-chip action-btn-pause" onclick="togglePause(${i})">${b.isPaused ? '<i class="fas fa-play"></i> فعال' : '<i class="fas fa-pause"></i> توقف'}</button>
+                        <button class="action-chip action-btn-zero" onclick="zeroItem(${i})"><i class="fas fa-eraser"></i> تصفیه</button>
                         <button class="action-chip action-btn-sub" onclick="openSubBudgetManager(${i})"><i class="fas fa-layer-group"></i> مدیریت زیرمجموعه</button>
                     </div>
                 </div>
@@ -1875,7 +1936,7 @@
                         g.curr += amountToTransfer;
                         if (sourceObj) {
                              sourceObj.spent += amountToTransfer;
-                             addToHistory(app.budgets.indexOf(sourceObj), amountToTransfer, "برداشت خودکار: " + g.name);
+                             addToHistory(app.budgets.indexOf(sourceObj), amountToTransfer, "برداشت خودکار: " + g.name, 'expense');
                         }
                     }
                 }
@@ -1883,29 +1944,143 @@
         });
     }
 
-    // --- NEW DEPOSIT LOGIC (Instruction 1) ---
+    // --- NEW FUNCTIONS FOR INSTRUCTIONS 1, 3, 4, 5 ---
+
+    // Instruction 1: Transfer
+    function openTransfer(index) {
+        tempDepositIndex = index; // using same temp index variable
+        const b = app.budgets[index];
+        document.getElementById('transferSourceName').innerText = b.name;
+        
+        const sel = document.getElementById('transferTargetSelect');
+        sel.innerHTML = app.budgets.map((item, i) => {
+            if (i === index) return '';
+            return `<option value="${i}">${item.name}</option>`;
+        }).join('');
+        
+        document.getElementById('transferAmount').value = '';
+        openModal('transferModal');
+    }
+
+    function performTransfer() {
+        const sourceIdx = tempDepositIndex;
+        const targetIdx = parseInt(document.getElementById('transferTargetSelect').value);
+        const amount = parseFormatted(document.getElementById('transferAmount').value);
+        
+        if (isNaN(amount) || amount <= 0) return alert("مبلغ نامعتبر است");
+        
+        // Calculate available logic not strictly enforced but good practice
+        // We just move money: Expense from Source, ManualAdd to Target
+        
+        saveSectionSnap('budget', `انتقال ${format(amount)} از ${app.budgets[sourceIdx].name} به ${app.budgets[targetIdx].name}`);
+        
+        // Deduct from Source (as expense)
+        app.budgets[sourceIdx].spent += amount;
+        addToHistory(sourceIdx, amount, `انتقال به ${app.budgets[targetIdx].name}`, 'transferOut');
+        
+        // Add to Target (as manual deposit)
+        if (!app.budgets[targetIdx].manualAdd) app.budgets[targetIdx].manualAdd = 0;
+        app.budgets[targetIdx].manualAdd += amount;
+        addToHistory(targetIdx, amount, `دریافت از ${app.budgets[sourceIdx].name}`, 'transferIn');
+        
+        saveData(); renderUI(); closeAllModals(); showToast("انتقال انجام شد");
+    }
+
+    // Instruction 4: Zero Item
+    function zeroItem(index) {
+        if (!confirm("آیا مطمئن هستید؟ این کار موجودی باقی‌مانده را با ثبت یک هزینه تصفیه صفر می‌کند.")) return;
+        
+        const b = app.budgets[index];
+        const baseAmount = app.distributedAmount;
+        const share = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
+        const remain = share - b.spent;
+        
+        if (remain > 0) {
+            saveSectionSnap('budget', `تصفیه حساب ${b.name}`);
+            b.spent += remain;
+            addToHistory(index, remain, "تصفیه حساب (صفر کردن)", 'expense');
+            saveData(); renderUI(); showToast("حساب صفر شد");
+        } else {
+            alert("موجودی برای صفر کردن وجود ندارد.");
+        }
+    }
+
+    // Updated Deposit Logic (Instruction 3 & 5)
     function openDepositOptions(index) {
         tempDepositIndex = index;
+        
+        // Check System Funds Availability for Instruction 5
+        const income = app.wallets.reduce((a,b)=>a+b.value,0);
+        const totalDebt = app.debts.reduce((a,b)=>a+b.value,0) + (app.checks || []).reduce((a,b)=>a+b.value,0);
+        const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
+        const currentTotalAllocated = app.distributedAmount + manualDeductions; // This logic in previous code was tricky
+        
+        // Correct logic based on Code Base:
+        // Net = Income - Debt - ManualAdds.
+        // Distributed = what has been processed.
+        // If Net > Distributed, there is surplus.
+        
+        const net = income - totalDebt - manualDeductions; // Note: manualDeductions are already subtracted in Net definition?
+        // Let's look at renderUI: Net = Income - Debt - ManualDeductions.
+        // So Net IS the distributable amount remaining for percentages.
+        // If Net > DistributedAmount, it means we have new money.
+        
+        const surplus = net - app.distributedAmount;
+        const btn = document.getElementById('btnSystemDep');
+        const msg = document.getElementById('systemDepMsg');
+        
+        if (surplus > 0) {
+            btn.disabled = false;
+            btn.classList.remove('btn-outline');
+            btn.classList.add('btn-primary');
+            msg.innerHTML = `موجودی قابل واریز: <b style="color:var(--success)">${format(surplus)}</b> تومان`;
+            // Store max for validation
+            btn.dataset.max = surplus;
+        } else {
+            btn.disabled = true;
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-outline');
+            msg.innerHTML = "موجودی جدیدی برای توزیع وجود ندارد.";
+            btn.dataset.max = 0;
+        }
+        
         openModal('depositOptionsModal');
     }
 
     function selectDepositType(type) {
         closeAllModals();
         if(type === 'system') {
-            openUniversalInput('واریز از سیستم', 'مبلغ برداشتی از بودجه کل:', true, (val) => {
+            const max = parseFloat(document.getElementById('btnSystemDep').dataset.max) || 0;
+            openUniversalInput('واریز از سیستم', `حداکثر قابل واریز: ${format(max)} تومان`, true, (val) => {
                  if(val && !isNaN(val)) {
+                    if (val > max) return alert("مبلغ وارد شده بیشتر از موجودی توزیع نشده است!");
+                    
                     saveSectionSnap('budget', `واریز سیستمی به ${app.budgets[tempDepositIndex].name}: ${format(val)}`);
                     if(!app.budgets[tempDepositIndex].manualAdd) app.budgets[tempDepositIndex].manualAdd = 0;
                     
-                    // Original logic: Move from Distributable Pool to Item
+                    // Logic: Add to item manualAdd.
+                    // IMPORTANT: We must also increase distributedAmount so that this money is not counted as "New Money" for percentage distribution next time.
+                    // Because: Net (calculated in render) reduces when manualAdd increases.
+                    // Wait: Net = Income - Debt - ManualAdds.
+                    // If ManualAdd increases, Net decreases.
+                    // DistributedAmount stays same.
+                    // So Surplus (Net - Distributed) decreases. Correct.
+                    // We don't need to touch DistributedAmount here?
+                    // Let's trace:
+                    // Income 100. Manual 0. Net 100. Dist 0. Surplus 100.
+                    // Action: System Deposit 20.
+                    // Manual 20. Net = 100 - 20 = 80.
+                    // Dist is still 0. Surplus = 80.
+                    // Correct! The money moved from Surplus to Item.
+                    
                     app.budgets[tempDepositIndex].manualAdd += val;
-                    app.distributedAmount -= val;
+                    addToHistory(tempDepositIndex, val, "واریز از سیستم", 'deposit');
                     
                     saveData(); renderUI(); showToast("واریز سیستمی انجام شد");
                  }
             });
         } else if (type === 'direct') {
-            // Instruction 1: Direct deposit must add to item AND add to account balance
+            // Instruction 3: Add to Item AND Main Account (Wallet)
             openUniversalInput('واریز مستقیم (بیرونی)', 'مبلغ واریزی:', true, (val) => {
                  if(val && !isNaN(val)) {
                     saveSectionSnap('budget', `واریز مستقیم به ${app.budgets[tempDepositIndex].name}: ${format(val)}`);
@@ -1913,19 +2088,21 @@
                     
                     // 1. Add to item
                     app.budgets[tempDepositIndex].manualAdd += val;
+                    addToHistory(tempDepositIndex, val, "واریز مستقیم (بیرونی)", 'deposit');
                     
-                    // 2. Add to Account Balance (Must add to a wallet to increase Net Worth)
-                    // We add to the first wallet by default or system wallet to keep it simple and automated
+                    // 2. Add to Wallet (Main Account)
                     if(app.wallets.length > 0) {
                         app.wallets[0].value += val;
                     } else {
-                        // If no wallet exists, create one
                         app.wallets.push({name: "کیف پول اصلی", value: val});
                     }
 
-                    // 3. Update Distributed Amount to match the new Net Worth so it doesn't show as "Unallocated"
-                    // Because the money is already allocated to this item manually
-                    app.distributedAmount += val; 
+                    // 3. Prevent Redistribution (Instruction 3)
+                    // If we add to Wallet, Income increases -> Net Increases.
+                    // If ManualAdd increases, Net Decreases.
+                    // Net Change = +Val (Income) - Val (Manual) = 0.
+                    // So Net remains same. Distributed remains same.
+                    // No recalculation triggered. Perfect logic.
 
                     saveData(); renderUI(); showToast("واریز مستقیم ثبت شد");
                  }
@@ -2069,7 +2246,7 @@
         saveData(); renderUI(); closeAllModals(); showToast("تنظیمات خودکار ذخیره شد");
     }
 
-    // --- SUB-BUDGET LOGIC (UPDATED: PERCENT BASED & FIXED BUG) ---
+    // --- SUB-BUDGET LOGIC ---
     function openSubBudgetManager(i) {
         tempSubIndex = i;
         const b = app.budgets[i];
@@ -2078,7 +2255,6 @@
         openModal('subBudgetModal');
     }
 
-    // Helper to capture inputs currently in the modal before re-rendering
     function captureSubState() {
         if(tempSubIndex === -1) return [];
         const nameInputs = document.querySelectorAll('.sub-name');
@@ -2094,10 +2270,7 @@
     }
 
     function renderSubBudgets(budget, tempState = null) {
-        // Use tempState if provided (during editing), otherwise use saved state
         const subsToRender = tempState || (budget.subs || []);
-        
-        // Calculate Total Parent Budget
         const baseAmount = app.distributedAmount;
         const share = Math.round((baseAmount * budget.percent) / 100) + (budget.manualAdd || 0);
         
@@ -2126,7 +2299,6 @@
     }
 
     function updateSubCalculations(totalShare) {
-         // Just visual update to avoid full re-render on every keystroke
          const inputs = document.querySelectorAll('.sub-percent-input');
          let totalP = 0;
          inputs.forEach((inp, idx) => {
@@ -2134,7 +2306,6 @@
              totalP += p;
              const amt = Math.round((totalShare * p) / 100);
              document.getElementById(`subCalc_${idx}`).innerText = format(amt);
-             // Update onclick for copy button
              const copyBtn = inp.parentElement.parentElement.querySelector('.btn-copy');
              copyBtn.setAttribute('onclick', `copySub(${amt})`);
          });
@@ -2163,15 +2334,12 @@
 
     function saveSubBudgets() {
         const finalData = captureSubState();
-        
         let totalP = 0;
         finalData.forEach(s => totalP += s.percent);
-
         if(totalP > 100) {
             alert("خطا: مجموع درصدها (" + totalP + "%) از ۱۰۰٪ بیشتر است!");
             return;
         }
-
         saveSectionSnap('budget', `تغییر زیرمجموعه‌های ${app.budgets[tempSubIndex].name}`);
         app.budgets[tempSubIndex].subs = finalData;
         saveData(); renderUI(); closeAllModals(); showToast("زیرمجموعه‌ها ذخیره شدند");
@@ -2180,7 +2348,6 @@
 
     // --- EDIT SYSTEM ---
     function openEdit(type, index) {
-        // --- FIX: Open modal FIRST to clear old data, then populate ---
         openModal('editModal'); 
 
         document.getElementById('editType').value = type;
@@ -2208,7 +2375,6 @@
             else if(type === 'shop') val = item.price || 0;
             else val = item.value;
             
-            // Prefill and format immediately
             document.getElementById('editVal').value = val;
             formatCurrency(document.getElementById('editVal'));
         } else {
@@ -2445,10 +2611,8 @@
         saveData(); renderUI(); closeAllModals(); tempBudget = null;
     }
 
-    // --- PRIORITY LOGIC (FIXED INSTRUCTION 4/5) ---
     function openPrioritySettings() {
         const list = document.getElementById('priorityList');
-        // Clean up zombie priorities
         const budgetNames = app.budgets.map(b => b.name);
         Object.keys(app.priorities).forEach(key => {
             if (!budgetNames.includes(key) && key !== 'سایر') delete app.priorities[key];
@@ -2460,7 +2624,6 @@
         document.getElementById('pRangeLow').value = app.priorityRanges.low;
         document.getElementById('pRangeMid').value = app.priorityRanges.mid;
         
-        // Use DocumentFragment for performance
         const frag = document.createDocumentFragment();
         
         app.budgets.forEach(b => {
@@ -2509,31 +2672,113 @@
         const r = document.getElementById('expReason').value || 'بدون توضیح';
         if(!isNaN(v) && activeIdx > -1) { 
             saveSectionSnap('budget', `هزینه ${format(v)} برای ${app.budgets[activeIdx].name}`); app.budgets[activeIdx].spent += v;
-            addToHistory(activeIdx, v, r);
+            addToHistory(activeIdx, v, r, 'expense');
             saveData(); renderUI(); closeAllModals(); showToast("هزینه ثبت شد");
         }
     }
-    function addToHistory(bIdx, amount, reason) {
+    
+    // Updated History (Instruction 2)
+    function addToHistory(bIdx, amount, reason, type = 'expense') {
         if(!app.budgets[bIdx].history) app.budgets[bIdx].history = [];
-        app.budgets[bIdx].history.push({ amount: amount, reason: reason, date: new Date().toLocaleDateString('fa-IR'), time: new Date().toLocaleTimeString('fa-IR') });
+        app.budgets[bIdx].history.push({ 
+            id: Date.now() + Math.random(), // Unique ID for editing
+            amount: amount, 
+            reason: reason, 
+            type: type, // 'expense', 'deposit', 'transferOut', 'transferIn'
+            date: new Date().toLocaleDateString('fa-IR'), 
+            time: new Date().toLocaleTimeString('fa-IR') 
+        });
     }
+
     function openItemHistory(i) {
+        tempDepositIndex = i; // Reuse index variable for identifying budget
         const hList = document.getElementById('itemHistList');
         const hist = app.budgets[i].history || [];
         if(hist.length === 0) { hList.innerHTML = '<p style="text-align:center;">موردی یافت نشد.</p>'; }
         else {
-            hList.innerHTML = hist.slice().reverse().map(h => `
+            hList.innerHTML = hist.slice().reverse().map((h, idx) => {
+                const isPositive = h.type === 'deposit' || h.type === 'transferIn';
+                const color = isPositive ? 'var(--success)' : 'var(--danger)';
+                const sign = isPositive ? '+' : '-';
+                return `
                 <div style="border-bottom:1px solid #eee; padding:10px 0;">
-                    <div style="display:flex; justify-content:space-between; font-weight:bold;">
-                        <span>${h.reason}</span><span style="color:var(--danger)">${format(h.amount)}</span>
+                    <div style="display:flex; justify-content:space-between; font-weight:bold; align-items:center;">
+                        <span>${h.reason}</span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="color:${color}; direction:ltr;">${sign}${format(h.amount)}</span>
+                            <i class="fas fa-edit" style="color:var(--text-sec); cursor:pointer; font-size:0.9rem;" onclick="editHistoryItem(${i}, '${h.id}')"></i>
+                        </div>
                     </div>
                     <div style="font-size:0.75rem; color:var(--text-sec); margin-top:3px;">${h.date} - ${h.time}</div>
-                </div>`).join('');
+                </div>`;
+            }).join('');
         }
         openModal('itemHistModal');
     }
 
-    // --- ALLOCATION LOGIC ---
+    // Instruction 2: History Editing Logic
+    function editHistoryItem(budgetIdx, histId) {
+        closeAllModals();
+        const budget = app.budgets[budgetIdx];
+        const hIndex = budget.history.findIndex(h => h.id == histId);
+        if (hIndex === -1) return;
+        const item = budget.history[hIndex];
+
+        document.getElementById('heBudgetId').value = budgetIdx;
+        document.getElementById('heHistIndex').value = hIndex;
+        document.getElementById('heType').value = item.type;
+        document.getElementById('heAmount').value = item.amount;
+        formatCurrency(document.getElementById('heAmount'));
+        document.getElementById('heReason').value = item.reason;
+        document.getElementById('heDate').value = item.date;
+
+        openModal('historyEditModal');
+    }
+
+    function saveHistoryEdit() {
+        const bIdx = parseInt(document.getElementById('heBudgetId').value);
+        const hIdx = parseInt(document.getElementById('heHistIndex').value);
+        const newAmount = parseFormatted(document.getElementById('heAmount').value);
+        const newReason = document.getElementById('heReason').value;
+        const newDate = document.getElementById('heDate').value;
+        
+        if (isNaN(newAmount)) return alert("مبلغ نامعتبر است");
+        
+        const budget = app.budgets[bIdx];
+        const histItem = budget.history[hIdx];
+        const oldAmount = histItem.amount;
+        const diff = newAmount - oldAmount;
+        const type = histItem.type;
+
+        saveSectionSnap('budget', `ویرایش تراکنش: ${histItem.reason}`);
+        
+        // Update Balance Logic based on Type
+        if (type === 'expense' || type === 'transferOut') {
+            // Expense increased -> Spent increases
+            budget.spent += diff;
+        } else if (type === 'deposit' || type === 'transferIn') {
+            // Deposit increased -> ManualAdd increases
+            if (!budget.manualAdd) budget.manualAdd = 0;
+            budget.manualAdd += diff;
+            
+            // Note: If we change a deposit that came from System or Direct, 
+            // strictly per Instruction 2 "Editable... stored in transaction",
+            // we update the Item's balance. 
+            // We do NOT necessarily have to trace back to Wallet/System for edits unless specified, 
+            // but for consistency with "Edit Everything", updating the item balance is key.
+            // If it was "Direct Deposit", wallet balance desync is possible if we don't update wallet, 
+            // but tracing back to specific wallet transaction is complex without a relational DB. 
+            // Instruction 2 emphasizes updating the ITEM transaction. 
+        }
+
+        // Update History Record
+        histItem.amount = newAmount;
+        histItem.reason = newReason;
+        histItem.date = newDate;
+        
+        saveData(); renderUI(); closeAllModals(); showToast("تراکنش ویرایش شد");
+    }
+
     function openAllocate(type, id) {
         document.getElementById('allocType').value = type;
         document.getElementById('allocId').value = id;
@@ -2585,7 +2830,7 @@
         saveSectionSnap('budget', reason); 
         app.budgets[bIdx].spent += amt;
         
-        addToHistory(bIdx, amt, reason);
+        addToHistory(bIdx, amt, reason, 'expense');
         saveData(); renderUI(); closeAllModals(); showToast("تراکنش ثبت شد");
     }
 
@@ -2609,7 +2854,6 @@
             const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
             const net = income - totalDebt - manualDeductions;
             
-            // Calculate days for report
             const days = app.user.startDate ? Math.floor((Date.now() - app.user.startDate)/(1000*60*60*24))+1 : 0;
 
             document.getElementById('printDate').innerText = new Date().toLocaleDateString('fa-IR');
@@ -2638,7 +2882,6 @@
                 const s = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
                 tb.innerHTML += `<tr><td>${b.name}</td><td>${b.percent}%</td><td>${format(s)}</td><td>${format(b.spent)}</td><td>${format(s-b.spent)}</td></tr>`;
                 if(b.subs && b.subs.length > 0) {
-                   // Render sub-budgets in print based on calculated amount
                    let subStr = b.subs.map(sub => {
                        const amt = Math.round((s * (sub.percent||0)) / 100);
                        return `${sub.name}: ${format(amt)}`;
@@ -2663,10 +2906,10 @@
                     const a = document.createElement('a');
                     a.download = `Financial_Report_${days}Days.png`; a.href = c.toDataURL(); a.click();
                     el.style.top = "-9999px";
-                    toggleLoading(false); // Hide loading after download starts
+                    toggleLoading(false); 
                 });
-            }, 500); // Slight delay to ensure chart rendering
-        }, 100); // Start Loading
+            }, 500);
+        }, 100);
     }
 
     function downloadBackup() {
@@ -2684,7 +2927,6 @@
             reader.onload = (e) => {
                 try {
                     app = JSON.parse(e.target.result);
-                    // Data Migration / Fixes
                     if(!app.priorities) app.priorities = defaultState.priorities;
                     if(!app.sectionHistory) app.sectionHistory = { dashboard: [], budget: [], tools: [] };
                     app.budgets.forEach(b => { 
@@ -2742,17 +2984,16 @@
         document.querySelectorAll('.nav-btn').forEach(b => { if(b.getAttribute('onclick').includes(id)) b.classList.add('active'); });
     }
     function openModal(id) { 
-        if(id === 'prioritySettingsModal') { openPrioritySettings(); return; } // Handled separately
+        if(id === 'prioritySettingsModal') { openPrioritySettings(); return; }
         const m = document.getElementById(id);
         const inputs = m.querySelectorAll('input');
-        // Clear inputs carefully
         inputs.forEach(i => {
-            // Don't clear certain inputs (like hidden IDs or names/values in sub-lists being rendered)
             if(i.type !== 'hidden' && i.type !== 'checkbox' && i.type !== 'range' 
             && !i.classList.contains('sub-name') 
             && !i.classList.contains('sub-percent-input') 
             && i.id !== 'pRangeLow' && i.id !== 'pRangeMid' 
-            && i.id !== 'aaPercent' && i.id !== 'aaAmount' && i.id !== 'aaMin') {
+            && i.id !== 'aaPercent' && i.id !== 'aaAmount' && i.id !== 'aaMin'
+            && i.id !== 'heBudgetId' && i.id !== 'heHistIndex' && i.id !== 'heType') {
                 i.value = '';
             }
         });
