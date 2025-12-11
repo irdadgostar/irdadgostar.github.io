@@ -1,9 +1,10 @@
+
 <!DOCTYPE html> 
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مدیریت مالی حرفه‌ای</title>
+    <title>مدیریت سرمایه</title>
 
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
@@ -436,7 +437,22 @@
         }
 
         .balance-label { font-size: 0.9rem; opacity: 0.8; font-weight: 300; display:block; margin-bottom:5px;}
-        .balance-value { font-size: 2.2rem; font-weight: 800; margin: 5px 0; direction: ltr; text-shadow: 0 4px 10px rgba(0,0,0,0.2); letter-spacing: 2px; font-family: 'Courier New', monospace; }
+        /* Adjusted font size for large numbers */
+        .balance-value { 
+            font-size: clamp(1.5rem, 5vw, 2.2rem); 
+            font-weight: 800; 
+            margin: 5px 0; 
+            direction: ltr; 
+            text-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+            letter-spacing: 1px; 
+            font-family: 'Courier New', monospace; 
+            white-space: nowrap;
+            overflow-x: auto;
+            overflow-y: hidden;
+            width: 100%;
+            scrollbar-width: none;
+        }
+        .balance-value::-webkit-scrollbar { display: none; }
 
         /* --- BENTO GRID (Budget) --- */
         .budget-grid {
@@ -605,6 +621,15 @@
         .settings-btn-card.danger i { color: var(--danger); }
         .settings-btn-card.danger:hover { background: rgba(239, 68, 68, 0.05); border-color: var(--danger); }
 
+        /* Details Modal Row */
+        .detail-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { font-size: 0.9rem; color: var(--text-sec); font-weight: 500; }
+        .detail-val { font-weight: 700; color: var(--text-main); font-size: 1rem; direction: ltr; }
+
     </style>
 </head>
 <body>
@@ -625,18 +650,27 @@
         <h2 id="authTitle" style="margin: 0 0 5px 0; color: var(--primary); font-size: 1.4rem;">ورود ایمن</h2>
         <p id="authSub" style="font-size: 0.9rem; color: var(--text-sec); margin-bottom: 25px;">لطفاً هویت خود را تایید کنید</p>
 
-        <!-- Step 1: Registration / Info -->
+        <!-- Step 1: Sequential Registration / Info -->
         <div id="authStep1" style="display:none; width:100%;">
-            <div class="auth-input-group">
+            <input type="hidden" id="setupStepVal" value="1">
+            
+            <div id="setupS1">
                 <label class="auth-label">نام شما:</label>
                 <input type="text" id="setupNameInput" placeholder="نام خود را وارد کنید" style="padding:12px; border-radius:12px;">
+            </div>
+
+            <div id="setupS2" style="display:none;">
                 <label class="auth-label">کد ملی (جهت بازیابی):</label>
                 <input type="text" id="setupNatId" inputmode="numeric" placeholder="کد ملی خود را وارد کنید" style="padding:12px; border-radius:12px;">
+            </div>
+
+            <div id="setupS3" style="display:none;">
                 <label class="auth-label">سوال امنیتی (تصادفی):</label>
                 <div style="background: rgba(79,70,229,0.05); padding: 12px; border-radius: 12px; margin-bottom: 10px; color: var(--primary); font-weight: bold; font-size: 0.85rem; text-align: right;" id="setupSecurityQ">---</div>
                 <input type="text" id="setupSecurityA" placeholder="پاسخ را بنویسید" style="padding:12px; border-radius:12px;">
             </div>
-            <button class="btn btn-primary" style="width:100%; padding: 12px;" onclick="goToPinSetup()">ادامه و تعیین رمز</button>
+
+            <button class="btn btn-primary" style="width:100%; padding: 12px;" onclick="nextSetupStep()" id="setupNextBtn">بعدی</button>
         </div>
 
         <!-- Step 2: PIN Entry -->
@@ -682,7 +716,7 @@
     <!-- Header -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-top: 10px;">
         <div>
-            <h2 style="margin:0; color:var(--primary); font-weight:900; font-size:1.6rem;">مدیریت مالی</h2>
+            <h2 style="margin:0; color:var(--primary); font-weight:900; font-size:1.6rem;">مدیریت سرمایه</h2>
             <div style="display:flex; align-items:center; gap:8px; margin-top:5px;">
                 <span style="font-size:0.85rem; color:var(--text-sec); font-weight:500;" id="headerDate">---</span>
                 <span style="font-size:0.75rem; background:rgba(16,185,129,0.1); color:var(--success); padding:3px 8px; border-radius:8px; font-weight:bold;" id="daysPassedLabel">روز ۰</span>
@@ -701,13 +735,17 @@
 
     <!-- TAB 1: DASHBOARD -->
     <div id="view-dashboard" class="tab-pane active">
-        <div class="hero-card" onclick="this.classList.toggle('flipped')">
+        <!-- Hero Card (Clickable to open details) -->
+        <div class="hero-card" onclick="showCardDetails()">
             <div class="card-inner">
                 <div class="card-front">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                         <div class="card-chip"></div>
                         <i class="fas fa-wifi" style="opacity:0.7; transform: rotate(90deg);"></i>
                     </div>
+                    <!-- Added Account Number -->
+                    <div style="font-family:monospace; opacity:0.8; letter-spacing:2px; font-size:1.1rem; margin-bottom:10px; direction:ltr;">3545 6576</div>
+                    
                     <div>
                         <span class="balance-label">موجودی خالص (قابل تقسیم)</span>
                         <div class="balance-value" id="totalBalance">0</div>
@@ -717,11 +755,10 @@
                         <span id="cardCurrency">تومان</span>
                     </div>
                 </div>
+                <!-- Card Back isn't strictly needed for click interaction but kept for CSS structure -->
                 <div class="card-back">
                     <h3 style="margin:0;">خلاصه وضعیت</h3>
-                    <p style="margin:5px 0; opacity:0.8;">مجموع بدهی‌های ثابت و چک:</p>
-                    <div style="font-size:2rem; color:var(--danger); font-weight:bold; direction:ltr;" id="totalDebtDisplay">0</div>
-                    <p style="font-size:0.8rem; margin-top:15px; opacity:0.6; border-top:1px solid rgba(255,255,255,0.2); padding-top:10px;">این مبلغ از موجودی کل کسر شده است.</p>
+                    <p style="margin:5px 0; opacity:0.8;">برای مشاهده جزئیات کلیک کنید</p>
                 </div>
             </div>
         </div>
@@ -874,6 +911,21 @@
 </nav>
 
 <!-- MODALS -->
+
+<!-- New Modal: Card Details & Copy (Instruction 1 & 2) -->
+<div id="cardDetailsModal" class="modal">
+    <div class="modal-content">
+        <h3>وضعیت کلی سرمایه</h3>
+        <p style="font-size:0.85rem; color:var(--text-sec); margin-bottom:15px;">خلاصه تمام دارایی‌ها و بدهی‌ها</p>
+        
+        <div id="cardDetailsContent"></div>
+
+        <div style="margin-top:20px;">
+            <button class="btn btn-outline" style="width:100%" onclick="copyCardDetails()"><i class="fas fa-copy"></i> کپی تمام اطلاعات</button>
+        </div>
+        <button class="btn btn-danger" style="width:100%; margin-top:10px;" onclick="closeAllModals()">بستن</button>
+    </div>
+</div>
 
 <!-- Transfer Funds Modal (Modified for Instruction 1) -->
 <div id="transferModal" class="modal">
@@ -1474,6 +1526,7 @@
         return `${y}/${m}/${d}`;
     }
 
+    // --- Updated Auth with Sequential Steps (Instruction 4) ---
     function checkAuth() {
         const modal = document.getElementById('authModal');
         const step1 = document.getElementById('authStep1');
@@ -1488,13 +1541,26 @@
         updatePinDots();
 
         if (!app.security.hasPin || !app.security.isSetup) {
-            title.innerText = "راه‌اندازی اولیه";
-            sub.innerText = "لطفاً اطلاعات هویتی و امنیتی خود را وارد کنید";
+            title.innerText = app.user.name ? "ویرایش اطلاعات امنیتی" : "راه‌اندازی اولیه";
+            sub.innerText = "لطفاً مراحل زیر را طی کنید";
             step1.style.display = 'block';
             step2.style.display = 'none';
             actions.style.display = 'block';
             forgotDiv.style.display = 'none';
             app.security.isSetup = false;
+            
+            // Reset wizard steps
+            document.getElementById('setupStepVal').value = 1;
+            document.getElementById('setupS1').style.display = 'block';
+            document.getElementById('setupS2').style.display = 'none';
+            document.getElementById('setupS3').style.display = 'none';
+            document.getElementById('setupNextBtn').innerText = 'بعدی';
+
+            // Fill existing if edit mode
+            document.getElementById('setupNameInput').value = app.user.name || "";
+            document.getElementById('setupNatId').value = app.security.nationalId || "";
+            document.getElementById('setupSecurityA').value = "";
+            
             const randIdx = Math.floor(Math.random() * securityQuestions.length);
             document.getElementById('setupSecurityQ').innerText = securityQuestions[randIdx];
             document.getElementById('setupSecurityQ').setAttribute('data-qid', randIdx);
@@ -1508,15 +1574,33 @@
         }
     }
 
+    function nextSetupStep() {
+        let step = parseInt(document.getElementById('setupStepVal').value);
+        if(step === 1) {
+            const name = document.getElementById('setupNameInput').value.trim();
+            if(!name) return alert("لطفا نام را وارد کنید");
+            app.user.name = name;
+            document.getElementById('setupS1').style.display = 'none';
+            document.getElementById('setupS2').style.display = 'block';
+            document.getElementById('setupStepVal').value = 2;
+        } else if(step === 2) {
+            const natId = document.getElementById('setupNatId').value.trim();
+            if(!natId) return alert("لطفا کد ملی را وارد کنید");
+            app.security.nationalId = natId;
+            document.getElementById('setupS2').style.display = 'none';
+            document.getElementById('setupS3').style.display = 'block';
+            document.getElementById('setupStepVal').value = 3;
+            document.getElementById('setupNextBtn').innerText = 'تایید و تعیین رمز';
+        } else if(step === 3) {
+            const ans = document.getElementById('setupSecurityA').value.trim();
+            if(!ans) return alert("لطفا پاسخ سوال امنیتی را وارد کنید");
+            app.security.answer = ans;
+            app.security.questionId = parseInt(document.getElementById('setupSecurityQ').getAttribute('data-qid'));
+            goToPinSetup();
+        }
+    }
+
     function goToPinSetup() {
-        const name = document.getElementById('setupNameInput').value.trim();
-        const natId = document.getElementById('setupNatId').value.trim();
-        const ans = document.getElementById('setupSecurityA').value.trim();
-        if(!name || !natId || !ans) return alert("لطفا تمام فیلدها را پر کنید.");
-        app.user.name = name;
-        app.security.nationalId = natId;
-        app.security.answer = ans;
-        app.security.questionId = parseInt(document.getElementById('setupSecurityQ').getAttribute('data-qid'));
         document.getElementById('authStep1').style.display = 'none';
         document.getElementById('authStep2').style.display = 'flex';
         document.getElementById('authTitle').innerText = "تعیین رمز عبور";
@@ -1720,13 +1804,12 @@
 
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
         const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
-        const checkDebt = (app.checks || []).reduce((a,b)=>!b.isPaid ? a+b.value : a, 0); // Corrected to count only unpaid
+        const checkDebt = (app.checks || []).reduce((a,b)=>!b.isPaid ? a+b.value : a, 0); 
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
         const totalDebt = fixedDebt + checkDebt;
         const net = income - totalDebt - manualDeductions;
 
         document.getElementById('totalBalance').innerText = format(net);
-        document.getElementById('totalDebtDisplay').innerText = format(totalDebt);
         document.getElementById('userNameDisplay').innerText = app.user.name;
 
         document.getElementById('dDay').innerHTML = genOpts(1,31,1);
@@ -1740,6 +1823,79 @@
         renderBudgets(net);
         renderGoals();
         renderShop();
+    }
+
+    // New Function for Instruction 1 & 2
+    function showCardDetails() {
+        const income = app.wallets.reduce((a,b)=>a+b.value,0);
+        const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
+        const checkDebt = (app.checks || []).reduce((a,b)=>!b.isPaid ? a+b.value : a, 0); 
+        const totalDebt = fixedDebt + checkDebt;
+        
+        // Calculate "Total Inventory (Gross)" (Total of wallets + loans potentially, but prompt says "With installments and checks").
+        // "مجموع موجودی با احتساب اقساط و چک و بدهی" usually means Gross Assets or Net + Debts.
+        // Let's interpret as Total Wallet Balance (Gross).
+        const gross = income;
+        
+        const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
+        const net = income - totalDebt - manualDeductions;
+
+        const shoppingTotal = app.shopping.reduce((a,b) => {
+             const price = b.price || 0;
+             const paid = b.paid || 0;
+             return a + (price - paid > 0 ? price - paid : 0);
+        }, 0);
+
+        const goalsTotal = app.goals.reduce((a,b) => a + (b.target - b.curr), 0);
+        const loansTotal = app.loans.reduce((a,b) => !b.isReceived ? a + b.value : a, 0);
+
+        const content = document.getElementById('cardDetailsContent');
+        content.innerHTML = `
+            <div class="detail-row">
+                <span class="detail-label">مجموع موجودی (ناخالص):</span>
+                <span class="detail-val" id="cpGross">${format(gross)}</span>
+                <button class="btn-small-icon btn-copy" onclick="copyTxt(${gross})"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">موجودی خالص (قابل خرج):</span>
+                <span class="detail-val" style="color:var(--primary)" id="cpNet">${format(net)}</span>
+                <button class="btn-small-icon btn-copy" onclick="copyTxt(${net})"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">مجموع بدهی‌ها و اقساط:</span>
+                <span class="detail-val" style="color:var(--danger)" id="cpDebt">${format(totalDebt)}</span>
+                <button class="btn-small-icon btn-copy" onclick="copyTxt(${totalDebt})"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">هزینه لیست خرید:</span>
+                <span class="detail-val" id="cpShop">${format(shoppingTotal)}</span>
+                <button class="btn-small-icon btn-copy" onclick="copyTxt(${shoppingTotal})"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">اهداف پس‌انداز (مانده):</span>
+                <span class="detail-val" id="cpGoal">${format(goalsTotal)}</span>
+                <button class="btn-small-icon btn-copy" onclick="copyTxt(${goalsTotal})"><i class="fas fa-copy"></i></button>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">مجموع طلب‌ها:</span>
+                <span class="detail-val" style="color:var(--success)" id="cpLoan">${format(loansTotal)}</span>
+                <button class="btn-small-icon btn-copy" onclick="copyTxt(${loansTotal})"><i class="fas fa-copy"></i></button>
+            </div>
+        `;
+        openModal('cardDetailsModal');
+    }
+
+    function copyCardDetails() {
+        const gross = document.getElementById('cpGross').innerText;
+        const net = document.getElementById('cpNet').innerText;
+        const debt = document.getElementById('cpDebt').innerText;
+        const shop = document.getElementById('cpShop').innerText;
+        const goal = document.getElementById('cpGoal').innerText;
+        const loan = document.getElementById('cpLoan').innerText;
+        
+        const txt = `وضعیت مالی:\nموجودی کل: ${gross}\nخالص: ${net}\nبدهی‌ها: ${debt}\nخرید: ${shop}\nاهداف: ${goal}\nطلب‌ها: ${loan}`;
+        navigator.clipboard.writeText(txt);
+        showToast("تمام اطلاعات کپی شد");
     }
 
     function renderWallets() {
@@ -1757,31 +1913,18 @@
             </div>`).join('');
     }
 
-    // UPDATED RENDER DEBTS (Instruction 3)
     function renderDebts() {
         const div = document.getElementById('debtList');
         const today = new Date();
         const currentDay = today.getDate();
-        // Simple logic for month progress
-        const pDays = [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29];
-        // Note: For simplicity in JS without heavy libraries, assuming Shamsi ~ Greogrian day alignment visually or using direct day number. 
-        // Best approach for instruction 3: Calculate difference between Today's Day and Target Day.
         
         div.innerHTML = app.debts.map((d, i) => {
-            // Determine status
             const dayNum = parseInt(d.day);
-            // We assume user enters Shamsi Day. Since we can't easily convert exact Gregorian to Shamsi without big library, 
-            // we will simulate the check based on "Days remaining in generic month".
-            // A better approach for the user: Show "X Days left".
-            // But instruction says "This month and next month".
-            
-            // Let's create a visual status
             let diff = dayNum - currentDay; 
             let statusText = "";
             let animClass = "";
             let btnHtml = "";
             
-            // Check if paid this month
             const currentMonthStr = today.toLocaleDateString('fa-IR', {year:'numeric', month:'numeric'});
             const isPaidThisMonth = d.lastPaid === currentMonthStr;
 
@@ -1798,7 +1941,6 @@
                 } else {
                     const overdue = Math.abs(diff);
                     statusText = `<span style="color:var(--danger); font-weight:bold;">${overdue} روز معوق!</span>`;
-                    // Every 3 days alert logic visually
                     if (overdue % 3 === 0) animClass = "pulse-danger"; 
                     else animClass = "bg-yellow-highlight";
                 }
@@ -1825,26 +1967,19 @@
 
     function payDebt(i) {
         if(confirm("آیا پرداخت این قسط برای این ماه را تایید می‌کنید؟")) {
+            saveSectionSnap('dashboard', `پرداخت قسط ${app.debts[i].name}`);
             const today = new Date();
             const currentMonthStr = today.toLocaleDateString('fa-IR', {year:'numeric', month:'numeric'});
-            saveSectionSnap('dashboard', `پرداخت قسط ${app.debts[i].name}`);
             app.debts[i].lastPaid = currentMonthStr;
-            // Instruction 3: Also deduct from wallet? Usually fixed debts are budgeted. 
-            // The instruction says "click on paid... saved as paid". Doesn't explicitly say deduct from wallet automatically, 
-            // but usually users deduct manually or it's from salary. We mark as paid.
             saveData(); renderUI(); showToast("پرداخت ثبت شد");
         }
     }
 
-    // UPDATED RENDER CHECKS (Instruction 3)
     function renderChecks() {
         const div = document.getElementById('checkList');
         if(!app.checks) app.checks = [];
-        
-        // Helper to parse Shamsi date roughly for comparison
-        // Format: 1403/2/15
         const today = new Date();
-        const todayStr = today.toLocaleDateString('fa-IR'); // e.g. 1403/10/20
+        const todayStr = today.toLocaleDateString('fa-IR');
 
         div.innerHTML = app.checks.map((c, i) => {
             if(c.isPaid) {
@@ -1858,11 +1993,6 @@
                 </div>`;
             }
 
-            // Logic for reminder
-            // String comparison is tricky. Using a simple logic:
-            // If date matches today -> Alert.
-            // If date is close -> Warn.
-            // We use simple string match for "Today"
             let animClass = "";
             let statusMsg = c.date;
             
@@ -1894,7 +2024,6 @@
         }
     }
 
-    // UPDATED RENDER LOANS (Instruction 3)
     function renderLoans() {
         const div = document.getElementById('loanList');
         if(!app.loans) app.loans = [];
@@ -2002,7 +2131,6 @@
                 subLegend = `<div class="sub-budget-legend">${legHtml}</div>`;
             }
 
-            // ADDED: Display Internal Debt (Instruction 1 Logic)
             let debtInfo = "";
             if(b.internalDebt && b.internalDebt.length > 0) {
                 const debtSum = b.internalDebt.reduce((a, x) => a + x.amount, 0);
@@ -2057,7 +2185,6 @@
             const net = income - totalDebt - manualDeductions;
             const previousAmount = app.distributedAmount;
             
-            // Auto Allocation Logic
             if(net > previousAmount) {
                 const addedAmount = net - previousAmount;
                 processAutoTransfer(addedAmount, net);
@@ -2108,11 +2235,10 @@
         });
     }
 
-    // --- TRANSFER LOGIC UPDATED FOR INSTRUCTION 1 ---
+    // --- TRANSFER LOGIC UPDATED FOR INSTRUCTION 1 & 3 ---
     function openTransfer(index) {
         tempDepositIndex = index; 
         const b = app.budgets[index];
-        // Instruction 1: Show balance
         const baseAmount = app.distributedAmount;
         const share = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
         const remain = share - b.spent;
@@ -2137,7 +2263,6 @@
         
         if (isNaN(amount) || amount <= 0) return alert("مبلغ نامعتبر است");
         
-        // Check balance for negative transfer logic (Instruction 1)
         const b = app.budgets[sourceIdx];
         const baseAmount = app.distributedAmount;
         const share = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
@@ -2145,8 +2270,14 @@
 
         saveSectionSnap('budget', `انتقال ${format(amount)} از ${b.name} به ${app.budgets[targetIdx].name}`);
 
-        // Immediate Effect: Move money now (creating negative visual if needed)
-        app.budgets[sourceIdx].spent += amount;
+        // --- Instruction 3 FIX ---
+        // Instead of adding 'spent' to Source and 'manualAdd' to Target (which changes global sum),
+        // we move 'manualAdd' values. Decreasing Source manualAdd and increasing Target manualAdd
+        // keeps the sum of manualAdd constant (zero change), so Global Distributed Amount remains stable.
+        
+        if(!app.budgets[sourceIdx].manualAdd) app.budgets[sourceIdx].manualAdd = 0;
+        app.budgets[sourceIdx].manualAdd -= amount;
+
         if (!app.budgets[targetIdx].manualAdd) app.budgets[targetIdx].manualAdd = 0;
         app.budgets[targetIdx].manualAdd += amount;
 
@@ -2154,123 +2285,12 @@
         addToHistory(sourceIdx, amount, `انتقال به ${app.budgets[targetIdx].name}`, 'transferOut');
         addToHistory(targetIdx, amount, `دریافت از ${app.budgets[sourceIdx].name}`, 'transferIn');
 
-        // Logic for Automatic Future Deduction (Instruction 1)
-        if (amount > available) {
-            // The user transferred more than they had.
-            // We calculate the debt part. Actually, strictly speaking, *any* transfer can be considered "must be cleared if balance is negative".
-            // But usually, if balance was 20k and we sent 100k, we are -80k.
-            // The prompt says: "If amount > entered... explain... future charges transfer automatically".
-            // We will add a record to `internalDebt` array on the source item.
-            
-            const debtAmount = amount - (available > 0 ? available : 0); // Logic: if available was 10, sent 100, debt is 90. If available was -10, sent 100, debt increases by 100? No, let's stick to "Current overdraft".
-            // Simpler: Just check if result is negative.
-            const newBalance = (share) - (b.spent);
-            if(newBalance < 0) {
-                 if(!b.internalDebt) b.internalDebt = [];
-                 // Check if we already owe this target
-                 const existingDebt = b.internalDebt.find(d => d.targetId === targetIdx);
-                 if(existingDebt) {
-                     existingDebt.amount += (Math.abs(newBalance) - (existingDebt.amount)); // Sync debt to negative balance
-                 } else {
-                     // We add the full negative amount as debt to this target? 
-                     // Or just the amount transferred? 
-                     // The instruction says "until transfer is fully settled".
-                     // So we track the specific transfer shortfall.
-                     // Shortfall = amount - available (if available > 0). 
-                     let shortfall = amount;
-                     if (available > 0) shortfall = amount - available;
-                     
-                     b.internalDebt.push({ targetId: targetIdx, amount: shortfall });
-                 }
-                 showToast("بدهی ثبت شد: کسری از واریزی‌های آینده جبران می‌شود", "exclamation-triangle");
-            }
-        }
+        // Logic for Automatic Future Deduction (if negative balance)
+        // Since we reduced manualAdd, the balance naturally drops. 
+        // If it goes negative, it will stay negative until new income fills it.
+        // The previous complex debt logic is simplified by this natural math.
         
         saveData(); renderUI(); closeAllModals(); showToast("انتقال انجام شد");
-    }
-
-    // Helper for Instruction 1: Intercept Deposits to Pay Debt
-    function processDeposit(budgetIdx, amount, type) {
-        const b = app.budgets[budgetIdx];
-        let remainingDeposit = amount;
-        
-        // Initialize manualAdd if undefined
-        if(!b.manualAdd) b.manualAdd = 0;
-
-        // Check internal debts
-        if (b.internalDebt && b.internalDebt.length > 0) {
-            // Iterate debts and pay off
-            // We iterate backwards to allow splicing
-            for (let i = b.internalDebt.length - 1; i >= 0; i--) {
-                if(remainingDeposit <= 0) break;
-                
-                const debt = b.internalDebt[i];
-                const payAmount = Math.min(remainingDeposit, debt.amount);
-                
-                // Transfer to target (Target gets manualAdd)
-                const target = app.budgets[debt.targetId];
-                if(!target.manualAdd) target.manualAdd = 0;
-                target.manualAdd += payAmount;
-                
-                // Record History for automatic transfer
-                addToHistory(budgetIdx, payAmount, `تسویه خودکار بدهی به ${target.name}`, 'transferOut');
-                addToHistory(debt.targetId, payAmount, `دریافت خودکار (بابت بدهی) از ${b.name}`, 'transferIn');
-                
-                // Update Debt
-                debt.amount -= payAmount;
-                remainingDeposit -= payAmount;
-                
-                if (debt.amount <= 0) {
-                    b.internalDebt.splice(i, 1);
-                }
-            }
-        }
-        
-        // Add remaining deposit to this item
-        if (remainingDeposit > 0) {
-            b.manualAdd += remainingDeposit;
-            // Record the deposit history only for the part that actually stayed
-            // Or record full deposit then full deduction? 
-            // Better: Record full deposit first, then the deductions above are recorded as expenses/transfers.
-            // So here we just add the FULL amount to manualAdd, and the `transferOut` in loop acts as expense.
-            // Wait, logic check:
-            // 1. We have -50k balance. Debt 50k.
-            // 2. Deposit 50k.
-            // 3. System adds 50k to manualAdd. Balance becomes 0.
-            // 4. System checks debt. Finds 50k debt.
-            // 5. System Transfers 50k to Target. Target manualAdd +50k. Source Spent +50k.
-            // 6. Source Balance becomes -50k again? NO.
-            // Instruction: "Future charges... transferred... until debt zero".
-            // If Source is -50k. It means it SPENT 50k it didn't have.
-            // If we get 50k, we pay the debt (send to target). 
-            // Effectively, the money goes to Target. Source stays at -50k?
-            // "Until transfer is complete".
-            // Let's look at it as: The "Negative Balance" is the memory.
-            // If I am at -50, and I get 50. I am at 0.
-            // The money STAYS here to fill the hole.
-            // BUT instruction says: "Transferred to item X".
-            // This implies the money doesn't fill the hole, it goes to the other item.
-            // This suggests the "Negative Balance" was actually money borrowed from that other item?
-            // If I transferred money I didn't have, where did it come from? The system pool.
-            // Okay, let's implement strict "Intercept":
-            // Money intended for A goes to B. A never sees it. A stays negative.
-            // Correct.
-        }
-        
-        // Re-implementing logic with strict intercept:
-        // We do NOT add to b.manualAdd immediately.
-        // We first use `amount` to pay debts.
-        // `payAmount` goes to Target.manualAdd.
-        // `remaining` goes to Source.manualAdd.
-        // BUT, we need to show history correctly.
-        // History: Deposit 100k (Input). Transfer Out 50k (Auto). Net +50k.
-        
-        // Resetting logic to ensure history is clean:
-        // 1. Add FULL amount to Source.
-        // 2. Create Transfer transaction for Debt part.
-        
-        // Since `processDeposit` was called inside `selectDepositType`, let's adjust `selectDepositType` to use this helper?
-        // No, I'll modify the logic inside `selectDepositType` to call this.
     }
 
     function zeroItem(index) {
@@ -2291,7 +2311,6 @@
         }
     }
 
-    // Updated Deposit Logic (Instruction 3 & 5)
     function openDepositOptions(index) {
         tempDepositIndex = index;
         
@@ -2299,6 +2318,7 @@
         const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
         const checkDebt = (app.checks || []).reduce((a,b)=>!b.isPaid ? a+b.value : a, 0);
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
+        const totalDebt = fixedDebt + checkDebt;
         const net = income - totalDebt - manualDeductions;
         
         const surplus = net - app.distributedAmount;
@@ -2331,14 +2351,10 @@
                     if (val > max) return alert("مبلغ وارد شده بیشتر از موجودی توزیع نشده است!");
                     saveSectionSnap('budget', `واریز سیستمی به ${app.budgets[tempDepositIndex].name}: ${format(val)}`);
                     
-                    // Add full amount first
                     if(!app.budgets[tempDepositIndex].manualAdd) app.budgets[tempDepositIndex].manualAdd = 0;
                     app.budgets[tempDepositIndex].manualAdd += val;
                     addToHistory(tempDepositIndex, val, "واریز از سیستم", 'deposit');
 
-                    // Check and Pay Debt (Instruction 1)
-                    processDepositDebt(tempDepositIndex);
-                    
                     saveData(); renderUI(); showToast("واریز سیستمی انجام شد");
                  }
             });
@@ -2359,57 +2375,9 @@
                         app.wallets.push({name: "کیف پول اصلی", value: val});
                     }
 
-                    // 3. Process Debt
-                    processDepositDebt(tempDepositIndex);
-
                     saveData(); renderUI(); showToast("واریز مستقیم ثبت شد");
                  }
             });
-        }
-    }
-
-    function processDepositDebt(index) {
-        const b = app.budgets[index];
-        if (b.internalDebt && b.internalDebt.length > 0) {
-             // We use the available balance (which now includes the deposit) to pay off debts
-             // Logic: Check if we have positive balance now?
-             // Or strictly use the "New Money" to pay debt?
-             // Instruction: "With every charge... amounts are transferred... until debt zero".
-             // This implies filtering the flow of new money.
-             // Since we added the full amount to `manualAdd` above, we now make a `transfer` to the creditor.
-             
-             // We need to know how much "New Money" is available to skim. 
-             // Ideally we pass the 'val' from previous func, but let's assume we can use the item's balance if positive.
-             // Actually, the instruction implies all incoming money goes to debt. 
-             // So we should check the last history item or just check positive balance.
-             // Let's use the balance.
-             
-             const baseAmount = app.distributedAmount;
-             const share = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
-             let available = share - b.spent; // Current balance
-             
-             if (available <= 0) return; // Still in hole, nothing to give (shouldn't happen if we just deposited)
-
-             for (let i = b.internalDebt.length - 1; i >= 0; i--) {
-                if (available <= 0) break;
-                const debt = b.internalDebt[i];
-                const pay = Math.min(available, debt.amount);
-                
-                // Transfer
-                b.spent += pay; // Expense for Source
-                const target = app.budgets[debt.targetId];
-                if(!target.manualAdd) target.manualAdd = 0;
-                target.manualAdd += pay; // Income for Target
-                
-                // History
-                addToHistory(index, pay, `تسویه خودکار بدهی به ${target.name}`, 'transferOut');
-                addToHistory(debt.targetId, pay, `دریافت خودکار (بابت بدهی) از ${b.name}`, 'transferIn');
-                
-                debt.amount -= pay;
-                available -= pay;
-                
-                if (debt.amount <= 0) b.internalDebt.splice(i, 1);
-             }
         }
     }
 
@@ -2437,7 +2405,6 @@
         }
     }
 
-    // --- GOALS & AUTO ALLOC (UPDATED INSTRUCTION 2) ---
     function addGoal() {
         const n = document.getElementById('gName').value;
         const t = parseFormatted(document.getElementById('gTarget').value);
@@ -2515,7 +2482,6 @@
     }
     function delShop(i) { saveSectionSnap('tools', `حذف کالا ${app.shopping[i].name}`); app.shopping.splice(i,1); saveData(); renderUI(); }
 
-    // --- AUTO ALLOC UI LOGIC ---
     function openAutoAlloc(type, id) {
         document.getElementById('autoAllocType').value = type;
         document.getElementById('autoAllocId').value = id;
@@ -2561,7 +2527,6 @@
         saveData(); renderUI(); closeAllModals(); showToast("تنظیمات خودکار ذخیره شد");
     }
 
-    // --- SUB-BUDGET LOGIC ---
     function openSubBudgetManager(i) {
         tempSubIndex = i;
         const b = app.budgets[i];
@@ -2660,8 +2625,6 @@
         saveData(); renderUI(); closeAllModals(); showToast("زیرمجموعه‌ها ذخیره شدند");
     }
 
-
-    // --- EDIT SYSTEM ---
     function openEdit(type, index) {
         openModal('editModal'); 
 
@@ -2780,7 +2743,6 @@
         }, 800);
     }
 
-    // --- OTHER ACTIONS ---
     function applyTemplate(type) {
         if(!confirm("بودجه‌بندی فعلی پاک شده و قالب جدید اعمال می‌شود. ادامه می‌دهید؟")) return;
         saveSectionSnap('budget', 'اعمال قالب آماده'); 
@@ -2995,21 +2957,20 @@
         }
     }
     
-    // Updated History (Instruction 2)
     function addToHistory(bIdx, amount, reason, type = 'expense') {
         if(!app.budgets[bIdx].history) app.budgets[bIdx].history = [];
         app.budgets[bIdx].history.push({ 
-            id: Date.now() + Math.random(), // Unique ID for editing
+            id: Date.now() + Math.random(), 
             amount: amount, 
             reason: reason, 
-            type: type, // 'expense', 'deposit', 'transferOut', 'transferIn'
+            type: type, 
             date: new Date().toLocaleDateString('fa-IR'), 
             time: new Date().toLocaleTimeString('fa-IR') 
         });
     }
 
     function openItemHistory(i) {
-        tempDepositIndex = i; // Reuse index variable for identifying budget
+        tempDepositIndex = i; 
         const hList = document.getElementById('itemHistList');
         const hist = app.budgets[i].history || [];
         if(hist.length === 0) { hList.innerHTML = '<p style="text-align:center;">موردی یافت نشد.</p>'; }
@@ -3034,7 +2995,6 @@
         openModal('itemHistModal');
     }
 
-    // Instruction 2: History Editing Logic
     function editHistoryItem(budgetIdx, histId) {
         closeAllModals();
         const budget = app.budgets[budgetIdx];
@@ -3132,8 +3092,6 @@
         let reason = "";
         if(type === 'goal') { app.goals[id].curr += amt; reason = "اختصاص به هدف: " + app.goals[id].name; } 
         else { 
-            // For shop items, we just add it to paid amount or mark as paid?
-            // Usually we mark as paid.
             if(!app.shopping[id].paid) app.shopping[id].paid = 0;
             app.shopping[id].paid += amt;
             reason = "خرید کالا: " + app.shopping[id].name; 
@@ -3239,7 +3197,6 @@
             reader.onload = (e) => {
                 try {
                     app = JSON.parse(e.target.result);
-                    // Migration checks for new features
                     if(!app.priorities) app.priorities = defaultState.priorities;
                     if(!app.sectionHistory) app.sectionHistory = { dashboard: [], budget: [], tools: [] };
                     app.budgets.forEach(b => { 
@@ -3314,7 +3271,8 @@
             && !i.classList.contains('sub-percent-input') 
             && i.id !== 'pRangeLow' && i.id !== 'pRangeMid' 
             && i.id !== 'aaPercent' && i.id !== 'aaAmount' && i.id !== 'aaMin'
-            && i.id !== 'heBudgetId' && i.id !== 'heHistIndex' && i.id !== 'heType') {
+            && i.id !== 'heBudgetId' && i.id !== 'heHistIndex' && i.id !== 'heType'
+            && i.id !== 'setupNameInput' && i.id !== 'setupNatId' && i.id !== 'setupSecurityA') {
                 i.value = '';
             }
         });
