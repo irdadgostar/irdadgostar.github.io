@@ -644,6 +644,25 @@
         .si-orange { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
         .si-gray { background: rgba(100, 116, 139, 0.1); color: var(--text-sec); }
 
+        /* Custom Toggle Switch (IOS Style) */
+        .ios-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 24px;
+        }
+        .ios-switch input { opacity: 0; width: 0; height: 0; }
+        .switch-slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc; transition: .4s; border-radius: 34px;
+        }
+        .switch-slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px;
+            left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .switch-slider { background-color: var(--primary); }
+        input:checked + .switch-slider:before { transform: translateX(16px); }
+
         /* Details Modal Row */
         .detail-row {
             display: flex; justify-content: space-between; align-items: center;
@@ -876,7 +895,7 @@
         </div>
     </div>
 
-    <!-- TAB 4: SETTINGS (Redesigned per Instruction 3) -->
+    <!-- TAB 4: SETTINGS (Redesigned per Instruction 3 & 5) -->
     <div id="view-settings" class="tab-pane">
         <div class="header-row">
             <h3>تنظیمات سیستم</h3>
@@ -899,6 +918,16 @@
                         <div class="settings-text">تغییر نام کاربر</div>
                     </div>
                     <i class="fas fa-chevron-left settings-chevron"></i>
+                </div>
+                <div class="settings-item">
+                    <div style="display:flex; align-items:center;">
+                        <div class="settings-item-icon si-red"><i class="fas fa-money-bill-wave-alt"></i></div>
+                        <div class="settings-text">کسر خودکار اقساط/چک از حساب اصلی</div>
+                    </div>
+                    <label class="ios-switch">
+                        <input type="checkbox" id="globalDebtToggle" onchange="toggleGlobalDebt(this)">
+                        <span class="switch-slider"></span>
+                    </label>
                 </div>
                 <label class="settings-item" style="cursor:pointer; display:flex;">
                     <div style="display:flex; align-items:center;">
@@ -1178,6 +1207,18 @@
                 <span class="money-unit currency-text">تومان</span>
             </div>
         </div>
+        
+        <!-- Instruction 1: Checkbox for Deduction -->
+        <div id="editDeductWrapper" style="display:none; margin-bottom:15px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.03); padding:10px 15px; border-radius:12px;">
+                <span>کسر از موجودی کل</span>
+                <label class="ios-switch">
+                    <input type="checkbox" id="editDeductCheck">
+                    <span class="switch-slider"></span>
+                </label>
+            </div>
+        </div>
+
         <div id="editDateWrapper" style="display:none;">
             <label>تاریخ:</label>
             <div class="date-picker-row" id="editDateRow"></div>
@@ -1229,6 +1270,13 @@
             <input type="text" id="dVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
             <span class="money-unit currency-text">تومان</span>
         </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; background:rgba(0,0,0,0.03); padding:10px 15px; border-radius:12px;">
+            <span>کسر از موجودی کل</span>
+            <label class="ios-switch">
+                <input type="checkbox" id="dDeduct" checked>
+                <span class="switch-slider"></span>
+            </label>
+        </div>
         <label>تاریخ پرداخت (روز):</label>
         <div class="date-picker-row">
             <select id="dDay" style="direction: rtl;"></select>
@@ -1249,6 +1297,13 @@
         <div class="money-input-wrapper">
             <input type="text" id="cVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
             <span class="money-unit currency-text">تومان</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; background:rgba(0,0,0,0.03); padding:10px 15px; border-radius:12px;">
+            <span>کسر از موجودی کل</span>
+            <label class="ios-switch">
+                <input type="checkbox" id="cDeduct" checked>
+                <span class="switch-slider"></span>
+            </label>
         </div>
         <label>تاریخ سررسید:</label>
         <div class="date-picker-row" id="checkDateRow"></div>
@@ -1397,7 +1452,7 @@
     </div>
 </div>
 
-<!-- Updated Priority Settings Modal (Instruction 2) -->
+<!-- Updated Priority Settings Modal (Instruction 3) -->
 <div id="prioritySettingsModal" class="modal">
     <div class="modal-content">
         <h3>مدیریت هوشمند اولویت‌ها</h3>
@@ -1476,6 +1531,7 @@
     const defaultState = {
         security: { hasPin: false, pin: "", isSetup: false, questionId: 0, answer: "", nationalId: "" },
         user: { name: "", theme: "light", currency: "toman", startDate: Date.now() },
+        settings: { deductDebtsGlobal: true },
         wallets: [],
         debts: [], 
         checks: [], 
@@ -1854,6 +1910,9 @@
         document.getElementById('currBtnText').innerText = curName;
         document.getElementById('cardCurrency').innerText = curName;
         document.querySelectorAll('.currency-text').forEach(el => el.innerText = curName);
+        
+        // Update Toggle Switch State
+        document.getElementById('globalDebtToggle').checked = app.settings.deductDebtsGlobal;
 
         if(app.user.startDate) {
             const diff = Date.now() - app.user.startDate;
@@ -1865,11 +1924,36 @@
         }
 
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
-        const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
-        const checkDebt = (app.checks || []).reduce((a,b)=>!b.isPaid ? a+b.value : a, 0); 
+        
+        // Calculate Deductible Debts based on Global Setting & Item Settings (Instruction 1)
+        let totalDeductibleDebt = 0;
+        let totalVisibleDebt = 0; // For Card details
+
+        app.debts.forEach(d => {
+            totalVisibleDebt += d.value;
+            // Default to true if undefined
+            const shouldDeduct = (d.deductFromBalance !== undefined) ? d.deductFromBalance : true;
+            if(app.settings.deductDebtsGlobal && shouldDeduct) {
+                totalDeductibleDebt += d.value;
+            }
+        });
+
+        if(app.checks) {
+            app.checks.forEach(c => {
+                if(!c.isPaid) {
+                    totalVisibleDebt += c.value;
+                    const shouldDeduct = (c.deductFromBalance !== undefined) ? c.deductFromBalance : true;
+                    if(app.settings.deductDebtsGlobal && shouldDeduct) {
+                        totalDeductibleDebt += c.value;
+                    }
+                }
+            });
+        }
+
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
-        const totalDebt = fixedDebt + checkDebt;
-        const net = income - totalDebt - manualDeductions;
+        
+        // Net for Distribution
+        const net = income - totalDeductibleDebt - manualDeductions;
 
         document.getElementById('totalBalance').innerText = format(net);
         document.getElementById('userNameDisplay').innerText = app.user.name;
@@ -1882,21 +1966,36 @@
         renderDebts();
         renderChecks(); 
         renderLoans(); 
-        renderBudgets(net);
+        renderBudgets(net); // Pass calculated Net
         renderGoals();
         renderShop();
     }
 
     function showCardDetails() {
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
-        const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
-        const checkDebt = (app.checks || []).reduce((a,b)=>!b.isPaid ? a+b.value : a, 0); 
-        const totalDebt = fixedDebt + checkDebt;
+        
+        // Calculate debts
+        let totalDebt = 0;
+        app.debts.forEach(d => totalDebt += d.value);
+        if(app.checks) app.checks.forEach(c => { if(!c.isPaid) totalDebt += c.value; });
         
         const gross = income;
         
+        // Recalculate Net logic same as renderUI
+        let totalDeductibleDebt = 0;
+        app.debts.forEach(d => {
+            const shouldDeduct = (d.deductFromBalance !== undefined) ? d.deductFromBalance : true;
+            if(app.settings.deductDebtsGlobal && shouldDeduct) totalDeductibleDebt += d.value;
+        });
+        if(app.checks) app.checks.forEach(c => {
+            if(!c.isPaid) {
+                const shouldDeduct = (c.deductFromBalance !== undefined) ? c.deductFromBalance : true;
+                if(app.settings.deductDebtsGlobal && shouldDeduct) totalDeductibleDebt += c.value;
+            }
+        });
+
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
-        const net = income - totalDebt - manualDeductions;
+        const net = income - totalDeductibleDebt - manualDeductions;
 
         const shoppingTotal = app.shopping.reduce((a,b) => {
              const price = b.price || 0;
@@ -1937,7 +2036,7 @@
         openModal('cardDetailsModal');
     }
 
-    // New Copy Format (Instruction 4)
+    // Instruction 4: Exact copy format
     function copyCardDetails() {
         const gross = document.getElementById('cpGross').innerText;
         const net = document.getElementById('cpNet').innerText;
@@ -1984,12 +2083,11 @@
             </div>`).join('');
     }
 
-    // UPDATED DEBT LOGIC (Instruction 1)
+    // Instruction 1: Corrected Date Logic
     function renderDebts() {
         const div = document.getElementById('debtList');
         const todayDate = new Date();
-        // Extract day using toLocaleDateString to be safe with timezones/calendars
-        const currentDay = parseInt(todayDate.toLocaleDateString('fa-IR-u-nu-latn').split('/')[2]);
+        const currentDay = todayDate.getDate(); // Uses system day (1-31)
         const currentMonthYear = todayDate.toLocaleDateString('fa-IR-u-nu-latn').split('/').slice(0, 2).join('/');
         
         div.innerHTML = app.debts.map((d, i) => {
@@ -1997,22 +2095,21 @@
             let statusText = "";
             let animClass = "";
             let btnHtml = "";
-            let isPaidThisMonth = false;
-
-            // Check if paid in current Solar Hijri Month
-            if (d.lastPaid === currentMonthYear) {
-                isPaidThisMonth = true;
-            }
+            let isPaidThisMonth = (d.lastPaid === currentMonthYear);
+            
+            // Instruction 1: Deduction Indicator
+            const shouldDeduct = (d.deductFromBalance !== undefined) ? d.deductFromBalance : true;
+            const deductIcon = (!app.settings.deductDebtsGlobal || !shouldDeduct) 
+                ? '<i class="fas fa-eye-slash" title="عدم کسر از موجودی" style="color:var(--text-sec); margin-left:5px;"></i>' 
+                : '';
 
             if (isPaidThisMonth) {
                 statusText = `<span style="color:var(--success); font-weight:bold;">پرداخت شد <i class="fas fa-check"></i></span>`;
-                // Calculate next month name/date simple logic (visual only)
                 statusText += `<br><small style="color:var(--text-sec)">سررسید بعدی: ${dueDay} ماه بعد</small>`;
             } else {
-                // If not paid, check dates
-                // Logic: 
-                // If today > dueDay: It is overdue for THIS month.
-                // If today <= dueDay: It is due coming up THIS month.
+                // Correct Logic:
+                // If currentDay > dueDay: Overdue within this month.
+                // If currentDay <= dueDay: Upcoming within this month.
                 
                 if (currentDay > dueDay) {
                     const daysOverdue = currentDay - dueDay;
@@ -2033,7 +2130,7 @@
             return `
             <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px; transition:0.3s;" class="${animClass}">
                 <div>
-                    <span style="font-weight:bold;">${d.name}</span>
+                    <span style="font-weight:bold;">${d.name} ${deductIcon}</span>
                     <div style="font-size:0.8rem; margin-top:4px; color:var(--text-sec); line-height:1.6;">${statusText}</div>
                 </div>
                 <div style="display:flex; align-items:center;">
@@ -2052,7 +2149,6 @@
         if(confirm("آیا پرداخت این قسط برای این ماه را تایید می‌کنید؟")) {
             saveSectionSnap('dashboard', `پرداخت قسط ${app.debts[i].name}`);
             const today = new Date();
-            // Store Year/Month (e.g., 1403/09) as the last paid token
             const currentMonthStr = today.toLocaleDateString('fa-IR-u-nu-latn').split('/').slice(0, 2).join('/');
             app.debts[i].lastPaid = currentMonthStr;
             saveData(); renderUI(); showToast("پرداخت ثبت شد");
@@ -2063,7 +2159,7 @@
         const div = document.getElementById('checkList');
         if(!app.checks) app.checks = [];
         const today = new Date();
-        const todayStr = today.toLocaleDateString('fa-IR');
+        const todayStr = today.toLocaleDateString('fa-IR'); // e.g., 1403/05/21
 
         div.innerHTML = app.checks.map((c, i) => {
             if(c.isPaid) {
@@ -2080,6 +2176,12 @@
             let animClass = "";
             let statusMsg = c.date;
             
+            // Deduction check
+            const shouldDeduct = (c.deductFromBalance !== undefined) ? c.deductFromBalance : true;
+            const deductIcon = (!app.settings.deductDebtsGlobal || !shouldDeduct) 
+                ? '<i class="fas fa-eye-slash" title="عدم کسر از موجودی" style="color:var(--text-sec); margin-left:5px;"></i>' 
+                : '';
+
             if (c.date === todayStr) {
                 animClass = "pulse-danger bg-yellow-highlight";
                 statusMsg = "سررسید امروز!";
@@ -2087,7 +2189,7 @@
             
             return `
             <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px;" class="${animClass}">
-                <div>${c.name} <br><small style="color:${animClass?'var(--danger)':'var(--text-sec)'}; font-weight:bold;">${statusMsg}</small></div>
+                <div>${c.name} ${deductIcon} <br><small style="color:${animClass?'var(--danger)':'var(--text-sec)'}; font-weight:bold;">${statusMsg}</small></div>
                 <div style="display:flex; align-items:center;">
                     <b style="color:var(--danger);">${format(c.value)}</b>
                     <span style="margin-right:15px; display:flex; gap:5px;">
@@ -2159,7 +2261,18 @@
         const distributeBtn = document.getElementById('btnDistribute');
         const distributableDisplay = document.getElementById('distributable');
         
-        if(net !== app.distributedAmount) {
+        // Instruction 1: Check Deficit logic
+        // Net has already been calculated in renderUI accounting for Deductible Debts.
+        // If Net < DistributedAmount, it's a deficit relative to what was already distributed.
+        // If Net < 0 (absolute deficit), distribution shouldn't work.
+
+        let deficitMode = false;
+        if (net < 0) {
+            deficitMode = true;
+            distributableDisplay.style.color = 'var(--danger)';
+            distributableDisplay.innerHTML = `<span style="font-size:1.2rem">کسری بودجه! (${format(Math.abs(net))}-)</span><br><small style="font-size:0.7rem; color:var(--text-sec)">تا زمان رفع کسری، توزیع متوقف است.</small>`;
+            distributeBtn.style.display = 'none';
+        } else if(net !== app.distributedAmount) {
             if (net > app.distributedAmount) {
                 const diff = net - app.distributedAmount;
                 distributeBtn.style.display = 'flex';
@@ -2167,7 +2280,7 @@
             } else {
                 distributeBtn.style.display = 'flex';
                 distributableDisplay.style.color = 'var(--warning)';
-                distributableDisplay.innerText = format(app.distributedAmount) + " (کسری)";
+                distributableDisplay.innerText = format(app.distributedAmount) + " (کسری توزیع)";
             }
         } else {
             distributeBtn.style.display = 'none';
@@ -2251,11 +2364,28 @@
     function triggerDistribution() {
         withLoading(() => {
             const income = app.wallets.reduce((a,b)=>a+b.value,0);
-            const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
-            const checkDebt = (app.checks || []).reduce((a,b)=>!b.isPaid ? a+b.value : a, 0);
+            
+            // Instruction 1: Recalculate Deductible Debts logic inside distribution
+            let totalDeductibleDebt = 0;
+            app.debts.forEach(d => {
+                const shouldDeduct = (d.deductFromBalance !== undefined) ? d.deductFromBalance : true;
+                if(app.settings.deductDebtsGlobal && shouldDeduct) totalDeductibleDebt += d.value;
+            });
+            if(app.checks) app.checks.forEach(c => {
+                if(!c.isPaid) {
+                    const shouldDeduct = (c.deductFromBalance !== undefined) ? c.deductFromBalance : true;
+                    if(app.settings.deductDebtsGlobal && shouldDeduct) totalDeductibleDebt += c.value;
+                }
+            });
+
             const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
-            const totalDebt = fixedDebt + checkDebt;
-            const net = income - totalDebt - manualDeductions;
+            const net = income - totalDeductibleDebt - manualDeductions;
+            
+            if (net < 0) {
+                toggleLoading(false);
+                return alert("خطا: موجودی حساب منفی است! امکان توزیع وجود ندارد.");
+            }
+
             const previousAmount = app.distributedAmount;
             
             if(net > previousAmount) {
@@ -2272,8 +2402,10 @@
     }
 
     function processAutoTransfer(addedAmount, currentNet) {
-        let totalDeducted = 0;
         app.goals.forEach(g => {
+            // Instruction 2: Skip if full
+            if(g.curr >= g.target) return;
+
             if(g.autoConfig && g.autoConfig.type !== 'none') {
                 const conf = g.autoConfig;
                 let sourceBalance = 0;
@@ -2372,12 +2504,17 @@
     function openDepositOptions(index) {
         tempDepositIndex = index;
         
+        // Recalculate net to show surplus
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
-        const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
-        const checkDebt = (app.checks || []).reduce((a,b)=>!b.isPaid ? a+b.value : a, 0);
+        let totalDeductibleDebt = 0;
+        app.debts.forEach(d => {
+            if(app.settings.deductDebtsGlobal && (d.deductFromBalance !== false)) totalDeductibleDebt += d.value;
+        });
+        if(app.checks) app.checks.forEach(c => {
+            if(!c.isPaid && app.settings.deductDebtsGlobal && (c.deductFromBalance !== false)) totalDeductibleDebt += c.value;
+        });
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
-        const totalDebt = fixedDebt + checkDebt;
-        const net = income - totalDebt - manualDeductions;
+        const net = income - totalDeductibleDebt - manualDeductions;
         
         const surplus = net - app.distributedAmount;
         const btn = document.getElementById('btnSystemDep');
@@ -2473,14 +2610,25 @@
         const div = document.getElementById('goalList');
         div.innerHTML = app.goals.map((g, i) => {
             const p = Math.min(100, Math.round((g.curr / g.target)*100));
-            const remaining = g.target - g.curr;
-            const autoBadge = g.autoConfig && g.autoConfig.type !== 'none' ? '<i class="fas fa-robot" style="color:var(--primary)" title="برداشت خودکار فعال"></i>' : '';
+            const remaining = Math.max(0, g.target - g.curr);
+            const isCompleted = (g.curr >= g.target);
+            
+            // Instruction 2: Success Message
+            let statusHtml = '';
+            if(isCompleted) {
+                statusHtml = `<div style="background:#ecfdf5; color:#059669; padding:8px; border-radius:10px; margin-top:5px; font-size:0.85rem; text-align:center; font-weight:bold;">
+                    <i class="fas fa-check-circle"></i> مبلغ مورد نظر جمع شد (تکمیل)
+                </div>`;
+            }
+
+            const autoBadge = (g.autoConfig && g.autoConfig.type !== 'none' && !isCompleted) ? '<i class="fas fa-robot" style="color:var(--primary)" title="برداشت خودکار فعال"></i>' : '';
+            
             return `
                 <div style="padding:15px; border-bottom:1px solid #eee;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                          <b style="font-size:1.05rem;">${g.name} ${autoBadge}</b> 
                          <span style="font-size:0.9rem;">
-                            <button class="btn-small-icon btn-settings" onclick="openAutoAlloc('goal', ${i})"><i class="fas fa-cog"></i></button>
+                            <button class="btn-small-icon btn-settings" onclick="openAutoAlloc('goal', ${i})" ${isCompleted ? 'disabled' : ''}><i class="fas fa-cog"></i></button>
                             <button class="btn-small-icon btn-edit" onclick="openEdit('goal', ${i})"><i class="fas fa-edit"></i></button>
                          </span>
                     </div>
@@ -2488,9 +2636,10 @@
                         <span>جمع‌شده: <b style="color:var(--success)">${format(g.curr)}</b></span>
                         <span>مانده: <b style="color:var(--danger)">${format(remaining)}</b></span>
                     </div>
-                    <div class="progress-bar"><div class="progress-fill" style="width:${p}%; background:var(--warning);"></div></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:${p}%; background:${isCompleted ? 'var(--success)' : 'var(--warning)'};"></div></div>
+                    ${statusHtml}
                     <div style="display:flex; gap:8px; margin-top:8px;">
-                         <button class="btn btn-primary" style="font-size:0.8rem; padding:6px 12px;" onclick="openAllocate('goal', ${i})">🔗 اختصاص بودجه</button>
+                         <button class="btn btn-primary" style="font-size:0.8rem; padding:6px 12px;" onclick="openAllocate('goal', ${i})" ${isCompleted ? 'disabled' : ''}>🔗 اختصاص بودجه</button>
                          <button class="btn btn-outline" style="font-size:0.8rem; padding:6px 12px;" onclick="addGoalMoneyDirect(${i})">+ مستقیم</button>
                          <button class="btn btn-danger" style="font-size:0.8rem; padding:6px 12px;" onclick="delGoal(${i})">×</button>
                     </div>
@@ -2514,11 +2663,20 @@
     function renderShop() {
         const div = document.getElementById('shopList');
         div.innerHTML = app.shopping.map((s, i) => {
-            const autoBadge = s.autoConfig && s.autoConfig.type !== 'none' ? '<i class="fas fa-robot" style="color:var(--primary)"></i>' : '';
             const paid = s.paid || 0;
             const price = s.price || 0;
             const remaining = price > 0 ? Math.max(0, price - paid) : 0;
+            const isCompleted = (price > 0 && paid >= price);
             
+            const autoBadge = (s.autoConfig && s.autoConfig.type !== 'none' && !isCompleted) ? '<i class="fas fa-robot" style="color:var(--primary)"></i>' : '';
+            
+            let statusHtml = '';
+            if(isCompleted) {
+                statusHtml = `<span style="display:block; width:100%; color:#059669; font-size:0.8rem; margin-top:5px; font-weight:bold;">
+                    <i class="fas fa-check"></i> مبلغ خرید تکمیل شد
+                </span>`;
+            }
+
             return `
             <div style="display:flex; justify-content:space-between; padding:15px; border-bottom:1px solid #eee; align-items:center; flex-wrap:wrap;">
                 <div style="flex:1;">
@@ -2528,10 +2686,11 @@
                         <span style="color:var(--success)">پرداخت: ${format(paid)}</span>
                         ${price ? ` | <span style="color:var(--danger)">مانده: ${format(remaining)}</span>` : ''}
                     </div>
+                    ${statusHtml}
                 </div>
                 <div style="display:flex; gap:8px; align-items:center; margin-top:5px;">
-                    <button class="btn btn-primary" style="font-size:0.8rem;" onclick="openAllocate('shop', ${i})">خرید</button>
-                    <button class="btn-small-icon btn-settings" onclick="openAutoAlloc('shop', ${i})"><i class="fas fa-cog"></i></button>
+                    <button class="btn btn-primary" style="font-size:0.8rem;" onclick="openAllocate('shop', ${i})" ${isCompleted ? 'disabled' : ''}>خرید</button>
+                    <button class="btn-small-icon btn-settings" onclick="openAutoAlloc('shop', ${i})" ${isCompleted ? 'disabled' : ''}><i class="fas fa-cog"></i></button>
                     <button class="btn-small-icon btn-edit" onclick="openEdit('shop', ${i})"><i class="fas fa-edit"></i></button>
                     <i class="fas fa-check-circle" style="cursor:pointer; font-size:1.4rem; color:var(--success);" onclick="delShop(${i})"></i>
                 </div>
@@ -2693,10 +2852,11 @@
         let showPercent = false;
         let showAmount = true;
         let showDate = false;
+        let showDeduct = false;
 
         if(type === 'wallet') item = app.wallets[index];
-        else if(type === 'debt') { item = app.debts[index]; showDate = true; }
-        else if(type === 'check') { item = app.checks[index]; showDate = true; }
+        else if(type === 'debt') { item = app.debts[index]; showDate = true; showDeduct = true; }
+        else if(type === 'check') { item = app.checks[index]; showDate = true; showDeduct = true; }
         else if(type === 'loan') { item = app.loans[index]; showDate = true; }
         else if(type === 'budget') { item = app.budgets[index]; showPercent = true; showAmount = false; }
         else if(type === 'goal') { item = app.goals[index]; }
@@ -2715,6 +2875,14 @@
             formatCurrency(document.getElementById('editVal'));
         } else {
             document.getElementById('editAmountWrapper').style.display = 'none';
+        }
+
+        // Instruction 1: Edit Modal Toggle
+        if(showDeduct) {
+            document.getElementById('editDeductWrapper').style.display = 'block';
+            document.getElementById('editDeductCheck').checked = (item.deductFromBalance !== undefined) ? item.deductFromBalance : true;
+        } else {
+            document.getElementById('editDeductWrapper').style.display = 'none';
         }
 
         if(showPercent) {
@@ -2755,11 +2923,13 @@
                 app.debts[index].name = newName;
                 app.debts[index].value = parseFormatted(document.getElementById('editVal').value);
                 app.debts[index].day = document.getElementById('editDDay').value;
+                app.debts[index].deductFromBalance = document.getElementById('editDeductCheck').checked;
             } else if(type === 'check') {
                 saveSectionSnap('dashboard', `ویرایش چک ${newName}`);
                 app.checks[index].name = newName;
                 app.checks[index].value = parseFormatted(document.getElementById('editVal').value);
                 app.checks[index].date = getDateString('editD');
+                app.checks[index].deductFromBalance = document.getElementById('editDeductCheck').checked;
             } else if(type === 'loan') {
                 saveSectionSnap('dashboard', `ویرایش طلب ${newName}`);
                 app.loans[index].name = newName;
@@ -2846,7 +3016,10 @@
         const n = document.getElementById('dName').value;
         const v = parseFormatted(document.getElementById('dVal').value);
         const d = document.getElementById('dDay').value;
-        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن قسط ${n}`); app.debts.push({name:n, value:v, day:d, lastPaid: null}); saveData(); renderUI(); closeAllModals(); }
+        // Instruction 1: Checkbox for new Debt
+        const ded = document.getElementById('dDeduct').checked;
+        
+        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن قسط ${n}`); app.debts.push({name:n, value:v, day:d, lastPaid: null, deductFromBalance: ded}); saveData(); renderUI(); closeAllModals(); }
     }
     function delDebt(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', `حذف قسط ${app.debts[i].name}`); app.debts.splice(i,1); saveData(); renderUI(); } }
 
@@ -2854,7 +3027,10 @@
         const n = document.getElementById('cName').value;
         const v = parseFormatted(document.getElementById('cVal').value);
         const d = getDateString('c');
-        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن چک ${n}`); if(!app.checks) app.checks = []; app.checks.push({name:n, value:v, date:d, isPaid: false}); saveData(); renderUI(); closeAllModals(); }
+        // Instruction 1: Checkbox for new Check
+        const ded = document.getElementById('cDeduct').checked;
+
+        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن چک ${n}`); if(!app.checks) app.checks = []; app.checks.push({name:n, value:v, date:d, isPaid: false, deductFromBalance: ded}); saveData(); renderUI(); closeAllModals(); }
     }
     function delCheck(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', `حذف چک ${app.checks[i].name}`); app.checks.splice(i,1); saveData(); renderUI(); } }
 
@@ -2949,10 +3125,10 @@
         saveData(); renderUI(); closeAllModals(); tempBudget = null;
     }
 
-    // --- REWRITTEN PRIORITY LOGIC (Instruction 2) ---
+    // --- REWRITTEN PRIORITY LOGIC (Instruction 3) ---
     function openPrioritySettings() {
         if(!app.priorityTiers || app.priorityTiers.length === 0) {
-            // Initial state if empty (should correspond to user's instruction example)
+            // Initial state if empty
             app.priorityTiers = []; 
         }
         renderPriorityTiers();
@@ -3193,6 +3369,14 @@
         if(app.user.currency === 'rial') btn.classList.add('active'); else btn.classList.remove('active');
         saveData(); renderUI();
     }
+    
+    function toggleGlobalDebt(el) {
+        app.settings.deductDebtsGlobal = el.checked;
+        saveData();
+        renderUI();
+        showToast("تنظیمات ذخیره شد");
+    }
+
     function toggleTheme() {
         if(document.body.getAttribute('data-theme') === 'dark') { document.body.removeAttribute('data-theme'); app.user.theme = 'light'; } 
         else { document.body.setAttribute('data-theme', 'dark'); app.user.theme = 'dark'; }
@@ -3203,9 +3387,23 @@
     function generateReportImage() {
         withLoading(() => {
             const income = app.wallets.reduce((a,b)=>a+b.value,0);
-            const totalDebt = app.debts.reduce((a,b)=>a+b.value,0) + (app.checks || []).reduce((a,b)=>!b.isPaid ? a+b.value : a, 0);
+            
+            // Calc debts for report
+            let totalDebt = 0;
+            app.debts.forEach(d => totalDebt += d.value);
+            if(app.checks) app.checks.forEach(c => { if(!c.isPaid) totalDebt += c.value; });
+
+            // Calc Net with Deduction Logic
+            let totalDeductibleDebt = 0;
+            app.debts.forEach(d => {
+                if(app.settings.deductDebtsGlobal && (d.deductFromBalance !== false)) totalDeductibleDebt += d.value;
+            });
+            if(app.checks) app.checks.forEach(c => {
+                if(!c.isPaid && app.settings.deductDebtsGlobal && (c.deductFromBalance !== false)) totalDeductibleDebt += c.value;
+            });
+
             const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
-            const net = income - totalDebt - manualDeductions;
+            const net = income - totalDeductibleDebt - manualDeductions;
             
             const days = app.user.startDate ? Math.floor((Date.now() - app.user.startDate)/(1000*60*60*24))+1 : 0;
 
@@ -3281,14 +3479,15 @@
                 try {
                     app = JSON.parse(e.target.result);
                     if(!app.priorities) app.priorities = defaultState.priorities;
-                    if(!app.priorityTiers) app.priorityTiers = defaultState.priorityTiers; // Fix for old backups
+                    if(!app.priorityTiers) app.priorityTiers = defaultState.priorityTiers; 
+                    if(!app.settings) app.settings = { deductDebtsGlobal: true };
                     if(!app.sectionHistory) app.sectionHistory = { dashboard: [], budget: [], tools: [] };
                     app.budgets.forEach(b => { 
                         if(!b.history) b.history = []; if(b.manualAdd === undefined) b.manualAdd = 0; if(b.isPaused === undefined) b.isPaused = false; if(b.savedPercent === undefined) b.savedPercent = 0; if(!b.subs) b.subs = []; if(!b.internalDebt) b.internalDebt = [];
                     });
-                    if(app.checks) app.checks.forEach(c => { if(c.isPaid === undefined) c.isPaid = false; });
+                    if(app.checks) app.checks.forEach(c => { if(c.isPaid === undefined) c.isPaid = false; if(c.deductFromBalance === undefined) c.deductFromBalance = true; });
                     if(app.loans) app.loans.forEach(l => { if(l.isReceived === undefined) l.isReceived = false; });
-                    if(app.debts) app.debts.forEach(d => { if(d.lastPaid === undefined) d.lastPaid = null; });
+                    if(app.debts) app.debts.forEach(d => { if(d.lastPaid === undefined) d.lastPaid = null; if(d.deductFromBalance === undefined) d.deductFromBalance = true; });
                     if(app.shopping) app.shopping.forEach(s => { if(s.paid === undefined) s.paid = 0; });
                     
                     if(app.distributedAmount === undefined) app.distributedAmount = 0;
@@ -3321,8 +3520,9 @@
             if(!app.loans) app.loans = [];
             if(!app.priorities) app.priorities = defaultState.priorities;
             if(!app.priorityTiers) app.priorityTiers = defaultState.priorityTiers;
+            if(!app.settings) app.settings = { deductDebtsGlobal: true };
             if(!app.sectionHistory) app.sectionHistory = { dashboard: [], budget: [], tools: [] };
-            if(!app.priorityRanges) app.priorityRanges = { low: 40, mid: 70 }; // Keep for compatibility
+            // Ensure compatibility
             if(app.distributedAmount === undefined) app.distributedAmount = 0;
             if(!app.security.nationalId) app.security.nationalId = "";
             if(app.security.isSetup === undefined) app.security.isSetup = app.security.hasPin;
@@ -3333,9 +3533,15 @@
             });
             app.goals.forEach(g => { if(!g.autoConfig) g.autoConfig = {type:'none'}; });
             app.shopping.forEach(s => { if(!s.autoConfig) s.autoConfig = {type:'none'}; if(s.paid === undefined) s.paid = 0; });
-            app.checks.forEach(c => { if(c.isPaid === undefined) c.isPaid = false; });
+            app.checks.forEach(c => { 
+                if(c.isPaid === undefined) c.isPaid = false; 
+                if(c.deductFromBalance === undefined) c.deductFromBalance = true;
+            });
             app.loans.forEach(l => { if(l.isReceived === undefined) l.isReceived = false; });
-            app.debts.forEach(d => { if(d.lastPaid === undefined) d.lastPaid = null; });
+            app.debts.forEach(d => { 
+                if(d.lastPaid === undefined) d.lastPaid = null; 
+                if(d.deductFromBalance === undefined) d.deductFromBalance = true; 
+            });
         }
     }
     function saveData() { if(!isGuestMode) { localStorage.setItem('amir_fin_v9', JSON.stringify(app)); } }
