@@ -1,9 +1,9 @@
- <!DOCTYPE html> 
+<!DOCTYPE html> 
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مدیریت سرمایه تعالی</title>
+    <title>مدیریت سرمایه تعالی - نسخه پیشرفته بانکی</title>
 
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
@@ -949,7 +949,7 @@
         </div>
     </div>
     
-    <!-- TAB 4: REPORTS (NEW - Instruction 7) -->
+    <!-- TAB 4: REPORTS -->
     <div id="view-reports" class="tab-pane">
         <div class="header-row" style="padding:0 5px;">
              <h3>گزارشات و نمودارها</h3>
@@ -972,7 +972,6 @@
 
     <!-- TAB 5: SETTINGS -->
     <div id="view-settings" class="tab-pane">
-        <!-- Instruction 5: Updated Header -->
         <div class="settings-header-card">
             <div class="settings-header-icon"><i class="fas fa-user-circle"></i></div>
             <div>
@@ -1015,7 +1014,7 @@
                 </label>
             </div>
 
-            <div class="settings-group-title">داده‌ها و گزارش (دستور هشتم)</div>
+            <div class="settings-group-title">داده‌ها و گزارش</div>
             <div class="settings-group">
                 <div class="settings-item" onclick="exportExcel()">
                     <div style="display:flex; align-items:center;">
@@ -2080,8 +2079,8 @@
         const loansTotal = app.loans.reduce((a,b) => !b.isReceived ? a + b.value : a, 0);
 
         const content = document.getElementById('cardDetailsContent');
-        content.innerHTML = 
-            `<div class="detail-row">
+        content.innerHTML = `
+            <div class="detail-row">
                 <span class="detail-label">مجموع موجودی (ناخالص):</span>
                 <span class="detail-val" id="cpGross">${format(gross)}</span>
             </div>
@@ -2104,8 +2103,8 @@
             <div class="detail-row">
                 <span class="detail-label">مجموع طلب‌ها:</span>
                 <span class="detail-val" style="color:var(--success)" id="cpLoan">${format(loansTotal)}</span>
-            </div>`;
-        
+            </div>
+        `;
         openModal('cardDetailsModal');
     }
 
@@ -3183,7 +3182,7 @@
         saveData(); renderUI(); closeAllModals(); tempBudget = null;
     }
 
-    // --- REWRITTEN PRIORITY LOGIC (Instruction 6: Wizard Style) ---
+    // --- REWRITTEN PRIORITY LOGIC (Instruction 1: Wizard Style) ---
     function openPrioritySettings() {
         if(!app.priorityTiers || app.priorityTiers.length === 0) {
             app.priorityTiers = []; 
@@ -3227,6 +3226,8 @@
         
         document.getElementById('newTierForm').style.display = 'block';
         document.getElementById('addTierBtn').style.display = 'none';
+        // Focus on input
+        setTimeout(() => document.getElementById('tierEndInput').focus(), 100);
     }
 
     function addPriorityTier() {
@@ -3242,9 +3243,9 @@
         saveData();
         renderPriorityTiers();
         
-        // Check if finished
+        // Check if finished or continue Wizard
         if (end < 100) {
-             showAddTierForm(); // Auto open next
+             showAddTierForm(); // Auto open next step (Wizard Flow)
         } else {
              document.getElementById('newTierForm').style.display = 'none';
              showToast("تعریف اولویت‌ها تکمیل شد");
@@ -3537,7 +3538,7 @@
         });
     }
 
-    // Instruction 2: Professional Excel Export (XML format with formulas)
+    // Instruction 2: Professional Excel Export (XML format with formulas and Number type)
     function exportExcel() {
         withLoading(() => {
             let table = '<table><thead><tr><th>تاریخ</th><th>ساعت</th><th>نوع</th><th>مبلغ</th><th>دسته‌بندی</th><th>توضیحات</th></tr></thead><tbody>';
@@ -3561,9 +3562,9 @@
             table += '<tr><td colspan="3"><b>جمع کل</b></td><td x:f="=SUM(D2:D1000)"></td><td colspan="2"></td></tr>';
             table += '</tbody></table>';
 
-            // Wrap in Excel XML template with UTF-8 BOM fix
-            const excelTemplate = 
-                `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+            // Wrap in Excel XML template
+            const excelTemplate = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
                 <head>
                     <!--[if gte mso 9]>
                     <xml>
@@ -3579,17 +3580,16 @@
                         </x:ExcelWorkbook>
                     </xml>
                     <![endif]-->
-                    <meta http-equiv="content-type" content="text/plain; charset=UTF-8"/>
+                    <meta charset="UTF-8">
                     <style>td{border:1px solid #ccc; font-family:Tahoma; text-align:center;} th{background-color:#4f46e5; color:white; border:1px solid #000;}</style>
                 </head>
                 <body>${table}</body>
                 </html>`;
 
-            // Using Blob with UTF-8 BOM
-            const blob = new Blob(["\ufeff", excelTemplate], { type: 'application/vnd.ms-excel;charset=utf-8' });
+            const blob = new Blob([excelTemplate], { type: 'application/vnd.ms-excel' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = "Financial_Report.xls"; 
+            link.download = "Financial_Report.xls"; // .xls ensures Excel opens it correctly with styles
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
