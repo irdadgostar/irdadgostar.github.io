@@ -1598,7 +1598,13 @@
 <div id="prioritySettingsModal" class="modal">
     <div class="modal-content">
         <h3>مدیریت هوشمند اولویت‌ها</h3>
-        <p style="font-size:0.85rem; color:var(--text-sec); margin-bottom:15px;">در این بخش بازه‌های درصدی اولویت‌ها را تعریف کنید. سیستم به صورت خودکار بازه‌ها را پشت سر هم قرار می‌دهد.</p>
+        <p style="font-size:0.85rem; color:var(--text-sec); margin-bottom:15px;">
+            سیستم برای کاهش خودکار، از <b>بالاترین عدد (مثلاً ۱۰)</b> شروع می‌کند.
+            <br>
+            <span style="color:var(--success)">عدد ۱ = حیاتی (آخرین گزینه حذف)</span>
+            <br>
+            <span style="color:var(--danger)">عدد بالا = غیرضروری (اولین گزینه حذف)</span>
+        </p>
         
         <div id="tierListContainer"></div>
 
@@ -1790,7 +1796,11 @@
     }
     function genOpts(min, max, sel) {
         let html = '';
-        for(let i=min; i<=max; i++) html += `<option value="${i}" ${i==sel?'selected':''}>${toPersianNum(i)}</option>`;
+        for(let i=min; i<=max; i++) {
+            // اضافه کردن صفر به اعداد زیر ۱۰ برای مقایسه صحیح رشته‌ای
+            let val = i < 10 ? '0' + i : i;
+            html += `<option value="${val}" ${parseInt(val)==parseInt(sel)?'selected':''}>${toPersianNum(i)}</option>`;
+        }
         return html;
     }
     function genYearOpts(sel) {
@@ -2004,19 +2014,33 @@
     }
 
     function formatCurrency(input) {
-        let val = input.value.replace(/[^\d]/g, '');
-        if (!val) { input.value = ''; return; }
-        // Input remains English digits for logic, but could display Persian if custom handled.
-        // For standard input, English digits are better for typing.
-        input.value = Number(val).toLocaleString('en-US');
+        let val = input.value;
+        if (!val) return;
+        // تبدیل اعداد فارسی به انگلیسی برای پردازش
+        val = val.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+                 .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+        
+        let cleanVal = val.replace(/[^0-9]/g, '');
+        
+        if (cleanVal) {
+            input.value = Number(cleanVal).toLocaleString('en-US');
+        } else {
+            input.value = '';
+        }
     }
+    
     function parseFormatted(val) {
         if(!val) return 0;
         if(typeof val === 'number') return val;
-        // Handle Persian digits in input if they were pasted
-        val = val.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
-        return parseInt(val.replace(/,/g, ''));
+        // تبدیل فارسی به انگلیسی
+        let s = val.toString().replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+                              .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+        // حذف کاما و غیر اعداد
+        s = s.replace(/,/g, '');
+        let res = parseInt(s);
+        return isNaN(res) ? 0 : res;
     }
+    
     // Instruction 1: Update format function to use Persian digits
     function format(n) { 
         return toPersianNum((n * rate).toLocaleString('en-US')); 
@@ -2098,7 +2122,8 @@
             <div id="btStep1">
                 <p style="color:var(--text-sec); font-size:0.9rem;">شماره کارت یا حساب مقصد را وارد کنید:</p>
                 <input type="tel" id="btDestInput" placeholder="xxxx-xxxx-xxxx-xxxx" style="text-align:center; letter-spacing:2px; font-weight:bold;">
-                <button class="btn btn-primary" style="width:100%" onclick="bankTransferNext(1)">ادامه</button>
+                <button class="btn btn-primary" style="width:100%; margin-bottom:10px;" onclick="bankTransferNext(1)">ادامه</button>
+                <button class="btn btn-outline" style="width:100%" onclick="closeAllModals()">انصراف</button>
             </div>
         `;
         openModal('bankTransferModal');
@@ -2173,13 +2198,14 @@
         if (pin !== app.security.pin) return alert("رمز عبور اشتباه است!");
         
         withLoading(() => {
-            // Deduct Logic: Try to deduct from wallets directly
+            // Deduct Logic: Safe iteration through wallets
             let remaining = amt;
             for(let w of app.wallets) {
+                if (remaining <= 0) break;
+                
                 if(w.value >= remaining) {
                     w.value -= remaining;
                     remaining = 0;
-                    break;
                 } else {
                     remaining -= w.value;
                     w.value = 0;
@@ -3347,17 +3373,22 @@
         }
         saveData(); renderUI(); closeAllModals(); tempBudget = null;
     }
+    
     function autoCorrectBudget() {
         if(!tempBudget) return;
         saveSectionSnap('budget', 'اصلاح خودکار بودجه');
-        let currentTotal = 0;
+        
+        let usedPercent = 0;
         app.budgets.forEach((b,i) => {
             if(tempBudget.isEdit && i === tempBudget.editIndex) return; 
-            currentTotal += b.percent;
+            usedPercent += b.percent;
         });
-        const needed = tempBudget.percent;
+
+        const needed = tempBudget.percent; 
         const allowZero = document.getElementById('allowZeroCheck').checked;
-        let overflow = (currentTotal + needed) - 100;
+        
+        let overflow = (usedPercent + needed) - 100;
+
         if(overflow <= 0) {
             if(tempBudget.isEdit) {
                  app.budgets[tempBudget.editIndex].name = tempBudget.name;
@@ -3365,23 +3396,45 @@
             } else { app.budgets.push(tempBudget); }
             saveData(); renderUI(); closeAllModals(); return;
         }
-        let sortedItems = app.budgets.map((b, index) => {
+
+        let candidates = app.budgets.map((b, index) => {
             if(tempBudget.isEdit && index === tempBudget.editIndex) return null; 
-            return { index: index, priority: app.priorities[b.name] || 4, percent: b.percent };
-        }).filter(x => x !== null).sort((a, b) => b.priority - a.priority); 
-        for (let item of sortedItems) {
-            if (overflow <= 0) break;
-            let currentP = item.percent;
-            let deductible = currentP;
-            if(!allowZero && currentP > 0) { deductible = currentP - 1; }
-            if (deductible >= overflow) { app.budgets[item.index].percent -= overflow; overflow = 0; } 
-            else { app.budgets[item.index].percent -= deductible; overflow -= deductible; }
+            return { 
+                index: index, 
+                priority: app.priorities[b.name] || 4, // پیش‌فرض ۴ است
+                percent: b.percent 
+            };
+        }).filter(x => x !== null)
+        .sort((a, b) => {
+            if (b.priority !== a.priority) return b.priority - a.priority; // اولویت بالاتر (عدد بزرگتر) اول
+            return b.percent - a.percent; // درصد بیشتر اول
+        });
+
+        for (let item of candidates) {
+            if (overflow <= 0) break; 
+
+            let currentP = app.budgets[item.index].percent;
+            let canDeduct = 0;
+
+            if (allowZero) {
+                canDeduct = currentP;
+            } else {
+                canDeduct = currentP > 1 ? currentP - 1 : 0;
+            }
+
+            let deductAmount = Math.min(canDeduct, overflow);
+            
+            app.budgets[item.index].percent -= deductAmount;
+            overflow -= deductAmount;
         }
+
         if(overflow > 0) {
-            alert("امکان اصلاح خودکار کامل وجود ندارد. فضا کافی نیست.");
-             const lastSnap = JSON.parse(app.sectionHistory['budget'][0].data);
-             app.budgets = lastSnap.budgets; return;
+            alert("امکان اصلاح خودکار وجود ندارد!\nحتی با کاهش اولویت‌های پایین، فضا کافی نیست.\nلطفاً درصد وارد شده را کمتر کنید یا اجازه صفر شدن آیتم‌ها را بدهید.");
+            const lastSnap = JSON.parse(app.sectionHistory['budget'][0].data);
+            app.budgets = lastSnap.budgets;
+            return;
         }
+
         if(tempBudget.isEdit) {
              app.budgets[tempBudget.editIndex].name = tempBudget.name;
              app.budgets[tempBudget.editIndex].percent = needed;
@@ -3389,7 +3442,9 @@
             app.budgets.push(tempBudget);
             if (!app.priorities[tempBudget.name]) app.priorities[tempBudget.name] = 4;
         }
+        
         saveData(); renderUI(); closeAllModals(); tempBudget = null;
+        showToast("بودجه با موفقیت اصلاح شد");
     }
 
     function openPrioritySettings() {
@@ -3742,57 +3797,84 @@
 
     function exportExcel() {
         withLoading(() => {
-            let table = '<table><thead><tr><th>تاریخ</th><th>ساعت</th><th>نوع</th><th>مبلغ (عدد)</th><th>دسته‌بندی</th><th>توضیحات</th></tr></thead><tbody>';
+            // ۱. تبدیل اعداد فارسی به انگلیسی برای محاسبات اکسل
+            const toEn = (str) => str ? str.toString().replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)) : '';
+
+            // ۲. ساخت جداول مختلف برای بخش‌های مختلف برنامه
+            let tableHTML = `
+            <style>td,th{border:1px solid #000; padding:5px; font-family:'Tahoma'; text-align:center;}</style>
+            
+            <!-- جدول ۱: خلاصه وضعیت -->
+            <h3>خلاصه وضعیت فعلی</h3>
+            <table>
+                <tr style="background:#ddd"><th>نام کاربر</th><th>موجودی کل</th><th>بدهی کل</th><th>تاریخ گزارش</th></tr>
+                <tr>
+                    <td>${app.user.name}</td>
+                    <td>${toEn(document.getElementById('totalBalance').innerText)}</td>
+                    <td>${toEn(app.debts.reduce((a,b)=>a+b.value,0) + app.checks.reduce((a,b)=>!b.isPaid?a+b.value:0,0))}</td>
+                    <td>${new Date().toLocaleDateString('fa-IR')}</td>
+                </tr>
+            </table>
+            <br>
+
+            <!-- جدول ۲: تراکنش‌های بودجه -->
+            <h3>تاریخچه تراکنش‌های بودجه</h3>
+            <table>
+                <tr style="background:#a78bfa; color:white;">
+                    <th>تاریخ</th><th>ساعت</th><th>نوع</th><th>مبلغ</th><th>دسته</th><th>توضیحات</th>
+                </tr>`;
 
             app.budgets.forEach(b => {
                 if (b.history) {
                     b.history.forEach(h => {
-                        table += `<tr>
+                        tableHTML += `<tr>
                             <td>${h.date}</td>
                             <td>${h.time}</td>
-                            <td>${h.type === 'expense' ? 'هزینه' : 'درآمد'}</td>
-                            <td style="mso-number-format:'0'">${h.amount}</td>
+                            <td>${h.type === 'expense' ? 'هزینه' : (h.type === 'deposit' ? 'واریز' : 'انتقال')}</td>
+                            <td style="mso-number-format:'0'">${toEn(h.amount)}</td> <!-- فرمت عدد برای اکسل -->
                             <td>${b.name}</td>
                             <td>${h.reason}</td>
                         </tr>`;
                     });
                 }
             });
-            
-            table += '</tbody></table>';
+            tableHTML += `</table><br>`;
 
-            const excelTemplate = 
-                `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-                <head>
-                    <!--[if gte mso 9]>
-                    <xml>
-                        <x:ExcelWorkbook>
-                            <x:ExcelWorksheets>
-                                <x:ExcelWorksheet>
-                                    <x:Name>تراکنش‌ها</x:Name>
-                                    <x:WorksheetOptions>
-                                        <x:DisplayRightToLeft/>
-                                    </x:WorksheetOptions>
-                                </x:ExcelWorksheet>
-                            </x:ExcelWorksheets>
-                        </x:ExcelWorkbook>
-                    </xml>
-                    <![endif]-->
-                    <meta charset="UTF-8">
-                    <style>td{border:1px solid #ccc; font-family:Tahoma; text-align:center;} th{background-color:#4f46e5; color:white; border:1px solid #000;}</style>
-                </head>
-                <body>${table}</body>
-                </html>`;
+            // جدول ۳: اهداف پس‌انداز
+            tableHTML += `<h3>اهداف پس‌انداز</h3>
+            <table><tr style="background:#34d399"><th>هدف</th><th>مبلغ هدف</th><th>جمع شده</th><th>مانده</th></tr>`;
+            app.goals.forEach(g => {
+                tableHTML += `<tr><td>${g.name}</td><td>${toEn(g.target)}</td><td>${toEn(g.curr)}</td><td>${toEn(g.target - g.curr)}</td></tr>`;
+            });
+            tableHTML += `</table><br>`;
 
-            const blob = new Blob([excelTemplate], { type: 'application/vnd.ms-excel' });
+            // جدول ۴: بدهی و اقساط
+            tableHTML += `<h3>بدهی و اقساط</h3>
+            <table><tr style="background:#f87171"><th>عنوان</th><th>مبلغ</th><th>وضعیت</th></tr>`;
+            app.debts.forEach(d => {
+                tableHTML += `<tr><td>${d.name}</td><td>${toEn(d.value)}</td><td>قسط ثابت</td></tr>`;
+            });
+            app.checks.forEach(c => {
+                tableHTML += `<tr><td>${c.name}</td><td>${toEn(c.value)}</td><td>${c.isPaid ? 'پاس شده' : 'پاس نشده'}</td></tr>`;
+            });
+            tableHTML += `</table>`;
+
+            // ۳. ساخت فایل نهایی با BOM برای پشتیبانی فارسی
+            const fullTemplate = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                <head><meta charset="UTF-8"></head>
+                <body>${tableHTML}</body></html>`;
+
+            // افزودن \uFEFF برای حل مشکل نمایش حروف فارسی
+            const blob = new Blob(['\uFEFF', fullTemplate], { type: 'application/vnd.ms-excel;charset=utf-8' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = "Financial_Report_Simple.xls"; 
+            link.download = `Gozaresh_Mali_${new Date().toLocaleDateString('fa-IR').replace(/\//g,'-')}.xls`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showToast("فایل اکسل ساده دانلود شد");
-        }, 1000);
+            showToast("فایل اکسل جامع دانلود شد");
+        }, 1500);
     }
 
     function generateReportImage() {
@@ -3924,28 +4006,46 @@
     function loadData() {
         const d = localStorage.getItem('amir_fin_v9');
         if(d) {
-            app = JSON.parse(d);
-            if(!app.checks) app.checks = [];
-            if(!app.loans) app.loans = [];
-            if(!app.priorities) app.priorities = defaultState.priorities;
-            if(!app.priorityTiers) app.priorityTiers = defaultState.priorityTiers;
-            if(!app.sectionHistory) app.sectionHistory = { dashboard: [], budget: [], tools: [] };
-            if(!app.settings) app.settings = { globalDeduct: true };
-            
-            if(app.distributedAmount === undefined) app.distributedAmount = 0;
-            if(!app.security.nationalId) app.security.nationalId = "";
-            if(app.security.isSetup === undefined) app.security.isSetup = app.security.hasPin;
-            if(!app.dailyLogs) app.dailyLogs = [];
-            if(!app.user.startDate) app.user.startDate = Date.now();
-            
-            app.budgets.forEach(b => { 
-                if(!b.history) b.history = []; if(b.manualAdd === undefined) b.manualAdd = 0; if(b.isPaused === undefined) b.isPaused = false; if(b.savedPercent === undefined) b.savedPercent = 0; if(!b.subs) b.subs = []; if(!b.internalDebt) b.internalDebt = [];
-            });
-            app.goals.forEach(g => { if(!g.autoConfig) g.autoConfig = {type:'none'}; });
-            app.shopping.forEach(s => { if(!s.autoConfig) s.autoConfig = {type:'none'}; if(s.paid === undefined) s.paid = 0; });
-            app.checks.forEach(c => { if(c.isPaid === undefined) c.isPaid = false; if(c.deduct === undefined) c.deduct = true; });
-            app.loans.forEach(l => { if(l.isReceived === undefined) l.isReceived = false; });
-            app.debts.forEach(d => { if(d.lastPaid === undefined) d.lastPaid = null; if(d.deduct === undefined) d.deduct = true; });
+            try {
+                const savedData = JSON.parse(d);
+                // ادغام عمیق (Deep Merge) ساده برای اطمینان از وجود همه فیلدها
+                app = { ...defaultState, ...savedData };
+                
+                // اطمینان از وجود آبجکت‌های داخلی ضروری
+                app.security = { ...defaultState.security, ...(savedData.security || {}) };
+                app.user = { ...defaultState.user, ...(savedData.user || {}) };
+                app.settings = { ...defaultState.settings, ...(savedData.settings || {}) };
+                
+                // آرایه‌ها را نمی‌توان مرج کرد، باید وجودشان چک شود
+                if(!Array.isArray(app.wallets)) app.wallets = [];
+                if(!Array.isArray(app.budgets)) app.budgets = [];
+                if(!Array.isArray(app.debts)) app.debts = [];
+                if(!Array.isArray(app.checks)) app.checks = [];
+                if(!Array.isArray(app.loans)) app.loans = [];
+                if(!Array.isArray(app.goals)) app.goals = [];
+                if(!Array.isArray(app.shopping)) app.shopping = [];
+                
+                // مقداردهی اولیه فیلدهای جدید در صورت عدم وجود
+                if(app.distributedAmount === undefined) app.distributedAmount = 0;
+                if(!app.security.nationalId) app.security.nationalId = "";
+                if(app.security.isSetup === undefined) app.security.isSetup = app.security.hasPin;
+                if(!app.dailyLogs) app.dailyLogs = [];
+                if(!app.user.startDate) app.user.startDate = Date.now();
+                if(!app.priorityTiers) app.priorityTiers = [];
+                if(!app.priorities) app.priorities = {};
+
+                app.budgets.forEach(b => { 
+                    if(!b.history) b.history = []; if(b.manualAdd === undefined) b.manualAdd = 0; if(b.isPaused === undefined) b.isPaused = false; if(b.savedPercent === undefined) b.savedPercent = 0; if(!b.subs) b.subs = []; if(!b.internalDebt) b.internalDebt = [];
+                });
+                app.goals.forEach(g => { if(!g.autoConfig) g.autoConfig = {type:'none'}; });
+                app.shopping.forEach(s => { if(!s.autoConfig) s.autoConfig = {type:'none'}; if(s.paid === undefined) s.paid = 0; });
+                app.checks.forEach(c => { if(c.isPaid === undefined) c.isPaid = false; if(c.deduct === undefined) c.deduct = true; });
+                app.loans.forEach(l => { if(l.isReceived === undefined) l.isReceived = false; });
+                app.debts.forEach(d => { if(d.lastPaid === undefined) d.lastPaid = null; if(d.deduct === undefined) d.deduct = true; });
+            } catch (e) {
+                console.error("Data Load Error", e);
+                // در صورت خرابی دیتا، از دیفالت استفاده می‌شود
+            }
         }
     }
     function saveData() { if(!isGuestMode) { localStorage.setItem('amir_fin_v9', JSON.stringify(app)); } }
