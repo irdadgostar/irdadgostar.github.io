@@ -1,4 +1,4 @@
- <!DOCTYPE html> 
+<!DOCTYPE html> 
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -466,9 +466,9 @@
         .card-chip::before { content: ''; position: absolute; left: 30%; top: 0; height: 100%; width: 1px; background: rgba(0,0,0,0.3); }
 
         .card-number-top {
-            font-family: 'Courier New', monospace;
+            font-family: 'Vazirmatn', sans-serif;
             font-size: 1.2rem;
-            letter-spacing: 4px;
+            letter-spacing: 2px;
             color: rgba(255, 255, 255, 0.9);
             text-align: center;
             margin-bottom: 5px;
@@ -481,23 +481,78 @@
             align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .balance-label { font-size: 0.8rem; opacity: 0.7; font-weight: 300; display:block; margin-bottom:2px; text-transform: uppercase; letter-spacing: 1px; }
+        /* Updated Card Styles for Instruction 2, 3, 4, 5 */
+        .balance-label { 
+            font-size: 0.9rem; 
+            opacity: 0.8; 
+            font-weight: 500; 
+            display:block; 
+            margin-bottom:2px; 
+            text-align: center; 
+        }
         
+        .balance-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin: 5px 0;
+            width: 100%;
+        }
+
         .balance-value { 
-            font-size: clamp(1.6rem, 5vw, 2.3rem); 
+            font-size: clamp(1.4rem, 4vw, 2rem); 
             font-weight: 800; 
-            margin: 5px 0; 
-            direction: ltr; 
             text-shadow: 0 4px 10px rgba(0,0,0,0.3); 
-            letter-spacing: 2px; 
-            font-family: 'Courier New', monospace; 
+            letter-spacing: -1px; 
+            font-family: 'Vazirmatn', sans-serif; 
             white-space: nowrap;
             overflow-x: auto;
-            overflow-y: hidden;
-            width: 100%;
             scrollbar-width: none;
+            text-align: center;
         }
         .balance-value::-webkit-scrollbar { display: none; }
+        .balance-value.hidden {
+            filter: blur(8px);
+            user-select: none;
+        }
+
+        .balance-currency {
+            font-size: 1rem;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+
+        #eyeIcon {
+            cursor: pointer;
+            font-size: 1.1rem;
+            opacity: 0.7;
+            transition: 0.2s;
+            padding: 5px;
+        }
+        #eyeIcon:hover { opacity: 1; transform: scale(1.1); }
+
+        .card-transfer-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.4);
+            color: white;
+            border-radius: 12px;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: all 0.2s;
+        }
+        .card-transfer-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        .card-transfer-btn:active { transform: scale(0.95); }
+
 
         /* --- BENTO GRID (Budget) --- */
         .budget-grid {
@@ -780,17 +835,17 @@
             </div>
 
             <div class="numpad">
-                <button class="num-key" onclick="pressKey(1)">1</button>
-                <button class="num-key" onclick="pressKey(2)">2</button>
-                <button class="num-key" onclick="pressKey(3)">3</button>
-                <button class="num-key" onclick="pressKey(4)">4</button>
-                <button class="num-key" onclick="pressKey(5)">5</button>
-                <button class="num-key" onclick="pressKey(6)">6</button>
-                <button class="num-key" onclick="pressKey(7)">7</button>
-                <button class="num-key" onclick="pressKey(8)">8</button>
-                <button class="num-key" onclick="pressKey(9)">9</button>
+                <button class="num-key" onclick="pressKey(1)">۱</button>
+                <button class="num-key" onclick="pressKey(2)">۲</button>
+                <button class="num-key" onclick="pressKey(3)">۳</button>
+                <button class="num-key" onclick="pressKey(4)">۴</button>
+                <button class="num-key" onclick="pressKey(5)">۵</button>
+                <button class="num-key" onclick="pressKey(6)">۶</button>
+                <button class="num-key" onclick="pressKey(7)">۷</button>
+                <button class="num-key" onclick="pressKey(8)">۸</button>
+                <button class="num-key" onclick="pressKey(9)">۹</button>
                 <div class="num-key" style="visibility: hidden;"></div>
-                <button class="num-key" onclick="pressKey(0)">0</button>
+                <button class="num-key" onclick="pressKey(0)">۰</button>
                 <button class="num-key del" onclick="pressKey('del')"><i class="fas fa-backspace"></i></button>
             </div>
         </div>
@@ -832,23 +887,29 @@
 
     <!-- TAB 1: DASHBOARD -->
     <div id="view-dashboard" class="tab-pane active">
-        <!-- Hero Card (Clickable to open details) -->
-        <div class="hero-card" onclick="showCardDetails()">
+        <!-- Hero Card (Modified) -->
+        <div class="hero-card">
             <div class="card-inner">
-                <div class="card-front">
-                    <div class="card-number-top" id="cardAccountNumber">3545 6576 8921 1004</div>
+                <div class="card-front" onclick="if(!event.target.closest('button') && !event.target.closest('.fa-eye')) showCardDetails()">
+                    <div class="card-number-top" id="cardAccountNumber">۳۵۴۵ ۶۵۷۶ ۸۹۲۱ ۱۰۰۴</div>
                     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-top:10px;">
                         <div class="card-chip"></div>
                         <i class="fas fa-wifi" style="opacity:0.7; transform: rotate(90deg); font-size:1.5rem;"></i>
                     </div>
                     
-                    <div style="margin-top: auto;">
-                        <span class="balance-label">موجودی خالص (غیر قابل تقسیم)</span>
-                        <div class="balance-value" id="totalBalance">0</div>
+                    <div style="margin-top: auto; text-align:center;">
+                        <span class="balance-label">موجودی</span>
+                        <div class="balance-wrapper">
+                            <div class="balance-value" id="totalBalance">۰</div>
+                            <span class="balance-currency currency-text" id="cardCurrency">تومان</span>
+                            <i class="fas fa-eye" id="eyeIcon" onclick="toggleBalanceHide(event)"></i>
+                        </div>
                     </div>
-                    <div style="display:flex; justify-content:space-between; font-size:1.1rem; opacity:0.95; font-weight:600; margin-top:10px;">
-                        <span id="userNameDisplay" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3); text-transform:uppercase;">کاربر</span>
-                        <span id="cardCurrency">تومان</span>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                        <span id="userNameDisplay" style="font-size:1rem; font-weight:700; opacity:0.95; text-shadow: 0 2px 4px rgba(0,0,0,0.3); text-transform:uppercase;">کاربر</span>
+                        <button class="card-transfer-btn" onclick="openBankTransfer(event)">
+                            <i class="fas fa-exchange-alt"></i> انتقال وجه
+                        </button>
                     </div>
                 </div>
                 <!-- Card Back isn't strictly needed for click interaction but kept for CSS structure -->
@@ -893,8 +954,8 @@
         <div class="glass-panel" style="text-align:center; padding: 25px;">
             <span style="color:var(--text-sec); font-size:0.95rem; font-weight:bold;">بودجه کل توزیع شده:</span>
             <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top:5px;">
-                <div id="distributable" style="font-size:2rem; font-weight:800; color:var(--primary); direction:ltr; display: flex; align-items: baseline; gap: 8px;">0</div>
-                <small id="totalPercentBadge" style="background:var(--text-sec); color:white; padding:4px 10px; border-radius:10px; font-weight:bold;">0%</small>
+                <div id="distributable" style="font-size:2rem; font-weight:800; color:var(--primary); direction:ltr; display: flex; align-items: baseline; gap: 8px;">۰</div>
+                <small id="totalPercentBadge" style="background:var(--text-sec); color:white; padding:4px 10px; border-radius:10px; font-weight:bold;">۰%</small>
             </div>
             <button id="btnDistribute" class="btn btn-primary" style="margin-top:20px; width:100%; display:none; justify-content:center;" onclick="triggerDistribution()">
                 <i class="fas fa-sync-alt"></i> توزیع موجودی جدید
@@ -1087,6 +1148,13 @@
 
 <!-- MODALS -->
 
+<!-- New Bank Transfer Wizard Modal -->
+<div id="bankTransferModal" class="modal">
+    <div class="modal-content" id="btContent">
+        <!-- Will be populated by JS -->
+    </div>
+</div>
+
 <!-- New Modal: Card Details & Copy -->
 <div id="cardDetailsModal" class="modal">
     <div class="modal-content">
@@ -1102,10 +1170,10 @@
     </div>
 </div>
 
-<!-- Transfer Funds Modal -->
+<!-- Transfer Funds Modal (Internal Budget) -->
 <div id="transferModal" class="modal">
     <div class="modal-content">
-        <h3>انتقال وجه</h3>
+        <h3>انتقال وجه (داخلی بودجه)</h3>
         <p style="font-size:0.9rem; color:var(--text-sec); margin-bottom:5px;">
             انتقال از <b><span id="transferSourceName"></span></b> به:
         </p>
@@ -1115,7 +1183,7 @@
         
         <label>مبلغ انتقال:</label>
         <div class="money-input-wrapper">
-            <input type="text" id="transferAmount" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
+            <input type="text" id="transferAmount" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="۰">
             <span class="money-unit currency-text">تومان</span>
         </div>
         
@@ -1169,7 +1237,7 @@
         <input type="text" id="heReason">
         
         <label>تاریخ:</label>
-        <input type="text" id="heDate" placeholder="1403/xx/xx">
+        <input type="text" id="heDate" placeholder="۱۴۰۳/xx/xx">
         
         <div style="margin-top:25px; display:flex; gap:12px;">
             <button class="btn btn-primary" style="flex:1" onclick="saveHistoryEdit()">ذخیره تغییرات</button>
@@ -1187,7 +1255,7 @@
              <input type="text" id="uInputText" placeholder="...">
         </div>
         <div id="uInputMoneyWrapper" class="money-input-wrapper" style="display:none;">
-            <input type="text" id="uInputMoney" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
+            <input type="text" id="uInputMoney" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="۰">
             <span class="money-unit currency-text">تومان</span>
         </div>
         <div style="margin-top:25px; display:flex; gap:12px;">
@@ -1205,8 +1273,8 @@
             تعیین درصد برای هر زیرمجموعه از ردیف "<b><span id="subParentName"></span></b>".
         </p>
         <div class="alloc-info-box">
-             <span id="subTotalBudget">سهم کل: 0</span>
-             <span id="subRemainPercent">باقی‌مانده: 100%</span>
+             <span id="subTotalBudget">سهم کل: ۰</span>
+             <span id="subRemainPercent">باقی‌مانده: ۱۰۰%</span>
         </div>
         <div id="subBudgetList" style="max-height:300px; overflow-y:auto; padding-bottom:10px;"></div>
         <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="addNewSubCategory()">+ افزودن زیرمجموعه</button>
@@ -1233,7 +1301,7 @@
 
         <div id="aaPercentField" style="display:none;">
             <label>درصد کسر:</label>
-            <input type="number" id="aaPercent" placeholder="مثلا 10">
+            <input type="number" id="aaPercent" placeholder="مثلا ۱۰">
         </div>
 
         <div id="aaAmountField" style="display:none;">
@@ -1249,7 +1317,7 @@
 
         <label>حداقل موجودی منبع برای کسر:</label>
         <div class="money-input-wrapper">
-            <input type="text" id="aaMin" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
+            <input type="text" id="aaMin" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="۰">
             <span class="money-unit currency-text">تومان</span>
         </div>
 
@@ -1329,7 +1397,7 @@
         <input type="text" id="wName" placeholder="مثلاً: کارت ملی">
         <label>مبلغ موجودی:</label>
         <div class="money-input-wrapper">
-            <input type="text" id="wVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
+            <input type="text" id="wVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="۰">
             <span class="money-unit currency-text">تومان</span>
         </div>
         <div style="margin-top:25px; display:flex; gap:12px;">
@@ -1346,7 +1414,7 @@
         <input type="text" id="dName" placeholder="مثلاً: وام مسکن">
         <label>مبلغ قسط:</label>
         <div class="money-input-wrapper">
-            <input type="text" id="dVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
+            <input type="text" id="dVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="۰">
             <span class="money-unit currency-text">تومان</span>
         </div>
         <label>تاریخ پرداخت (روز):</label>
@@ -1372,7 +1440,7 @@
         <input type="text" id="cName" placeholder="مثلاً: چک صیادی">
         <label>مبلغ:</label>
         <div class="money-input-wrapper">
-            <input type="text" id="cVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
+            <input type="text" id="cVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="۰">
             <span class="money-unit currency-text">تومان</span>
         </div>
         <label>تاریخ سررسید:</label>
@@ -1396,7 +1464,7 @@
         <input type="text" id="lName" placeholder="مثلاً: علی رضایی">
         <label>مبلغ قرض:</label>
         <div class="money-input-wrapper">
-            <input type="text" id="lVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
+            <input type="text" id="lVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="۰">
             <span class="money-unit currency-text">تومان</span>
         </div>
         <label>تاریخ وصول:</label>
@@ -1414,7 +1482,7 @@
         <label>عنوان:</label>
         <input type="text" id="bName" placeholder="مثلاً: پوشاک">
         <label>درصد سهم:</label>
-        <input type="number" id="bPercent" inputmode="numeric" placeholder="مثلاً: 10">
+        <input type="number" id="bPercent" inputmode="numeric" placeholder="مثلاً: ۱۰">
         <div style="margin-top:25px; display:flex; gap:12px;">
             <button class="btn btn-primary" style="flex:1" onclick="addNewBudget()">ثبت</button>
             <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
@@ -1428,7 +1496,7 @@
         <input type="hidden" id="expBudgetId">
         <label>مبلغ هزینه:</label>
         <div class="money-input-wrapper">
-            <input type="text" id="expAmt" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
+            <input type="text" id="expAmt" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="۰">
             <span class="money-unit currency-text">تومان</span>
         </div>
         <label>بابت (توضیح):</label>
@@ -1447,7 +1515,7 @@
         <input type="text" id="gName" placeholder="مثلاً: لپ‌تاپ">
         <label>مبلغ هدف:</label>
         <div class="money-input-wrapper">
-            <input type="text" id="gTarget" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
+            <input type="text" id="gTarget" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="۰">
             <span class="money-unit currency-text">تومان</span>
         </div>
         <div style="margin-top:25px; display:flex; gap:12px;">
@@ -1464,7 +1532,7 @@
         <input type="text" id="sName" placeholder="مثلاً: روغن زیتون">
         <label>قیمت حدودی (اختیاری):</label>
         <div class="money-input-wrapper">
-            <input type="text" id="sPrice" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
+            <input type="text" id="sPrice" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="۰">
             <span class="money-unit currency-text">تومان</span>
         </div>
         <div style="margin-top:25px; display:flex; gap:12px;">
@@ -1485,12 +1553,12 @@
         
         <div id="allocInfo" class="alloc-info-box" style="display:none;">
              <span>موجودی این ردیف:</span>
-             <b id="allocLimitDisplay" style="direction:ltr">0</b>
+             <b id="allocLimitDisplay" style="direction:ltr">۰</b>
         </div>
 
         <label>مبلغ اختصاصی:</label>
         <div class="money-input-wrapper">
-            <input type="text" id="allocAmt" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="0">
+            <input type="text" id="allocAmt" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="۰">
             <span class="money-unit currency-text">تومان</span>
         </div>
         <div style="margin-top:25px; display:flex; gap:12px;">
@@ -1506,11 +1574,11 @@
         <p>مجموع درصد‌ها از ۱۰۰٪ بیشتر شده است.</p>
         <div style="margin:20px 0; padding:15px; background:rgba(0,0,0,0.05); border-radius:12px;">
             <p><b>حالت اول:</b> انتخاب دستی تا سقف مجاز</p>
-            <p style="font-size:0.9rem;">حداکثر درصد قابل انتخاب: <b id="maxAllowedPercent" style="color:var(--primary)">0%</b></p>
+            <p style="font-size:0.9rem;">حداکثر درصد قابل انتخاب: <b id="maxAllowedPercent" style="color:var(--primary)">۰%</b></p>
             <div style="display:flex; align-items:center; gap:10px;">
-                <span>0</span>
+                <span>۰</span>
                 <input type="range" id="percentSlider" min="0" value="0" oninput="updateSliderVal()">
-                <span id="sliderValDisplay">0</span>%
+                <span id="sliderValDisplay">۰</span>%
             </div>
             <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="useSliderPercent()">ثبت درصد انتخابی</button>
         </div>
@@ -1527,7 +1595,6 @@
     </div>
 </div>
 
-<!-- Updated Priority Settings Modal (Instruction 1) -->
 <div id="prioritySettingsModal" class="modal">
     <div class="modal-content">
         <h3>مدیریت هوشمند اولویت‌ها</h3>
@@ -1538,7 +1605,7 @@
         <div id="newTierForm" style="margin-top:20px; padding:15px; background:rgba(0,0,0,0.03); border-radius:12px; display:none;">
             <h4 style="margin:0 0 10px 0; color:var(--primary);">افزودن اولویت <span id="nextTierNum"></span></h4>
             <div style="display:flex; gap:10px; align-items:center;">
-                <span>از <b id="tierStartDisplay">0</b>% تا</span>
+                <span>از <b id="tierStartDisplay">۰</b>% تا</span>
                 <input type="number" id="tierEndInput" placeholder="سقف درصد" style="margin:0; width:100px;">
                 <span>%</span>
             </div>
@@ -1578,12 +1645,12 @@
     <div class="print-header">
         <h1>گزارش جامع وضعیت مالی</h1>
         <p id="printDate">تاریخ: ---</p>
-        <p>کاربر: <span id="printUser">---</span> | روزهای سپری شده: <span id="printDays">0</span></p>
+        <p>کاربر: <span id="printUser">---</span> | روزهای سپری شده: <span id="printDays">۰</span></p>
     </div>
     <div class="print-summary">
-        <div>کل دارایی: <b id="printInc">0</b></div>
-        <div>کل بدهی (موثر): <b id="printDebt">0</b></div>
-        <div>خالص قابل خرج: <b id="printNet">0</b></div>
+        <div>کل دارایی: <b id="printInc">۰</b></div>
+        <div>کل بدهی (موثر): <b id="printDebt">۰</b></div>
+        <div>خالص قابل خرج: <b id="printNet">۰</b></div>
     </div>
     <div class="print-section-title">نمودار پیشرفت مالی (روزانه)</div>
     <div class="print-chart-container">
@@ -1626,8 +1693,8 @@
             {id: 9, name: "تفریح", percent: 3, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: [], internalDebt: []},
             {id: 10, name: "پس‌انداز کل", percent: 11, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: [], internalDebt: []}
         ],
-        priorities: {}, // Will be managed via wizard
-        priorityTiers: [], // New structure for Instruction 1
+        priorities: {},
+        priorityTiers: [], 
         distributedAmount: 0, 
         goals: [],
         shopping: [],
@@ -1652,8 +1719,9 @@
     let tempSubIndex = -1;
     let universalCallback = null;
     let tempDepositIndex = -1;
-    let myChart1 = null; // Donut Chart
-    let myChart2 = null; // Line Chart
+    let myChart1 = null; 
+    let myChart2 = null; 
+    let isBalanceHidden = false; // Instruction 3
 
     function showToast(message, icon="check-circle") {
         const container = document.getElementById('toastContainer');
@@ -1684,6 +1752,19 @@
 
     window.onload = () => { loadData(); checkAuth(); setupDatePickers(); };
 
+    // Instruction 1: Persian Num Helper
+    function toPersianNum(num, dontTrim) {
+        if(num === null || num === undefined) return '';
+        const str = num.toString();
+        const persian = { '0': '۰', '1': '۱', '2': '۲', '3': '۳', '4': '۴', '5': '۵', '6': '۶', '7': '۷', '8': '۸', '9': '۹' };
+        let res = "";
+        for (let i = 0; i < str.length; i++) {
+            let ch = str[i];
+            res += persian[ch] || ch;
+        }
+        return res;
+    }
+
     function processDailyLog() {
         if(isGuestMode) return;
         const today = new Date().toLocaleDateString('fa-IR');
@@ -1709,23 +1790,23 @@
     }
     function genOpts(min, max, sel) {
         let html = '';
-        for(let i=min; i<=max; i++) html += `<option value="${i}" ${i==sel?'selected':''}>${i}</option>`;
+        for(let i=min; i<=max; i++) html += `<option value="${i}" ${i==sel?'selected':''}>${toPersianNum(i)}</option>`;
         return html;
     }
     function genYearOpts(sel) {
         const currentYear = 1403;
         let html = '';
-        for(let i=0; i<=20; i++) html += `<option value="${currentYear+i}" ${(currentYear+i)==sel?'selected':''}>${currentYear+i}</option>`;
+        for(let i=0; i<=20; i++) html += `<option value="${currentYear+i}" ${(currentYear+i)==sel?'selected':''}>${toPersianNum(currentYear+i)}</option>`;
         return html;
     }
     function getDateString(prefix) {
         const d = document.getElementById(prefix+'Day').value;
         const m = document.getElementById(prefix+'Month').value;
         const y = document.getElementById(prefix+'Year').value;
-        return `${y}/${m}/${d}`;
+        return toPersianNum(`${y}/${m}/${d}`);
     }
     function getCurMonth() {
-        return new Date().toLocaleDateString('fa-IR-u-nu-latn').split('/').slice(0, 2).join('/');
+        return toPersianNum(new Date().toLocaleDateString('fa-IR-u-nu-latn').split('/').slice(0, 2).join('/'));
     }
 
     function checkAuth() {
@@ -1925,14 +2006,21 @@
     function formatCurrency(input) {
         let val = input.value.replace(/[^\d]/g, '');
         if (!val) { input.value = ''; return; }
+        // Input remains English digits for logic, but could display Persian if custom handled.
+        // For standard input, English digits are better for typing.
         input.value = Number(val).toLocaleString('en-US');
     }
     function parseFormatted(val) {
         if(!val) return 0;
         if(typeof val === 'number') return val;
+        // Handle Persian digits in input if they were pasted
+        val = val.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
         return parseInt(val.replace(/,/g, ''));
     }
-    function format(n) { return (n * rate).toLocaleString('en-US'); }
+    // Instruction 1: Update format function to use Persian digits
+    function format(n) { 
+        return toPersianNum((n * rate).toLocaleString('en-US')); 
+    }
 
     function saveSectionSnap(section, description = "تغییر بدون توضیح") {
         if(isGuestMode) return;
@@ -1958,7 +2046,7 @@
                 `<div style="padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="restoreSectionSnap('${section}', ${i})">
                     <div style="text-align:right;">
                         <span style="display:block; font-weight:bold; font-size:0.9rem; color:var(--text-main); margin-bottom:5px;">${h.description || 'تغییر سیستم'}</span>
-                        <span style="font-size:0.75rem; color:var(--text-sec);">${h.time}</span>
+                        <span style="font-size:0.75rem; color:var(--text-sec);">${toPersianNum(h.time)}</span>
                     </div>
                     <i class="fas fa-undo" style="color:var(--primary); font-size:1.1rem;"></i>
                 </div>`).join('');
@@ -1980,6 +2068,138 @@
         }, 1000);
     }
 
+    // Instruction 3: Hide Balance Toggle
+    function toggleBalanceHide(e) {
+        e.stopPropagation();
+        isBalanceHidden = !isBalanceHidden;
+        const balEl = document.getElementById('totalBalance');
+        const icon = document.getElementById('eyeIcon');
+        
+        if(isBalanceHidden) {
+            balEl.classList.add('hidden');
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            balEl.classList.remove('hidden');
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+
+    // Instruction 4: Bank Transfer Logic
+    function openBankTransfer(e) {
+        e.stopPropagation();
+        const modal = document.getElementById('bankTransferModal');
+        const content = document.getElementById('btContent');
+        
+        // Initial Step 1: Account Number
+        content.innerHTML = `
+            <h3>انتقال وجه</h3>
+            <div id="btStep1">
+                <p style="color:var(--text-sec); font-size:0.9rem;">شماره کارت یا حساب مقصد را وارد کنید:</p>
+                <input type="tel" id="btDestInput" placeholder="xxxx-xxxx-xxxx-xxxx" style="text-align:center; letter-spacing:2px; font-weight:bold;">
+                <button class="btn btn-primary" style="width:100%" onclick="bankTransferNext(1)">ادامه</button>
+            </div>
+        `;
+        openModal('bankTransferModal');
+    }
+
+    function bankTransferNext(step) {
+        const content = document.getElementById('btContent');
+        const income = app.wallets.reduce((a,b)=>a+b.value,0);
+        const fixedDebt = app.debts.reduce((a,b)=> (b.deduct !== false && b.lastPaid !== getCurMonth()) ? a+b.value : a, 0);
+        const checkDebt = (app.checks || []).reduce((a,b)=> (!b.isPaid && b.deduct !== false) ? a+b.value : a, 0);
+        const net = Math.max(0, income - (fixedDebt + checkDebt));
+
+        if (step === 1) {
+            const dest = document.getElementById('btDestInput').value;
+            if(dest.length < 4) return alert("شماره مقصد معتبر نیست");
+            // Step 2: Amount
+            content.innerHTML = `
+                <h3>مبلغ انتقال</h3>
+                <p style="color:var(--text-sec); font-size:0.85rem; margin-bottom:10px;">به مقصد: ${toPersianNum(dest)}</p>
+                <div class="alloc-info-box">
+                    <span>موجودی قابل برداشت:</span>
+                    <b>${format(net)}</b>
+                </div>
+                <div class="money-input-wrapper">
+                    <input type="text" id="btAmountInput" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="۰">
+                    <span class="money-unit currency-text">${document.getElementById('currBtnText').innerText}</span>
+                </div>
+                <input type="hidden" id="btDestVal" value="${dest}">
+                <div style="display:flex; gap:10px;">
+                    <button class="btn btn-outline" style="flex:1" onclick="openBankTransfer({stopPropagation:()=>{}})">بازگشت</button>
+                    <button class="btn btn-primary" style="flex:1" onclick="bankTransferNext(2)">ادامه</button>
+                </div>
+            `;
+        } else if (step === 2) {
+            const amt = parseFormatted(document.getElementById('btAmountInput').value);
+            const dest = document.getElementById('btDestVal').value;
+            if(amt <= 0) return alert("مبلغ نامعتبر است");
+            if(amt > net) return alert("موجودی کافی نیست!");
+
+            // Mock Name Lookup
+            const mockName = "کاربر مهمان (تست)";
+
+            // Step 3: Confirm Name & Password
+            content.innerHTML = `
+                <h3>تایید انتقال</h3>
+                <div style="background:rgba(0,0,0,0.03); padding:15px; border-radius:12px; margin-bottom:15px; text-align:center;">
+                    <div style="font-size:0.9rem; color:var(--text-sec);">انتقال مبلغ</div>
+                    <div style="font-size:1.4rem; font-weight:bold; color:var(--primary); margin:5px 0;">${format(amt)}</div>
+                    <div style="font-size:0.9rem; color:var(--text-sec);">به حساب</div>
+                    <div style="font-weight:bold;">${mockName}</div>
+                    <div style="font-size:0.8rem; margin-top:5px;">${toPersianNum(dest)}</div>
+                </div>
+                <label>رمز عبور اپلیکیشن:</label>
+                <input type="password" id="btPinInput" placeholder="****" style="text-align:center;">
+                
+                <input type="hidden" id="btDestFinal" value="${dest}">
+                <input type="hidden" id="btAmtFinal" value="${amt}">
+                
+                <div style="display:flex; gap:10px;">
+                    <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+                    <button class="btn btn-primary" style="flex:1" onclick="bankTransferCheckPin()">تایید نهایی</button>
+                </div>
+            `;
+        }
+    }
+
+    function bankTransferCheckPin() {
+        const pin = document.getElementById('btPinInput').value;
+        const amt = parseFloat(document.getElementById('btAmtFinal').value);
+        const dest = document.getElementById('btDestFinal').value;
+
+        if (pin !== app.security.pin) return alert("رمز عبور اشتباه است!");
+        
+        withLoading(() => {
+            // Deduct Logic: Try to deduct from wallets directly
+            let remaining = amt;
+            for(let w of app.wallets) {
+                if(w.value >= remaining) {
+                    w.value -= remaining;
+                    remaining = 0;
+                    break;
+                } else {
+                    remaining -= w.value;
+                    w.value = 0;
+                }
+            }
+            
+            if(remaining > 0) {
+                // This shouldn't happen due to previous validation but just in case
+                alert("خطا در کسر موجودی");
+                return;
+            }
+
+            saveSectionSnap('dashboard', `انتقال وجه بانکی: ${format(amt)}`);
+            saveData(); 
+            renderUI(); 
+            closeAllModals(); 
+            showToast("انتقال با موفقیت انجام شد");
+        }, 1500);
+    }
+
     function renderUI() {
         applyTheme();
         rate = app.user.currency === 'rial' ? 10 : 1;
@@ -1993,7 +2213,7 @@
         if(app.user.startDate) {
             const diff = Date.now() - app.user.startDate;
             const days = Math.floor(diff / (1000 * 60 * 60 * 24)) + 1; 
-            document.getElementById('daysPassedLabel').innerText = `روز ${days}`;
+            document.getElementById('daysPassedLabel').innerText = `روز ${toPersianNum(days)}`;
         } else {
              app.user.startDate = Date.now();
              document.getElementById('daysPassedLabel').innerText = `روز ۱`;
@@ -2013,36 +2233,44 @@
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
         const totalDeductibleDebt = fixedDebt + checkDebt;
         
-        // --- Calculate Dashboard Net (Card Display) ---
-        // This includes all money in wallets minus debts, regardless of budget allocation
         let cardNet = income - totalDeductibleDebt;
         if (cardNet < 0) cardNet = 0;
 
-        // --- Calculate Distributable Net (Budget Tab) ---
-        // This removes money already allocated to budget items manually (External Money)
         let distributableNet = cardNet - manualDeductions;
         if (distributableNet < 0) distributableNet = 0;
 
-        document.getElementById('totalBalance').innerText = format(cardNet);
+        // Update card value
+        const balEl = document.getElementById('totalBalance');
+        balEl.innerText = format(cardNet);
+        // Ensure hidden state persists on re-render
+        if(isBalanceHidden) {
+            balEl.classList.add('hidden');
+            const icon = document.getElementById('eyeIcon');
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+             balEl.classList.remove('hidden');
+        }
+
         document.getElementById('userNameDisplay').innerText = app.user.name;
         
         document.getElementById('settingsUserName').innerText = app.user.name || 'کاربر';
-        document.getElementById('settingsNatId').innerText = app.security.nationalId || 'کد ملی ثبت نشده';
+        document.getElementById('settingsNatId').innerText = toPersianNum(app.security.nationalId) || 'کد ملی ثبت نشده';
 
         document.getElementById('dDay').innerHTML = genOpts(1,31,1);
         document.getElementById('checkDateRow').innerHTML = createDatePickerHTML('c');
         document.getElementById('loanDateRow').innerHTML = createDatePickerHTML('l');
         
         const accNum = app.security.nationalId && app.security.nationalId.length >=6 
-            ? "3545 6576 " + app.security.nationalId.substring(0,4) + " " + app.security.nationalId.substring(4,6) + "XX" 
-            : "3545 6576 8921 1004";
-        document.getElementById('cardAccountNumber').innerText = accNum;
+            ? "۳۵۴۵ ۶۵۷۶ " + app.security.nationalId.substring(0,4) + " " + app.security.nationalId.substring(4,6) + "XX" 
+            : "۳۵۴۵ ۶۵۷۶ ۸۹۲۱ ۱۰۰۴";
+        document.getElementById('cardAccountNumber').innerText = toPersianNum(accNum);
 
         renderWallets();
         renderDebts();
         renderChecks(); 
         renderLoans(); 
-        renderBudgets(distributableNet); // Pass distributable net separately
+        renderBudgets(distributableNet); 
         renderGoals();
         renderShop();
         renderReports(); 
@@ -2059,7 +2287,6 @@
         const currentMonth = getCurMonth();
         const deductibleFixed = app.debts.reduce((a,b)=> (b.deduct !== false && b.lastPaid !== currentMonth) ? a+b.value : a, 0);
         const deductibleCheck = (app.checks || []).reduce((a,b)=> (!b.isPaid && b.deduct !== false) ? a+b.value : a, 0);
-        // We use the same card logic here for consistency with the main card
         let net = income - (deductibleFixed + deductibleCheck);
         if(net < 0) net = 0;
 
@@ -2116,8 +2343,8 @@
 
         const txt = `وضعیت مالی ${app.user.name}
 شماره حساب: ${acc}
-تاریخ: ${dateStr}
-ساعت: ${timeStr}
+تاریخ: ${toPersianNum(dateStr)}
+ساعت: ${toPersianNum(timeStr)}
 
 موجودی کل: ${gross}
 خالص: ${net}
@@ -2154,7 +2381,7 @@
         const currentYear = parseInt(faDateParts[0]);
         const currentMonth = parseInt(faDateParts[1]);
         const currentDay = parseInt(faDateParts[2]);
-        const currentMonthStr = `${currentYear}/${currentMonth}`; 
+        const currentMonthStr = toPersianNum(`${currentYear}/${currentMonth}`); 
 
         div.innerHTML = app.debts.map((d, i) => {
             const dueDay = parseInt(d.day);
@@ -2165,18 +2392,18 @@
             if (d.lastPaid === currentMonthStr) {
                 statusText = `<span style="color:var(--success); font-weight:bold;">پرداخت شد <i class="fas fa-check"></i></span>`;
                 let nextDueInDays = (30 - currentDay) + dueDay; 
-                statusText += `<br><small style="color:var(--text-sec)">سررسید بعدی: حدود ${nextDueInDays} روز دیگر</small>`;
+                statusText += `<br><small style="color:var(--text-sec)">سررسید بعدی: حدود ${toPersianNum(nextDueInDays)} روز دیگر</small>`;
             } else {
                 if (currentDay > dueDay) {
                     const daysOverdue = currentDay - dueDay;
-                    statusText = `<span style="color:var(--danger); font-weight:bold;">${daysOverdue} روز معوق!</span>`;
+                    statusText = `<span style="color:var(--danger); font-weight:bold;">${toPersianNum(daysOverdue)} روز معوق!</span>`;
                     animClass = "pulse-danger bg-yellow-highlight";
                 } else if (currentDay === dueDay) {
                     statusText = `<span style="color:var(--danger); font-weight:bold;">سررسید امروز!</span>`;
                     animClass = "pulse-danger";
                 } else {
                     const daysLeft = dueDay - currentDay;
-                    statusText = `${daysLeft} روز تا پرداخت`;
+                    statusText = `${toPersianNum(daysLeft)} روز تا پرداخت`;
                     if (daysLeft <= 3) animClass = "pulse-warning";
                 }
                 btnHtml = `<button class="btn-small-icon btn-check" onclick="payDebt(${i})" title="پرداخت شد"><i class="fas fa-check"></i></button>`;
@@ -2206,7 +2433,7 @@
         if(confirm("آیا پرداخت این قسط برای این ماه را تایید می‌کنید؟")) {
             saveSectionSnap('dashboard', `پرداخت قسط ${app.debts[i].name}`);
             const today = new Date();
-            const currentMonthStr = today.toLocaleDateString('fa-IR-u-nu-latn').split('/').slice(0, 2).join('/');
+            const currentMonthStr = toPersianNum(today.toLocaleDateString('fa-IR-u-nu-latn').split('/').slice(0, 2).join('/'));
             
             app.debts[i].lastPaid = currentMonthStr;
             
@@ -2223,7 +2450,7 @@
         if(!app.checks) app.checks = [];
         
         const dateToNum = (s) => parseInt(s.replace(/\//g, ''));
-        const todayStr = new Date().toLocaleDateString('fa-IR-u-nu-latn'); 
+        const todayStr = toPersianNum(new Date().toLocaleDateString('fa-IR-u-nu-latn')); 
         const todayNum = dateToNum(todayStr);
 
         div.innerHTML = app.checks.map((c, i) => {
@@ -2252,10 +2479,8 @@
             }
             
             if(cDateNum > todayNum) {
-                const pNow = todayStr.split('/').map(Number);
-                const pTarget = c.date.split('/').map(Number);
-                let days = (pTarget[0]-pNow[0])*365 + (pTarget[1]-pNow[1])*30 + (pTarget[2]-pNow[2]);
-                if (days > 0) statusMsg = `${days} روز مانده`;
+               // Approximate calculation as dates are strings
+               statusMsg = `سررسید: ${c.date}`;
             }
 
             const isDeducted = (c.deduct !== false);
@@ -2289,7 +2514,7 @@
     function renderLoans() {
         const div = document.getElementById('loanList');
         if(!app.loans) app.loans = [];
-        const todayStr = new Date().toLocaleDateString('fa-IR');
+        const todayStr = toPersianNum(new Date().toLocaleDateString('fa-IR'));
 
         div.innerHTML = app.loans.map((l, i) => {
             if(l.isReceived) {
@@ -2360,7 +2585,7 @@
         let totalP = 0;
         app.budgets.forEach(b => totalP += b.percent);
         const badge = document.getElementById('totalPercentBadge');
-        badge.innerText = totalP + '%';
+        badge.innerText = toPersianNum(totalP) + '%';
         badge.style.background = totalP > 100 ? 'var(--danger)' : (totalP === 100 ? 'var(--success)' : 'var(--text-sec)');
 
         const baseAmount = app.distributedAmount;
@@ -2397,7 +2622,7 @@
             div.innerHTML += 
                 `<div class="bento-item ${status} ${pausedClass}">
                     <div class="bento-header">
-                        <span>${b.name} (${b.percent}%) ${b.isPaused ? '<small>(توقف)</small>' : ''} <i class="fas fa-edit" style="font-size:0.9rem; cursor:pointer; margin-right:5px; color:var(--text-sec);" onclick="openEdit('budget', ${i})"></i></span>
+                        <span>${b.name} (${toPersianNum(b.percent)}%) ${b.isPaused ? '<small>(توقف)</small>' : ''} <i class="fas fa-edit" style="font-size:0.9rem; cursor:pointer; margin-right:5px; color:var(--text-sec);" onclick="openEdit('budget', ${i})"></i></span>
                         <div style="display:flex; gap:8px;">
                             <i class="fas fa-list-alt" style="opacity:0.5; cursor:pointer;" onclick="openItemHistory(${i})" title="تاریخچه"></i>
                             <i class="fas fa-trash" style="opacity:0.3; cursor:pointer;" onclick="delBudget(${i})"></i>
@@ -2616,7 +2841,6 @@
                     app.budgets[tempDepositIndex].manualAdd += val;
                     addToHistory(tempDepositIndex, val, "واریز مستقیم (بیرونی)", 'deposit');
                     
-                    // Logic changed as per Instruction 1 & 3: Find or Create 'پول بیرونی' wallet
                     const targetWalletName = "پول بیرونی";
                     let wIdx = app.wallets.findIndex(w => w.name === targetWalletName);
                     
@@ -2825,7 +3049,7 @@
         const remainPercent = 100 - totalPercentAllocated;
 
         document.getElementById('subTotalBudget').innerText = "سهم کل: " + format(share);
-        document.getElementById('subRemainPercent').innerText = "باقی‌مانده: " + remainPercent + "%";
+        document.getElementById('subRemainPercent').innerText = "باقی‌مانده: " + toPersianNum(remainPercent) + "%";
         if(remainPercent < 0) document.getElementById('subRemainPercent').style.color = 'var(--danger)';
         else document.getElementById('subRemainPercent').style.color = 'var(--success)';
 
@@ -2856,7 +3080,7 @@
              copyBtn.setAttribute('onclick', `copySub(${amt})`);
          });
          const remain = 100 - totalP;
-         document.getElementById('subRemainPercent').innerText = "باقی‌مانده: " + remain + "%";
+         document.getElementById('subRemainPercent').innerText = "باقی‌مانده: " + toPersianNum(remain) + "%";
          if(remain < 0) document.getElementById('subRemainPercent').style.color = 'var(--danger)';
          else document.getElementById('subRemainPercent').style.color = 'var(--success)';
     }
@@ -2883,7 +3107,7 @@
         let totalP = 0;
         finalData.forEach(s => totalP += s.percent);
         if(totalP > 100) {
-            alert("خطا: مجموع درصدها (" + totalP + "%) از ۱۰۰٪ بیشتر است!");
+            alert("خطا: مجموع درصدها (" + toPersianNum(totalP) + "%) از ۱۰۰٪ بیشتر است!");
             return;
         }
         saveSectionSnap('budget', `تغییر زیرمجموعه‌های ${app.budgets[tempSubIndex].name}`);
@@ -2993,10 +3217,10 @@
                     tempBudget = JSON.parse(JSON.stringify(app.budgets[index]));
                     tempBudget.name = newName; tempBudget.percent = newP;
                     const safeMax = 100 - total;
-                    document.getElementById('maxAllowedPercent').innerText = safeMax + '%';
+                    document.getElementById('maxAllowedPercent').innerText = toPersianNum(safeMax) + '%';
                     const slider = document.getElementById('percentSlider');
                     slider.max = safeMax; slider.value = 0;
-                    document.getElementById('sliderValDisplay').innerText = 0;
+                    document.getElementById('sliderValDisplay').innerText = toPersianNum(0);
                     tempBudget.isEdit = true; tempBudget.editIndex = index;
                     openModal('fixPercentModal'); return; 
                 }
@@ -3095,10 +3319,10 @@
             tempBudget = { name: n, percent: p, id: Date.now(), spent: 0, history: [], manualAdd: 0, isEdit: false, subs:[], internalDebt: [] };
             const max = 100 - currentTotal;
             const safeMax = max > 0 ? max : 0;
-            document.getElementById('maxAllowedPercent').innerText = safeMax + '%';
+            document.getElementById('maxAllowedPercent').innerText = toPersianNum(safeMax) + '%';
             const slider = document.getElementById('percentSlider');
             slider.max = safeMax; slider.value = 0;
-            document.getElementById('sliderValDisplay').innerText = 0;
+            document.getElementById('sliderValDisplay').innerText = toPersianNum(0);
             openModal('fixPercentModal');
         } else {
             saveSectionSnap('budget', `افزودن بودجه ${n}`);
@@ -3108,7 +3332,7 @@
         }
     }
 
-    function updateSliderVal() { document.getElementById('sliderValDisplay').innerText = document.getElementById('percentSlider').value; }
+    function updateSliderVal() { document.getElementById('sliderValDisplay').innerText = toPersianNum(document.getElementById('percentSlider').value); }
     function useSliderPercent() {
         if(!tempBudget) return;
         saveSectionSnap('budget', 'اصلاح درصد بودجه');
@@ -3168,7 +3392,6 @@
         saveData(); renderUI(); closeAllModals(); tempBudget = null;
     }
 
-    // --- PRIORITY LOGIC (Instruction 1: Wizard Style) ---
     function openPrioritySettings() {
         if(!app.priorityTiers) {
             app.priorityTiers = []; 
@@ -3191,8 +3414,8 @@
         } else {
             div.innerHTML = app.priorityTiers.map((t, idx) => 
                 `<div style="background:var(--bg-body); border-radius:12px; padding:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                    <div style="font-weight:bold;">اولویت ${idx + 1}</div>
-                    <div style="direction:ltr;">${t.start}% - ${t.end}%</div>
+                    <div style="font-weight:bold;">اولویت ${toPersianNum(idx + 1)}</div>
+                    <div style="direction:ltr;">${toPersianNum(t.start)}% - ${toPersianNum(t.end)}%</div>
                 </div>`
             ).join('');
         }
@@ -3204,11 +3427,11 @@
         
         if (start >= 100) return alert("ظرفیت اولویت‌ها تکمیل شده است (۱۰۰٪).");
         
-        document.getElementById('tierStartDisplay').innerText = start;
+        document.getElementById('tierStartDisplay').innerText = toPersianNum(start);
         document.getElementById('tierEndInput').value = '';
         document.getElementById('tierEndInput').setAttribute('min', start + 1);
         document.getElementById('tierEndInput').setAttribute('max', 100);
-        document.getElementById('nextTierNum').innerText = (app.priorityTiers.length + 1);
+        document.getElementById('nextTierNum').innerText = toPersianNum(app.priorityTiers.length + 1);
         
         document.getElementById('newTierForm').style.display = 'block';
         document.getElementById('addTierBtn').style.display = 'none';
@@ -3229,7 +3452,7 @@
         
         // Check if finished
         if (end < 100) {
-             showAddTierForm(); // Auto open next
+             showAddTierForm(); 
         } else {
              document.getElementById('newTierForm').style.display = 'none';
              showToast("تعریف اولویت‌ها تکمیل شد");
@@ -3265,8 +3488,8 @@
             amount: amount, 
             reason: reason, 
             type: type, 
-            date: new Date().toLocaleDateString('fa-IR'), 
-            time: new Date().toLocaleTimeString('fa-IR') 
+            date: toPersianNum(new Date().toLocaleDateString('fa-IR')), 
+            time: toPersianNum(new Date().toLocaleTimeString('fa-IR')) 
         });
     }
 
@@ -3488,7 +3711,7 @@
         if (myChart2) myChart2.destroy();
         
         const logs = app.dailyLogs.slice(-30); 
-        const labels = logs.map(l => l.date);
+        const labels = logs.map(l => toPersianNum(l.date));
         const data = logs.map(l => l.net);
 
         myChart2 = new Chart(ctx, {
@@ -3517,7 +3740,6 @@
         });
     }
 
-    // Instruction 2: Simple Excel Export (Numeric data as numbers)
     function exportExcel() {
         withLoading(() => {
             let table = '<table><thead><tr><th>تاریخ</th><th>ساعت</th><th>نوع</th><th>مبلغ (عدد)</th><th>دسته‌بندی</th><th>توضیحات</th></tr></thead><tbody>';
@@ -3525,7 +3747,6 @@
             app.budgets.forEach(b => {
                 if (b.history) {
                     b.history.forEach(h => {
-                        // Using raw number for h.amount to ensure Excel treats it as number
                         table += `<tr>
                             <td>${h.date}</td>
                             <td>${h.time}</td>
@@ -3540,7 +3761,6 @@
             
             table += '</tbody></table>';
 
-            // Simple HTML Excel wrapper
             const excelTemplate = 
                 `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
                 <head>
@@ -3575,7 +3795,6 @@
         }, 1000);
     }
 
-    // Instruction 3: Report Image
     function generateReportImage() {
         withLoading(() => {
             const income = app.wallets.reduce((a,b)=>a+b.value,0);
@@ -3590,9 +3809,9 @@
             
             const days = app.user.startDate ? Math.floor((Date.now() - app.user.startDate)/(1000*60*60*24))+1 : 0;
 
-            document.getElementById('printDate').innerText = new Date().toLocaleDateString('fa-IR');
+            document.getElementById('printDate').innerText = toPersianNum(new Date().toLocaleDateString('fa-IR'));
             document.getElementById('printUser').innerText = app.user.name;
-            document.getElementById('printDays').innerText = days;
+            document.getElementById('printDays').innerText = toPersianNum(days);
             document.getElementById('printInc').innerText = format(income);
             document.getElementById('printDebt').innerText = format(totalDebt);
             document.getElementById('printNet').innerText = format(net);
@@ -3603,12 +3822,12 @@
                 const logs = app.dailyLogs.slice(-15);
                 window.myPrintChart = new Chart(ctx, {
                     type: 'line',
-                    data: { labels: logs.map(l => l.date), datasets: [{ label: 'خالص دارایی (تومان)', data: logs.map(l => l.net), borderColor: '#4338ca', backgroundColor: 'rgba(67, 56, 202, 0.1)', fill: true }] },
+                    data: { labels: logs.map(l => toPersianNum(l.date)), datasets: [{ label: 'خالص دارایی (تومان)', data: logs.map(l => l.net), borderColor: '#4338ca', backgroundColor: 'rgba(67, 56, 202, 0.1)', fill: true }] },
                     options: { responsive: true, maintainAspectRatio: false }
                 });
                 
                 const hTab = document.getElementById('printHistoryTable');
-                hTab.innerHTML = logs.map(l => `<tr><td>${l.date}</td><td>${format(l.net)}</td><td>${format(l.spent)}</td></tr>`).join('');
+                hTab.innerHTML = logs.map(l => `<tr><td>${toPersianNum(l.date)}</td><td>${format(l.net)}</td><td>${format(l.spent)}</td></tr>`).join('');
             }
             
             const tb = document.getElementById('printBody');
@@ -3616,7 +3835,7 @@
             app.budgets.forEach(b => {
                 const baseAmount = app.distributedAmount;
                 const s = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
-                tb.innerHTML += `<tr><td>${b.name}</td><td>${b.percent}%</td><td>${format(s)}</td><td>${format(b.spent)}</td><td>${format(s-b.spent)}</td></tr>`;
+                tb.innerHTML += `<tr><td>${b.name}</td><td>${toPersianNum(b.percent)}%</td><td>${format(s)}</td><td>${format(b.spent)}</td><td>${format(s-b.spent)}</td></tr>`;
             });
             
             const dList = document.getElementById('printDebtsList');
@@ -3730,7 +3949,7 @@
         }
     }
     function saveData() { if(!isGuestMode) { localStorage.setItem('amir_fin_v9', JSON.stringify(app)); } }
-    function updateDate() { document.getElementById('headerDate').innerText = new Date().toLocaleDateString('fa-IR'); }
+    function updateDate() { document.getElementById('headerDate').innerText = toPersianNum(new Date().toLocaleDateString('fa-IR')); }
 
     function switchTab(id) {
         document.querySelectorAll('.tab-pane').forEach(e => e.classList.remove('active'));
@@ -3753,7 +3972,8 @@
             && i.id !== 'aaPercent' && i.id !== 'aaAmount' && i.id !== 'aaMin'
             && i.id !== 'heBudgetId' && i.id !== 'heHistIndex' && i.id !== 'heType'
             && i.id !== 'setupNameInput' && i.id !== 'setupNatId' && i.id !== 'setupSecurityA'
-            && i.id !== 'tierEndInput' && i.id !== 'histSearchInput') {
+            && i.id !== 'tierEndInput' && i.id !== 'histSearchInput'
+            && i.id !== 'btDestInput' && i.id !== 'btAmountInput' && i.id !== 'btPinInput') {
                 i.value = '';
             }
         });
