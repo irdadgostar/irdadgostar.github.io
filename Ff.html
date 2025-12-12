@@ -1,5 +1,4 @@
-
-<!DOCTYPE html> 
+ <!DOCTYPE html> 
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -844,7 +843,7 @@
                     </div>
                     
                     <div style="margin-top: auto;">
-                        <span class="balance-label">موجودی خالص (قابل تقسیم)</span>
+                        <span class="balance-label">موجودی خالص (غیر قابل تقسیم)</span>
                         <div class="balance-value" id="totalBalance">0</div>
                     </div>
                     <div style="display:flex; justify-content:space-between; font-size:1.1rem; opacity:0.95; font-weight:600; margin-top:10px;">
@@ -2014,10 +2013,17 @@
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
         const totalDeductibleDebt = fixedDebt + checkDebt;
         
-        let net = income - totalDeductibleDebt - manualDeductions;
-        if (net < 0) net = 0;
+        // --- Calculate Dashboard Net (Card Display) ---
+        // This includes all money in wallets minus debts, regardless of budget allocation
+        let cardNet = income - totalDeductibleDebt;
+        if (cardNet < 0) cardNet = 0;
 
-        document.getElementById('totalBalance').innerText = format(net);
+        // --- Calculate Distributable Net (Budget Tab) ---
+        // This removes money already allocated to budget items manually (External Money)
+        let distributableNet = cardNet - manualDeductions;
+        if (distributableNet < 0) distributableNet = 0;
+
+        document.getElementById('totalBalance').innerText = format(cardNet);
         document.getElementById('userNameDisplay').innerText = app.user.name;
         
         document.getElementById('settingsUserName').innerText = app.user.name || 'کاربر';
@@ -2036,7 +2042,7 @@
         renderDebts();
         renderChecks(); 
         renderLoans(); 
-        renderBudgets(net);
+        renderBudgets(distributableNet); // Pass distributable net separately
         renderGoals();
         renderShop();
         renderReports(); 
@@ -2053,9 +2059,8 @@
         const currentMonth = getCurMonth();
         const deductibleFixed = app.debts.reduce((a,b)=> (b.deduct !== false && b.lastPaid !== currentMonth) ? a+b.value : a, 0);
         const deductibleCheck = (app.checks || []).reduce((a,b)=> (!b.isPaid && b.deduct !== false) ? a+b.value : a, 0);
-        const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
-
-        let net = income - (deductibleFixed + deductibleCheck) - manualDeductions;
+        // We use the same card logic here for consistency with the main card
+        let net = income - (deductibleFixed + deductibleCheck);
         if(net < 0) net = 0;
 
         const shoppingTotal = app.shopping.reduce((a,b) => {
@@ -2611,10 +2616,14 @@
                     app.budgets[tempDepositIndex].manualAdd += val;
                     addToHistory(tempDepositIndex, val, "واریز مستقیم (بیرونی)", 'deposit');
                     
-                    if(app.wallets.length > 0) {
-                        app.wallets[0].value += val;
+                    // Logic changed as per Instruction 1 & 3: Find or Create 'پول بیرونی' wallet
+                    const targetWalletName = "پول بیرونی";
+                    let wIdx = app.wallets.findIndex(w => w.name === targetWalletName);
+                    
+                    if(wIdx > -1) {
+                        app.wallets[wIdx].value += val;
                     } else {
-                        app.wallets.push({name: "کیف پول اصلی", value: val});
+                        app.wallets.push({name: targetWalletName, value: val});
                     }
 
                     saveData(); renderUI(); showToast("واریز مستقیم ثبت شد");
