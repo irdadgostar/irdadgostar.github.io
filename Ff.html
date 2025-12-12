@@ -1,9 +1,10 @@
+
 <!DOCTYPE html> 
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مدیریت سرمایه تعالی</title>
+    <title>مدیریت سرمایه تعالی - نسخه پیشرفته بانکی</title>
 
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
@@ -949,7 +950,7 @@
         </div>
     </div>
     
-    <!-- TAB 4: REPORTS (NEW - Instruction 7) -->
+    <!-- TAB 4: REPORTS -->
     <div id="view-reports" class="tab-pane">
         <div class="header-row" style="padding:0 5px;">
              <h3>گزارشات و نمودارها</h3>
@@ -972,7 +973,6 @@
 
     <!-- TAB 5: SETTINGS -->
     <div id="view-settings" class="tab-pane">
-        <!-- Instruction 5: Updated Header -->
         <div class="settings-header-card">
             <div class="settings-header-icon"><i class="fas fa-user-circle"></i></div>
             <div>
@@ -1015,12 +1015,12 @@
                 </label>
             </div>
 
-            <div class="settings-group-title">داده‌ها و گزارش (دستور هشتم)</div>
+            <div class="settings-group-title">داده‌ها و گزارش</div>
             <div class="settings-group">
                 <div class="settings-item" onclick="exportExcel()">
                     <div style="display:flex; align-items:center;">
                         <div class="settings-item-icon si-green"><i class="fas fa-file-excel"></i></div>
-                        <div class="settings-text">دانلود فایل اکسل حرفه‌ای</div>
+                        <div class="settings-text">دانلود فایل اکسل ساده</div>
                     </div>
                     <i class="fas fa-chevron-left settings-chevron"></i>
                 </div>
@@ -1354,7 +1354,6 @@
         <div class="date-picker-row">
             <select id="dDay" style="direction: rtl;"></select>
         </div>
-        <!-- Instruction 4: Checkbox for deduction -->
         <label class="checkbox-wrapper" style="margin-top:15px;">
             <input type="checkbox" id="dDeduct" checked>
             <span style="font-size:0.9rem;">کسر از موجودی کل حساب سیستم</span>
@@ -1379,7 +1378,6 @@
         </div>
         <label>تاریخ سررسید:</label>
         <div class="date-picker-row" id="checkDateRow"></div>
-        <!-- Instruction 4: Checkbox for deduction -->
         <label class="checkbox-wrapper" style="margin-top:15px;">
             <input type="checkbox" id="cDeduct" checked>
             <span style="font-size:0.9rem;">کسر از موجودی کل حساب سیستم</span>
@@ -1530,7 +1528,7 @@
     </div>
 </div>
 
-<!-- Updated Priority Settings Modal (Instruction 6) -->
+<!-- Updated Priority Settings Modal (Instruction 1) -->
 <div id="prioritySettingsModal" class="modal">
     <div class="modal-content">
         <h3>مدیریت هوشمند اولویت‌ها</h3>
@@ -1559,7 +1557,6 @@
 <div id="itemHistModal" class="modal">
     <div class="modal-content">
         <h3>تاریخچه تراکنش‌ها (قابل ویرایش)</h3>
-        <!-- Live Search (Instruction 8) -->
         <div class="search-bar">
              <input type="text" id="histSearchInput" onkeyup="filterList('histSearchInput', 'itemHistList')" placeholder="جستجو در مبلغ یا توضیحات...">
              <i class="fas fa-search"></i>
@@ -1578,7 +1575,6 @@
     </div>
 </div>
 
-<!-- Print Area (Modified for Instruction 3) -->
 <div id="printArea">
     <div class="print-header">
         <h1>گزارش جامع وضعیت مالی</h1>
@@ -1632,7 +1628,7 @@
             {id: 10, name: "پس‌انداز کل", percent: 11, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: [], internalDebt: []}
         ],
         priorities: {}, // Will be managed via wizard
-        priorityTiers: [], // New structure for Instruction 6
+        priorityTiers: [], // New structure for Instruction 1
         distributedAmount: 0, 
         goals: [],
         shopping: [],
@@ -1664,7 +1660,7 @@
         const container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
         toast.className = 'toast';
-        toast.innerHTML = <i class="fas fa-${icon}"></i> ${message};
+        toast.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
         container.appendChild(toast);
         requestAnimationFrame(() => toast.classList.add('show'));
         setTimeout(() => {
@@ -1696,12 +1692,9 @@
         const lastLog = app.dailyLogs.length > 0 ? app.dailyLogs[app.dailyLogs.length-1] : null;
         if (!lastLog || lastLog.date !== today) {
             const income = app.wallets.reduce((a,b)=>a+b.value,0);
-            
-            // Instruction 4: Deduct only if unpaid
             const fixedDebt = app.debts.reduce((a,b)=> (b.deduct !== false && b.lastPaid !== getCurMonth()) ? a+b.value : a, 0);
             const checkDebt = (app.checks || []).reduce((a,b)=> (!b.isPaid && b.deduct !== false) ? a+b.value : a, 0);
             const totalDebt = fixedDebt + checkDebt;
-            
             const net = Math.max(0, income - totalDebt);
             const spent = app.budgets.reduce((a,b)=>a+b.spent,0);
             app.dailyLogs.push({ date: today, net: net, spent: spent, timestamp: Date.now() });
@@ -1711,26 +1704,26 @@
 
     function setupDatePickers() { }
     function createDatePickerHTML(prefix, defaultD=1, defaultM=1, defaultY=1403) {
-        return <select id="${prefix}Day" class="date-sel">${genOpts(1,31, defaultD)}</select>
+        return `<select id="${prefix}Day" class="date-sel">${genOpts(1,31, defaultD)}</select>
                 <select id="${prefix}Month" class="date-sel">${genOpts(1,12, defaultM)}</select>
-                <select id="${prefix}Year" class="date-sel">${genYearOpts(defaultY)}</select>;
+                <select id="${prefix}Year" class="date-sel">${genYearOpts(defaultY)}</select>`;
     }
     function genOpts(min, max, sel) {
         let html = '';
-        for(let i=min; i<=max; i++) html += <option value="${i}" ${i==sel?'selected':''}>${i}</option>;
+        for(let i=min; i<=max; i++) html += `<option value="${i}" ${i==sel?'selected':''}>${i}</option>`;
         return html;
     }
     function genYearOpts(sel) {
         const currentYear = 1403;
         let html = '';
-        for(let i=0; i<=20; i++) html += <option value="${currentYear+i}" ${(currentYear+i)==sel?'selected':''}>${currentYear+i}</option>;
+        for(let i=0; i<=20; i++) html += `<option value="${currentYear+i}" ${(currentYear+i)==sel?'selected':''}>${currentYear+i}</option>`;
         return html;
     }
     function getDateString(prefix) {
         const d = document.getElementById(prefix+'Day').value;
         const m = document.getElementById(prefix+'Month').value;
         const y = document.getElementById(prefix+'Year').value;
-        return ${y}/${m}/${d};
+        return `${y}/${m}/${d}`;
     }
     function getCurMonth() {
         return new Date().toLocaleDateString('fa-IR-u-nu-latn').split('/').slice(0, 2).join('/');
@@ -1772,7 +1765,7 @@
             document.getElementById('setupSecurityQ').innerText = securityQuestions[randIdx];
             document.getElementById('setupSecurityQ').setAttribute('data-qid', randIdx);
         } else {
-            title.innerText = app.user.name ? سلام، ${app.user.name} : "خوش آمدید";
+            title.innerText = app.user.name ? `سلام، ${app.user.name}` : "خوش آمدید";
             sub.innerText = "جهت ورود رمز خود را وارد کنید";
             step1.style.display = 'none';
             step2.style.display = 'flex';
@@ -1833,7 +1826,7 @@
     }
     function updatePinDots() {
         for(let i=1; i<=4; i++) {
-            const dot = document.getElementById(pd${i});
+            const dot = document.getElementById(`pd${i}`);
             if (i <= pinBuffer.length) dot.classList.add('filled');
             else dot.classList.remove('filled');
         }
@@ -1963,13 +1956,13 @@
         if(hist.length === 0) { list.innerHTML = "<p style='text-align:center'>سابقه‌ای موجود نیست.</p>"; } 
         else {
             list.innerHTML = hist.map((h, i) => 
-                <div style="padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="restoreSectionSnap('${section}', ${i})">
+                `<div style="padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="restoreSectionSnap('${section}', ${i})">
                     <div style="text-align:right;">
                         <span style="display:block; font-weight:bold; font-size:0.9rem; color:var(--text-main); margin-bottom:5px;">${h.description || 'تغییر سیستم'}</span>
                         <span style="font-size:0.75rem; color:var(--text-sec);">${h.time}</span>
                     </div>
                     <i class="fas fa-undo" style="color:var(--primary); font-size:1.1rem;"></i>
-                </div>).join('');
+                </div>`).join('');
         }
         openModal('sectionHistoryModal');
     }
@@ -2001,15 +1994,14 @@
         if(app.user.startDate) {
             const diff = Date.now() - app.user.startDate;
             const days = Math.floor(diff / (1000 * 60 * 60 * 24)) + 1; 
-            document.getElementById('daysPassedLabel').innerText = روز ${days};
+            document.getElementById('daysPassedLabel').innerText = `روز ${days}`;
         } else {
              app.user.startDate = Date.now();
-             document.getElementById('daysPassedLabel').innerText = روز ۱;
+             document.getElementById('daysPassedLabel').innerText = `روز ۱`;
         }
 
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
         
-        // --- LOGIC FOR INSTRUCTION 4: Deduct only if unpaid and deducted ---
         const currentMonth = getCurMonth();
         const fixedDebt = app.debts.reduce((a,b)=> {
              return (b.deduct !== false && b.lastPaid !== currentMonth) ? a+b.value : a;
@@ -2022,23 +2014,19 @@
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
         const totalDeductibleDebt = fixedDebt + checkDebt;
         
-        // Calculate Net
         let net = income - totalDeductibleDebt - manualDeductions;
         if (net < 0) net = 0;
 
         document.getElementById('totalBalance').innerText = format(net);
         document.getElementById('userNameDisplay').innerText = app.user.name;
         
-        // Instruction 5: Update Settings Header
         document.getElementById('settingsUserName').innerText = app.user.name || 'کاربر';
         document.getElementById('settingsNatId').innerText = app.security.nationalId || 'کد ملی ثبت نشده';
 
-        // Populate Pickers
         document.getElementById('dDay').innerHTML = genOpts(1,31,1);
         document.getElementById('checkDateRow').innerHTML = createDatePickerHTML('c');
         document.getElementById('loanDateRow').innerHTML = createDatePickerHTML('l');
         
-        // Render 6-digit Account (Instruction 9 - though not explicit request here, kept from prev)
         const accNum = app.security.nationalId && app.security.nationalId.length >=6 
             ? "3545 6576 " + app.security.nationalId.substring(0,4) + " " + app.security.nationalId.substring(4,6) + "XX" 
             : "3545 6576 8921 1004";
@@ -2051,7 +2039,7 @@
         renderBudgets(net);
         renderGoals();
         renderShop();
-        renderReports(); // Instruction 7
+        renderReports(); 
     }
 
     function showCardDetails() {
@@ -2081,7 +2069,7 @@
 
         const content = document.getElementById('cardDetailsContent');
         content.innerHTML = 
-            <div class="detail-row">
+            `<div class="detail-row">
                 <span class="detail-label">مجموع موجودی (ناخالص):</span>
                 <span class="detail-val" id="cpGross">${format(gross)}</span>
             </div>
@@ -2104,8 +2092,7 @@
             <div class="detail-row">
                 <span class="detail-label">مجموع طلب‌ها:</span>
                 <span class="detail-val" style="color:var(--success)" id="cpLoan">${format(loansTotal)}</span>
-            </div>
-        ;
+            </div>`;
         openModal('cardDetailsModal');
     }
 
@@ -2122,7 +2109,7 @@
         const dateStr = now.toLocaleDateString('fa-IR');
         const timeStr = now.toLocaleTimeString('fa-IR');
 
-        const txt = وضعیت مالی ${app.user.name}
+        const txt = `وضعیت مالی ${app.user.name}
 شماره حساب: ${acc}
 تاریخ: ${dateStr}
 ساعت: ${timeStr}
@@ -2134,7 +2121,7 @@
 اهداف: ${goal}
 طلب‌ها: ${loan}
 
-سیستم مدیریت سرمایه تعالی;
+سیستم مدیریت سرمایه تعالی`;
 
         navigator.clipboard.writeText(txt);
         showToast("اطلاعات کپی شد");
@@ -2143,7 +2130,7 @@
     function renderWallets() {
         const div = document.getElementById('walletList');
         div.innerHTML = app.wallets.map((w, i) => 
-            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center;">
+            `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center;">
                 <span style="font-weight:600;">${w.name}</span>
                 <div style="display:flex; align-items:center;">
                     <b style="font-size:1.1rem; color:var(--primary);">${format(w.value)}</b>
@@ -2152,7 +2139,7 @@
                         <button class="btn-small-icon btn-del" onclick="delWallet(${i})"><i class="fas fa-trash"></i></button>
                     </span>
                 </div>
-            </div>).join('');
+            </div>`).join('');
     }
 
     function renderDebts() {
@@ -2162,7 +2149,7 @@
         const currentYear = parseInt(faDateParts[0]);
         const currentMonth = parseInt(faDateParts[1]);
         const currentDay = parseInt(faDateParts[2]);
-        const currentMonthStr = ${currentYear}/${currentMonth}; 
+        const currentMonthStr = `${currentYear}/${currentMonth}`; 
 
         div.innerHTML = app.debts.map((d, i) => {
             const dueDay = parseInt(d.day);
@@ -2171,30 +2158,29 @@
             let btnHtml = "";
             
             if (d.lastPaid === currentMonthStr) {
-                statusText = <span style="color:var(--success); font-weight:bold;">پرداخت شد <i class="fas fa-check"></i></span>;
+                statusText = `<span style="color:var(--success); font-weight:bold;">پرداخت شد <i class="fas fa-check"></i></span>`;
                 let nextDueInDays = (30 - currentDay) + dueDay; 
-                statusText += <br><small style="color:var(--text-sec)">سررسید بعدی: حدود ${nextDueInDays} روز دیگر</small>;
+                statusText += `<br><small style="color:var(--text-sec)">سررسید بعدی: حدود ${nextDueInDays} روز دیگر</small>`;
             } else {
                 if (currentDay > dueDay) {
                     const daysOverdue = currentDay - dueDay;
-                    statusText = <span style="color:var(--danger); font-weight:bold;">${daysOverdue} روز معوق!</span>;
+                    statusText = `<span style="color:var(--danger); font-weight:bold;">${daysOverdue} روز معوق!</span>`;
                     animClass = "pulse-danger bg-yellow-highlight";
                 } else if (currentDay === dueDay) {
-                    statusText = <span style="color:var(--danger); font-weight:bold;">سررسید امروز!</span>;
+                    statusText = `<span style="color:var(--danger); font-weight:bold;">سررسید امروز!</span>`;
                     animClass = "pulse-danger";
                 } else {
                     const daysLeft = dueDay - currentDay;
-                    statusText = ${daysLeft} روز تا پرداخت;
+                    statusText = `${daysLeft} روز تا پرداخت`;
                     if (daysLeft <= 3) animClass = "pulse-warning";
                 }
-                btnHtml = <button class="btn-small-icon btn-check" onclick="payDebt(${i})" title="پرداخت شد"><i class="fas fa-check"></i></button>;
+                btnHtml = `<button class="btn-small-icon btn-check" onclick="payDebt(${i})" title="پرداخت شد"><i class="fas fa-check"></i></button>`;
             }
 
             const isDeducted = (d.deduct !== false);
             const deductIcon = isDeducted ? '' : '<i class="fas fa-eye-slash" title="عدم کسر از موجودی" style="color:var(--text-sec); margin-right:5px; font-size:0.8rem;"></i>';
 
-            return 
-            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px; transition:0.3s;" class="${animClass}">
+            return `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px; transition:0.3s;" class="${animClass}">
                 <div>
                     <span style="font-weight:bold;">${d.name} ${deductIcon}</span>
                     <div style="font-size:0.8rem; margin-top:4px; color:var(--text-sec); line-height:1.6;">${statusText}</div>
@@ -2207,13 +2193,13 @@
                         <button class="btn-small-icon btn-del" onclick="delDebt(${i})"><i class="fas fa-trash"></i></button>
                     </span>
                 </div>
-            </div>;
+            </div>`;
         }).join('');
     }
 
     function payDebt(i) {
         if(confirm("آیا پرداخت این قسط برای این ماه را تایید می‌کنید؟")) {
-            saveSectionSnap('dashboard', پرداخت قسط ${app.debts[i].name});
+            saveSectionSnap('dashboard', `پرداخت قسط ${app.debts[i].name}`);
             const today = new Date();
             const currentMonthStr = today.toLocaleDateString('fa-IR-u-nu-latn').split('/').slice(0, 2).join('/');
             
@@ -2237,14 +2223,13 @@
 
         div.innerHTML = app.checks.map((c, i) => {
             if(c.isPaid) {
-                 return 
-                <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; opacity:0.6;">
+                 return `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; opacity:0.6;">
                     <div><del>${c.name}</del> <small style="color:var(--success);">(پاس شد)</small></div>
                     <div style="display:flex; align-items:center;">
                         <b style="color:var(--text-sec);">${format(c.value)}</b>
                         <button class="btn-small-icon btn-del" onclick="delCheck(${i})" style="margin-right:10px;"><i class="fas fa-trash"></i></button>
                     </div>
-                </div>;
+                </div>`;
             }
 
             let animClass = "";
@@ -2258,21 +2243,20 @@
                 statusMsg = "سررسید امروز است!";
                 animClass = "pulse-danger";
             } else {
-                statusMsg = تاریخ سررسید: ${c.date}; 
+                statusMsg = `تاریخ سررسید: ${c.date}`; 
             }
             
             if(cDateNum > todayNum) {
                 const pNow = todayStr.split('/').map(Number);
                 const pTarget = c.date.split('/').map(Number);
                 let days = (pTarget[0]-pNow[0])*365 + (pTarget[1]-pNow[1])*30 + (pTarget[2]-pNow[2]);
-                if (days > 0) statusMsg = ${days} روز مانده;
+                if (days > 0) statusMsg = `${days} روز مانده`;
             }
 
             const isDeducted = (c.deduct !== false);
             const deductIcon = isDeducted ? '' : '<i class="fas fa-eye-slash" title="عدم کسر از موجودی" style="color:var(--text-sec); margin-right:5px; font-size:0.8rem;"></i>';
             
-            return 
-            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px;" class="${animClass}">
+            return `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px;" class="${animClass}">
                 <div>${c.name} ${deductIcon} <br><small style="color:${animClass?'var(--danger)':'var(--text-sec)'}; font-weight:bold;">${statusMsg}</small></div>
                 <div style="display:flex; align-items:center;">
                     <b style="color:var(--danger);">${format(c.value)}</b>
@@ -2282,13 +2266,13 @@
                         <button class="btn-small-icon btn-del" onclick="delCheck(${i})"><i class="fas fa-trash"></i></button>
                     </span>
                 </div>
-            </div>;
+            </div>`;
         }).join('');
     }
 
     function passCheck(i) {
         if(confirm("آیا این چک/بدهی پاس شده است؟")) {
-            saveSectionSnap('dashboard', پاس شدن چک ${app.checks[i].name});
+            saveSectionSnap('dashboard', `پاس شدن چک ${app.checks[i].name}`);
             app.checks[i].isPaid = true;
             if(app.wallets.length > 0) {
                  app.wallets[0].value -= app.checks[i].value;
@@ -2304,14 +2288,13 @@
 
         div.innerHTML = app.loans.map((l, i) => {
             if(l.isReceived) {
-                 return 
-                <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; opacity:0.6;">
+                 return `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; opacity:0.6;">
                     <div><del>${l.name}</del> <small style="color:var(--success);">(وصول شد)</small></div>
                     <div style="display:flex; align-items:center;">
                         <b style="color:var(--text-sec);">${format(l.value)}</b>
                         <button class="btn-small-icon btn-del" onclick="delLoan(${i})" style="margin-right:10px;"><i class="fas fa-trash"></i></button>
                     </div>
-                </div>;
+                </div>`;
             }
 
             let animClass = "";
@@ -2321,8 +2304,7 @@
                 statusMsg = "زمان وصول امروز!";
             }
 
-            return 
-            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px;" class="${animClass}">
+            return `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px;" class="${animClass}">
                 <div>${l.name} <br><small style="color:var(--text-sec);">${statusMsg}</small></div>
                 <div style="display:flex; align-items:center;">
                     <b style="color:var(--success);">${format(l.value)}</b>
@@ -2332,13 +2314,13 @@
                         <button class="btn-small-icon btn-del" onclick="delLoan(${i})"><i class="fas fa-trash"></i></button>
                     </span>
                 </div>
-            </div>;
+            </div>`;
         }).join('');
     }
 
     function receiveLoan(i) {
         if(confirm("آیا مبلغ قرض داده شده وصول شد؟")) {
-            saveSectionSnap('dashboard', وصول طلب ${app.loans[i].name});
+            saveSectionSnap('dashboard', `وصول طلب ${app.loans[i].name}`);
             app.loans[i].isReceived = true;
              if(app.wallets.length > 0) {
                  app.wallets[0].value += app.loans[i].value;
@@ -2355,7 +2337,7 @@
             if (net > app.distributedAmount) {
                 const diff = net - app.distributedAmount;
                 distributeBtn.style.display = 'flex';
-                distributableDisplay.innerHTML = <span style="color:var(--text-sec);">${format(app.distributedAmount)}</span> <span style="color:var(--success); font-size:0.9em; margin-right:5px;">(+${format(diff)})</span>;
+                distributableDisplay.innerHTML = `<span style="color:var(--text-sec);">${format(app.distributedAmount)}</span> <span style="color:var(--success); font-size:0.9em; margin-right:5px;">(+${format(diff)})</span>`;
             } else {
                 distributeBtn.style.display = 'flex';
                 distributableDisplay.style.color = 'var(--warning)';
@@ -2399,16 +2381,16 @@
                     const c = colors[idx % colors.length];
                     const sAmount = Math.round((totalShare * s.percent) / 100);
                     if(sAmount > 0) {
-                         subHtml += <div class="sub-budget-seg" style="width:${s.percent}%; background:${c};" title="${s.name} (${format(sAmount)})"></div>;
-                         legHtml += <div class="sub-legend-item"><div class="sub-dot" style="background:${c}"></div> ${s.name}: ${format(sAmount)}</div>;
+                         subHtml += `<div class="sub-budget-seg" style="width:${s.percent}%; background:${c};" title="${s.name} (${format(sAmount)})"></div>`;
+                         legHtml += `<div class="sub-legend-item"><div class="sub-dot" style="background:${c}"></div> ${s.name}: ${format(sAmount)}</div>`;
                     }
                 });
-                subBars = <div class="sub-budget-bar">${subHtml}</div>;
-                subLegend = <div class="sub-budget-legend">${legHtml}</div>;
+                subBars = `<div class="sub-budget-bar">${subHtml}</div>`;
+                subLegend = `<div class="sub-budget-legend">${legHtml}</div>`;
             }
 
             div.innerHTML += 
-                <div class="bento-item ${status} ${pausedClass}">
+                `<div class="bento-item ${status} ${pausedClass}">
                     <div class="bento-header">
                         <span>${b.name} (${b.percent}%) ${b.isPaused ? '<small>(توقف)</small>' : ''} <i class="fas fa-edit" style="font-size:0.9rem; cursor:pointer; margin-right:5px; color:var(--text-sec);" onclick="openEdit('budget', ${i})"></i></span>
                         <div style="display:flex; gap:8px;">
@@ -2417,7 +2399,7 @@
                         </div>
                     </div>
                     <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-top:5px; color:var(--text-sec);">
-                        <span>سهم: ${format(shareFromPercent)} ${b.manualAdd ? + ${format(b.manualAdd)} : ''}</span>
+                        <span>سهم: ${format(shareFromPercent)} ${b.manualAdd ? `+ ${format(b.manualAdd)}` : ''}</span>
                         <span style="color:var(--danger)">خرج: ${format(b.spent)}</span>
                     </div>
                     <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(percent,100)}%"></div></div>
@@ -2435,8 +2417,7 @@
                         <button class="action-chip action-btn-zero" onclick="zeroItem(${i})"><i class="fas fa-eraser"></i> تصفیه</button>
                         <button class="action-chip action-btn-sub" onclick="openSubBudgetManager(${i})"><i class="fas fa-layer-group"></i> مدیریت زیرمجموعه</button>
                     </div>
-                </div>
-            ;
+                </div>`;
         });
     }
 
@@ -2518,12 +2499,12 @@
         const remain = share - b.spent;
 
         document.getElementById('transferSourceName').innerText = b.name;
-        document.getElementById('transferSourceBalance').innerText = موجودی فعلی: ${format(remain)} تومان;
+        document.getElementById('transferSourceBalance').innerText = `موجودی فعلی: ${format(remain)} تومان`;
         
         const sel = document.getElementById('transferTargetSelect');
         sel.innerHTML = app.budgets.map((item, i) => {
             if (i === index) return '';
-            return <option value="${i}">${item.name}</option>;
+            return `<option value="${i}">${item.name}</option>`;
         }).join('');
         
         document.getElementById('transferAmount').value = '';
@@ -2539,7 +2520,7 @@
         
         const b = app.budgets[sourceIdx];
         
-        saveSectionSnap('budget', انتقال ${format(amount)} از ${b.name} به ${app.budgets[targetIdx].name});
+        saveSectionSnap('budget', `انتقال ${format(amount)} از ${b.name} به ${app.budgets[targetIdx].name}`);
         
         if(!app.budgets[sourceIdx].manualAdd) app.budgets[sourceIdx].manualAdd = 0;
         app.budgets[sourceIdx].manualAdd -= amount;
@@ -2547,8 +2528,8 @@
         if (!app.budgets[targetIdx].manualAdd) app.budgets[targetIdx].manualAdd = 0;
         app.budgets[targetIdx].manualAdd += amount;
 
-        addToHistory(sourceIdx, amount, انتقال به ${app.budgets[targetIdx].name}, 'transferOut');
-        addToHistory(targetIdx, amount, دریافت از ${app.budgets[sourceIdx].name}, 'transferIn');
+        addToHistory(sourceIdx, amount, `انتقال به ${app.budgets[targetIdx].name}`, 'transferOut');
+        addToHistory(targetIdx, amount, `دریافت از ${app.budgets[sourceIdx].name}`, 'transferIn');
         
         saveData(); renderUI(); closeAllModals(); showToast("انتقال انجام شد");
     }
@@ -2562,7 +2543,7 @@
         const remain = share - b.spent;
         
         if (remain > 0) {
-            saveSectionSnap('budget', تصفیه حساب ${b.name});
+            saveSectionSnap('budget', `تصفیه حساب ${b.name}`);
             b.spent += remain;
             addToHistory(index, remain, "تصفیه حساب (صفر کردن)", 'expense');
             saveData(); renderUI(); showToast("حساب صفر شد");
@@ -2592,7 +2573,7 @@
             btn.disabled = false;
             btn.classList.remove('btn-outline');
             btn.classList.add('btn-primary');
-            msg.innerHTML = موجودی قابل واریز: <b style="color:var(--success)">${format(surplus)}</b> تومان;
+            msg.innerHTML = `موجودی قابل واریز: <b style="color:var(--success)">${format(surplus)}</b> تومان`;
             btn.dataset.max = surplus;
         } else {
             btn.disabled = true;
@@ -2609,10 +2590,10 @@
         closeAllModals();
         if(type === 'system') {
             const max = parseFloat(document.getElementById('btnSystemDep').dataset.max) || 0;
-            openUniversalInput('واریز از سیستم', حداکثر قابل واریز: ${format(max)} تومان, true, (val) => {
+            openUniversalInput('واریز از سیستم', `حداکثر قابل واریز: ${format(max)} تومان`, true, (val) => {
                  if(val && !isNaN(val)) {
                     if (val > max) return alert("مبلغ وارد شده بیشتر از موجودی توزیع نشده است!");
-                    saveSectionSnap('budget', واریز سیستمی به ${app.budgets[tempDepositIndex].name}: ${format(val)});
+                    saveSectionSnap('budget', `واریز سیستمی به ${app.budgets[tempDepositIndex].name}: ${format(val)}`);
                     
                     if(!app.budgets[tempDepositIndex].manualAdd) app.budgets[tempDepositIndex].manualAdd = 0;
                     app.budgets[tempDepositIndex].manualAdd += val;
@@ -2624,14 +2605,12 @@
         } else if (type === 'direct') {
             openUniversalInput('واریز مستقیم (بیرونی)', 'مبلغ واریزی:', true, (val) => {
                  if(val && !isNaN(val)) {
-                    saveSectionSnap('budget', واریز مستقیم به ${app.budgets[tempDepositIndex].name}: ${format(val)});
+                    saveSectionSnap('budget', `واریز مستقیم به ${app.budgets[tempDepositIndex].name}: ${format(val)}`);
                     if(!app.budgets[tempDepositIndex].manualAdd) app.budgets[tempDepositIndex].manualAdd = 0;
                     
-                    // 1. Add to item
                     app.budgets[tempDepositIndex].manualAdd += val;
                     addToHistory(tempDepositIndex, val, "واریز مستقیم (بیرونی)", 'deposit');
                     
-                    // 2. Add to Wallet
                     if(app.wallets.length > 0) {
                         app.wallets[0].value += val;
                     } else {
@@ -2645,10 +2624,10 @@
     }
 
     function togglePause(index) {
-        saveSectionSnap('budget', تغییر وضعیت توقف برای ${app.budgets[index].name});
+        saveSectionSnap('budget', `تغییر وضعیت توقف برای ${app.budgets[index].name}`);
         const b = app.budgets[index];
         if(b.isPaused) {
-            let restore = confirm(آیا درصد قبلی (${b.savedPercent}%) اعمال شود؟\nتایید = بله\nلغو = خیر (وارد کردن درصد جدید));
+            let restore = confirm(`آیا درصد قبلی (${b.savedPercent}%) اعمال شود؟\nتایید = بله\nلغو = خیر (وارد کردن درصد جدید)`);
             b.isPaused = false;
             if(restore) {
                 b.percent = b.savedPercent;
@@ -2671,7 +2650,7 @@
     function addGoal() {
         const n = document.getElementById('gName').value;
         const t = parseFormatted(document.getElementById('gTarget').value);
-        if(n && !isNaN(t)) { saveSectionSnap('tools', افزودن هدف: ${n}); app.goals.push({name:n, target:t, curr:0, autoConfig:{type:'none'}}); saveData(); renderUI(); closeAllModals(); }
+        if(n && !isNaN(t)) { saveSectionSnap('tools', `افزودن هدف: ${n}`); app.goals.push({name:n, target:t, curr:0, autoConfig:{type:'none'}}); saveData(); renderUI(); closeAllModals(); }
     }
     
     function renderGoals() {
@@ -2681,16 +2660,16 @@
             const remaining = Math.max(0, g.target - g.curr);
             const autoBadge = g.autoConfig && g.autoConfig.type !== 'none' ? '<i class="fas fa-robot" style="color:var(--primary)" title="برداشت خودکار فعال"></i>' : '';
             
-            let statusHTML = <span>مانده: <b style="color:var(--danger)">${format(remaining)}</b></span>;
+            let statusHTML = `<span>مانده: <b style="color:var(--danger)">${format(remaining)}</b></span>`;
             let completeMsg = "";
             
             if (g.curr >= g.target) {
-                statusHTML = <span style="color:var(--success); font-weight:bold;"><i class="fas fa-check-circle"></i> تکمیل شد</span>;
-                completeMsg = <span class="complete-badge">تبریک! تکمیل شد</span>;
+                statusHTML = `<span style="color:var(--success); font-weight:bold;"><i class="fas fa-check-circle"></i> تکمیل شد</span>`;
+                completeMsg = `<span class="complete-badge">تبریک! تکمیل شد</span>`;
                 if(g.autoConfig && g.autoConfig.type !== 'none') g.autoConfig.type = 'none'; 
             }
 
-            return 
+            return `
                 <div style="padding:15px; border-bottom:1px solid #eee;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                          <b style="font-size:1.05rem;">${completeMsg} ${g.name} ${autoBadge}</b> 
@@ -2709,23 +2688,22 @@
                          <button class="btn btn-outline" style="font-size:0.8rem; padding:6px 12px;" onclick="addGoalMoneyDirect(${i})" ${g.curr>=g.target ? 'disabled style="opacity:0.5"' : ''}>+ مستقیم</button>
                          <button class="btn btn-danger" style="font-size:0.8rem; padding:6px 12px;" onclick="delGoal(${i})">×</button>
                     </div>
-                </div>
-            ;
+                </div>`;
         }).join('');
     }
 
     function addGoalMoneyDirect(i) {
         if(app.goals[i].curr >= app.goals[i].target) return alert("این هدف تکمیل شده است.");
         openUniversalInput('واریز مستقیم به هدف', 'مبلغ را وارد کنید:', true, (val) => {
-            if(val) { saveSectionSnap('tools', واریز دستی به هدف ${app.goals[i].name}); app.goals[i].curr += parseInt(val); saveData(); renderUI(); }
+            if(val) { saveSectionSnap('tools', `واریز دستی به هدف ${app.goals[i].name}`); app.goals[i].curr += parseInt(val); saveData(); renderUI(); }
         });
     }
-    function delGoal(i) { saveSectionSnap('tools', حذف هدف ${app.goals[i].name}); app.goals.splice(i,1); saveData(); renderUI(); }
+    function delGoal(i) { saveSectionSnap('tools', `حذف هدف ${app.goals[i].name}`); app.goals.splice(i,1); saveData(); renderUI(); }
 
     function addShop() {
         const n = document.getElementById('sName').value;
         const p = parseFormatted(document.getElementById('sPrice').value);
-        if(n) { saveSectionSnap('tools', افزودن کالا: ${n}); app.shopping.push({name:n, price: p || 0, autoConfig:{type:'none'}, paid: 0}); saveData(); renderUI(); closeAllModals(); }
+        if(n) { saveSectionSnap('tools', `افزودن کالا: ${n}`); app.shopping.push({name:n, price: p || 0, autoConfig:{type:'none'}, paid: 0}); saveData(); renderUI(); closeAllModals(); }
     }
     
     function renderShop() {
@@ -2740,16 +2718,15 @@
             if(isComplete && s.autoConfig.type !== 'none') s.autoConfig.type = 'none';
 
             let msg = "";
-            if(isComplete) msg = <span class="complete-badge">خرید کامل شد</span>;
+            if(isComplete) msg = `<span class="complete-badge">خرید کامل شد</span>`;
             
-            return 
-            <div style="display:flex; justify-content:space-between; padding:15px; border-bottom:1px solid #eee; align-items:center; flex-wrap:wrap;">
+            return `<div style="display:flex; justify-content:space-between; padding:15px; border-bottom:1px solid #eee; align-items:center; flex-wrap:wrap;">
                 <div style="flex:1;">
                     <span style="font-weight:bold; font-size:1.05rem;">${msg} ${s.name} ${autoBadge}</span>
                     <div style="font-size:0.8rem; color:var(--text-sec); margin-top:3px;">
-                        ${price ? قیمت: ${format(price)} |  : ''}
+                        ${price ? `قیمت: ${format(price)} | ` : ''}
                         <span style="color:var(--success)">پرداخت: ${format(paid)}</span>
-                        ${price ?  | <span style="color:var(--danger)">مانده: ${format(remaining)}</span> : ''}
+                        ${price ? ` | <span style="color:var(--danger)">مانده: ${format(remaining)}</span>` : ''}
                     </div>
                 </div>
                 <div style="display:flex; gap:8px; align-items:center; margin-top:5px;">
@@ -2758,10 +2735,10 @@
                     <button class="btn-small-icon btn-edit" onclick="openEdit('shop', ${i})"><i class="fas fa-edit"></i></button>
                     <i class="fas fa-check-circle" style="cursor:pointer; font-size:1.4rem; color:var(--success);" onclick="delShop(${i})"></i>
                 </div>
-            </div>;
+            </div>`;
         }).join('');
     }
-    function delShop(i) { saveSectionSnap('tools', حذف کالا ${app.shopping[i].name}); app.shopping.splice(i,1); saveData(); renderUI(); }
+    function delShop(i) { saveSectionSnap('tools', `حذف کالا ${app.shopping[i].name}`); app.shopping.splice(i,1); saveData(); renderUI(); }
 
     function openAutoAlloc(type, id) {
         document.getElementById('autoAllocType').value = type;
@@ -2778,7 +2755,7 @@
         formatCurrency(document.getElementById('aaMin'));
 
         const sel = document.getElementById('aaSource');
-        sel.innerHTML = app.budgets.map(b => <option value="${b.id}">${b.name}</option>).join('');
+        sel.innerHTML = app.budgets.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
         if(conf.sourceId) sel.value = conf.sourceId;
 
         toggleAutoAllocFields();
@@ -2846,8 +2823,7 @@
         const div = document.getElementById('subBudgetList');
         div.innerHTML = subsToRender.map((s, idx) => {
             const calculatedAmount = Math.round((share * (s.percent || 0)) / 100);
-            return 
-            <div class="sub-budget-row">
+            return `<div class="sub-budget-row">
                 <input type="text" value="${s.name}" class="sub-name" placeholder="عنوان" style="flex:1.5; margin:0; font-size:0.9rem; padding:10px;">
                 <div style="flex:1; position:relative;">
                      <input type="number" value="${s.percent}" class="sub-percent-input" placeholder="%" oninput="updateSubCalculations(${share})" style="margin:0; text-align:center; padding:10px; font-size:0.95rem;">
@@ -2855,7 +2831,7 @@
                 <div class="sub-budget-calc-display" id="subCalc_${idx}">${format(calculatedAmount)}</div>
                 <button class="btn-small-icon btn-copy" onclick="copySub(${calculatedAmount})" title="کپی مبلغ"><i class="fas fa-copy"></i></button>
                 <i class="fas fa-times" style="cursor:pointer; color:var(--danger); font-size:1.2rem; margin-right:5px;" onclick="deleteSub(${idx})"></i>
-            </div>
+            </div>`
         }).join('');
     }
 
@@ -2866,9 +2842,9 @@
              const p = parseFloat(inp.value) || 0;
              totalP += p;
              const amt = Math.round((totalShare * p) / 100);
-             document.getElementById(subCalc_${idx}).innerText = format(amt);
+             document.getElementById(`subCalc_${idx}`).innerText = format(amt);
              const copyBtn = inp.parentElement.parentElement.querySelector('.btn-copy');
-             copyBtn.setAttribute('onclick', copySub(${amt}));
+             copyBtn.setAttribute('onclick', `copySub(${amt})`);
          });
          const remain = 100 - totalP;
          document.getElementById('subRemainPercent').innerText = "باقی‌مانده: " + remain + "%";
@@ -2901,7 +2877,7 @@
             alert("خطا: مجموع درصدها (" + totalP + "%) از ۱۰۰٪ بیشتر است!");
             return;
         }
-        saveSectionSnap('budget', تغییر زیرمجموعه‌های ${app.budgets[tempSubIndex].name});
+        saveSectionSnap('budget', `تغییر زیرمجموعه‌های ${app.budgets[tempSubIndex].name}`);
         app.budgets[tempSubIndex].subs = finalData;
         saveData(); renderUI(); closeAllModals(); showToast("زیرمجموعه‌ها ذخیره شدند");
     }
@@ -2959,7 +2935,7 @@
             document.getElementById('editDateWrapper').style.display = 'block';
             const row = document.getElementById('editDateRow');
             if(type === 'debt') {
-                row.innerHTML = <select id="editDDay" class="date-sel" style="width:100%">${genOpts(1,31, item.day)}</select>;
+                row.innerHTML = `<select id="editDDay" class="date-sel" style="width:100%">${genOpts(1,31, item.day)}</select>`;
             } else {
                 const parts = item.date ? item.date.split('/') : [1403, 1, 1];
                 row.innerHTML = createDatePickerHTML('editD', parseInt(parts[2]), parseInt(parts[1]), parseInt(parts[0]));
@@ -2978,23 +2954,23 @@
 
             let desc = "ویرایش آیتم";
             if(type === 'wallet') {
-                saveSectionSnap('dashboard', ویرایش کیف پول ${newName});
+                saveSectionSnap('dashboard', `ویرایش کیف پول ${newName}`);
                 app.wallets[index].name = newName;
                 app.wallets[index].value = parseFormatted(document.getElementById('editVal').value);
             } else if(type === 'debt') {
-                saveSectionSnap('dashboard', ویرایش قسط ${newName});
+                saveSectionSnap('dashboard', `ویرایش قسط ${newName}`);
                 app.debts[index].name = newName;
                 app.debts[index].value = parseFormatted(document.getElementById('editVal').value);
                 app.debts[index].day = document.getElementById('editDDay').value;
                 app.debts[index].deduct = document.getElementById('editDeductCheck').checked;
             } else if(type === 'check') {
-                saveSectionSnap('dashboard', ویرایش چک ${newName});
+                saveSectionSnap('dashboard', `ویرایش چک ${newName}`);
                 app.checks[index].name = newName;
                 app.checks[index].value = parseFormatted(document.getElementById('editVal').value);
                 app.checks[index].date = getDateString('editD');
                 app.checks[index].deduct = document.getElementById('editDeductCheck').checked;
             } else if(type === 'loan') {
-                saveSectionSnap('dashboard', ویرایش طلب ${newName});
+                saveSectionSnap('dashboard', `ویرایش طلب ${newName}`);
                 app.loans[index].name = newName;
                 app.loans[index].value = parseFormatted(document.getElementById('editVal').value);
                 app.loans[index].date = getDateString('editD');
@@ -3015,18 +2991,18 @@
                     tempBudget.isEdit = true; tempBudget.editIndex = index;
                     openModal('fixPercentModal'); return; 
                 }
-                saveSectionSnap('budget', ویرایش بودجه ${newName});
+                saveSectionSnap('budget', `ویرایش بودجه ${newName}`);
                 app.budgets[index].name = newName;
                 app.budgets[index].percent = newP;
                 if(oldName !== newName && app.priorities[oldName]) {
                     app.priorities[newName] = app.priorities[oldName]; delete app.priorities[oldName];
                 }
             } else if(type === 'goal') {
-                saveSectionSnap('tools', ویرایش هدف ${newName});
+                saveSectionSnap('tools', `ویرایش هدف ${newName}`);
                 app.goals[index].name = newName;
                 app.goals[index].target = parseFormatted(document.getElementById('editVal').value);
             } else if(type === 'shop') {
-                saveSectionSnap('tools', ویرایش کالا ${newName});
+                saveSectionSnap('tools', `ویرایش کالا ${newName}`);
                 app.shopping[index].name = newName;
                 app.shopping[index].price = parseFormatted(document.getElementById('editVal').value);
             }
@@ -3070,35 +3046,35 @@
     function addWallet() {
         const n = document.getElementById('wName').value;
         const v = parseFormatted(document.getElementById('wVal').value);
-        if(n && !isNaN(v)) { saveSectionSnap('dashboard', افزودن کیف پول ${n}); app.wallets.push({name:n, value:v}); saveData(); renderUI(); closeAllModals(); }
+        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن کیف پول ${n}`); app.wallets.push({name:n, value:v}); saveData(); renderUI(); closeAllModals(); }
     }
-    function delWallet(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', حذف کیف پول ${app.wallets[i].name}); app.wallets.splice(i,1); saveData(); renderUI(); } }
+    function delWallet(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', `حذف کیف پول ${app.wallets[i].name}`); app.wallets.splice(i,1); saveData(); renderUI(); } }
 
     function addDebt() {
         const n = document.getElementById('dName').value;
         const v = parseFormatted(document.getElementById('dVal').value);
         const d = document.getElementById('dDay').value;
         const deduct = document.getElementById('dDeduct').checked; 
-        if(n && !isNaN(v)) { saveSectionSnap('dashboard', افزودن قسط ${n}); app.debts.push({name:n, value:v, day:d, lastPaid: null, deduct: deduct}); saveData(); renderUI(); closeAllModals(); }
+        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن قسط ${n}`); app.debts.push({name:n, value:v, day:d, lastPaid: null, deduct: deduct}); saveData(); renderUI(); closeAllModals(); }
     }
-    function delDebt(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', حذف قسط ${app.debts[i].name}); app.debts.splice(i,1); saveData(); renderUI(); } }
+    function delDebt(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', `حذف قسط ${app.debts[i].name}`); app.debts.splice(i,1); saveData(); renderUI(); } }
 
     function addCheck() {
         const n = document.getElementById('cName').value;
         const v = parseFormatted(document.getElementById('cVal').value);
         const d = getDateString('c');
         const deduct = document.getElementById('cDeduct').checked; 
-        if(n && !isNaN(v)) { saveSectionSnap('dashboard', افزودن چک ${n}); if(!app.checks) app.checks = []; app.checks.push({name:n, value:v, date:d, isPaid: false, deduct: deduct}); saveData(); renderUI(); closeAllModals(); }
+        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن چک ${n}`); if(!app.checks) app.checks = []; app.checks.push({name:n, value:v, date:d, isPaid: false, deduct: deduct}); saveData(); renderUI(); closeAllModals(); }
     }
-    function delCheck(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', حذف چک ${app.checks[i].name}); app.checks.splice(i,1); saveData(); renderUI(); } }
+    function delCheck(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', `حذف چک ${app.checks[i].name}`); app.checks.splice(i,1); saveData(); renderUI(); } }
 
     function addLoan() {
         const n = document.getElementById('lName').value;
         const v = parseFormatted(document.getElementById('lVal').value);
         const d = getDateString('l');
-        if(n && !isNaN(v)) { saveSectionSnap('dashboard', افزودن طلب ${n}); if(!app.loans) app.loans = []; app.loans.push({name:n, value:v, date:d, isReceived: false}); saveData(); renderUI(); closeAllModals(); }
+        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن طلب ${n}`); if(!app.loans) app.loans = []; app.loans.push({name:n, value:v, date:d, isReceived: false}); saveData(); renderUI(); closeAllModals(); }
     }
-    function delLoan(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', حذف طلب ${app.loans[i].name}); app.loans.splice(i,1); saveData(); renderUI(); } }
+    function delLoan(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', `حذف طلب ${app.loans[i].name}`); app.loans.splice(i,1); saveData(); renderUI(); } }
 
     function addNewBudget() {
         const n = document.getElementById('bName').value;
@@ -3116,7 +3092,7 @@
             document.getElementById('sliderValDisplay').innerText = 0;
             openModal('fixPercentModal');
         } else {
-            saveSectionSnap('budget', افزودن بودجه ${n});
+            saveSectionSnap('budget', `افزودن بودجه ${n}`);
             app.budgets.push({id:Date.now(), name:n, percent:p, spent:0, history:[], manualAdd: 0, subs:[], internalDebt: []});
             if (!app.priorities[n]) app.priorities[n] = 4;
             saveData(); renderUI(); closeAllModals();
@@ -3183,9 +3159,9 @@
         saveData(); renderUI(); closeAllModals(); tempBudget = null;
     }
 
-    // --- REWRITTEN PRIORITY LOGIC (Instruction 6: Wizard Style) ---
+    // --- PRIORITY LOGIC (Instruction 1: Wizard Style) ---
     function openPrioritySettings() {
-        if(!app.priorityTiers || app.priorityTiers.length === 0) {
+        if(!app.priorityTiers) {
             app.priorityTiers = []; 
         }
         renderPriorityTiers();
@@ -3205,10 +3181,10 @@
             div.innerHTML = '<p style="text-align:center; color:var(--text-sec); margin:20px 0;">هیچ بازه اولویتی تعریف نشده است.</p>';
         } else {
             div.innerHTML = app.priorityTiers.map((t, idx) => 
-                <div style="background:var(--bg-body); border-radius:12px; padding:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                `<div style="background:var(--bg-body); border-radius:12px; padding:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-weight:bold;">اولویت ${idx + 1}</div>
                     <div style="direction:ltr;">${t.start}% - ${t.end}%</div>
-                </div>
+                </div>`
             ).join('');
         }
     }
@@ -3259,7 +3235,7 @@
         }
     }
 
-    function delBudget(i) { if(confirm('حذف ردیف؟')) { saveSectionSnap('budget', حذف بودجه ${app.budgets[i].name}); app.budgets.splice(i,1); saveData(); renderUI(); } }
+    function delBudget(i) { if(confirm('حذف ردیف؟')) { saveSectionSnap('budget', `حذف بودجه ${app.budgets[i].name}`); app.budgets.splice(i,1); saveData(); renderUI(); } }
 
     let activeIdx = -1;
     function openExp(i) { activeIdx = i; openModal('expModal'); }
@@ -3267,7 +3243,7 @@
         const v = parseFormatted(document.getElementById('expAmt').value);
         const r = document.getElementById('expReason').value || 'بدون توضیح';
         if(!isNaN(v) && activeIdx > -1) { 
-            saveSectionSnap('budget', هزینه ${format(v)} برای ${app.budgets[activeIdx].name}); app.budgets[activeIdx].spent += v;
+            saveSectionSnap('budget', `هزینه ${format(v)} برای ${app.budgets[activeIdx].name}`); app.budgets[activeIdx].spent += v;
             addToHistory(activeIdx, v, r, 'expense');
             saveData(); renderUI(); closeAllModals(); showToast("هزینه ثبت شد");
         }
@@ -3289,7 +3265,6 @@
         tempDepositIndex = i; 
         const hList = document.getElementById('itemHistList');
         const hist = app.budgets[i].history || [];
-        // Clear search input
         document.getElementById('histSearchInput').value = '';
         
         if(hist.length === 0) { hList.innerHTML = '<p style="text-align:center;">موردی یافت نشد.</p>'; }
@@ -3298,9 +3273,7 @@
                 const isPositive = h.type === 'deposit' || h.type === 'transferIn';
                 const color = isPositive ? 'var(--success)' : 'var(--danger)';
                 const sign = isPositive ? '+' : '-';
-                // Data attributes for live search
-                return 
-                <div class="hist-item" data-search="${h.amount} ${h.reason}" style="border-bottom:1px solid #eee; padding:10px 0;">
+                return `<div class="hist-item" data-search="${h.amount} ${h.reason}" style="border-bottom:1px solid #eee; padding:10px 0;">
                     <div style="display:flex; justify-content:space-between; font-weight:bold; align-items:center;">
                         <span>${h.reason}</span>
                         <div style="display:flex; align-items:center; gap:8px;">
@@ -3309,16 +3282,15 @@
                         </div>
                     </div>
                     <div style="font-size:0.75rem; color:var(--text-sec); margin-top:3px;">${h.date} - ${h.time}</div>
-                </div>;
+                </div>`;
             }).join('');
         }
         openModal('itemHistModal');
     }
 
-    // Instruction 8: Live Search
     function filterList(inputId, listId) {
         const query = document.getElementById(inputId).value.toLowerCase();
-        const items = document.querySelectorAll(#${listId} .hist-item);
+        const items = document.querySelectorAll(`#${listId} .hist-item`);
         items.forEach(item => {
             const text = item.getAttribute('data-search').toLowerCase();
             if(text.includes(query)) {
@@ -3362,7 +3334,7 @@
         const diff = newAmount - oldAmount;
         const type = histItem.type;
 
-        saveSectionSnap('budget', ویرایش تراکنش: ${histItem.reason});
+        saveSectionSnap('budget', `ویرایش تراکنش: ${histItem.reason}`);
         
         if (type === 'expense' || type === 'transferOut') {
             budget.spent += diff;
@@ -3371,7 +3343,6 @@
             budget.manualAdd += diff;
         }
 
-        // Update History Record
         histItem.amount = newAmount;
         histItem.reason = newReason;
         histItem.date = newDate;
@@ -3383,7 +3354,7 @@
         document.getElementById('allocType').value = type;
         document.getElementById('allocId').value = id;
         const sel = document.getElementById('allocBudgetSelect');
-        sel.innerHTML = <option value="">انتخاب کنید...</option> + app.budgets.map((b, i) => <option value="${i}">${b.name}</option>).join('');
+        sel.innerHTML = `<option value="">انتخاب کنید...</option>` + app.budgets.map((b, i) => `<option value="${i}">${b.name}</option>`).join('');
         
         sel.onchange = function() {
             const idx = sel.value;
@@ -3464,7 +3435,7 @@
     }
     function applyTheme() { if(app.user.theme === 'dark') document.body.setAttribute('data-theme', 'dark'); }
 
-    // Instruction 7: Analytics (Reports Tab)
+    // Analytics (Reports Tab)
     function renderReports() {
         if (document.getElementById('view-reports').classList.contains('active')) {
              setTimeout(() => {
@@ -3507,7 +3478,6 @@
         const ctx = document.getElementById('netWorthChart').getContext('2d');
         if (myChart2) myChart2.destroy();
         
-        // Use daily logs
         const logs = app.dailyLogs.slice(-30); 
         const labels = logs.map(l => l.date);
         const data = logs.map(l => l.net);
@@ -3538,33 +3508,32 @@
         });
     }
 
-    // Instruction 2: Professional Excel Export (XML format with formulas)
+    // Instruction 2: Simple Excel Export (Numeric data as numbers)
     function exportExcel() {
         withLoading(() => {
-            let table = '<table><thead><tr><th>تاریخ</th><th>ساعت</th><th>نوع</th><th>مبلغ</th><th>دسته‌بندی</th><th>توضیحات</th></tr></thead><tbody>';
+            let table = '<table><thead><tr><th>تاریخ</th><th>ساعت</th><th>نوع</th><th>مبلغ (عدد)</th><th>دسته‌بندی</th><th>توضیحات</th></tr></thead><tbody>';
 
             app.budgets.forEach(b => {
                 if (b.history) {
                     b.history.forEach(h => {
-                        table += <tr>
+                        // Using raw number for h.amount to ensure Excel treats it as number
+                        table += `<tr>
                             <td>${h.date}</td>
                             <td>${h.time}</td>
                             <td>${h.type === 'expense' ? 'هزینه' : 'درآمد'}</td>
-                            <td x:num>${h.amount}</td>
+                            <td style="mso-number-format:'0'">${h.amount}</td>
                             <td>${b.name}</td>
                             <td>${h.reason}</td>
-                        </tr>;
+                        </tr>`;
                     });
                 }
             });
             
-            // Add Sum Formula Row
-            table += '<tr><td colspan="3"><b>جمع کل</b></td><td x:f="=SUM(D2:D1000)"></td><td colspan="2"></td></tr>';
             table += '</tbody></table>';
 
-            // Wrap in Excel XML template
+            // Simple HTML Excel wrapper
             const excelTemplate = 
-                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
                 <head>
                     <!--[if gte mso 9]>
                     <xml>
@@ -3584,20 +3553,20 @@
                     <style>td{border:1px solid #ccc; font-family:Tahoma; text-align:center;} th{background-color:#4f46e5; color:white; border:1px solid #000;}</style>
                 </head>
                 <body>${table}</body>
-                </html>;
+                </html>`;
 
             const blob = new Blob([excelTemplate], { type: 'application/vnd.ms-excel' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = "Financial_Report.xls"; // .xls ensures Excel opens it correctly with styles
+            link.download = "Financial_Report_Simple.xls"; 
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showToast("فایل اکسل حرفه‌ای دانلود شد");
+            showToast("فایل اکسل ساده دانلود شد");
         }, 1000);
     }
 
-    // Instruction 3: Better Image Report
+    // Instruction 3: Report Image
     function generateReportImage() {
         withLoading(() => {
             const income = app.wallets.reduce((a,b)=>a+b.value,0);
@@ -3619,7 +3588,6 @@
             document.getElementById('printDebt').innerText = format(totalDebt);
             document.getElementById('printNet').innerText = format(net);
 
-            // Chart for Print
             if(app.dailyLogs && app.dailyLogs.length > 0) {
                 const ctx = document.getElementById('printChart').getContext('2d');
                 if(window.myPrintChart) window.myPrintChart.destroy();
@@ -3631,7 +3599,7 @@
                 });
                 
                 const hTab = document.getElementById('printHistoryTable');
-                hTab.innerHTML = logs.map(l => <tr><td>${l.date}</td><td>${format(l.net)}</td><td>${format(l.spent)}</td></tr>).join('');
+                hTab.innerHTML = logs.map(l => `<tr><td>${l.date}</td><td>${format(l.net)}</td><td>${format(l.spent)}</td></tr>`).join('');
             }
             
             const tb = document.getElementById('printBody');
@@ -3639,14 +3607,14 @@
             app.budgets.forEach(b => {
                 const baseAmount = app.distributedAmount;
                 const s = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
-                tb.innerHTML += <tr><td>${b.name}</td><td>${b.percent}%</td><td>${format(s)}</td><td>${format(b.spent)}</td><td>${format(s-b.spent)}</td></tr>;
+                tb.innerHTML += `<tr><td>${b.name}</td><td>${b.percent}%</td><td>${format(s)}</td><td>${format(b.spent)}</td><td>${format(s-b.spent)}</td></tr>`;
             });
             
             const dList = document.getElementById('printDebtsList');
             let debtHtml = "";
             app.debts.forEach(d => {
                  let info = d.deduct !== false ? '' : ' (عدم کسر از سیستم)';
-                 debtHtml += <div>${d.name}${info}: ${format(d.value)}</div>;
+                 debtHtml += `<div>${d.name}${info}: ${format(d.value)}</div>`;
             });
             dList.innerHTML = debtHtml || "ندارد";
             
@@ -3654,18 +3622,17 @@
             let goalHtml = "";
             app.goals.forEach(g => {
                 let status = g.curr >= g.target ? " (تکمیل)" : "";
-                goalHtml += <div>${g.name}${status}: ${format(g.curr)} / ${format(g.target)}</div>;
+                goalHtml += `<div>${g.name}${status}: ${format(g.curr)} / ${format(g.target)}</div>`;
             });
             gList.innerHTML = goalHtml || "ندارد";
             
             const el = document.getElementById('printArea');
-            el.style.top = "0"; // Temporarily bring into view
+            el.style.top = "0"; 
             
-            // Wait for Chart to Render completely
             setTimeout(() => {
                 html2canvas(el, { scale: 2 }).then(c => {
                     const a = document.createElement('a');
-                    a.download = Financial_Report_${days}Days.png; a.href = c.toDataURL(); a.click();
+                    a.download = `Financial_Report_${days}Days.png`; a.href = c.toDataURL(); a.click();
                     el.style.top = "-9999px";
                     toggleLoading(false); 
                 });
@@ -3673,7 +3640,6 @@
         }, 100);
     }
 
-    // Instruction 4: Backup all data including priorities
     function downloadBackup() {
         withLoading(() => {
             const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(app));
@@ -3689,7 +3655,6 @@
             reader.onload = (e) => {
                 try {
                     app = JSON.parse(e.target.result);
-                    // Migrations & Fallbacks
                     if(!app.priorities) app.priorities = defaultState.priorities;
                     if(!app.priorityTiers) app.priorityTiers = defaultState.priorityTiers;
                     if(!app.settings) app.settings = defaultState.settings;
@@ -3704,8 +3669,6 @@
                     
                     app.goals.forEach(g => { if(!g.autoConfig) g.autoConfig = {type:'none'}; });
                     app.shopping.forEach(s => { if(!s.autoConfig) s.autoConfig = {type:'none'}; if(s.paid === undefined) s.paid = 0; });
-                    
-                    // Migrate deduct property
                     app.debts.forEach(d => { if(d.deduct === undefined) d.deduct = true; if(d.lastPaid === undefined) d.lastPaid = null; });
                     app.checks.forEach(c => { if(c.deduct === undefined) c.deduct = true; if(c.isPaid === undefined) c.isPaid = false; });
                     app.loans.forEach(l => { if(l.isReceived === undefined) l.isReceived = false; });
@@ -3719,7 +3682,7 @@
     
     function showHistory() {
         const d = document.getElementById('histList');
-        d.innerHTML = app.history.map(h => <div style="padding:10px; border-bottom:1px solid #eee;">${h.name} - ${new Date(h.date).toLocaleDateString('fa-IR')}</div>).join('');
+        d.innerHTML = app.history.map(h => `<div style="padding:10px; border-bottom:1px solid #eee;">${h.name} - ${new Date(h.date).toLocaleDateString('fa-IR')}</div>`).join('');
         openModal('histModal');
     }
     function resetAll() { if(confirm("هشدار: تمام اطلاعات شما پاک خواهد شد. آیا مطمئن هستید؟")) { localStorage.removeItem('amir_fin_v9'); location.reload(); } }
