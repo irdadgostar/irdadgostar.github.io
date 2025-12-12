@@ -1,3 +1,4 @@
+
 <!DOCTYPE html> 
 <html lang="fa" dir="rtl">
 <head>
@@ -3216,8 +3217,11 @@
     }
 
     function showAddTierForm() {
-        const lastTier = app.priorityTiers[app.priorityTiers.length-1];
-        const start = lastTier ? lastTier.end : 0;
+        // FIXED LOGIC: If array empty, start = 0. Else start = last.end
+        let start = 0;
+        if (app.priorityTiers && app.priorityTiers.length > 0) {
+            start = app.priorityTiers[app.priorityTiers.length - 1].end;
+        }
         
         if (start >= 100) return alert("ظرفیت اولویت‌ها تکمیل شده است (۱۰۰٪).");
         
@@ -3232,8 +3236,12 @@
     }
 
     function addPriorityTier() {
-        const lastTier = app.priorityTiers[app.priorityTiers.length-1];
-        const start = lastTier ? lastTier.end : 0;
+        // FIXED LOGIC HERE TOO
+        let start = 0;
+        if (app.priorityTiers && app.priorityTiers.length > 0) {
+            start = app.priorityTiers[app.priorityTiers.length - 1].end;
+        }
+
         const end = parseInt(document.getElementById('tierEndInput').value);
         
         if (isNaN(end) || end <= start) return alert("سقف باید بیشتر از کف باشد.");
@@ -3547,11 +3555,13 @@
             app.budgets.forEach(b => {
                 if (b.history) {
                     b.history.forEach(h => {
+                        // Clean number for Excel
+                        const amountClean = h.amount.toString().replace(/,/g, '');
                         table += `<tr>
                             <td>${h.date}</td>
                             <td>${h.time}</td>
                             <td>${h.type === 'expense' ? 'هزینه' : 'درآمد'}</td>
-                            <td>${h.amount}</td>
+                            <td style="mso-number-format:'\#\,\#\#0';">${amountClean}</td>
                             <td>${b.name}</td>
                             <td>${h.reason}</td>
                         </tr>`;
