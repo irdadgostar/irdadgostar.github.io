@@ -1,9 +1,9 @@
-<!DOCTYPE html> 
+ <!DOCTYPE html> 
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مدیریت سرمایه تعالی - نسخه پیشرفته بانکی</title>
+    <title>مدیریت سرمایه تعالی</title>
 
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
@@ -1962,8 +1962,8 @@
         const hist = app.sectionHistory[section] || [];
         if(hist.length === 0) { list.innerHTML = "<p style='text-align:center'>سابقه‌ای موجود نیست.</p>"; } 
         else {
-            list.innerHTML = hist.map((h, i) => `
-                <div style="padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="restoreSectionSnap('${section}', ${i})">
+            list.innerHTML = hist.map((h, i) => 
+                `<div style="padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="restoreSectionSnap('${section}', ${i})">
                     <div style="text-align:right;">
                         <span style="display:block; font-weight:bold; font-size:0.9rem; color:var(--text-main); margin-bottom:5px;">${h.description || 'تغییر سیستم'}</span>
                         <span style="font-size:0.75rem; color:var(--text-sec);">${h.time}</span>
@@ -2080,8 +2080,8 @@
         const loansTotal = app.loans.reduce((a,b) => !b.isReceived ? a + b.value : a, 0);
 
         const content = document.getElementById('cardDetailsContent');
-        content.innerHTML = `
-            <div class="detail-row">
+        content.innerHTML = 
+            `<div class="detail-row">
                 <span class="detail-label">مجموع موجودی (ناخالص):</span>
                 <span class="detail-val" id="cpGross">${format(gross)}</span>
             </div>
@@ -2104,8 +2104,8 @@
             <div class="detail-row">
                 <span class="detail-label">مجموع طلب‌ها:</span>
                 <span class="detail-val" style="color:var(--success)" id="cpLoan">${format(loansTotal)}</span>
-            </div>
-        `;
+            </div>`;
+        
         openModal('cardDetailsModal');
     }
 
@@ -2142,8 +2142,8 @@
 
     function renderWallets() {
         const div = document.getElementById('walletList');
-        div.innerHTML = app.wallets.map((w, i) => `
-            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center;">
+        div.innerHTML = app.wallets.map((w, i) => 
+            `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center;">
                 <span style="font-weight:600;">${w.name}</span>
                 <div style="display:flex; align-items:center;">
                     <b style="font-size:1.1rem; color:var(--primary);">${format(w.value)}</b>
@@ -2855,8 +2855,8 @@
                 <div class="sub-budget-calc-display" id="subCalc_${idx}">${format(calculatedAmount)}</div>
                 <button class="btn-small-icon btn-copy" onclick="copySub(${calculatedAmount})" title="کپی مبلغ"><i class="fas fa-copy"></i></button>
                 <i class="fas fa-times" style="cursor:pointer; color:var(--danger); font-size:1.2rem; margin-right:5px;" onclick="deleteSub(${idx})"></i>
-            </div>
-        `}).join('');
+            </div>`
+        }).join('');
     }
 
     function updateSubCalculations(totalShare) {
@@ -3204,12 +3204,12 @@
         if(app.priorityTiers.length === 0) {
             div.innerHTML = '<p style="text-align:center; color:var(--text-sec); margin:20px 0;">هیچ بازه اولویتی تعریف نشده است.</p>';
         } else {
-            div.innerHTML = app.priorityTiers.map((t, idx) => `
-                <div style="background:var(--bg-body); border-radius:12px; padding:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+            div.innerHTML = app.priorityTiers.map((t, idx) => 
+                `<div style="background:var(--bg-body); border-radius:12px; padding:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="font-weight:bold;">اولویت ${idx + 1}</div>
                     <div style="direction:ltr;">${t.start}% - ${t.end}%</div>
-                </div>
-            `).join('');
+                </div>`
+            ).join('');
         }
     }
 
@@ -3299,8 +3299,7 @@
                 const color = isPositive ? 'var(--success)' : 'var(--danger)';
                 const sign = isPositive ? '+' : '-';
                 // Data attributes for live search
-                return `
-                <div class="hist-item" data-search="${h.amount} ${h.reason}" style="border-bottom:1px solid #eee; padding:10px 0;">
+                return `<div class="hist-item" data-search="${h.amount} ${h.reason}" style="border-bottom:1px solid #eee; padding:10px 0;">
                     <div style="display:flex; justify-content:space-between; font-weight:bold; align-items:center;">
                         <span>${h.reason}</span>
                         <div style="display:flex; align-items:center; gap:8px;">
@@ -3562,9 +3561,9 @@
             table += '<tr><td colspan="3"><b>جمع کل</b></td><td x:f="=SUM(D2:D1000)"></td><td colspan="2"></td></tr>';
             table += '</tbody></table>';
 
-            // Wrap in Excel XML template
-            const excelTemplate = `
-                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+            // Wrap in Excel XML template with UTF-8 BOM fix
+            const excelTemplate = 
+                `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
                 <head>
                     <!--[if gte mso 9]>
                     <xml>
@@ -3580,16 +3579,17 @@
                         </x:ExcelWorkbook>
                     </xml>
                     <![endif]-->
-                    <meta charset="UTF-8">
+                    <meta http-equiv="content-type" content="text/plain; charset=UTF-8"/>
                     <style>td{border:1px solid #ccc; font-family:Tahoma; text-align:center;} th{background-color:#4f46e5; color:white; border:1px solid #000;}</style>
                 </head>
                 <body>${table}</body>
                 </html>`;
 
-            const blob = new Blob([excelTemplate], { type: 'application/vnd.ms-excel' });
+            // Using Blob with UTF-8 BOM
+            const blob = new Blob(["\ufeff", excelTemplate], { type: 'application/vnd.ms-excel;charset=utf-8' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = "Financial_Report.xls"; // .xls ensures Excel opens it correctly with styles
+            link.download = "Financial_Report.xls"; 
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
