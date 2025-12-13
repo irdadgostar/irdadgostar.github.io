@@ -392,30 +392,6 @@
             box-shadow: 0 10px 25px rgba(55, 48, 163, 0.3);
         }
 
-        .pin-dots { display: flex; gap: 15px; margin: 25px 0; justify-content: center; }
-        .pin-dot { 
-            width: 14px; height: 14px; border-radius: 50%; 
-            background: #cbd5e1; transition: all 0.3s; 
-        }
-        .pin-dot.filled { 
-            background: var(--primary); transform: scale(1.3); box-shadow: 0 0 10px rgba(55, 48, 163, 0.5); 
-        }
-        
-        .numpad {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; direction: ltr; 
-            width: 100%; margin-top: 10px;
-        }
-        .num-key {
-            width: 60px; height: 60px; border-radius: 18px;
-            background: rgba(0,0,0,0.02); 
-            font-size: 1.4rem; font-weight: 600; color: var(--text-main);
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s; margin: 0 auto; border: 1px solid transparent;
-        }
-        .num-key:hover { background: rgba(0,0,0,0.05); }
-        .num-key:active { background: var(--primary); color: white; border-radius: 50%; transform: scale(0.9); }
-        .num-key.del { color: var(--danger); background: rgba(239,68,68,0.05); }
-
         .auth-link {
             margin-top: 20px; color: var(--text-sec); font-size: 0.8rem;
             cursor: pointer; transition: 0.2s;
@@ -428,6 +404,30 @@
             font-size: 0.85rem; width: 100%; transition: 0.2s;
         }
         .guest-btn:hover { background: rgba(245, 158, 11, 0.1); }
+
+        /* --- Identity Card Styles (New) --- */
+        .identity-card-container {
+            width: 100%; max-width: 350px; border-radius: 20px; overflow: hidden;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: white; font-family: 'Vazirmatn', sans-serif;
+            position: relative; border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            margin: 0 auto;
+        }
+        .id-card-header {
+            background: rgba(255,255,255,0.1); padding: 15px; text-align: center;
+            font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.05);
+            display:flex; align-items:center; justify-content:center; gap:8px;
+        }
+        .id-card-body { padding: 20px; }
+        .id-row { margin-bottom: 15px; }
+        .id-label { font-size: 0.75rem; color: #94a3b8; display: block; margin-bottom: 4px; }
+        .id-value { font-size: 1.1rem; font-weight: bold; color: white; letter-spacing: 1px; }
+        .id-value-big { font-size: 1.4rem; color: #fbbf24; letter-spacing: 2px; direction: ltr; font-family: monospace; }
+        .id-footer { 
+            background: rgba(0,0,0,0.2); padding: 10px; text-align: center; 
+            font-size: 0.7rem; color: #64748b; 
+        }
 
         /* --- Bank Card --- */
         .hero-card { perspective: 1500px; height: 240px; margin-bottom: 30px; cursor: pointer; }
@@ -828,60 +828,53 @@
 
 <div id="toastContainer" class="toast-container"></div>
 
-<!-- 1. LOCK SCREEN -->
+<!-- 1. AUTH SCREEN (MODIFIED FOR GOOGLE APPS SCRIPT) -->
 <div id="authModal" class="pin-screen" style="display: flex;">
     <div class="auth-card">
         <div class="auth-avatar" id="authIcon">
             <i class="fas fa-fingerprint"></i>
         </div>
-        <h2 id="authTitle" style="margin: 0 0 5px 0; color: var(--primary); font-size: 1.4rem;">ورود ایمن</h2>
-        <p id="authSub" style="font-size: 0.9rem; color: var(--text-sec); margin-bottom: 25px;">لطفاً هویت خود را تایید کنید</p>
+        <h2 id="authTitle" style="margin: 0 0 5px 0; color: var(--primary); font-size: 1.4rem;">مدیریت سرمایه</h2>
+        <p id="authSub" style="font-size: 0.9rem; color: var(--text-sec); margin-bottom: 25px;">لطفاً وارد شوید یا ثبت نام کنید</p>
 
-        <!-- Step 1: Sequential Registration / Info -->
+        <!-- Initial Buttons -->
+        <div id="authInitial" style="width:100%;">
+             <button class="btn btn-primary" style="width:100%; margin-bottom:10px;" onclick="showLoginForm()">ورود به سیستم</button>
+             <button class="btn btn-outline" style="width:100%;" onclick="showRegisterForm()">ثبت نام جدید</button>
+        </div>
+
+        <!-- Login Form -->
+        <div id="loginForm" style="display:none; width:100%;">
+             <label class="auth-label">کد ملی:</label>
+             <input type="text" id="loginNatId" inputmode="numeric" placeholder="کد ملی خود را وارد کنید">
+             <label class="auth-label">رمز عبور:</label>
+             <input type="password" id="loginPass" placeholder="رمز عبور...">
+             <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="processLogin()">ورود</button>
+             <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="resetAuthView()">بازگشت</button>
+        </div>
+
+        <!-- Registration Steps (Sequential) -->
         <div id="authStep1" style="display:none; width:100%;">
             <input type="hidden" id="setupStepVal" value="1">
             
             <div id="setupS1">
-                <label class="auth-label">نام شما:</label>
+                <label class="auth-label">مرحله ۱: نام و نام خانوادگی</label>
                 <input type="text" id="setupNameInput" placeholder="نام خود را وارد کنید" style="padding:12px; border-radius:12px;">
             </div>
 
             <div id="setupS2" style="display:none;">
-                <label class="auth-label">کد ملی (جهت بازیابی):</label>
+                <label class="auth-label">مرحله ۲: کد ملی</label>
                 <input type="text" id="setupNatId" inputmode="numeric" placeholder="کد ملی خود را وارد کنید" style="padding:12px; border-radius:12px;">
             </div>
 
             <div id="setupS3" style="display:none;">
-                <label class="auth-label">سوال امنیتی (تصادفی):</label>
-                <div style="background: rgba(79,70,229,0.05); padding: 12px; border-radius: 12px; margin-bottom: 10px; color: var(--primary); font-weight: bold; font-size: 0.85rem; text-align: right;" id="setupSecurityQ">---</div>
-                <input type="text" id="setupSecurityA" placeholder="پاسخ را بنویسید" style="padding:12px; border-radius:12px;">
+                <label class="auth-label">مرحله ۳: تعیین رمز عبور</label>
+                <input type="password" id="setupPassword" placeholder="یک رمز عبور قوی وارد کنید" style="padding:12px; border-radius:12px;">
             </div>
 
-            <button class="btn btn-primary" style="width:100%; padding: 12px;" onclick="nextSetupStep()" id="setupNextBtn">بعدی</button>
-        </div>
-
-        <!-- Step 2: PIN Entry -->
-        <div id="authStep2" style="display:none; width:100%; flex-direction: column; align-items: center;">
-            <div class="pin-dots">
-                <div class="pin-dot" id="pd1"></div>
-                <div class="pin-dot" id="pd2"></div>
-                <div class="pin-dot" id="pd3"></div>
-                <div class="pin-dot" id="pd4"></div>
-            </div>
-
-            <div class="numpad">
-                <button class="num-key" onclick="pressKey(1)">۱</button>
-                <button class="num-key" onclick="pressKey(2)">۲</button>
-                <button class="num-key" onclick="pressKey(3)">۳</button>
-                <button class="num-key" onclick="pressKey(4)">۴</button>
-                <button class="num-key" onclick="pressKey(5)">۵</button>
-                <button class="num-key" onclick="pressKey(6)">۶</button>
-                <button class="num-key" onclick="pressKey(7)">۷</button>
-                <button class="num-key" onclick="pressKey(8)">۸</button>
-                <button class="num-key" onclick="pressKey(9)">۹</button>
-                <div class="num-key" style="visibility: hidden;"></div>
-                <button class="num-key" onclick="pressKey(0)">۰</button>
-                <button class="num-key del" onclick="pressKey('del')"><i class="fas fa-backspace"></i></button>
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button class="btn btn-outline" style="flex:1;" onclick="resetAuthView()">انصراف</button>
+                <button class="btn btn-primary" style="flex:1;" onclick="nextSetupStep()" id="setupNextBtn">بعدی</button>
             </div>
         </div>
 
@@ -1194,6 +1187,46 @@
 
 <!-- MODALS -->
 
+<!-- NEW: Identity Card Modal -->
+<div id="identityCardModal" class="modal">
+    <div class="modal-content" style="text-align:center;">
+        <h3>کارت هویت دیجیتال</h3>
+        <p style="font-size:0.9rem; color:var(--text-sec); margin-bottom:20px;">لطفاً این کارت را ذخیره کنید. شامل کد بازیابی شماست.</p>
+        
+        <div id="idCardRenderArea">
+            <div class="identity-card-container">
+                <div class="id-card-header">
+                    <i class="fas fa-id-card"></i> مدیریت سرمایه تعالی
+                </div>
+                <div class="id-card-body">
+                    <div class="id-row">
+                        <span class="id-label">نام کاربر</span>
+                        <span class="id-value" id="idCardName">---</span>
+                    </div>
+                    <div class="id-row">
+                        <span class="id-label">شماره حساب (یکتا)</span>
+                        <span class="id-value-big" id="idCardAcc">---</span>
+                    </div>
+                    <div class="id-row">
+                        <span class="id-label">کد بازیابی (PUK)</span>
+                        <span class="id-value-big" id="idCardPuk" style="color:#22d3ee;">---</span>
+                    </div>
+                </div>
+                <div class="id-footer">
+                    نسخه بانکی پیشرفته • کد ملی: <span id="idCardNat">---</span>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" style="width:100%; margin-top:20px;" onclick="downloadIdCard()">
+            <i class="fas fa-download"></i> دانلود کارت
+        </button>
+        <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="closeIdCardAndLogin()">
+            ورود به برنامه
+        </button>
+    </div>
+</div>
+
 <!-- New Bank Transfer Wizard Modal -->
 <div id="bankTransferModal" class="modal">
     <div class="modal-content" id="btContent">
@@ -1390,15 +1423,16 @@
 <div id="recoveryModal" class="modal">
     <div class="modal-content">
         <h3><i class="fas fa-key"></i> بازیابی رمز عبور</h3>
-        <p style="color:var(--text-sec); font-size:0.9rem; margin-bottom:15px;">برای بازیابی، اطلاعات اولیه خود را وارد کنید.</p>
+        <p style="color:var(--text-sec); font-size:0.9rem; margin-bottom:15px;">برای بازیابی، کد ملی و کد PUK خود را وارد کنید.</p>
         <label>کد ملی:</label>
         <input type="text" id="recNatId" inputmode="numeric" placeholder="کد ملی خود را وارد کنید">
-        <label>سوال امنیتی:</label>
-        <p id="recoveryQuestionText" style="font-weight:bold; color:var(--primary); margin: 10px 0; background:rgba(79,70,229,0.1); padding:15px; border-radius:12px; border:1px dashed var(--primary);">---</p>
-        <label>پاسخ:</label>
-        <input type="text" id="recoveryAnswerInput" placeholder="پاسخ شما...">
+        <label>کد بازیابی (PUK):</label>
+        <input type="text" id="recPuk" placeholder="کد ۸ رقمی PUK" inputmode="numeric">
+        <label>رمز عبور جدید:</label>
+        <input type="password" id="recNewPass" placeholder="رمز جدید...">
+        
         <div style="margin-top:25px; display:flex; gap:12px;">
-            <button class="btn btn-primary" style="flex:1" onclick="checkRecoveryAnswer()">بررسی و تایید</button>
+            <button class="btn btn-primary" style="flex:1" onclick="checkRecovery()">بازیابی اکانت</button>
             <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">بستن</button>
         </div>
     </div>
@@ -1738,6 +1772,8 @@
 </div>
 
 <script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzLum9qk7WmBan9jNI7HhS5Jjq-rc9h0i7p2bTxm2kF1FOpjyaYEwNJ5Pu5C7sC6ymt/exec";
+
     const defaultState = {
         security: { hasPin: false, pin: "", isSetup: false, questionId: 0, answer: "", nationalId: "" },
         user: { name: "", theme: "light", currency: "toman", startDate: Date.now() },
@@ -1746,7 +1782,7 @@
         debts: [], 
         checks: [], 
         loans: [],  
-        transfers: [], // NEW: Store transaction history
+        transfers: [],
         budgets: [
             {id: 1, name: "کرایه شهری", percent: 20, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: [], internalDebt: []},
             {id: 2, name: "خورد و خوراک", percent: 14, spent: 0, history: [], manualAdd: 0, subs: [], internalDebt: []},
@@ -1769,16 +1805,7 @@
         sectionHistory: { dashboard: [], budget: [], tools: [] }
     };
 
-    const securityQuestions = [
-        "نام اولین حیوان خانگی شما چیست؟",
-        "نام معلم کلاس اول دبستان شما چه بود؟",
-        "نام خیابانی که در کودکی در آن زندگی می‌کردید؟",
-        "رنگ مورد علاقه شما چیست؟",
-        "نام بهترین دوست دوران کودکی؟"
-    ];
-
     let app = JSON.parse(JSON.stringify(defaultState));
-    let pinBuffer = "";
     let rate = 1; 
     let tempBudget = null; 
     let isGuestMode = false;
@@ -1788,6 +1815,38 @@
     let myChart1 = null; 
     let myChart2 = null; 
     let isBalanceHidden = false;
+
+    // --- Helper Function for Google API ---
+    // This bridges the HTML to the Google Script using Fetch, since direct run calls won't work from GitHub
+    async function googleApi(funcName, ...args) {
+        // Construct the payload. 
+        // We will send a "function" parameter and an array of "arguments"
+        const payload = {
+            functionName: funcName,
+            args: args
+        };
+
+        // Note: Google Apps Script Web App must handle doPost(e) and parse this JSON.
+        // If your script uses google.script.run, that only works inside GAS environment.
+        // Since we are external, we use fetch.
+        
+        try {
+            // We use no-cors if simple GET/POST, but for JSON data we need standard POST.
+            // Google Scripts redirect, so we follow.
+            const response = await fetch(WEB_APP_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8', // Plain text avoids CORS preflight issues usually
+                }
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error("API Error:", error);
+            throw error;
+        }
+    }
 
     function showToast(message, icon="check-circle") {
         const container = document.getElementById('toastContainer');
@@ -1816,7 +1875,7 @@
         }, duration);
     }
 
-    window.onload = () => { loadData(); checkAuth(); setupDatePickers(); };
+    window.onload = () => { checkAuth(); setupDatePickers(); };
 
     function toPersianNum(num, dontTrim) {
         if(num === null || num === undefined) return '';
@@ -1830,11 +1889,9 @@
         return res;
     }
 
-    // New Function: Get Account Number from National ID (Reverse)
     function getAccountNumber() {
         const natId = app.security.nationalId || "";
         if(!natId || natId.length !== 10) return "۰۰۰۰۰۰۰۰۰۰";
-        // Reverse the national ID string
         const reversed = natId.split('').reverse().join('');
         return toPersianNum(reversed);
     }
@@ -1886,49 +1943,48 @@
         return toPersianNum(new Date().toLocaleDateString('fa-IR-u-nu-latn').split('/').slice(0, 2).join('/'));
     }
 
+    // --- NEW AUTHENTICATION LOGIC ---
+
     function checkAuth() {
-        const modal = document.getElementById('authModal');
-        const step1 = document.getElementById('authStep1');
-        const step2 = document.getElementById('authStep2');
-        const actions = document.getElementById('authActions');
-        const title = document.getElementById('authTitle');
-        const sub = document.getElementById('authSub');
-        const forgotDiv = document.getElementById('forgotPassDiv');
+        // Show Auth Modal, reset to initial state
+        document.getElementById('authModal').style.display = 'flex';
+        resetAuthView();
+    }
 
-        modal.style.display = 'flex';
-        pinBuffer = "";
-        updatePinDots();
+    function resetAuthView() {
+        document.getElementById('authInitial').style.display = 'block';
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('authStep1').style.display = 'none';
+        document.getElementById('authActions').style.display = 'block';
+        document.getElementById('authTitle').innerText = "مدیریت سرمایه";
+        document.getElementById('authSub').innerText = "لطفاً وارد شوید یا ثبت نام کنید";
+        
+        // Clear Inputs
+        document.getElementById('loginNatId').value = '';
+        document.getElementById('loginPass').value = '';
+    }
 
-        if (!app.security.hasPin || !app.security.isSetup) {
-            title.innerText = app.user.name ? "ویرایش اطلاعات امنیتی" : "راه‌اندازی اولیه";
-            sub.innerText = "لطفاً مراحل زیر را طی کنید";
-            step1.style.display = 'block';
-            step2.style.display = 'none';
-            actions.style.display = 'block';
-            forgotDiv.style.display = 'none';
-            app.security.isSetup = false;
-            
-            document.getElementById('setupStepVal').value = 1;
-            document.getElementById('setupS1').style.display = 'block';
-            document.getElementById('setupS2').style.display = 'none';
-            document.getElementById('setupS3').style.display = 'none';
-            document.getElementById('setupNextBtn').innerText = 'بعدی';
+    function showLoginForm() {
+        document.getElementById('authInitial').style.display = 'none';
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('authActions').style.display = 'block';
+        document.getElementById('authTitle').innerText = "ورود به حساب";
+        document.getElementById('authSub').innerText = "اطلاعات کاربری خود را وارد کنید";
+    }
 
-            document.getElementById('setupNameInput').value = app.user.name || "";
-            document.getElementById('setupNatId').value = app.security.nationalId || "";
-            document.getElementById('setupSecurityA').value = "";
-            
-            const randIdx = Math.floor(Math.random() * securityQuestions.length);
-            document.getElementById('setupSecurityQ').innerText = securityQuestions[randIdx];
-            document.getElementById('setupSecurityQ').setAttribute('data-qid', randIdx);
-        } else {
-            title.innerText = app.user.name ? `سلام، ${app.user.name}` : "خوش آمدید";
-            sub.innerText = "جهت ورود رمز خود را وارد کنید";
-            step1.style.display = 'none';
-            step2.style.display = 'flex';
-            actions.style.display = 'block';
-            forgotDiv.style.display = 'block';
-        }
+    function showRegisterForm() {
+        document.getElementById('authInitial').style.display = 'none';
+        document.getElementById('authStep1').style.display = 'block';
+        document.getElementById('authActions').style.display = 'none';
+        document.getElementById('authTitle').innerText = "ثبت نام";
+        document.getElementById('authSub').innerText = "مراحل را به ترتیب طی کنید";
+        
+        // Reset Steps
+        document.getElementById('setupStepVal').value = 1;
+        document.getElementById('setupS1').style.display = 'block';
+        document.getElementById('setupS2').style.display = 'none';
+        document.getElementById('setupS3').style.display = 'none';
+        document.getElementById('setupNextBtn').innerText = 'بعدی';
     }
 
     function nextSetupStep() {
@@ -1947,21 +2003,91 @@
             document.getElementById('setupS2').style.display = 'none';
             document.getElementById('setupS3').style.display = 'block';
             document.getElementById('setupStepVal').value = 3;
-            document.getElementById('setupNextBtn').innerText = 'تایید و تعیین رمز';
+            document.getElementById('setupNextBtn').innerText = 'تکمیل ثبت نام';
         } else if(step === 3) {
-            const ans = document.getElementById('setupSecurityA').value.trim();
-            if(!ans) return alert("لطفا پاسخ سوال امنیتی را وارد کنید");
-            app.security.answer = ans;
-            app.security.questionId = parseInt(document.getElementById('setupSecurityQ').getAttribute('data-qid'));
-            goToPinSetup();
+            const pass = document.getElementById('setupPassword').value;
+            if(!pass) return alert("رمز عبور را وارد کنید");
+            
+            // Call Backend to Register
+            toggleLoading(true);
+            
+            googleApi('apiRegister', app.user.name, app.security.nationalId, pass)
+            .then(response => {
+                toggleLoading(false);
+                if (response.success) {
+                    showIdentityCardModal(response.data.name, response.data.accountNumber, response.data.puk, pass, response.data.nationalId);
+                } else {
+                    alert("خطا در ثبت نام: " + response.message);
+                }
+            })
+            .catch(err => {
+                toggleLoading(false);
+                alert("خطا در ارتباط با سرور: " + err);
+            });
         }
     }
 
-    function goToPinSetup() {
-        document.getElementById('authStep1').style.display = 'none';
-        document.getElementById('authStep2').style.display = 'flex';
-        document.getElementById('authTitle').innerText = "تعیین رمز عبور";
-        document.getElementById('authSub').innerText = "یک رمز ۴ رقمی وارد کنید";
+    function showIdentityCardModal(name, acc, puk, pass, natId) {
+        document.getElementById('authModal').style.display = 'none';
+        document.getElementById('idCardName').innerText = name;
+        document.getElementById('idCardAcc').innerText = toPersianNum(acc);
+        document.getElementById('idCardPuk').innerText = puk;
+        document.getElementById('idCardNat').innerText = toPersianNum(natId);
+        
+        openModal('identityCardModal');
+    }
+
+    function downloadIdCard() {
+        const el = document.getElementById('idCardRenderArea');
+        html2canvas(el, { scale: 2 }).then(canvas => {
+            const a = document.createElement('a');
+            a.download = `IdentityCard_${Date.now()}.png`;
+            a.href = canvas.toDataURL();
+            a.click();
+            showToast("کارت هویت ذخیره شد");
+        });
+    }
+
+    function closeIdCardAndLogin() {
+        closeAllModals();
+        alert("لطفاً با رمز عبور خود وارد شوید.");
+        checkAuth();
+        showLoginForm();
+    }
+
+    function processLogin() {
+        const natId = document.getElementById('loginNatId').value.trim();
+        const pass = document.getElementById('loginPass').value;
+        
+        if(!natId || !pass) return alert("لطفاً تمام فیلدها را پر کنید");
+
+        toggleLoading(true);
+        
+        googleApi('apiLogin', natId, pass)
+        .then(response => {
+            toggleLoading(false);
+            if(response.success) {
+                // Merge data from cloud
+                const cloudData = response.userData.appData;
+                const securityData = response.userData.security;
+                
+                app = { ...defaultState, ...cloudData };
+                app.security = securityData; 
+                
+                document.getElementById('authModal').style.display = 'none';
+                document.getElementById('appContent').style.display = 'block';
+                processDailyLog(); 
+                updateDate();
+                renderUI();
+                showToast("خوش آمدید", "user-check");
+            } else {
+                alert(response.message);
+            }
+        })
+        .catch(err => {
+            toggleLoading(false);
+            alert("خطا در ورود: " + err);
+        });
     }
 
     function enterGuestMode() {
@@ -1975,67 +2101,41 @@
         }
     }
 
-    function pressKey(key) {
-        if (key === 'del') pinBuffer = pinBuffer.slice(0, -1);
-        else if (pinBuffer.length < 4) pinBuffer += key;
-        updatePinDots();
-        if (pinBuffer.length === 4) setTimeout(processPin, 100);
-    }
-    function updatePinDots() {
-        for(let i=1; i<=4; i++) {
-            const dot = document.getElementById(`pd${i}`);
-            if (i <= pinBuffer.length) dot.classList.add('filled');
-            else dot.classList.remove('filled');
-        }
-    }
-    function processPin() {
-        if (!app.security.hasPin) {
-            if(confirm("رمز شما: " + pinBuffer + "\nآیا این رمز تایید است؟")) {
-                app.security.pin = pinBuffer;
-                app.security.hasPin = true;
-                app.security.isSetup = true;
-                if(!app.user.startDate) app.user.startDate = Date.now();
-                saveData(); 
-                document.getElementById('authModal').style.display = 'none';
-                document.getElementById('appContent').style.display = 'block';
-                renderUI();
-            } else { pinBuffer = ""; updatePinDots(); }
-        } else {
-            if (pinBuffer === app.security.pin) {
-                document.getElementById('authModal').style.display = 'none';
-                document.getElementById('appContent').style.display = 'block';
-                processDailyLog(); 
-                updateDate();
-                renderUI();
-            } else { showToast("رمز اشتباه است!", "times-circle"); pinBuffer = ""; updatePinDots(); }
-        }
-    }
-
     function startRecovery() {
-        const qId = app.security.questionId || 0;
-        document.getElementById('recoveryQuestionText').innerText = securityQuestions[qId];
-        document.getElementById('recNatId').value = '';
-        document.getElementById('recoveryAnswerInput').value = '';
         openModal('recoveryModal');
     }
-    function checkRecoveryAnswer() {
-        const uNat = document.getElementById('recNatId').value.trim();
-        const uAns = document.getElementById('recoveryAnswerInput').value.trim();
-        if(uNat === app.security.nationalId && uAns === app.security.answer) {
-            alert("اطلاعات صحیح است. لطفا رمز جدید تعریف کنید.");
-            app.security.hasPin = false;
-            app.security.pin = "";
-            app.security.isSetup = true;
-            saveData();
-            location.reload();
-        } else { alert("اطلاعات وارد شده اشتباه است."); }
+    
+    function checkRecovery() {
+        const natId = document.getElementById('recNatId').value.trim();
+        const puk = document.getElementById('recPuk').value.trim();
+        const newPass = document.getElementById('recNewPass').value.trim();
+
+        if(!natId || !puk || !newPass) return alert("همه فیلدها الزامی است");
+
+        toggleLoading(true);
+        
+        googleApi('apiRecoverAccount', natId, puk, newPass)
+        .then(response => {
+            toggleLoading(false);
+            if(response.success) {
+                alert(response.message);
+                closeAllModals();
+                showLoginForm();
+            } else {
+                alert(response.message);
+                if(response.locked) {
+                    closeAllModals();
+                }
+            }
+        })
+        .catch(err => {
+            toggleLoading(false);
+            alert("خطا در بازیابی: " + err);
+        });
     }
 
     function changePin() {
-        if(confirm("آیا می‌خواهید رمز و مشخصات را بازنشانی کنید؟")) {
-            app.security.hasPin = false;
-            app.security.isSetup = false;
-            saveData();
+        if(confirm("آیا می‌خواهید از حساب خارج شوید؟")) {
             location.reload();
         }
     }
@@ -2204,11 +2304,9 @@
 
         if (step === 1) {
             const dest = document.getElementById('btDestInput').value;
-            // Validating exactly 10 digits
             const cleanDest = dest.replace(/[^0-9]/g, '');
             if(cleanDest.length !== 10) return alert("شماره حساب باید دقیقاً ۱۰ رقم و عددی باشد.");
             
-            // Step 2: Amount (Enhanced with display above)
             content.innerHTML = `
                 <h3>مبلغ انتقال</h3>
                 <p style="color:var(--text-sec); font-size:0.85rem; margin-bottom:10px;">به مقصد: ${toPersianNum(cleanDest)}</p>
@@ -2235,10 +2333,8 @@
             if(amt <= 0) return alert("مبلغ نامعتبر است");
             if(amt > net) return alert("موجودی کافی نیست!");
 
-            // Mock Name Lookup
             const mockName = "کاربر مهمان (تست)";
 
-            // Step 3: Confirm Name & Password
             content.innerHTML = `
                 <h3>تایید انتقال</h3>
                 <div style="background:rgba(0,0,0,0.03); padding:15px; border-radius:12px; margin-bottom:15px; text-align:center;">
@@ -2269,10 +2365,9 @@
         const dest = document.getElementById('btDestFinal').value;
         const destName = document.getElementById('btNameFinal').value;
 
-        if (pin !== app.security.pin) return alert("رمز عبور اشتباه است!");
+        if (pin !== app.security.password) return alert("رمز عبور اشتباه است!");
         
         withLoading(() => {
-            // Deduct Logic
             let remaining = amt;
             for(let w of app.wallets) {
                 if (remaining <= 0) break;
@@ -2290,7 +2385,6 @@
                 return;
             }
 
-            // Save Transaction
             const now = new Date();
             const dateStr = now.toLocaleDateString('fa-IR');
             const newTransfer = {
@@ -2300,7 +2394,7 @@
                 date: dateStr,
                 destAccount: dest,
                 destName: destName,
-                status: 'approved' // Auto approved since it's outgoing
+                status: 'approved' 
             };
             
             if(!app.transfers) app.transfers = [];
@@ -2310,7 +2404,6 @@
             saveData(); 
             renderUI(); 
             
-            // Show Receipt instead of just closing
             showReceipt(true, amt, getAccountNumber(), app.user.name, dest, destName);
         }, 1500);
     }
@@ -4184,7 +4277,6 @@
                     if(!app.security.nationalId) app.security.nationalId = "";
                     if(!app.dailyLogs) app.dailyLogs = [];
                     
-                    // Ensure transfers array exists
                     if(!app.transfers) app.transfers = [];
 
                     app.budgets.forEach(b => { 
@@ -4217,48 +4309,25 @@
         navigator.clipboard.writeText(txt); showToast("کپی شد: " + txt);
     }
     
-    function loadData() {
-        const d = localStorage.getItem('amir_fin_v9');
-        if(d) {
-            try {
-                const savedData = JSON.parse(d);
-                app = { ...defaultState, ...savedData };
-                
-                app.security = { ...defaultState.security, ...(savedData.security || {}) };
-                app.user = { ...defaultState.user, ...(savedData.user || {}) };
-                app.settings = { ...defaultState.settings, ...(savedData.settings || {}) };
-                
-                if(!Array.isArray(app.wallets)) app.wallets = [];
-                if(!Array.isArray(app.budgets)) app.budgets = [];
-                if(!Array.isArray(app.debts)) app.debts = [];
-                if(!Array.isArray(app.checks)) app.checks = [];
-                if(!Array.isArray(app.loans)) app.loans = [];
-                if(!Array.isArray(app.goals)) app.goals = [];
-                if(!Array.isArray(app.shopping)) app.shopping = [];
-                if(!Array.isArray(app.transfers)) app.transfers = []; // NEW
-                
-                if(app.distributedAmount === undefined) app.distributedAmount = 0;
-                if(!app.security.nationalId) app.security.nationalId = "";
-                if(app.security.isSetup === undefined) app.security.isSetup = app.security.hasPin;
-                if(!app.dailyLogs) app.dailyLogs = [];
-                if(!app.user.startDate) app.user.startDate = Date.now();
-                if(!app.priorityTiers) app.priorityTiers = [];
-                if(!app.priorities) app.priorities = {};
+    // --- SAVING DATA ---
+    function saveData() { 
+        if(!isGuestMode) { 
+            // Local Backup
+            localStorage.setItem('amir_fin_v9', JSON.stringify(app)); 
 
-                app.budgets.forEach(b => { 
-                    if(!b.history) b.history = []; if(b.manualAdd === undefined) b.manualAdd = 0; if(b.isPaused === undefined) b.isPaused = false; if(b.savedPercent === undefined) b.savedPercent = 0; if(!b.subs) b.subs = []; if(!b.internalDebt) b.internalDebt = [];
-                });
-                app.goals.forEach(g => { if(!g.autoConfig) g.autoConfig = {type:'none'}; });
-                app.shopping.forEach(s => { if(!s.autoConfig) s.autoConfig = {type:'none'}; if(s.paid === undefined) s.paid = 0; });
-                app.checks.forEach(c => { if(c.isPaid === undefined) c.isPaid = false; if(c.deduct === undefined) c.deduct = true; });
-                app.loans.forEach(l => { if(l.isReceived === undefined) l.isReceived = false; });
-                app.debts.forEach(d => { if(d.lastPaid === undefined) d.lastPaid = null; if(d.deduct === undefined) d.deduct = true; });
-            } catch (e) {
-                console.error("Data Load Error", e);
+            // Cloud Backup (if logged in)
+            if(app.security && app.security.nationalId) {
+                // Send appData to cloud
+                // Note: We send 'app' which contains everything.
+                googleApi('apiSaveData', app.security.nationalId, JSON.stringify(app))
+                .then(res => {
+                    if(!res.success) console.error("Cloud Save Failed: " + res.message);
+                })
+                .catch(err => console.error("Cloud Save Network Error", err));
             }
-        }
+        } 
     }
-    function saveData() { if(!isGuestMode) { localStorage.setItem('amir_fin_v9', JSON.stringify(app)); } }
+
     function updateDate() { document.getElementById('headerDate').innerText = toPersianNum(new Date().toLocaleDateString('fa-IR')); }
 
     function switchTab(id) {
@@ -4283,7 +4352,9 @@
             && i.id !== 'heBudgetId' && i.id !== 'heHistIndex' && i.id !== 'heType'
             && i.id !== 'setupNameInput' && i.id !== 'setupNatId' && i.id !== 'setupSecurityA'
             && i.id !== 'tierEndInput' && i.id !== 'histSearchInput'
-            && i.id !== 'btDestInput' && i.id !== 'btAmountInput' && i.id !== 'btPinInput') {
+            && i.id !== 'btDestInput' && i.id !== 'btAmountInput' && i.id !== 'btPinInput'
+            && i.id !== 'loginNatId' && i.id !== 'loginPass' // Keep login inputs clear on modal open? Maybe not needed if we manage views manually
+            ) {
                 i.value = '';
             }
         });
@@ -4293,4 +4364,4 @@
 
 </script>
 </body>
-    </html>
+</html>
