@@ -1,3 +1,4 @@
+
 <!DOCTYPE html> 
 <html lang="fa" dir="rtl">
 <head>
@@ -391,30 +392,6 @@
             box-shadow: 0 10px 25px rgba(55, 48, 163, 0.3);
         }
 
-        .pin-dots { display: flex; gap: 15px; margin: 25px 0; justify-content: center; }
-        .pin-dot { 
-            width: 14px; height: 14px; border-radius: 50%; 
-            background: #cbd5e1; transition: all 0.3s; 
-        }
-        .pin-dot.filled { 
-            background: var(--primary); transform: scale(1.3); box-shadow: 0 0 10px rgba(55, 48, 163, 0.5); 
-        }
-        
-        .numpad {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; direction: ltr; 
-            width: 100%; margin-top: 10px;
-        }
-        .num-key {
-            width: 60px; height: 60px; border-radius: 18px;
-            background: rgba(0,0,0,0.02); 
-            font-size: 1.4rem; font-weight: 600; color: var(--text-main);
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s; margin: 0 auto; border: 1px solid transparent;
-        }
-        .num-key:hover { background: rgba(0,0,0,0.05); }
-        .num-key:active { background: var(--primary); color: white; border-radius: 50%; transform: scale(0.9); }
-        .num-key.del { color: var(--danger); background: rgba(239,68,68,0.05); }
-
         .auth-link {
             margin-top: 20px; color: var(--text-sec); font-size: 0.8rem;
             cursor: pointer; transition: 0.2s;
@@ -427,6 +404,30 @@
             font-size: 0.85rem; width: 100%; transition: 0.2s;
         }
         .guest-btn:hover { background: rgba(245, 158, 11, 0.1); }
+
+        /* --- Identity Card Styles --- */
+        .identity-card-container {
+            width: 100%; max-width: 350px; border-radius: 20px; overflow: hidden;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: white; font-family: 'Vazirmatn', sans-serif;
+            position: relative; border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            margin: 0 auto;
+        }
+        .id-card-header {
+            background: rgba(255,255,255,0.1); padding: 15px; text-align: center;
+            font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.05);
+            display:flex; align-items:center; justify-content:center; gap:8px;
+        }
+        .id-card-body { padding: 20px; }
+        .id-row { margin-bottom: 15px; }
+        .id-label { font-size: 0.75rem; color: #94a3b8; display: block; margin-bottom: 4px; }
+        .id-value { font-size: 1.1rem; font-weight: bold; color: white; letter-spacing: 1px; }
+        .id-value-big { font-size: 1.4rem; color: #fbbf24; letter-spacing: 2px; direction: ltr; font-family: monospace; }
+        .id-footer { 
+            background: rgba(0,0,0,0.2); padding: 10px; text-align: center; 
+            font-size: 0.7rem; color: #64748b; 
+        }
 
         /* --- Bank Card --- */
         .hero-card { perspective: 1500px; height: 240px; margin-bottom: 30px; cursor: pointer; }
@@ -827,60 +828,53 @@
 
 <div id="toastContainer" class="toast-container"></div>
 
-<!-- 1. LOCK SCREEN -->
+<!-- 1. AUTH SCREEN (MODIFIED) -->
 <div id="authModal" class="pin-screen" style="display: flex;">
     <div class="auth-card">
         <div class="auth-avatar" id="authIcon">
             <i class="fas fa-fingerprint"></i>
         </div>
-        <h2 id="authTitle" style="margin: 0 0 5px 0; color: var(--primary); font-size: 1.4rem;">ورود ایمن</h2>
-        <p id="authSub" style="font-size: 0.9rem; color: var(--text-sec); margin-bottom: 25px;">لطفاً هویت خود را تایید کنید</p>
+        <h2 id="authTitle" style="margin: 0 0 5px 0; color: var(--primary); font-size: 1.4rem;">مدیریت سرمایه</h2>
+        <p id="authSub" style="font-size: 0.9rem; color: var(--text-sec); margin-bottom: 25px;">لطفاً وارد شوید یا ثبت نام کنید</p>
 
-        <!-- Step 1: Sequential Registration / Info -->
+        <!-- Initial Buttons -->
+        <div id="authInitial" style="width:100%;">
+             <button class="btn btn-primary" style="width:100%; margin-bottom:10px;" onclick="showLoginForm()">ورود به سیستم</button>
+             <button class="btn btn-outline" style="width:100%;" onclick="showRegisterForm()">ثبت نام جدید</button>
+        </div>
+
+        <!-- Login Form -->
+        <div id="loginForm" style="display:none; width:100%;">
+             <label class="auth-label">کد ملی:</label>
+             <input type="text" id="loginNatId" inputmode="numeric" placeholder="کد ملی خود را وارد کنید">
+             <label class="auth-label">رمز عبور:</label>
+             <input type="password" id="loginPass" placeholder="رمز عبور...">
+             <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="processLogin()">ورود</button>
+             <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="resetAuthView()">بازگشت</button>
+        </div>
+
+        <!-- Registration Steps (Sequential) -->
         <div id="authStep1" style="display:none; width:100%;">
             <input type="hidden" id="setupStepVal" value="1">
             
             <div id="setupS1">
-                <label class="auth-label">نام شما:</label>
+                <label class="auth-label">مرحله ۱: نام و نام خانوادگی</label>
                 <input type="text" id="setupNameInput" placeholder="نام خود را وارد کنید" style="padding:12px; border-radius:12px;">
             </div>
 
             <div id="setupS2" style="display:none;">
-                <label class="auth-label">کد ملی (جهت بازیابی):</label>
+                <label class="auth-label">مرحله ۲: کد ملی</label>
                 <input type="text" id="setupNatId" inputmode="numeric" placeholder="کد ملی خود را وارد کنید" style="padding:12px; border-radius:12px;">
             </div>
 
             <div id="setupS3" style="display:none;">
-                <label class="auth-label">سوال امنیتی (تصادفی):</label>
-                <div style="background: rgba(79,70,229,0.05); padding: 12px; border-radius: 12px; margin-bottom: 10px; color: var(--primary); font-weight: bold; font-size: 0.85rem; text-align: right;" id="setupSecurityQ">---</div>
-                <input type="text" id="setupSecurityA" placeholder="پاسخ را بنویسید" style="padding:12px; border-radius:12px;">
+                <label class="auth-label">مرحله ۳: تعیین رمز عبور</label>
+                <input type="password" id="setupPassword" placeholder="یک رمز عبور قوی وارد کنید" style="padding:12px; border-radius:12px;">
             </div>
 
-            <button class="btn btn-primary" style="width:100%; padding: 12px;" onclick="nextSetupStep()" id="setupNextBtn">بعدی</button>
-        </div>
-
-        <!-- Step 2: PIN Entry -->
-        <div id="authStep2" style="display:none; width:100%; flex-direction: column; align-items: center;">
-            <div class="pin-dots">
-                <div class="pin-dot" id="pd1"></div>
-                <div class="pin-dot" id="pd2"></div>
-                <div class="pin-dot" id="pd3"></div>
-                <div class="pin-dot" id="pd4"></div>
-            </div>
-
-            <div class="numpad">
-                <button class="num-key" onclick="pressKey(1)">۱</button>
-                <button class="num-key" onclick="pressKey(2)">۲</button>
-                <button class="num-key" onclick="pressKey(3)">۳</button>
-                <button class="num-key" onclick="pressKey(4)">۴</button>
-                <button class="num-key" onclick="pressKey(5)">۵</button>
-                <button class="num-key" onclick="pressKey(6)">۶</button>
-                <button class="num-key" onclick="pressKey(7)">۷</button>
-                <button class="num-key" onclick="pressKey(8)">۸</button>
-                <button class="num-key" onclick="pressKey(9)">۹</button>
-                <div class="num-key" style="visibility: hidden;"></div>
-                <button class="num-key" onclick="pressKey(0)">۰</button>
-                <button class="num-key del" onclick="pressKey('del')"><i class="fas fa-backspace"></i></button>
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button class="btn btn-outline" style="flex:1;" onclick="resetAuthView()">انصراف</button>
+                <button class="btn btn-primary" style="flex:1;" onclick="nextSetupStep()" id="setupNextBtn">بعدی</button>
             </div>
         </div>
 
@@ -1193,6 +1187,46 @@
 
 <!-- MODALS -->
 
+<!-- NEW: Identity Card Modal -->
+<div id="identityCardModal" class="modal">
+    <div class="modal-content" style="text-align:center;">
+        <h3>کارت هویت دیجیتال</h3>
+        <p style="font-size:0.9rem; color:var(--text-sec); margin-bottom:20px;">لطفاً این کارت را ذخیره کنید. شامل کد بازیابی شماست.</p>
+        
+        <div id="idCardRenderArea">
+            <div class="identity-card-container">
+                <div class="id-card-header">
+                    <i class="fas fa-id-card"></i> مدیریت سرمایه تعالی
+                </div>
+                <div class="id-card-body">
+                    <div class="id-row">
+                        <span class="id-label">نام کاربر</span>
+                        <span class="id-value" id="idCardName">---</span>
+                    </div>
+                    <div class="id-row">
+                        <span class="id-label">شماره حساب (یکتا)</span>
+                        <span class="id-value-big" id="idCardAcc">---</span>
+                    </div>
+                    <div class="id-row">
+                        <span class="id-label">کد بازیابی (PUK)</span>
+                        <span class="id-value-big" id="idCardPuk" style="color:#22d3ee;">---</span>
+                    </div>
+                </div>
+                <div class="id-footer">
+                    نسخه بانکی پیشرفته • کد ملی: <span id="idCardNat">---</span>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" style="width:100%; margin-top:20px;" onclick="downloadIdCard()">
+            <i class="fas fa-download"></i> دانلود کارت
+        </button>
+        <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="closeIdCardAndLogin()">
+            ورود به برنامه
+        </button>
+    </div>
+</div>
+
 <!-- New Bank Transfer Wizard Modal -->
 <div id="bankTransferModal" class="modal">
     <div class="modal-content" id="btContent">
@@ -1389,15 +1423,16 @@
 <div id="recoveryModal" class="modal">
     <div class="modal-content">
         <h3><i class="fas fa-key"></i> بازیابی رمز عبور</h3>
-        <p style="color:var(--text-sec); font-size:0.9rem; margin-bottom:15px;">برای بازیابی، اطلاعات اولیه خود را وارد کنید.</p>
+        <p style="color:var(--text-sec); font-size:0.9rem; margin-bottom:15px;">برای بازیابی، کد ملی و کد PUK خود را وارد کنید.</p>
         <label>کد ملی:</label>
         <input type="text" id="recNatId" inputmode="numeric" placeholder="کد ملی خود را وارد کنید">
-        <label>سوال امنیتی:</label>
-        <p id="recoveryQuestionText" style="font-weight:bold; color:var(--primary); margin: 10px 0; background:rgba(79,70,229,0.1); padding:15px; border-radius:12px; border:1px dashed var(--primary);">---</p>
-        <label>پاسخ:</label>
-        <input type="text" id="recoveryAnswerInput" placeholder="پاسخ شما...">
+        <label>کد بازیابی (PUK):</label>
+        <input type="text" id="recPuk" placeholder="کد ۸ رقمی PUK" inputmode="numeric">
+        <label>رمز عبور جدید:</label>
+        <input type="password" id="recNewPass" placeholder="رمز جدید...">
+        
         <div style="margin-top:25px; display:flex; gap:12px;">
-            <button class="btn btn-primary" style="flex:1" onclick="checkRecoveryAnswer()">بررسی و تایید</button>
+            <button class="btn btn-primary" style="flex:1" onclick="checkRecovery()">بازیابی اکانت</button>
             <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">بستن</button>
         </div>
     </div>
@@ -1745,7 +1780,7 @@
         debts: [], 
         checks: [], 
         loans: [],  
-        transfers: [], // NEW: Store transaction history
+        transfers: [],
         budgets: [
             {id: 1, name: "کرایه شهری", percent: 20, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: [], internalDebt: []},
             {id: 2, name: "خورد و خوراک", percent: 14, spent: 0, history: [], manualAdd: 0, subs: [], internalDebt: []},
@@ -1768,16 +1803,7 @@
         sectionHistory: { dashboard: [], budget: [], tools: [] }
     };
 
-    const securityQuestions = [
-        "نام اولین حیوان خانگی شما چیست؟",
-        "نام معلم کلاس اول دبستان شما چه بود؟",
-        "نام خیابانی که در کودکی در آن زندگی می‌کردید؟",
-        "رنگ مورد علاقه شما چیست؟",
-        "نام بهترین دوست دوران کودکی؟"
-    ];
-
     let app = JSON.parse(JSON.stringify(defaultState));
-    let pinBuffer = "";
     let rate = 1; 
     let tempBudget = null; 
     let isGuestMode = false;
@@ -1815,7 +1841,7 @@
         }, duration);
     }
 
-    window.onload = () => { loadData(); checkAuth(); setupDatePickers(); };
+    window.onload = () => { checkAuth(); setupDatePickers(); };
 
     function toPersianNum(num, dontTrim) {
         if(num === null || num === undefined) return '';
@@ -1829,11 +1855,9 @@
         return res;
     }
 
-    // New Function: Get Account Number from National ID (Reverse)
     function getAccountNumber() {
         const natId = app.security.nationalId || "";
         if(!natId || natId.length !== 10) return "۰۰۰۰۰۰۰۰۰۰";
-        // Reverse the national ID string
         const reversed = natId.split('').reverse().join('');
         return toPersianNum(reversed);
     }
@@ -1885,49 +1909,48 @@
         return toPersianNum(new Date().toLocaleDateString('fa-IR-u-nu-latn').split('/').slice(0, 2).join('/'));
     }
 
+    // --- NEW AUTHENTICATION LOGIC ---
+
     function checkAuth() {
-        const modal = document.getElementById('authModal');
-        const step1 = document.getElementById('authStep1');
-        const step2 = document.getElementById('authStep2');
-        const actions = document.getElementById('authActions');
-        const title = document.getElementById('authTitle');
-        const sub = document.getElementById('authSub');
-        const forgotDiv = document.getElementById('forgotPassDiv');
+        // Show Auth Modal, reset to initial state
+        document.getElementById('authModal').style.display = 'flex';
+        resetAuthView();
+    }
 
-        modal.style.display = 'flex';
-        pinBuffer = "";
-        updatePinDots();
+    function resetAuthView() {
+        document.getElementById('authInitial').style.display = 'block';
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('authStep1').style.display = 'none';
+        document.getElementById('authActions').style.display = 'block';
+        document.getElementById('authTitle').innerText = "مدیریت سرمایه";
+        document.getElementById('authSub').innerText = "لطفاً وارد شوید یا ثبت نام کنید";
+        
+        // Clear Inputs
+        document.getElementById('loginNatId').value = '';
+        document.getElementById('loginPass').value = '';
+    }
 
-        if (!app.security.hasPin || !app.security.isSetup) {
-            title.innerText = app.user.name ? "ویرایش اطلاعات امنیتی" : "راه‌اندازی اولیه";
-            sub.innerText = "لطفاً مراحل زیر را طی کنید";
-            step1.style.display = 'block';
-            step2.style.display = 'none';
-            actions.style.display = 'block';
-            forgotDiv.style.display = 'none';
-            app.security.isSetup = false;
-            
-            document.getElementById('setupStepVal').value = 1;
-            document.getElementById('setupS1').style.display = 'block';
-            document.getElementById('setupS2').style.display = 'none';
-            document.getElementById('setupS3').style.display = 'none';
-            document.getElementById('setupNextBtn').innerText = 'بعدی';
+    function showLoginForm() {
+        document.getElementById('authInitial').style.display = 'none';
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('authActions').style.display = 'block';
+        document.getElementById('authTitle').innerText = "ورود به حساب";
+        document.getElementById('authSub').innerText = "اطلاعات کاربری خود را وارد کنید";
+    }
 
-            document.getElementById('setupNameInput').value = app.user.name || "";
-            document.getElementById('setupNatId').value = app.security.nationalId || "";
-            document.getElementById('setupSecurityA').value = "";
-            
-            const randIdx = Math.floor(Math.random() * securityQuestions.length);
-            document.getElementById('setupSecurityQ').innerText = securityQuestions[randIdx];
-            document.getElementById('setupSecurityQ').setAttribute('data-qid', randIdx);
-        } else {
-            title.innerText = app.user.name ? `سلام، ${app.user.name}` : "خوش آمدید";
-            sub.innerText = "جهت ورود رمز خود را وارد کنید";
-            step1.style.display = 'none';
-            step2.style.display = 'flex';
-            actions.style.display = 'block';
-            forgotDiv.style.display = 'block';
-        }
+    function showRegisterForm() {
+        document.getElementById('authInitial').style.display = 'none';
+        document.getElementById('authStep1').style.display = 'block';
+        document.getElementById('authActions').style.display = 'none';
+        document.getElementById('authTitle').innerText = "ثبت نام";
+        document.getElementById('authSub').innerText = "مراحل را به ترتیب طی کنید";
+        
+        // Reset Steps
+        document.getElementById('setupStepVal').value = 1;
+        document.getElementById('setupS1').style.display = 'block';
+        document.getElementById('setupS2').style.display = 'none';
+        document.getElementById('setupS3').style.display = 'none';
+        document.getElementById('setupNextBtn').innerText = 'بعدی';
     }
 
     function nextSetupStep() {
@@ -1946,21 +1969,81 @@
             document.getElementById('setupS2').style.display = 'none';
             document.getElementById('setupS3').style.display = 'block';
             document.getElementById('setupStepVal').value = 3;
-            document.getElementById('setupNextBtn').innerText = 'تایید و تعیین رمز';
+            document.getElementById('setupNextBtn').innerText = 'تکمیل ثبت نام';
         } else if(step === 3) {
-            const ans = document.getElementById('setupSecurityA').value.trim();
-            if(!ans) return alert("لطفا پاسخ سوال امنیتی را وارد کنید");
-            app.security.answer = ans;
-            app.security.questionId = parseInt(document.getElementById('setupSecurityQ').getAttribute('data-qid'));
-            goToPinSetup();
+            const pass = document.getElementById('setupPassword').value;
+            if(!pass) return alert("رمز عبور را وارد کنید");
+            
+            // Call Backend to Register
+            toggleLoading(true);
+            google.script.run.withSuccessHandler(response => {
+                toggleLoading(false);
+                if (response.success) {
+                    showIdentityCardModal(response.data.name, response.data.accountNumber, response.data.puk, pass, response.data.nationalId);
+                } else {
+                    alert("خطا در ثبت نام: " + response.message);
+                }
+            }).apiRegister(app.user.name, app.security.nationalId, pass);
         }
     }
 
-    function goToPinSetup() {
-        document.getElementById('authStep1').style.display = 'none';
-        document.getElementById('authStep2').style.display = 'flex';
-        document.getElementById('authTitle').innerText = "تعیین رمز عبور";
-        document.getElementById('authSub').innerText = "یک رمز ۴ رقمی وارد کنید";
+    function showIdentityCardModal(name, acc, puk, pass, natId) {
+        document.getElementById('authModal').style.display = 'none';
+        document.getElementById('idCardName').innerText = name;
+        document.getElementById('idCardAcc').innerText = toPersianNum(acc);
+        document.getElementById('idCardPuk').innerText = puk;
+        document.getElementById('idCardNat').innerText = toPersianNum(natId);
+        
+        // Temporarily store password to auto-login later if needed, or just let them login manually
+        // For UX, we prompt them to download.
+        openModal('identityCardModal');
+    }
+
+    function downloadIdCard() {
+        const el = document.getElementById('idCardRenderArea');
+        html2canvas(el, { scale: 2 }).then(canvas => {
+            const a = document.createElement('a');
+            a.download = `IdentityCard_${Date.now()}.png`;
+            a.href = canvas.toDataURL();
+            a.click();
+            showToast("کارت هویت ذخیره شد");
+        });
+    }
+
+    function closeIdCardAndLogin() {
+        closeAllModals();
+        alert("لطفاً با رمز عبور خود وارد شوید.");
+        checkAuth();
+        showLoginForm();
+    }
+
+    function processLogin() {
+        const natId = document.getElementById('loginNatId').value.trim();
+        const pass = document.getElementById('loginPass').value;
+        
+        if(!natId || !pass) return alert("لطفاً تمام فیلدها را پر کنید");
+
+        toggleLoading(true);
+        google.script.run.withSuccessHandler(response => {
+            toggleLoading(false);
+            if(response.success) {
+                // Merge data from cloud
+                const cloudData = response.userData.appData;
+                const securityData = response.userData.security;
+                
+                app = { ...defaultState, ...cloudData };
+                app.security = securityData; // Update security context
+                
+                document.getElementById('authModal').style.display = 'none';
+                document.getElementById('appContent').style.display = 'block';
+                processDailyLog(); 
+                updateDate();
+                renderUI();
+                showToast("خوش آمدید", "user-check");
+            } else {
+                alert(response.message);
+            }
+        }).apiLogin(natId, pass);
     }
 
     function enterGuestMode() {
@@ -1974,67 +2057,37 @@
         }
     }
 
-    function pressKey(key) {
-        if (key === 'del') pinBuffer = pinBuffer.slice(0, -1);
-        else if (pinBuffer.length < 4) pinBuffer += key;
-        updatePinDots();
-        if (pinBuffer.length === 4) setTimeout(processPin, 100);
-    }
-    function updatePinDots() {
-        for(let i=1; i<=4; i++) {
-            const dot = document.getElementById(`pd${i}`);
-            if (i <= pinBuffer.length) dot.classList.add('filled');
-            else dot.classList.remove('filled');
-        }
-    }
-    function processPin() {
-        if (!app.security.hasPin) {
-            if(confirm("رمز شما: " + pinBuffer + "\nآیا این رمز تایید است؟")) {
-                app.security.pin = pinBuffer;
-                app.security.hasPin = true;
-                app.security.isSetup = true;
-                if(!app.user.startDate) app.user.startDate = Date.now();
-                saveData(); 
-                document.getElementById('authModal').style.display = 'none';
-                document.getElementById('appContent').style.display = 'block';
-                renderUI();
-            } else { pinBuffer = ""; updatePinDots(); }
-        } else {
-            if (pinBuffer === app.security.pin) {
-                document.getElementById('authModal').style.display = 'none';
-                document.getElementById('appContent').style.display = 'block';
-                processDailyLog(); 
-                updateDate();
-                renderUI();
-            } else { showToast("رمز اشتباه است!", "times-circle"); pinBuffer = ""; updatePinDots(); }
-        }
-    }
-
     function startRecovery() {
-        const qId = app.security.questionId || 0;
-        document.getElementById('recoveryQuestionText').innerText = securityQuestions[qId];
-        document.getElementById('recNatId').value = '';
-        document.getElementById('recoveryAnswerInput').value = '';
         openModal('recoveryModal');
     }
-    function checkRecoveryAnswer() {
-        const uNat = document.getElementById('recNatId').value.trim();
-        const uAns = document.getElementById('recoveryAnswerInput').value.trim();
-        if(uNat === app.security.nationalId && uAns === app.security.answer) {
-            alert("اطلاعات صحیح است. لطفا رمز جدید تعریف کنید.");
-            app.security.hasPin = false;
-            app.security.pin = "";
-            app.security.isSetup = true;
-            saveData();
-            location.reload();
-        } else { alert("اطلاعات وارد شده اشتباه است."); }
+    
+    function checkRecovery() {
+        const natId = document.getElementById('recNatId').value.trim();
+        const puk = document.getElementById('recPuk').value.trim();
+        const newPass = document.getElementById('recNewPass').value.trim();
+
+        if(!natId || !puk || !newPass) return alert("همه فیلدها الزامی است");
+
+        toggleLoading(true);
+        google.script.run.withSuccessHandler(response => {
+            toggleLoading(false);
+            if(response.success) {
+                alert(response.message);
+                closeAllModals();
+                showLoginForm();
+            } else {
+                alert(response.message);
+                if(response.locked) {
+                    closeAllModals();
+                }
+            }
+        }).apiRecoverAccount(natId, puk, newPass);
     }
 
     function changePin() {
-        if(confirm("آیا می‌خواهید رمز و مشخصات را بازنشانی کنید؟")) {
-            app.security.hasPin = false;
-            app.security.isSetup = false;
-            saveData();
+        // Renamed function, but logic is basically reset local state
+        // Since we are cloud-based now, maybe just logout?
+        if(confirm("آیا می‌خواهید از حساب خارج شوید؟")) {
             location.reload();
         }
     }
@@ -2203,11 +2256,9 @@
 
         if (step === 1) {
             const dest = document.getElementById('btDestInput').value;
-            // Validating exactly 10 digits
             const cleanDest = dest.replace(/[^0-9]/g, '');
             if(cleanDest.length !== 10) return alert("شماره حساب باید دقیقاً ۱۰ رقم و عددی باشد.");
             
-            // Step 2: Amount (Enhanced with display above)
             content.innerHTML = `
                 <h3>مبلغ انتقال</h3>
                 <p style="color:var(--text-sec); font-size:0.85rem; margin-bottom:10px;">به مقصد: ${toPersianNum(cleanDest)}</p>
@@ -2234,10 +2285,8 @@
             if(amt <= 0) return alert("مبلغ نامعتبر است");
             if(amt > net) return alert("موجودی کافی نیست!");
 
-            // Mock Name Lookup
             const mockName = "کاربر مهمان (تست)";
 
-            // Step 3: Confirm Name & Password
             content.innerHTML = `
                 <h3>تایید انتقال</h3>
                 <div style="background:rgba(0,0,0,0.03); padding:15px; border-radius:12px; margin-bottom:15px; text-align:center;">
@@ -2268,10 +2317,17 @@
         const dest = document.getElementById('btDestFinal').value;
         const destName = document.getElementById('btNameFinal').value;
 
-        if (pin !== app.security.pin) return alert("رمز عبور اشتباه است!");
+        // In cloud mode, we might want to verify with server, but for simplicity here we check local security context
+        // OR better: Assume 'pin' is the login password
+        if (pin !== app.security.password && pin !== app.security.pin) { // Allow both if legacy exists
+             // Actually, we switched to password. Let's check password.
+             // But security context has password from login response?
+             // Since we don't store plain password in app variable usually (good practice), 
+             // but here we stored it in app.security for simplicity based on previous prompt requirements.
+             if(pin !== app.security.password) return alert("رمز عبور اشتباه است!");
+        }
         
         withLoading(() => {
-            // Deduct Logic
             let remaining = amt;
             for(let w of app.wallets) {
                 if (remaining <= 0) break;
@@ -2289,7 +2345,6 @@
                 return;
             }
 
-            // Save Transaction
             const now = new Date();
             const dateStr = now.toLocaleDateString('fa-IR');
             const newTransfer = {
@@ -2299,7 +2354,7 @@
                 date: dateStr,
                 destAccount: dest,
                 destName: destName,
-                status: 'approved' // Auto approved since it's outgoing
+                status: 'approved' 
             };
             
             if(!app.transfers) app.transfers = [];
@@ -2309,7 +2364,6 @@
             saveData(); 
             renderUI(); 
             
-            // Show Receipt instead of just closing
             showReceipt(true, amt, getAccountNumber(), app.user.name, dest, destName);
         }, 1500);
     }
@@ -2608,1656 +2662,30 @@
         showToast("اطلاعات کپی شد");
     }
 
-    function renderWallets() {
-        const div = document.getElementById('walletList');
-        div.innerHTML = app.wallets.map((w, i) => 
-            `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center;">
-                <span style="font-weight:600;">${w.name}</span>
-                <div style="display:flex; align-items:center;">
-                    <b style="font-size:1.1rem; color:var(--primary);">${format(w.value)}</b>
-                    <span style="margin-right:15px; display:flex;">
-                        <button class="btn-small-icon btn-edit" onclick="openEdit('wallet', ${i})"><i class="fas fa-edit"></i></button>
-                        <button class="btn-small-icon btn-del" onclick="delWallet(${i})"><i class="fas fa-trash"></i></button>
-                    </span>
-                </div>
-            </div>`).join('');
-    }
+    // --- SAVE AND LOAD ---
+    // Modified to use Google Script Backend
 
-    function renderDebts() {
-        const div = document.getElementById('debtList');
-        const todayDate = new Date();
-        const faDateParts = todayDate.toLocaleDateString('fa-IR-u-nu-latn').split('/');
-        const currentYear = parseInt(faDateParts[0]);
-        const currentMonth = parseInt(faDateParts[1]);
-        const currentDay = parseInt(faDateParts[2]);
-        const currentMonthStr = toPersianNum(`${currentYear}/${currentMonth}`); 
+    function saveData() {
+        if(isGuestMode) return;
+        
+        // Local Backup
+        localStorage.setItem('amir_fin_v9', JSON.stringify(app));
 
-        div.innerHTML = app.debts.map((d, i) => {
-            const dueDay = parseInt(d.day);
-            let statusText = "";
-            let animClass = "";
-            let btnHtml = "";
-            
-            if (d.lastPaid === currentMonthStr) {
-                statusText = `<span style="color:var(--success); font-weight:bold;">پرداخت شد <i class="fas fa-check"></i></span>`;
-                let nextDueInDays = (30 - currentDay) + dueDay; 
-                statusText += `<br><small style="color:var(--text-sec)">سررسید بعدی: حدود ${toPersianNum(nextDueInDays)} روز دیگر</small>`;
-            } else {
-                if (currentDay > dueDay) {
-                    const daysOverdue = currentDay - dueDay;
-                    statusText = `<span style="color:var(--danger); font-weight:bold;">${toPersianNum(daysOverdue)} روز معوق!</span>`;
-                    animClass = "pulse-danger bg-yellow-highlight";
-                } else if (currentDay === dueDay) {
-                    statusText = `<span style="color:var(--danger); font-weight:bold;">سررسید امروز!</span>`;
-                    animClass = "pulse-danger";
-                } else {
-                    const daysLeft = dueDay - currentDay;
-                    statusText = `${toPersianNum(daysLeft)} روز تا پرداخت`;
-                    if (daysLeft <= 3) animClass = "pulse-warning";
+        // Cloud Save
+        if(app.security && app.security.nationalId) {
+            // Send the entire app object. The backend will put it into 'appData'.
+            // The backend handles merging 'security' info separately if needed, 
+            // but primarily it updates the app data blob.
+            const dataStr = JSON.stringify(app);
+            google.script.run.withSuccessHandler(res => {
+                if(!res.success) {
+                    console.error("Cloud Save Error: " + res.message);
+                    showToast("خطا در ذخیره ابری", "cloud-upload-alt");
                 }
-                btnHtml = `<button class="btn-small-icon btn-check" onclick="payDebt(${i})" title="پرداخت شد"><i class="fas fa-check"></i></button>`;
-            }
-
-            const isDeducted = (d.deduct !== false);
-            const deductIcon = isDeducted ? '' : '<i class="fas fa-eye-slash" title="عدم کسر از موجودی" style="color:var(--text-sec); margin-right:5px; font-size:0.8rem;"></i>';
-
-            return `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px; transition:0.3s;" class="${animClass}">
-                <div>
-                    <span style="font-weight:bold;">${d.name} ${deductIcon}</span>
-                    <div style="font-size:0.8rem; margin-top:4px; color:var(--text-sec); line-height:1.6;">${statusText}</div>
-                </div>
-                <div style="display:flex; align-items:center;">
-                    <b style="color:var(--danger); margin-left:10px;">${format(d.value)}</b>
-                    <span style="display:flex; gap:5px;">
-                        ${btnHtml}
-                        <button class="btn-small-icon btn-edit" onclick="openEdit('debt', ${i})"><i class="fas fa-edit"></i></button>
-                        <button class="btn-small-icon btn-del" onclick="delDebt(${i})"><i class="fas fa-trash"></i></button>
-                    </span>
-                </div>
-            </div>`;
-        }).join('');
-    }
-
-    function payDebt(i) {
-        if(confirm("آیا پرداخت این قسط برای این ماه را تایید می‌کنید؟")) {
-            saveSectionSnap('dashboard', `پرداخت قسط ${app.debts[i].name}`);
-            const today = new Date();
-            const currentMonthStr = toPersianNum(today.toLocaleDateString('fa-IR-u-nu-latn').split('/').slice(0, 2).join('/'));
-            
-            app.debts[i].lastPaid = currentMonthStr;
-            
-            if(app.wallets.length > 0) {
-                 app.wallets[0].value -= app.debts[i].value; 
-            }
-
-            saveData(); renderUI(); showToast("پرداخت ثبت شد (کسر از کیف پول اصلی)");
-        }
-    }
-
-    function renderChecks() {
-        const div = document.getElementById('checkList');
-        if(!app.checks) app.checks = [];
-        
-        const dateToNum = (s) => parseInt(s.replace(/\//g, ''));
-        const todayStr = toPersianNum(new Date().toLocaleDateString('fa-IR-u-nu-latn')); 
-        const todayNum = dateToNum(todayStr);
-
-        div.innerHTML = app.checks.map((c, i) => {
-            if(c.isPaid) {
-                 return `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; opacity:0.6;">
-                    <div><del>${c.name}</del> <small style="color:var(--success);">(پاس شد)</small></div>
-                    <div style="display:flex; align-items:center;">
-                        <b style="color:var(--text-sec);">${format(c.value)}</b>
-                        <button class="btn-small-icon btn-del" onclick="delCheck(${i})" style="margin-right:10px;"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>`;
-            }
-
-            let animClass = "";
-            let statusMsg = "";
-            const cDateNum = dateToNum(c.date);
-
-            if (cDateNum < todayNum) {
-                statusMsg = "زمان سررسید گذشته است!";
-                animClass = "pulse-danger bg-yellow-highlight";
-            } else if (cDateNum === todayNum) {
-                statusMsg = "سررسید امروز است!";
-                animClass = "pulse-danger";
-            } else {
-                statusMsg = `تاریخ سررسید: ${c.date}`; 
-            }
-            
-            if(cDateNum > todayNum) {
-               statusMsg = `سررسید: ${c.date}`;
-            }
-
-            const isDeducted = (c.deduct !== false);
-            const deductIcon = isDeducted ? '' : '<i class="fas fa-eye-slash" title="عدم کسر از موجودی" style="color:var(--text-sec); margin-right:5px; font-size:0.8rem;"></i>';
-            
-            return `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px;" class="${animClass}">
-                <div>${c.name} ${deductIcon} <br><small style="color:${animClass?'var(--danger)':'var(--text-sec)'}; font-weight:bold;">${statusMsg}</small></div>
-                <div style="display:flex; align-items:center;">
-                    <b style="color:var(--danger);">${format(c.value)}</b>
-                    <span style="margin-right:15px; display:flex; gap:5px;">
-                        <button class="btn-small-icon btn-check" onclick="passCheck(${i})" title="پاس شد"><i class="fas fa-check"></i></button>
-                        <button class="btn-small-icon btn-edit" onclick="openEdit('check', ${i})"><i class="fas fa-edit"></i></button>
-                        <button class="btn-small-icon btn-del" onclick="delCheck(${i})"><i class="fas fa-trash"></i></button>
-                    </span>
-                </div>
-            </div>`;
-        }).join('');
-    }
-
-    function passCheck(i) {
-        if(confirm("آیا این چک/بدهی پاس شده است؟")) {
-            saveSectionSnap('dashboard', `پاس شدن چک ${app.checks[i].name}`);
-            app.checks[i].isPaid = true;
-            if(app.wallets.length > 0) {
-                 app.wallets[0].value -= app.checks[i].value;
-            }
-            saveData(); renderUI(); showToast("وضعیت ذخیره شد (کسر از کیف پول اصلی)");
-        }
-    }
-
-    function renderLoans() {
-        const div = document.getElementById('loanList');
-        if(!app.loans) app.loans = [];
-        const todayStr = toPersianNum(new Date().toLocaleDateString('fa-IR'));
-
-        div.innerHTML = app.loans.map((l, i) => {
-            if(l.isReceived) {
-                 return `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; opacity:0.6;">
-                    <div><del>${l.name}</del> <small style="color:var(--success);">(وصول شد)</small></div>
-                    <div style="display:flex; align-items:center;">
-                        <b style="color:var(--text-sec);">${format(l.value)}</b>
-                        <button class="btn-small-icon btn-del" onclick="delLoan(${i})" style="margin-right:10px;"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>`;
-            }
-
-            let animClass = "";
-            let statusMsg = "وصول: " + l.date;
-            if (l.date === todayStr) {
-                animClass = "pulse-warning bg-yellow-highlight";
-                statusMsg = "زمان وصول امروز!";
-            }
-
-            return `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px;" class="${animClass}">
-                <div>${l.name} <br><small style="color:var(--text-sec);">${statusMsg}</small></div>
-                <div style="display:flex; align-items:center;">
-                    <b style="color:var(--success);">${format(l.value)}</b>
-                    <span style="margin-right:15px; display:flex; gap:5px;">
-                        <button class="btn-small-icon btn-check" onclick="receiveLoan(${i})" title="دریافت شد"><i class="fas fa-download"></i></button>
-                        <button class="btn-small-icon btn-edit" onclick="openEdit('loan', ${i})"><i class="fas fa-edit"></i></button>
-                        <button class="btn-small-icon btn-del" onclick="delLoan(${i})"><i class="fas fa-trash"></i></button>
-                    </span>
-                </div>
-            </div>`;
-        }).join('');
-    }
-
-    function receiveLoan(i) {
-        if(confirm("آیا مبلغ قرض داده شده وصول شد؟")) {
-            saveSectionSnap('dashboard', `وصول طلب ${app.loans[i].name}`);
-            app.loans[i].isReceived = true;
-             if(app.wallets.length > 0) {
-                 app.wallets[0].value += app.loans[i].value;
-            }
-            saveData(); renderUI(); showToast("وصول ثبت شد (اضافه به کیف پول اصلی)");
-        }
-    }
-
-    function renderBudgets(net) {
-        const distributeBtn = document.getElementById('btnDistribute');
-        const distributableDisplay = document.getElementById('distributable');
-        
-        if(net !== app.distributedAmount) {
-            if (net > app.distributedAmount) {
-                const diff = net - app.distributedAmount;
-                distributeBtn.style.display = 'flex';
-                distributableDisplay.innerHTML = `<span style="color:var(--text-sec);">${format(app.distributedAmount)}</span> <span style="color:var(--success); font-size:0.9em; margin-right:5px;">(+${format(diff)})</span>`;
-            } else {
-                distributeBtn.style.display = 'flex';
-                distributableDisplay.style.color = 'var(--warning)';
-                distributableDisplay.innerText = format(app.distributedAmount) + " (کسری)";
-            }
-        } else {
-            distributeBtn.style.display = 'none';
-            distributableDisplay.style.color = 'var(--primary)';
-            distributableDisplay.innerText = format(app.distributedAmount);
-        }
-
-        const div = document.getElementById('budgetGrid');
-        div.innerHTML = '';
-        
-        let totalP = 0;
-        app.budgets.forEach(b => totalP += b.percent);
-        const badge = document.getElementById('totalPercentBadge');
-        badge.innerText = toPersianNum(totalP) + '%';
-        badge.style.background = totalP > 100 ? 'var(--danger)' : (totalP === 100 ? 'var(--success)' : 'var(--text-sec)');
-
-        const baseAmount = app.distributedAmount;
-        const colors = ['#f87171', '#fbbf24', '#34d399', '#60a5fa', '#818cf8'];
-
-        app.budgets.forEach((b, i) => {
-            const shareFromPercent = Math.round((baseAmount * b.percent) / 100);
-            const totalShare = shareFromPercent + (b.manualAdd || 0);
-            const remain = totalShare - b.spent;
-            const percent = totalShare > 0 ? (b.spent / totalShare) * 100 : 0;
-            
-            let status = 'stat-green';
-            if(percent > 50) status = 'stat-yellow';
-            if(percent > 90) status = 'stat-red';
-            const pausedClass = b.isPaused ? 'paused' : '';
-
-            let subBars = "";
-            let subLegend = "";
-            if(b.subs && b.subs.length > 0) {
-                let subHtml = "";
-                let legHtml = "";
-                b.subs.forEach((s, idx) => {
-                    const c = colors[idx % colors.length];
-                    const sAmount = Math.round((totalShare * s.percent) / 100);
-                    if(sAmount > 0) {
-                         subHtml += `<div class="sub-budget-seg" style="width:${s.percent}%; background:${c};" title="${s.name} (${format(sAmount)})"></div>`;
-                         legHtml += `<div class="sub-legend-item"><div class="sub-dot" style="background:${c}"></div> ${s.name}: ${format(sAmount)}</div>`;
-                    }
-                });
-                subBars = `<div class="sub-budget-bar">${subHtml}</div>`;
-                subLegend = `<div class="sub-budget-legend">${legHtml}</div>`;
-            }
-
-            div.innerHTML += 
-                `<div class="bento-item ${status} ${pausedClass}">
-                    <div class="bento-header">
-                        <span>${b.name} (${toPersianNum(b.percent)}%) ${b.isPaused ? '<small>(توقف)</small>' : ''} <i class="fas fa-edit" style="font-size:0.9rem; cursor:pointer; margin-right:5px; color:var(--text-sec);" onclick="openEdit('budget', ${i})"></i></span>
-                        <div style="display:flex; gap:8px;">
-                            <i class="fas fa-list-alt" style="opacity:0.5; cursor:pointer;" onclick="openItemHistory(${i})" title="تاریخچه"></i>
-                            <i class="fas fa-trash" style="opacity:0.3; cursor:pointer;" onclick="delBudget(${i})"></i>
-                        </div>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-top:5px; color:var(--text-sec);">
-                        <span>سهم: ${format(shareFromPercent)} ${b.manualAdd ? `+ ${format(b.manualAdd)}` : ''}</span>
-                        <span style="color:var(--danger)">خرج: ${format(b.spent)}</span>
-                    </div>
-                    <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(percent,100)}%"></div></div>
-                    ${subBars}
-                    ${subLegend}
-                    <div style="text-align:left; font-weight:800; font-size:1.4rem; color:var(--primary); direction:ltr; letter-spacing:1px; margin: 5px 0;">
-                        ${format(remain)}
-                    </div>
-                    <div class="bento-actions">
-                        <button class="action-chip action-btn-exp" onclick="openExp(${i})" ${b.isPaused ? 'disabled' : ''}><i class="fas fa-minus-circle"></i> ثبت هزینه</button>
-                        <button class="action-chip action-btn-copy" onclick="copyTxt(${remain})"><i class="fas fa-copy"></i> کپی</button>
-                        <button class="action-chip action-btn-add" onclick="openDepositOptions(${i})"><i class="fas fa-plus-circle"></i> واریز</button>
-                        <button class="action-chip action-btn-transfer" onclick="openTransfer(${i})"><i class="fas fa-exchange-alt"></i> انتقال</button>
-                        <button class="action-chip action-btn-pause" onclick="togglePause(${i})">${b.isPaused ? '<i class="fas fa-play"></i> فعال' : '<i class="fas fa-pause"></i> توقف'}</button>
-                        <button class="action-chip action-btn-zero" onclick="zeroItem(${i})"><i class="fas fa-eraser"></i> تصفیه</button>
-                        <button class="action-chip action-btn-sub" onclick="openSubBudgetManager(${i})"><i class="fas fa-layer-group"></i> مدیریت زیرمجموعه</button>
-                    </div>
-                </div>`;
-        });
-    }
-
-    function triggerDistribution() {
-        withLoading(() => {
-            const income = app.wallets.reduce((a,b)=>a+b.value,0);
-            const currentMonth = getCurMonth();
-            const fixedDebt = app.debts.reduce((a,b)=> (b.deduct !== false && b.lastPaid !== currentMonth) ? a+b.value : a, 0);
-            const checkDebt = (app.checks || []).reduce((a,b)=> (!b.isPaid && b.deduct !== false) ? a+b.value : a, 0);
-            
-            const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
-            const totalDebt = fixedDebt + checkDebt;
-            let net = income - totalDebt - manualDeductions;
-            if(net < 0) net = 0; 
-
-            const previousAmount = app.distributedAmount;
-            
-            if(net > previousAmount) {
-                const addedAmount = net - previousAmount;
-                processAutoTransfer(addedAmount, net);
-            }
-
-            app.distributedAmount = net;
-            saveSectionSnap('budget', 'توزیع موجودی جدید');
-            saveData();
-            renderUI();
-            showToast("بودجه توزیع شد");
-        }, 1200);
-    }
-
-    function processAutoTransfer(addedAmount, currentNet) {
-        let totalDeducted = 0;
-        app.goals.forEach(g => {
-            if(g.curr >= g.target) return;
-
-            if(g.autoConfig && g.autoConfig.type !== 'none') {
-                const conf = g.autoConfig;
-                let sourceBalance = 0;
-                let sourceObj = null;
-                if(conf.sourceId === 'main') {
-                    sourceBalance = currentNet; 
-                } else {
-                    sourceObj = app.budgets.find(b => b.id == conf.sourceId);
-                    if(sourceObj) {
-                        const baseShare = Math.round((currentNet * sourceObj.percent) / 100);
-                        sourceBalance = baseShare + (sourceObj.manualAdd || 0) - sourceObj.spent;
-                    }
-                }
-
-                if(sourceBalance >= (conf.minThreshold || 0)) {
-                    let amountToTransfer = 0;
-                    if(conf.type === 'percent') {
-                         amountToTransfer = Math.round((addedAmount * conf.percent) / 100);
-                    } else if(conf.type === 'fixed') {
-                        amountToTransfer = conf.amount;
-                    }
-
-                    if(amountToTransfer > 0) {
-                        if (g.curr + amountToTransfer > g.target) {
-                             amountToTransfer = g.target - g.curr;
-                        }
-
-                        g.curr += amountToTransfer;
-                        if (sourceObj) {
-                             sourceObj.spent += amountToTransfer;
-                             addToHistory(app.budgets.indexOf(sourceObj), amountToTransfer, "برداشت خودکار: " + g.name, 'expense');
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    function openTransfer(index) {
-        tempDepositIndex = index; 
-        const b = app.budgets[index];
-        const baseAmount = app.distributedAmount;
-        const share = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
-        const remain = share - b.spent;
-
-        document.getElementById('transferSourceName').innerText = b.name;
-        document.getElementById('transferSourceBalance').innerText = `موجودی فعلی: ${format(remain)} تومان`;
-        
-        const sel = document.getElementById('transferTargetSelect');
-        sel.innerHTML = app.budgets.map((item, i) => {
-            if (i === index) return '';
-            return `<option value="${i}">${item.name}</option>`;
-        }).join('');
-        
-        document.getElementById('transferAmount').value = '';
-        openModal('transferModal');
-    }
-
-    function performTransfer() {
-        const sourceIdx = tempDepositIndex;
-        const targetIdx = parseInt(document.getElementById('transferTargetSelect').value);
-        const amount = parseFormatted(document.getElementById('transferAmount').value);
-        
-        if (isNaN(amount) || amount <= 0) return alert("مبلغ نامعتبر است");
-        
-        const b = app.budgets[sourceIdx];
-        
-        saveSectionSnap('budget', `انتقال ${format(amount)} از ${b.name} به ${app.budgets[targetIdx].name}`);
-        
-        if(!app.budgets[sourceIdx].manualAdd) app.budgets[sourceIdx].manualAdd = 0;
-        app.budgets[sourceIdx].manualAdd -= amount;
-
-        if (!app.budgets[targetIdx].manualAdd) app.budgets[targetIdx].manualAdd = 0;
-        app.budgets[targetIdx].manualAdd += amount;
-
-        addToHistory(sourceIdx, amount, `انتقال به ${app.budgets[targetIdx].name}`, 'transferOut');
-        addToHistory(targetIdx, amount, `دریافت از ${app.budgets[sourceIdx].name}`, 'transferIn');
-        
-        saveData(); renderUI(); closeAllModals(); showToast("انتقال انجام شد");
-    }
-
-    function zeroItem(index) {
-        if (!confirm("آیا مطمئن هستید؟ این کار موجودی باقی‌مانده را با ثبت یک هزینه تصفیه صفر می‌کند.")) return;
-        
-        const b = app.budgets[index];
-        const baseAmount = app.distributedAmount;
-        const share = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
-        const remain = share - b.spent;
-        
-        if (remain > 0) {
-            saveSectionSnap('budget', `تصفیه حساب ${b.name}`);
-            b.spent += remain;
-            addToHistory(index, remain, "تصفیه حساب (صفر کردن)", 'expense');
-            saveData(); renderUI(); showToast("حساب صفر شد");
-        } else {
-            alert("موجودی برای صفر کردن وجود ندارد.");
-        }
-    }
-
-    function openDepositOptions(index) {
-        tempDepositIndex = index;
-        
-        const income = app.wallets.reduce((a,b)=>a+b.value,0);
-        const currentMonth = getCurMonth();
-        const fixedDebt = app.debts.reduce((a,b)=> (b.deduct !== false && b.lastPaid !== currentMonth) ? a+b.value : a, 0);
-        const checkDebt = (app.checks || []).reduce((a,b)=> (!b.isPaid && b.deduct !== false) ? a+b.value : a, 0);
-        
-        const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
-        const totalDebt = fixedDebt + checkDebt;
-        let net = income - totalDebt - manualDeductions;
-        if(net < 0) net = 0;
-        
-        const surplus = net - app.distributedAmount;
-        const btn = document.getElementById('btnSystemDep');
-        const msg = document.getElementById('systemDepMsg');
-        
-        if (surplus > 0) {
-            btn.disabled = false;
-            btn.classList.remove('btn-outline');
-            btn.classList.add('btn-primary');
-            msg.innerHTML = `موجودی قابل واریز: <b style="color:var(--success)">${format(surplus)}</b> تومان`;
-            btn.dataset.max = surplus;
-        } else {
-            btn.disabled = true;
-            btn.classList.remove('btn-primary');
-            btn.classList.add('btn-outline');
-            msg.innerHTML = "موجودی جدیدی برای توزیع وجود ندارد.";
-            btn.dataset.max = 0;
-        }
-        
-        openModal('depositOptionsModal');
-    }
-
-    function selectDepositType(type) {
-        closeAllModals();
-        if(type === 'system') {
-            const max = parseFloat(document.getElementById('btnSystemDep').dataset.max) || 0;
-            openUniversalInput('واریز از سیستم', `حداکثر قابل واریز: ${format(max)} تومان`, true, (val) => {
-                 if(val && !isNaN(val)) {
-                    if (val > max) return alert("مبلغ وارد شده بیشتر از موجودی توزیع نشده است!");
-                    saveSectionSnap('budget', `واریز سیستمی به ${app.budgets[tempDepositIndex].name}: ${format(val)}`);
-                    
-                    if(!app.budgets[tempDepositIndex].manualAdd) app.budgets[tempDepositIndex].manualAdd = 0;
-                    app.budgets[tempDepositIndex].manualAdd += val;
-                    addToHistory(tempDepositIndex, val, "واریز از سیستم", 'deposit');
-
-                    saveData(); renderUI(); showToast("واریز سیستمی انجام شد");
-                 }
-            });
-        } else if (type === 'direct') {
-            openUniversalInput('واریز مستقیم (بیرونی)', 'مبلغ واریزی:', true, (val) => {
-                 if(val && !isNaN(val)) {
-                    saveSectionSnap('budget', `واریز مستقیم به ${app.budgets[tempDepositIndex].name}: ${format(val)}`);
-                    if(!app.budgets[tempDepositIndex].manualAdd) app.budgets[tempDepositIndex].manualAdd = 0;
-                    
-                    app.budgets[tempDepositIndex].manualAdd += val;
-                    addToHistory(tempDepositIndex, val, "واریز مستقیم (بیرونی)", 'deposit');
-                    
-                    const targetWalletName = "پول بیرونی";
-                    let wIdx = app.wallets.findIndex(w => w.name === targetWalletName);
-                    
-                    if(wIdx > -1) {
-                        app.wallets[wIdx].value += val;
-                    } else {
-                        app.wallets.push({name: targetWalletName, value: val});
-                    }
-
-                    saveData(); renderUI(); showToast("واریز مستقیم ثبت شد");
-                 }
-            });
-        }
-    }
-
-    function togglePause(index) {
-        saveSectionSnap('budget', `تغییر وضعیت توقف برای ${app.budgets[index].name}`);
-        const b = app.budgets[index];
-        if(b.isPaused) {
-            let restore = confirm(`آیا درصد قبلی (${b.savedPercent}%) اعمال شود؟\nتایید = بله\nلغو = خیر (وارد کردن درصد جدید)`);
-            b.isPaused = false;
-            if(restore) {
-                b.percent = b.savedPercent;
-                saveData(); renderUI();
-            } else {
-                openUniversalInput('درصد جدید', 'درصد جدید را وارد کنید:', false, (val) => {
-                    b.percent = parseInt(val) || 0;
-                    saveData(); renderUI();
-                });
-            }
-        } else {
-            b.savedPercent = b.percent;
-            b.percent = 0;
-            b.isPaused = true;
-            saveData(); renderUI();
-            showToast("آیتم متوقف شد");
-        }
-    }
-
-    function addGoal() {
-        const n = document.getElementById('gName').value;
-        const t = parseFormatted(document.getElementById('gTarget').value);
-        if(n && !isNaN(t)) { saveSectionSnap('tools', `افزودن هدف: ${n}`); app.goals.push({name:n, target:t, curr:0, autoConfig:{type:'none'}}); saveData(); renderUI(); closeAllModals(); }
-    }
-    
-    function renderGoals() {
-        const div = document.getElementById('goalList');
-        div.innerHTML = app.goals.map((g, i) => {
-            const p = Math.min(100, Math.round((g.curr / g.target)*100));
-            const remaining = Math.max(0, g.target - g.curr);
-            const autoBadge = g.autoConfig && g.autoConfig.type !== 'none' ? '<i class="fas fa-robot" style="color:var(--primary)" title="برداشت خودکار فعال"></i>' : '';
-            
-            let statusHTML = `<span>مانده: <b style="color:var(--danger)">${format(remaining)}</b></span>`;
-            let completeMsg = "";
-            
-            if (g.curr >= g.target) {
-                statusHTML = `<span style="color:var(--success); font-weight:bold;"><i class="fas fa-check-circle"></i> تکمیل شد</span>`;
-                completeMsg = `<span class="complete-badge">تبریک! تکمیل شد</span>`;
-                if(g.autoConfig && g.autoConfig.type !== 'none') g.autoConfig.type = 'none'; 
-            }
-
-            return `
-                <div style="padding:15px; border-bottom:1px solid #eee;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                         <b style="font-size:1.05rem;">${completeMsg} ${g.name} ${autoBadge}</b> 
-                         <span style="font-size:0.9rem;">
-                            <button class="btn-small-icon btn-settings" onclick="openAutoAlloc('goal', ${i})"><i class="fas fa-cog"></i></button>
-                            <button class="btn-small-icon btn-edit" onclick="openEdit('goal', ${i})"><i class="fas fa-edit"></i></button>
-                         </span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-sec); margin-top:5px;">
-                        <span>جمع‌شده: <b style="color:var(--success)">${format(g.curr)}</b></span>
-                        ${statusHTML}
-                    </div>
-                    <div class="progress-bar"><div class="progress-fill" style="width:${p}%; background:${g.curr>=g.target ? 'var(--success)' : 'var(--warning)'};"></div></div>
-                    <div style="display:flex; gap:8px; margin-top:8px;">
-                         <button class="btn btn-primary" style="font-size:0.8rem; padding:6px 12px;" onclick="openAllocate('goal', ${i})" ${g.curr>=g.target ? 'disabled style="opacity:0.5"' : ''}>🔗 اختصاص بودجه</button>
-                         <button class="btn btn-outline" style="font-size:0.8rem; padding:6px 12px;" onclick="addGoalMoneyDirect(${i})" ${g.curr>=g.target ? 'disabled style="opacity:0.5"' : ''}>+ مستقیم</button>
-                         <button class="btn btn-danger" style="font-size:0.8rem; padding:6px 12px;" onclick="delGoal(${i})">×</button>
-                    </div>
-                </div>`;
-        }).join('');
-    }
-
-    function addGoalMoneyDirect(i) {
-        if(app.goals[i].curr >= app.goals[i].target) return alert("این هدف تکمیل شده است.");
-        openUniversalInput('واریز مستقیم به هدف', 'مبلغ را وارد کنید:', true, (val) => {
-            if(val) { saveSectionSnap('tools', `واریز دستی به هدف ${app.goals[i].name}`); app.goals[i].curr += parseInt(val); saveData(); renderUI(); }
-        });
-    }
-    function delGoal(i) { saveSectionSnap('tools', `حذف هدف ${app.goals[i].name}`); app.goals.splice(i,1); saveData(); renderUI(); }
-
-    function addShop() {
-        const n = document.getElementById('sName').value;
-        const p = parseFormatted(document.getElementById('sPrice').value);
-        if(n) { saveSectionSnap('tools', `افزودن کالا: ${n}`); app.shopping.push({name:n, price: p || 0, autoConfig:{type:'none'}, paid: 0}); saveData(); renderUI(); closeAllModals(); }
-    }
-    
-    function renderShop() {
-        const div = document.getElementById('shopList');
-        div.innerHTML = app.shopping.map((s, i) => {
-            const autoBadge = s.autoConfig && s.autoConfig.type !== 'none' ? '<i class="fas fa-robot" style="color:var(--primary)"></i>' : '';
-            const paid = s.paid || 0;
-            const price = s.price || 0;
-            const remaining = price > 0 ? Math.max(0, price - paid) : 0;
-            
-            let isComplete = (price > 0 && paid >= price);
-            if(isComplete && s.autoConfig.type !== 'none') s.autoConfig.type = 'none';
-
-            let msg = "";
-            if(isComplete) msg = `<span class="complete-badge">خرید کامل شد</span>`;
-            
-            return `<div style="display:flex; justify-content:space-between; padding:15px; border-bottom:1px solid #eee; align-items:center; flex-wrap:wrap;">
-                <div style="flex:1;">
-                    <span style="font-weight:bold; font-size:1.05rem;">${msg} ${s.name} ${autoBadge}</span>
-                    <div style="font-size:0.8rem; color:var(--text-sec); margin-top:3px;">
-                        ${price ? `قیمت: ${format(price)} | ` : ''}
-                        <span style="color:var(--success)">پرداخت: ${format(paid)}</span>
-                        ${price ? ` | <span style="color:var(--danger)">مانده: ${format(remaining)}</span>` : ''}
-                    </div>
-                </div>
-                <div style="display:flex; gap:8px; align-items:center; margin-top:5px;">
-                    <button class="btn btn-primary" style="font-size:0.8rem;" onclick="openAllocate('shop', ${i})" ${isComplete ? 'disabled style="opacity:0.5"' : ''}>خرید</button>
-                    <button class="btn-small-icon btn-settings" onclick="openAutoAlloc('shop', ${i})"><i class="fas fa-cog"></i></button>
-                    <button class="btn-small-icon btn-edit" onclick="openEdit('shop', ${i})"><i class="fas fa-edit"></i></button>
-                    <i class="fas fa-check-circle" style="cursor:pointer; font-size:1.4rem; color:var(--success);" onclick="delShop(${i})"></i>
-                </div>
-            </div>`;
-        }).join('');
-    }
-    function delShop(i) { saveSectionSnap('tools', `حذف کالا ${app.shopping[i].name}`); app.shopping.splice(i,1); saveData(); renderUI(); }
-
-    function openAutoAlloc(type, id) {
-        document.getElementById('autoAllocType').value = type;
-        document.getElementById('autoAllocId').value = id;
-        
-        const item = type === 'goal' ? app.goals[id] : app.shopping[id];
-        const conf = item.autoConfig || { type: 'none' };
-        
-        document.getElementById('aaType').value = conf.type || 'none';
-        document.getElementById('aaPercent').value = conf.percent || '';
-        document.getElementById('aaAmount').value = conf.amount || '';
-        formatCurrency(document.getElementById('aaAmount'));
-        document.getElementById('aaMin').value = conf.minThreshold || '';
-        formatCurrency(document.getElementById('aaMin'));
-
-        const sel = document.getElementById('aaSource');
-        sel.innerHTML = app.budgets.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
-        if(conf.sourceId) sel.value = conf.sourceId;
-
-        toggleAutoAllocFields();
-        openModal('autoAllocModal');
-    }
-
-    function toggleAutoAllocFields() {
-        const t = document.getElementById('aaType').value;
-        document.getElementById('aaPercentField').style.display = t === 'percent' ? 'block' : 'none';
-        document.getElementById('aaAmountField').style.display = t === 'fixed' ? 'block' : 'none';
-    }
-
-    function saveAutoAlloc() {
-        const type = document.getElementById('autoAllocType').value;
-        const id = document.getElementById('autoAllocId').value;
-        const conf = {
-            type: document.getElementById('aaType').value,
-            percent: parseFloat(document.getElementById('aaPercent').value) || 0,
-            amount: parseFormatted(document.getElementById('aaAmount').value),
-            minThreshold: parseFormatted(document.getElementById('aaMin').value),
-            sourceId: document.getElementById('aaSource').value
-        };
-
-        if(type === 'goal') app.goals[id].autoConfig = conf;
-        else app.shopping[id].autoConfig = conf;
-        
-        saveData(); renderUI(); closeAllModals(); showToast("تنظیمات خودکار ذخیره شد");
-    }
-
-    function openSubBudgetManager(i) {
-        tempSubIndex = i;
-        const b = app.budgets[i];
-        document.getElementById('subParentName').innerText = b.name;
-        renderSubBudgets(b);
-        openModal('subBudgetModal');
-    }
-
-    function captureSubState() {
-        if(tempSubIndex === -1) return [];
-        const nameInputs = document.querySelectorAll('.sub-name');
-        const percentInputs = document.querySelectorAll('.sub-percent-input');
-        const temp = [];
-        nameInputs.forEach((inp, idx) => {
-            temp.push({
-                name: inp.value,
-                percent: parseFloat(percentInputs[idx].value) || 0
-            });
-        });
-        return temp;
-    }
-
-    function renderSubBudgets(budget, tempState = null) {
-        const subsToRender = tempState || (budget.subs || []);
-        const baseAmount = app.distributedAmount;
-        const share = Math.round((baseAmount * budget.percent) / 100) + (budget.manualAdd || 0);
-        
-        const totalPercentAllocated = subsToRender.reduce((acc, s) => acc + (s.percent || 0), 0);
-        const remainPercent = 100 - totalPercentAllocated;
-
-        document.getElementById('subTotalBudget').innerText = "سهم کل: " + format(share);
-        document.getElementById('subRemainPercent').innerText = "باقی‌مانده: " + toPersianNum(remainPercent) + "%";
-        if(remainPercent < 0) document.getElementById('subRemainPercent').style.color = 'var(--danger)';
-        else document.getElementById('subRemainPercent').style.color = 'var(--success)';
-
-        const div = document.getElementById('subBudgetList');
-        div.innerHTML = subsToRender.map((s, idx) => {
-            const calculatedAmount = Math.round((share * (s.percent || 0)) / 100);
-            return `<div class="sub-budget-row">
-                <input type="text" value="${s.name}" class="sub-name" placeholder="عنوان" style="flex:1.5; margin:0; font-size:0.9rem; padding:10px;">
-                <div style="flex:1; position:relative;">
-                     <input type="number" value="${s.percent}" class="sub-percent-input" placeholder="%" oninput="updateSubCalculations(${share})" style="margin:0; text-align:center; padding:10px; font-size:0.95rem;">
-                </div>
-                <div class="sub-budget-calc-display" id="subCalc_${idx}">${format(calculatedAmount)}</div>
-                <button class="btn-small-icon btn-copy" onclick="copySub(${calculatedAmount})" title="کپی مبلغ"><i class="fas fa-copy"></i></button>
-                <i class="fas fa-times" style="cursor:pointer; color:var(--danger); font-size:1.2rem; margin-right:5px;" onclick="deleteSub(${idx})"></i>
-            </div>`
-        }).join('');
-    }
-
-    function updateSubCalculations(totalShare) {
-         const inputs = document.querySelectorAll('.sub-percent-input');
-         let totalP = 0;
-         inputs.forEach((inp, idx) => {
-             const p = parseFloat(inp.value) || 0;
-             totalP += p;
-             const amt = Math.round((totalShare * p) / 100);
-             document.getElementById(`subCalc_${idx}`).innerText = format(amt);
-             const copyBtn = inp.parentElement.parentElement.querySelector('.btn-copy');
-             copyBtn.setAttribute('onclick', `copySub(${amt})`);
-         });
-         const remain = 100 - totalP;
-         document.getElementById('subRemainPercent').innerText = "باقی‌مانده: " + toPersianNum(remain) + "%";
-         if(remain < 0) document.getElementById('subRemainPercent').style.color = 'var(--danger)';
-         else document.getElementById('subRemainPercent').style.color = 'var(--success)';
-    }
-
-    function addNewSubCategory() {
-        if(tempSubIndex === -1) return;
-        const currentData = captureSubState();
-        currentData.push({name: "", percent: 0});
-        renderSubBudgets(app.budgets[tempSubIndex], currentData);
-    }
-    
-    function deleteSub(idx) {
-        const currentData = captureSubState();
-        currentData.splice(idx, 1);
-        renderSubBudgets(app.budgets[tempSubIndex], currentData);
-    }
-
-    function copySub(amt) {
-        copyTxt(amt);
-    }
-
-    function saveSubBudgets() {
-        const finalData = captureSubState();
-        let totalP = 0;
-        finalData.forEach(s => totalP += s.percent);
-        if(totalP > 100) {
-            alert("خطا: مجموع درصدها (" + toPersianNum(totalP) + "%) از ۱۰۰٪ بیشتر است!");
-            return;
-        }
-        saveSectionSnap('budget', `تغییر زیرمجموعه‌های ${app.budgets[tempSubIndex].name}`);
-        app.budgets[tempSubIndex].subs = finalData;
-        saveData(); renderUI(); closeAllModals(); showToast("زیرمجموعه‌ها ذخیره شدند");
-    }
-
-    function openEdit(type, index) {
-        openModal('editModal'); 
-
-        document.getElementById('editType').value = type;
-        document.getElementById('editIndex').value = index;
-        
-        let item;
-        let showPercent = false;
-        let showAmount = true;
-        let showDate = false;
-        let showDeduct = false; 
-
-        if(type === 'wallet') item = app.wallets[index];
-        else if(type === 'debt') { item = app.debts[index]; showDate = true; showDeduct = true; }
-        else if(type === 'check') { item = app.checks[index]; showDate = true; showDeduct = true; }
-        else if(type === 'loan') { item = app.loans[index]; showDate = true; }
-        else if(type === 'budget') { item = app.budgets[index]; showPercent = true; showAmount = false; }
-        else if(type === 'goal') { item = app.goals[index]; }
-        else if(type === 'shop') { item = app.shopping[index]; }
-
-        document.getElementById('editName').value = item.name;
-        
-        if(showAmount) {
-            document.getElementById('editAmountWrapper').style.display = 'block';
-            let val = 0;
-            if(type === 'goal') val = item.target;
-            else if(type === 'shop') val = item.price || 0;
-            else val = item.value;
-            
-            document.getElementById('editVal').value = val;
-            formatCurrency(document.getElementById('editVal'));
-        } else {
-            document.getElementById('editAmountWrapper').style.display = 'none';
-        }
-
-        if(showDeduct) {
-             document.getElementById('editDeductWrapper').style.display = 'block';
-             document.getElementById('editDeductCheck').checked = (item.deduct !== false);
-        } else {
-             document.getElementById('editDeductWrapper').style.display = 'none';
-        }
-
-        if(showPercent) {
-            document.getElementById('editPercentWrapper').style.display = 'block';
-            document.getElementById('editPercent').value = item.percent;
-        } else {
-            document.getElementById('editPercentWrapper').style.display = 'none';
-        }
-
-        if(showDate) {
-            document.getElementById('editDateWrapper').style.display = 'block';
-            const row = document.getElementById('editDateRow');
-            if(type === 'debt') {
-                row.innerHTML = `<select id="editDDay" class="date-sel" style="width:100%">${genOpts(1,31, item.day)}</select>`;
-            } else {
-                const parts = item.date ? item.date.split('/') : [1403, 1, 1];
-                row.innerHTML = createDatePickerHTML('editD', parseInt(parts[2]), parseInt(parts[1]), parseInt(parts[0]));
-            }
-        } else {
-            document.getElementById('editDateWrapper').style.display = 'none';
-        }
-    }
-
-    function performEdit() {
-        withLoading(() => {
-            const type = document.getElementById('editType').value;
-            const index = parseInt(document.getElementById('editIndex').value);
-            const newName = document.getElementById('editName').value;
-            if(!newName) return alert("نام نمی‌تواند خالی باشد");
-
-            let desc = "ویرایش آیتم";
-            if(type === 'wallet') {
-                saveSectionSnap('dashboard', `ویرایش کیف پول ${newName}`);
-                app.wallets[index].name = newName;
-                app.wallets[index].value = parseFormatted(document.getElementById('editVal').value);
-            } else if(type === 'debt') {
-                saveSectionSnap('dashboard', `ویرایش قسط ${newName}`);
-                app.debts[index].name = newName;
-                app.debts[index].value = parseFormatted(document.getElementById('editVal').value);
-                app.debts[index].day = document.getElementById('editDDay').value;
-                app.debts[index].deduct = document.getElementById('editDeductCheck').checked;
-            } else if(type === 'check') {
-                saveSectionSnap('dashboard', `ویرایش چک ${newName}`);
-                app.checks[index].name = newName;
-                app.checks[index].value = parseFormatted(document.getElementById('editVal').value);
-                app.checks[index].date = getDateString('editD');
-                app.checks[index].deduct = document.getElementById('editDeductCheck').checked;
-            } else if(type === 'loan') {
-                saveSectionSnap('dashboard', `ویرایش طلب ${newName}`);
-                app.loans[index].name = newName;
-                app.loans[index].value = parseFormatted(document.getElementById('editVal').value);
-                app.loans[index].date = getDateString('editD');
-            } else if(type === 'budget') {
-                const oldName = app.budgets[index].name;
-                const newP = parseInt(document.getElementById('editPercent').value) || 0;
-                let total = 0;
-                app.budgets.forEach((b, i) => { if(i !== index) total += b.percent; });
-                
-                if(total + newP > 100) {
-                    tempBudget = JSON.parse(JSON.stringify(app.budgets[index]));
-                    tempBudget.name = newName; tempBudget.percent = newP;
-                    const safeMax = 100 - total;
-                    document.getElementById('maxAllowedPercent').innerText = toPersianNum(safeMax) + '%';
-                    const slider = document.getElementById('percentSlider');
-                    slider.max = safeMax; slider.value = 0;
-                    document.getElementById('sliderValDisplay').innerText = toPersianNum(0);
-                    tempBudget.isEdit = true; tempBudget.editIndex = index;
-                    openModal('fixPercentModal'); return; 
-                }
-                saveSectionSnap('budget', `ویرایش بودجه ${newName}`);
-                app.budgets[index].name = newName;
-                app.budgets[index].percent = newP;
-                if(oldName !== newName && app.priorities[oldName]) {
-                    app.priorities[newName] = app.priorities[oldName]; delete app.priorities[oldName];
-                }
-            } else if(type === 'goal') {
-                saveSectionSnap('tools', `ویرایش هدف ${newName}`);
-                app.goals[index].name = newName;
-                app.goals[index].target = parseFormatted(document.getElementById('editVal').value);
-            } else if(type === 'shop') {
-                saveSectionSnap('tools', `ویرایش کالا ${newName}`);
-                app.shopping[index].name = newName;
-                app.shopping[index].price = parseFormatted(document.getElementById('editVal').value);
-            }
-            saveData(); renderUI(); closeAllModals(); showToast("تغییرات ذخیره شد");
-        }, 800);
-    }
-
-    function applyTemplate(type) {
-        if(!confirm("بودجه‌بندی فعلی پاک شده و قالب جدید اعمال می‌شود. ادامه می‌دهید؟")) return;
-        saveSectionSnap('budget', 'اعمال قالب آماده'); 
-        let newBudgets = [];
-        if(type === 'default') {
-            newBudgets = JSON.parse(JSON.stringify(defaultState.budgets));
-        } else if(type === 'student') {
-            newBudgets = [
-                {id: 1, name: "رفت‌وآمد", percent: 30, spent: 0, history: [], manualAdd: 0, subs:[]},
-                {id: 2, name: "غذا (سلف/بیرون)", percent: 25, spent: 0, history: [], manualAdd: 0, subs:[]},
-                {id: 3, name: "اینترنت و شارژ", percent: 15, spent: 0, history: [], manualAdd: 0, subs:[]},
-                {id: 4, name: "کتاب و جزوه", percent: 10, spent: 0, history: [], manualAdd: 0, subs:[]},
-                {id: 5, name: "تفریح دوستانه", percent: 15, spent: 0, history: [], manualAdd: 0, subs:[]},
-                {id: 6, name: "پس‌انداز اضطراری", percent: 5, spent: 0, history: [], manualAdd: 0, subs:[]}
-            ];
-        } else if(type === 'married') {
-            newBudgets = [
-                {id: 1, name: "اجاره خانه", percent: 35, spent: 0, history: [], manualAdd: 0, subs:[]},
-                {id: 2, name: "خورد و خوراک منزل", percent: 25, spent: 0, history: [], manualAdd: 0, subs:[]},
-                {id: 3, name: "قبوض و شارژ", percent: 10, spent: 0, history: [], manualAdd: 0, subs:[]},
-                {id: 4, name: "درمان و بهداشت", percent: 10, spent: 0, history: [], manualAdd: 0, subs:[]},
-                {id: 5, name: "پوشاک", percent: 5, spent: 0, history: [], manualAdd: 0, subs:[]},
-                {id: 6, name: "پس‌انداز آینده", percent: 10, spent: 0, history: [], manualAdd: 0, subs:[]},
-                {id: 7, name: "تفریح", percent: 5, spent: 0, history: [], manualAdd: 0, subs:[]}
-            ];
-        } else if(type === 'clear') { newBudgets = []; }
-        app.budgets = newBudgets;
-        // Reset Priorities
-        app.priorities = {};
-        app.priorityTiers = [];
-        saveData(); renderUI();
-    }
-
-    function addWallet() {
-        const n = document.getElementById('wName').value;
-        const v = parseFormatted(document.getElementById('wVal').value);
-        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن کیف پول ${n}`); app.wallets.push({name:n, value:v}); saveData(); renderUI(); closeAllModals(); }
-    }
-    function delWallet(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', `حذف کیف پول ${app.wallets[i].name}`); app.wallets.splice(i,1); saveData(); renderUI(); } }
-
-    function addDebt() {
-        const n = document.getElementById('dName').value;
-        const v = parseFormatted(document.getElementById('dVal').value);
-        const d = document.getElementById('dDay').value;
-        const deduct = document.getElementById('dDeduct').checked; 
-        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن قسط ${n}`); app.debts.push({name:n, value:v, day:d, lastPaid: null, deduct: deduct}); saveData(); renderUI(); closeAllModals(); }
-    }
-    function delDebt(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', `حذف قسط ${app.debts[i].name}`); app.debts.splice(i,1); saveData(); renderUI(); } }
-
-    function addCheck() {
-        const n = document.getElementById('cName').value;
-        const v = parseFormatted(document.getElementById('cVal').value);
-        const d = getDateString('c');
-        const deduct = document.getElementById('cDeduct').checked; 
-        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن چک ${n}`); if(!app.checks) app.checks = []; app.checks.push({name:n, value:v, date:d, isPaid: false, deduct: deduct}); saveData(); renderUI(); closeAllModals(); }
-    }
-    function delCheck(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', `حذف چک ${app.checks[i].name}`); app.checks.splice(i,1); saveData(); renderUI(); } }
-
-    function addLoan() {
-        const n = document.getElementById('lName').value;
-        const v = parseFormatted(document.getElementById('lVal').value);
-        const d = getDateString('l');
-        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن طلب ${n}`); if(!app.loans) app.loans = []; app.loans.push({name:n, value:v, date:d, isReceived: false}); saveData(); renderUI(); closeAllModals(); }
-    }
-    function delLoan(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', `حذف طلب ${app.loans[i].name}`); app.loans.splice(i,1); saveData(); renderUI(); } }
-
-    function addNewBudget() {
-        const n = document.getElementById('bName').value;
-        const p = parseInt(document.getElementById('bPercent').value);
-        if(!n || isNaN(p)) return alert("لطفا مقادیر صحیح وارد کنید");
-        let currentTotal = 0;
-        app.budgets.forEach(b => currentTotal += b.percent);
-        if (currentTotal + p > 100) {
-            tempBudget = { name: n, percent: p, id: Date.now(), spent: 0, history: [], manualAdd: 0, isEdit: false, subs:[], internalDebt: [] };
-            const max = 100 - currentTotal;
-            const safeMax = max > 0 ? max : 0;
-            document.getElementById('maxAllowedPercent').innerText = toPersianNum(safeMax) + '%';
-            const slider = document.getElementById('percentSlider');
-            slider.max = safeMax; slider.value = 0;
-            document.getElementById('sliderValDisplay').innerText = toPersianNum(0);
-            openModal('fixPercentModal');
-        } else {
-            saveSectionSnap('budget', `افزودن بودجه ${n}`);
-            app.budgets.push({id:Date.now(), name:n, percent:p, spent:0, history:[], manualAdd: 0, subs:[], internalDebt: []});
-            if (!app.priorities[n]) app.priorities[n] = 4;
-            saveData(); renderUI(); closeAllModals();
-        }
-    }
-
-    function updateSliderVal() { document.getElementById('sliderValDisplay').innerText = toPersianNum(document.getElementById('percentSlider').value); }
-    function useSliderPercent() {
-        if(!tempBudget) return;
-        saveSectionSnap('budget', 'اصلاح درصد بودجه');
-        const newP = parseInt(document.getElementById('percentSlider').value);
-        if(tempBudget.isEdit) {
-            app.budgets[tempBudget.editIndex].name = tempBudget.name;
-            app.budgets[tempBudget.editIndex].percent = newP;
-        } else {
-            tempBudget.percent = newP;
-            app.budgets.push(tempBudget);
-            if (!app.priorities[tempBudget.name]) app.priorities[tempBudget.name] = 4;
-        }
-        saveData(); renderUI(); closeAllModals(); tempBudget = null;
-    }
-    
-    function autoCorrectBudget() {
-        if(!tempBudget) return;
-        saveSectionSnap('budget', 'اصلاح خودکار بودجه');
-        
-        let usedPercent = 0;
-        app.budgets.forEach((b,i) => {
-            if(tempBudget.isEdit && i === tempBudget.editIndex) return; 
-            usedPercent += b.percent;
-        });
-
-        const needed = tempBudget.percent; 
-        const allowZero = document.getElementById('allowZeroCheck').checked;
-        
-        let overflow = (usedPercent + needed) - 100;
-
-        if(overflow <= 0) {
-            if(tempBudget.isEdit) {
-                 app.budgets[tempBudget.editIndex].name = tempBudget.name;
-                 app.budgets[tempBudget.editIndex].percent = needed;
-            } else { app.budgets.push(tempBudget); }
-            saveData(); renderUI(); closeAllModals(); return;
-        }
-
-        let candidates = app.budgets.map((b, index) => {
-            if(tempBudget.isEdit && index === tempBudget.editIndex) return null; 
-            return { 
-                index: index, 
-                priority: app.priorities[b.name] || 4, // پیش‌فرض ۴ است
-                percent: b.percent 
-            };
-        }).filter(x => x !== null)
-        .sort((a, b) => {
-            if (b.priority !== a.priority) return b.priority - a.priority; // اولویت بالاتر (عدد بزرگتر) اول
-            return b.percent - a.percent; // درصد بیشتر اول
-        });
-
-        for (let item of candidates) {
-            if (overflow <= 0) break; 
-
-            let currentP = app.budgets[item.index].percent;
-            let canDeduct = 0;
-
-            if (allowZero) {
-                canDeduct = currentP;
-            } else {
-                canDeduct = currentP > 1 ? currentP - 1 : 0;
-            }
-
-            let deductAmount = Math.min(canDeduct, overflow);
-            
-            app.budgets[item.index].percent -= deductAmount;
-            overflow -= deductAmount;
-        }
-
-        if(overflow > 0) {
-            alert("امکان اصلاح خودکار وجود ندارد!\nحتی با کاهش اولویت‌های پایین، فضا کافی نیست.\nلطفاً درصد وارد شده را کمتر کنید یا اجازه صفر شدن آیتم‌ها را بدهید.");
-            const lastSnap = JSON.parse(app.sectionHistory['budget'][0].data);
-            app.budgets = lastSnap.budgets;
-            return;
-        }
-
-        if(tempBudget.isEdit) {
-             app.budgets[tempBudget.editIndex].name = tempBudget.name;
-             app.budgets[tempBudget.editIndex].percent = needed;
-        } else {
-            app.budgets.push(tempBudget);
-            if (!app.priorities[tempBudget.name]) app.priorities[tempBudget.name] = 4;
-        }
-        
-        saveData(); renderUI(); closeAllModals(); tempBudget = null;
-        showToast("بودجه با موفقیت اصلاح شد");
-    }
-
-    function openPrioritySettings() {
-        if(!app.priorityTiers) {
-            app.priorityTiers = []; 
-        }
-        renderPriorityTiers();
-        document.getElementById('newTierForm').style.display = 'none';
-        
-        // Show add button only if < 100%
-        const lastTier = app.priorityTiers[app.priorityTiers.length-1];
-        const currentCap = lastTier ? lastTier.end : 0;
-        document.getElementById('addTierBtn').style.display = currentCap >= 100 ? 'none' : 'block';
-        
-        openModal('prioritySettingsModal');
-    }
-
-    function renderPriorityTiers() {
-        const div = document.getElementById('tierListContainer');
-        if(app.priorityTiers.length === 0) {
-            div.innerHTML = '<p style="text-align:center; color:var(--text-sec); margin:20px 0;">هیچ بازه اولویتی تعریف نشده است.</p>';
-        } else {
-            div.innerHTML = app.priorityTiers.map((t, idx) => 
-                `<div style="background:var(--bg-body); border-radius:12px; padding:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                    <div style="font-weight:bold;">اولویت ${toPersianNum(idx + 1)}</div>
-                    <div style="direction:ltr;">${toPersianNum(t.start)}% - ${toPersianNum(t.end)}%</div>
-                </div>`
-            ).join('');
-        }
-    }
-
-    function showAddTierForm() {
-        const lastTier = app.priorityTiers[app.priorityTiers.length-1];
-        const start = lastTier ? lastTier.end : 0;
-        
-        if (start >= 100) return alert("ظرفیت اولویت‌ها تکمیل شده است (۱۰۰٪).");
-        
-        document.getElementById('tierStartDisplay').innerText = toPersianNum(start);
-        document.getElementById('tierEndInput').value = '';
-        document.getElementById('tierEndInput').setAttribute('min', start + 1);
-        document.getElementById('tierEndInput').setAttribute('max', 100);
-        document.getElementById('nextTierNum').innerText = toPersianNum(app.priorityTiers.length + 1);
-        
-        document.getElementById('newTierForm').style.display = 'block';
-        document.getElementById('addTierBtn').style.display = 'none';
-    }
-
-    function addPriorityTier() {
-        const lastTier = app.priorityTiers[app.priorityTiers.length-1];
-        const start = lastTier ? lastTier.end : 0;
-        const end = parseInt(document.getElementById('tierEndInput').value);
-        
-        if (isNaN(end) || end <= start) return alert("سقف باید بیشتر از کف باشد.");
-        if (end > 100) return alert("سقف نمی‌تواند بیشتر از ۱۰۰ باشد.");
-        
-        app.priorityTiers.push({ id: Date.now(), start: start, end: end });
-        
-        saveData();
-        renderPriorityTiers();
-        
-        // Check if finished
-        if (end < 100) {
-             showAddTierForm(); 
-        } else {
-             document.getElementById('newTierForm').style.display = 'none';
-             showToast("تعریف اولویت‌ها تکمیل شد");
-        }
-    }
-
-    function resetPriorities() {
-        if(confirm("آیا تمام بازه‌های اولویت پاک شوند؟")) {
-            app.priorityTiers = [];
-            saveData();
-            openPrioritySettings();
-        }
-    }
-
-    function delBudget(i) { if(confirm('حذف ردیف؟')) { saveSectionSnap('budget', `حذف بودجه ${app.budgets[i].name}`); app.budgets.splice(i,1); saveData(); renderUI(); } }
-
-    let activeIdx = -1;
-    function openExp(i) { activeIdx = i; openModal('expModal'); }
-    function submitExp() {
-        const v = parseFormatted(document.getElementById('expAmt').value);
-        const r = document.getElementById('expReason').value || 'بدون توضیح';
-        if(!isNaN(v) && activeIdx > -1) { 
-            saveSectionSnap('budget', `هزینه ${format(v)} برای ${app.budgets[activeIdx].name}`); app.budgets[activeIdx].spent += v;
-            addToHistory(activeIdx, v, r, 'expense');
-            saveData(); renderUI(); closeAllModals(); showToast("هزینه ثبت شد");
+            }).apiSaveData(app.security.nationalId, dataStr);
         }
     }
     
-    function addToHistory(bIdx, amount, reason, type = 'expense') {
-        if(!app.budgets[bIdx].history) app.budgets[bIdx].history = [];
-        app.budgets[bIdx].history.push({ 
-            id: Date.now() + Math.random(), 
-            amount: amount, 
-            reason: reason, 
-            type: type, 
-            date: toPersianNum(new Date().toLocaleDateString('fa-IR')), 
-            time: toPersianNum(new Date().toLocaleTimeString('fa-IR')) 
-        });
-    }
-
-    function openItemHistory(i) {
-        tempDepositIndex = i; 
-        const hList = document.getElementById('itemHistList');
-        const hist = app.budgets[i].history || [];
-        document.getElementById('histSearchInput').value = '';
-        
-        if(hist.length === 0) { hList.innerHTML = '<p style="text-align:center;">موردی یافت نشد.</p>'; }
-        else {
-            hList.innerHTML = hist.slice().reverse().map((h, idx) => {
-                const isPositive = h.type === 'deposit' || h.type === 'transferIn';
-                const color = isPositive ? 'var(--success)' : 'var(--danger)';
-                const sign = isPositive ? '+' : '-';
-                return `<div class="hist-item" data-search="${h.amount} ${h.reason}" style="border-bottom:1px solid #eee; padding:10px 0;">
-                    <div style="display:flex; justify-content:space-between; font-weight:bold; align-items:center;">
-                        <span>${h.reason}</span>
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <span style="color:${color}; direction:ltr;">${sign}${format(h.amount)}</span>
-                            <i class="fas fa-edit" style="color:var(--text-sec); cursor:pointer; font-size:0.9rem;" onclick="editHistoryItem(${i}, '${h.id}')"></i>
-                        </div>
-                    </div>
-                    <div style="font-size:0.75rem; color:var(--text-sec); margin-top:3px;">${h.date} - ${h.time}</div>
-                </div>`;
-            }).join('');
-        }
-        openModal('itemHistModal');
-    }
-
-    function filterList(inputId, listId) {
-        const query = document.getElementById(inputId).value.toLowerCase();
-        const items = document.querySelectorAll(`#${listId} .hist-item`);
-        items.forEach(item => {
-            const text = item.getAttribute('data-search').toLowerCase();
-            if(text.includes(query)) {
-                item.style.display = 'block';
-            } else {
-                item.style.display = 'none';
-            }
-        });
-    }
-
-    function editHistoryItem(budgetIdx, histId) {
-        closeAllModals();
-        const budget = app.budgets[budgetIdx];
-        const hIndex = budget.history.findIndex(h => h.id == histId);
-        if (hIndex === -1) return;
-        const item = budget.history[hIndex];
-
-        document.getElementById('heBudgetId').value = budgetIdx;
-        document.getElementById('heHistIndex').value = hIndex;
-        document.getElementById('heType').value = item.type;
-        document.getElementById('heAmount').value = item.amount;
-        formatCurrency(document.getElementById('heAmount'));
-        document.getElementById('heReason').value = item.reason;
-        document.getElementById('heDate').value = item.date;
-
-        openModal('historyEditModal');
-    }
-
-    function saveHistoryEdit() {
-        const bIdx = parseInt(document.getElementById('heBudgetId').value);
-        const hIdx = parseInt(document.getElementById('heHistIndex').value);
-        const newAmount = parseFormatted(document.getElementById('heAmount').value);
-        const newReason = document.getElementById('heReason').value;
-        const newDate = document.getElementById('heDate').value;
-        
-        if (isNaN(newAmount)) return alert("مبلغ نامعتبر است");
-        
-        const budget = app.budgets[bIdx];
-        const histItem = budget.history[hIdx];
-        const oldAmount = histItem.amount;
-        const diff = newAmount - oldAmount;
-        const type = histItem.type;
-
-        saveSectionSnap('budget', `ویرایش تراکنش: ${histItem.reason}`);
-        
-        if (type === 'expense' || type === 'transferOut') {
-            budget.spent += diff;
-        } else if (type === 'deposit' || type === 'transferIn') {
-            if (!budget.manualAdd) budget.manualAdd = 0;
-            budget.manualAdd += diff;
-        }
-
-        histItem.amount = newAmount;
-        histItem.reason = newReason;
-        histItem.date = newDate;
-        
-        saveData(); renderUI(); closeAllModals(); showToast("تراکنش ویرایش شد");
-    }
-
-    function openAllocate(type, id) {
-        document.getElementById('allocType').value = type;
-        document.getElementById('allocId').value = id;
-        const sel = document.getElementById('allocBudgetSelect');
-        sel.innerHTML = `<option value="">انتخاب کنید...</option>` + app.budgets.map((b, i) => `<option value="${i}">${b.name}</option>`).join('');
-        
-        sel.onchange = function() {
-            const idx = sel.value;
-            const infoBox = document.getElementById('allocInfo');
-            if(idx === "") {
-                infoBox.style.display = 'none';
-                return;
-            }
-            const b = app.budgets[idx];
-            const baseAmount = app.distributedAmount;
-            const share = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
-            const remain = share - b.spent;
-            
-            infoBox.style.display = 'flex';
-            const displayEl = document.getElementById('allocLimitDisplay');
-            displayEl.innerText = format(remain);
-            displayEl.dataset.max = remain;
-        };
-
-        if(type === 'shop' && app.shopping[id].price) { document.getElementById('allocAmt').value = app.shopping[id].price.toLocaleString(); } 
-        else { document.getElementById('allocAmt').value = ''; }
-        
-        document.getElementById('allocInfo').style.display = 'none';
-        openModal('allocModal');
-    }
-
-    function performAllocation() {
-        const type = document.getElementById('allocType').value;
-        const id = parseInt(document.getElementById('allocId').value);
-        const bIdxStr = document.getElementById('allocBudgetSelect').value;
-        if(bIdxStr === "") return alert("لطفا یک ردیف بودجه انتخاب کنید");
-        
-        const bIdx = parseInt(bIdxStr);
-        const amt = parseFormatted(document.getElementById('allocAmt').value);
-        const max = parseFloat(document.getElementById('allocLimitDisplay').dataset.max) || 0;
-        
-        if(isNaN(amt) || amt <= 0) return alert("مبلغ نامعتبر");
-        if(amt > max) return alert("خطا: مبلغ وارد شده از موجودی این ردیف بودجه بیشتر است!");
-
-        let reason = "";
-        if(type === 'goal') { app.goals[id].curr += amt; reason = "اختصاص به هدف: " + app.goals[id].name; } 
-        else { 
-            if(!app.shopping[id].paid) app.shopping[id].paid = 0;
-            app.shopping[id].paid += amt;
-            reason = "خرید کالا: " + app.shopping[id].name; 
-        }
-
-        saveSectionSnap('budget', reason); 
-        app.budgets[bIdx].spent += amt;
-        
-        addToHistory(bIdx, amt, reason, 'expense');
-        saveData(); renderUI(); closeAllModals(); showToast("تراکنش ثبت شد");
-    }
-
-    function toggleGlobalDeduct() {
-        const checked = document.getElementById('globalDeductCheck').checked;
-        app.settings.globalDeduct = checked;
-        
-        if(confirm("آیا مایلید این تنظیم روی تمام بدهی‌ها و چک‌های فعلی هم اعمال شود؟")) {
-             app.debts.forEach(d => d.deduct = checked);
-             app.checks.forEach(c => c.deduct = checked);
-             showToast("تنظیمات روی همه آیتم‌ها اعمال شد");
-        }
-        
-        saveData(); renderUI();
-    }
-
-    function toggleCurrency() {
-        app.user.currency = app.user.currency === 'toman' ? 'rial' : 'toman';
-        const btn = document.getElementById('currBtn');
-        if(app.user.currency === 'rial') btn.classList.add('active'); else btn.classList.remove('active');
-        saveData(); renderUI();
-    }
-    function toggleTheme() {
-        if(document.body.getAttribute('data-theme') === 'dark') { document.body.removeAttribute('data-theme'); app.user.theme = 'light'; } 
-        else { document.body.setAttribute('data-theme', 'dark'); app.user.theme = 'dark'; }
-        saveData();
-    }
-    function applyTheme() { if(app.user.theme === 'dark') document.body.setAttribute('data-theme', 'dark'); }
-
-    // Analytics (Reports Tab)
-    function renderReports() {
-        if (document.getElementById('view-reports').classList.contains('active')) {
-             setTimeout(() => {
-                renderDonutChart();
-                renderLineChart();
-             }, 200);
-        }
-    }
-
-    function renderDonutChart() {
-        const ctx = document.getElementById('expenseChart').getContext('2d');
-        if (myChart1) myChart1.destroy();
-
-        const labels = app.budgets.map(b => b.name);
-        const data = app.budgets.map(b => b.spent);
-        const colors = ['#f87171', '#fbbf24', '#34d399', '#60a5fa', '#818cf8', '#a78bfa', '#f472b6'];
-
-        myChart1 = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: data,
-                    backgroundColor: colors,
-                    borderWidth: 0,
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { font: { family: 'Vazirmatn' } } }
-                }
-            }
-        });
-    }
-
-    function renderLineChart() {
-        const ctx = document.getElementById('netWorthChart').getContext('2d');
-        if (myChart2) myChart2.destroy();
-        
-        const logs = app.dailyLogs.slice(-30); 
-        const labels = logs.map(l => toPersianNum(l.date));
-        const data = logs.map(l => l.net);
-
-        myChart2 = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'موجودی خالص',
-                    data: data,
-                    borderColor: '#4f46e5',
-                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: { beginAtZero: true }
-                },
-                plugins: {
-                    legend: { display: false }
-                }
-            }
-        });
-    }
-
-    function exportExcel() {
-        withLoading(() => {
-            const toEn = (str) => str ? str.toString().replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)) : '';
-
-            let tableHTML = `
-            <style>td,th{border:1px solid #000; padding:5px; font-family:'Tahoma'; text-align:center;}</style>
-            <h3>خلاصه وضعیت فعلی</h3>
-            <table>
-                <tr style="background:#ddd"><th>نام کاربر</th><th>موجودی کل</th><th>بدهی کل</th><th>تاریخ گزارش</th></tr>
-                <tr>
-                    <td>${app.user.name}</td>
-                    <td>${toEn(document.getElementById('totalBalance').innerText)}</td>
-                    <td>${toEn(app.debts.reduce((a,b)=>a+b.value,0) + app.checks.reduce((a,b)=>!b.isPaid?a+b.value:0,0))}</td>
-                    <td>${new Date().toLocaleDateString('fa-IR')}</td>
-                </tr>
-            </table>
-            <br>
-            <h3>تاریخچه تراکنش‌های بودجه</h3>
-            <table>
-                <tr style="background:#a78bfa; color:white;">
-                    <th>تاریخ</th><th>ساعت</th><th>نوع</th><th>مبلغ</th><th>دسته</th><th>توضیحات</th>
-                </tr>`;
-
-            app.budgets.forEach(b => {
-                if (b.history) {
-                    b.history.forEach(h => {
-                        tableHTML += `<tr>
-                            <td>${h.date}</td>
-                            <td>${h.time}</td>
-                            <td>${h.type === 'expense' ? 'هزینه' : (h.type === 'deposit' ? 'واریز' : 'انتقال')}</td>
-                            <td style="mso-number-format:'0'">${toEn(h.amount)}</td> 
-                            <td>${b.name}</td>
-                            <td>${h.reason}</td>
-                        </tr>`;
-                    });
-                }
-            });
-            tableHTML += `</table><br>`;
-            tableHTML += `<h3>اهداف پس‌انداز</h3>
-            <table><tr style="background:#34d399"><th>هدف</th><th>مبلغ هدف</th><th>جمع شده</th><th>مانده</th></tr>`;
-            app.goals.forEach(g => {
-                tableHTML += `<tr><td>${g.name}</td><td>${toEn(g.target)}</td><td>${toEn(g.curr)}</td><td>${toEn(g.target - g.curr)}</td></tr>`;
-            });
-            tableHTML += `</table><br>`;
-            tableHTML += `<h3>بدهی و اقساط</h3>
-            <table><tr style="background:#f87171"><th>عنوان</th><th>مبلغ</th><th>وضعیت</th></tr>`;
-            app.debts.forEach(d => {
-                tableHTML += `<tr><td>${d.name}</td><td>${toEn(d.value)}</td><td>قسط ثابت</td></tr>`;
-            });
-            app.checks.forEach(c => {
-                tableHTML += `<tr><td>${c.name}</td><td>${toEn(c.value)}</td><td>${c.isPaid ? 'پاس شده' : 'پاس نشده'}</td></tr>`;
-            });
-            tableHTML += `</table>`;
-
-            const fullTemplate = `
-                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-                <head><meta charset="UTF-8"></head>
-                <body>${tableHTML}</body></html>`;
-
-            const blob = new Blob(['\uFEFF', fullTemplate], { type: 'application/vnd.ms-excel;charset=utf-8' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `Gozaresh_Mali_${new Date().toLocaleDateString('fa-IR').replace(/\//g,'-')}.xls`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showToast("فایل اکسل جامع دانلود شد");
-        }, 1500);
-    }
-
-    function generateReportImage() {
-        withLoading(() => {
-            const income = app.wallets.reduce((a,b)=>a+b.value,0);
-            const currentMonth = getCurMonth();
-            const fixedDebt = app.debts.reduce((a,b)=> (b.deduct !== false && b.lastPaid !== currentMonth) ? a+b.value : a, 0);
-            const checkDebt = (app.checks || []).reduce((a,b)=> (!b.isPaid && b.deduct !== false) ? a+b.value : a, 0);
-            
-            const totalDebt = fixedDebt + checkDebt;
-            const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
-            let net = income - totalDebt - manualDeductions;
-            if (net < 0) net = 0;
-            
-            const days = app.user.startDate ? Math.floor((Date.now() - app.user.startDate)/(1000*60*60*24))+1 : 0;
-
-            document.getElementById('printDate').innerText = toPersianNum(new Date().toLocaleDateString('fa-IR'));
-            document.getElementById('printUser').innerText = app.user.name;
-            document.getElementById('printDays').innerText = toPersianNum(days);
-            document.getElementById('printInc').innerText = format(income);
-            document.getElementById('printDebt').innerText = format(totalDebt);
-            document.getElementById('printNet').innerText = format(net);
-
-            if(app.dailyLogs && app.dailyLogs.length > 0) {
-                const ctx = document.getElementById('printChart').getContext('2d');
-                if(window.myPrintChart) window.myPrintChart.destroy();
-                const logs = app.dailyLogs.slice(-15);
-                window.myPrintChart = new Chart(ctx, {
-                    type: 'line',
-                    data: { labels: logs.map(l => toPersianNum(l.date)), datasets: [{ label: 'خالص دارایی (تومان)', data: logs.map(l => l.net), borderColor: '#4338ca', backgroundColor: 'rgba(67, 56, 202, 0.1)', fill: true }] },
-                    options: { responsive: true, maintainAspectRatio: false }
-                });
-                
-                const hTab = document.getElementById('printHistoryTable');
-                hTab.innerHTML = logs.map(l => `<tr><td>${toPersianNum(l.date)}</td><td>${format(l.net)}</td><td>${format(l.spent)}</td></tr>`).join('');
-            }
-            
-            const tb = document.getElementById('printBody');
-            tb.innerHTML = '';
-            app.budgets.forEach(b => {
-                const baseAmount = app.distributedAmount;
-                const s = Math.round((baseAmount * b.percent) / 100) + (b.manualAdd || 0);
-                tb.innerHTML += `<tr><td>${b.name}</td><td>${toPersianNum(b.percent)}%</td><td>${format(s)}</td><td>${format(b.spent)}</td><td>${format(s-b.spent)}</td></tr>`;
-            });
-            
-            const dList = document.getElementById('printDebtsList');
-            let debtHtml = "";
-            app.debts.forEach(d => {
-                 let info = d.deduct !== false ? '' : ' (عدم کسر از سیستم)';
-                 debtHtml += `<div>${d.name}${info}: ${format(d.value)}</div>`;
-            });
-            dList.innerHTML = debtHtml || "ندارد";
-            
-            const gList = document.getElementById('printGoalsList');
-            let goalHtml = "";
-            app.goals.forEach(g => {
-                let status = g.curr >= g.target ? " (تکمیل)" : "";
-                goalHtml += `<div>${g.name}${status}: ${format(g.curr)} / ${format(g.target)}</div>`;
-            });
-            gList.innerHTML = goalHtml || "ندارد";
-            
-            const el = document.getElementById('printArea');
-            el.style.top = "0"; 
-            
-            setTimeout(() => {
-                html2canvas(el, { scale: 2 }).then(c => {
-                    const a = document.createElement('a');
-                    a.download = `Financial_Report_${days}Days.png`; a.href = c.toDataURL(); a.click();
-                    el.style.top = "-9999px";
-                    toggleLoading(false); 
-                });
-            }, 800);
-        }, 100);
-    }
-
-    function downloadBackup() {
-        withLoading(() => {
-            const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(app));
-            const a = document.createElement('a'); a.href = str; a.download = "backup.json"; a.click();
-            if(!isGuestMode) { app.history.unshift({date: Date.now(), name: "بکاپ دستی"}); if(app.history.length > 5) app.history.pop(); saveData(); }
-        }, 1500);
-    }
-    
-    function restoreBackup(input) {
-        withLoading(() => {
-            const file = input.files[0];
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    app = JSON.parse(e.target.result);
-                    if(!app.priorities) app.priorities = defaultState.priorities;
-                    if(!app.priorityTiers) app.priorityTiers = defaultState.priorityTiers;
-                    if(!app.settings) app.settings = defaultState.settings;
-                    if(!app.sectionHistory) app.sectionHistory = { dashboard: [], budget: [], tools: [] };
-                    if(app.distributedAmount === undefined) app.distributedAmount = 0;
-                    if(!app.security.nationalId) app.security.nationalId = "";
-                    if(!app.dailyLogs) app.dailyLogs = [];
-                    
-                    // Ensure transfers array exists
-                    if(!app.transfers) app.transfers = [];
-
-                    app.budgets.forEach(b => { 
-                        if(!b.history) b.history = []; if(b.manualAdd === undefined) b.manualAdd = 0; if(b.isPaused === undefined) b.isPaused = false; if(b.savedPercent === undefined) b.savedPercent = 0; if(!b.subs) b.subs = []; if(!b.internalDebt) b.internalDebt = [];
-                    });
-                    
-                    app.goals.forEach(g => { if(!g.autoConfig) g.autoConfig = {type:'none'}; });
-                    app.shopping.forEach(s => { if(!s.autoConfig) s.autoConfig = {type:'none'}; if(s.paid === undefined) s.paid = 0; });
-                    app.debts.forEach(d => { if(d.deduct === undefined) d.deduct = true; if(d.lastPaid === undefined) d.lastPaid = null; });
-                    app.checks.forEach(c => { if(c.deduct === undefined) c.deduct = true; if(c.isPaid === undefined) c.isPaid = false; });
-                    app.loans.forEach(l => { if(l.isReceived === undefined) l.isReceived = false; });
-                    
-                    saveData(); location.reload();
-                } catch(err) { alert("فایل نامعتبر"); }
-            };
-            reader.readAsText(file);
-        }, 2000);
-    }
-    
-    function showHistory() {
-        const d = document.getElementById('histList');
-        d.innerHTML = app.history.map(h => `<div style="padding:10px; border-bottom:1px solid #eee;">${h.name} - ${new Date(h.date).toLocaleDateString('fa-IR')}</div>`).join('');
-        openModal('histModal');
-    }
-    function resetAll() { if(confirm("هشدار: تمام اطلاعات شما پاک خواهد شد. آیا مطمئن هستید؟")) { localStorage.removeItem('amir_fin_v9'); location.reload(); } }
-    
-    function copyTxt(n) {
-        const raw = document.getElementById('rawCopyCheck').checked;
-        const txt = raw ? (n*rate).toString() : format(n);
-        navigator.clipboard.writeText(txt); showToast("کپی شد: " + txt);
-    }
-    
-    function loadData() {
-        const d = localStorage.getItem('amir_fin_v9');
-        if(d) {
-            try {
-                const savedData = JSON.parse(d);
-                app = { ...defaultState, ...savedData };
-                
-                app.security = { ...defaultState.security, ...(savedData.security || {}) };
-                app.user = { ...defaultState.user, ...(savedData.user || {}) };
-                app.settings = { ...defaultState.settings, ...(savedData.settings || {}) };
-                
-                if(!Array.isArray(app.wallets)) app.wallets = [];
-                if(!Array.isArray(app.budgets)) app.budgets = [];
-                if(!Array.isArray(app.debts)) app.debts = [];
-                if(!Array.isArray(app.checks)) app.checks = [];
-                if(!Array.isArray(app.loans)) app.loans = [];
-                if(!Array.isArray(app.goals)) app.goals = [];
-                if(!Array.isArray(app.shopping)) app.shopping = [];
-                if(!Array.isArray(app.transfers)) app.transfers = []; // NEW
-                
-                if(app.distributedAmount === undefined) app.distributedAmount = 0;
-                if(!app.security.nationalId) app.security.nationalId = "";
-                if(app.security.isSetup === undefined) app.security.isSetup = app.security.hasPin;
-                if(!app.dailyLogs) app.dailyLogs = [];
-                if(!app.user.startDate) app.user.startDate = Date.now();
-                if(!app.priorityTiers) app.priorityTiers = [];
-                if(!app.priorities) app.priorities = {};
-
-                app.budgets.forEach(b => { 
-                    if(!b.history) b.history = []; if(b.manualAdd === undefined) b.manualAdd = 0; if(b.isPaused === undefined) b.isPaused = false; if(b.savedPercent === undefined) b.savedPercent = 0; if(!b.subs) b.subs = []; if(!b.internalDebt) b.internalDebt = [];
-                });
-                app.goals.forEach(g => { if(!g.autoConfig) g.autoConfig = {type:'none'}; });
-                app.shopping.forEach(s => { if(!s.autoConfig) s.autoConfig = {type:'none'}; if(s.paid === undefined) s.paid = 0; });
-                app.checks.forEach(c => { if(c.isPaid === undefined) c.isPaid = false; if(c.deduct === undefined) c.deduct = true; });
-                app.loans.forEach(l => { if(l.isReceived === undefined) l.isReceived = false; });
-                app.debts.forEach(d => { if(d.lastPaid === undefined) d.lastPaid = null; if(d.deduct === undefined) d.deduct = true; });
-            } catch (e) {
-                console.error("Data Load Error", e);
-            }
-        }
-    }
-    function saveData() { if(!isGuestMode) { localStorage.setItem('amir_fin_v9', JSON.stringify(app)); } }
     function updateDate() { document.getElementById('headerDate').innerText = toPersianNum(new Date().toLocaleDateString('fa-IR')); }
 
     function switchTab(id) {
@@ -4292,4 +2720,4 @@
 
 </script>
 </body>
-</html>
+    </html>
