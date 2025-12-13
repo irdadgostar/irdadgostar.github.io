@@ -1,3 +1,4 @@
+
 <!DOCTYPE html> 
 <html lang="fa" dir="rtl">
 <head>
@@ -246,7 +247,7 @@
         .btn-copy:hover { background: var(--text-main); color: white; }
         .btn-check { color: var(--success); background: rgba(16, 185, 129, 0.15); }
         .btn-check:hover { background: var(--success); color: white; }
-        .btn-reject { color: var(--danger); background: rgba(220, 38, 38, 0.15); }
+        .btn-reject { color: var(--danger); background: rgba(239, 68, 68, 0.15); }
         .btn-reject:hover { background: var(--danger); color: white; }
         
         .currency-toggle-btn {
@@ -554,6 +555,62 @@
         }
         .card-transfer-btn:active { transform: scale(0.95); }
 
+        /* Receipt Styles */
+        .receipt-card {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            position: absolute;
+            top: -9999px;
+            left: 0;
+            width: 400px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            text-align: center;
+            border-top: 5px solid var(--primary);
+            font-family: 'Vazirmatn', sans-serif;
+            z-index: 100000;
+        }
+        .receipt-header {
+            margin-bottom: 20px;
+            border-bottom: 2px dashed #eee;
+            padding-bottom: 15px;
+        }
+        .receipt-status {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .receipt-amount {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 15px 0;
+            direction: ltr;
+        }
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #f8f8f8;
+            padding-bottom: 5px;
+        }
+        .receipt-label { color: #888; }
+        .receipt-value { font-weight: bold; color: #333; }
+        .receipt-footer {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+        
+        .p2p-item {
+            display:flex; flex-direction:column; gap:8px; border-bottom:1px solid rgba(0,0,0,0.05); padding:12px;
+        }
+        .p2p-header { display:flex; justify-content:space-between; align-items:center; }
+        .status-badge { padding:4px 10px; border-radius:12px; font-size:0.75rem; font-weight:bold; }
+        .sb-pending { background:rgba(245, 158, 11, 0.1); color:var(--warning); }
+        .sb-success { background:rgba(16, 185, 129, 0.1); color:var(--success); }
+        .sb-reject { background:rgba(239, 68, 68, 0.1); color:var(--danger); }
 
         /* --- BENTO GRID (Budget) --- */
         .budget-grid {
@@ -686,35 +743,6 @@
         .print-section-title { font-weight: bold; margin-top: 20px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
         .print-chart-container { width: 100%; height: 300px; margin-top: 20px; border: 1px dashed #ccc; padding: 10px; }
 
-        /* --- Receipt (New Feature) --- */
-        .receipt-box {
-            position: absolute; top: -9999px; left: -9999px;
-            width: 450px;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            font-family: 'Vazirmatn', sans-serif;
-            text-align: center;
-            border: 1px solid #cbd5e1;
-        }
-        .receipt-success { border-top: 8px solid #059669; }
-        .receipt-fail { border-top: 8px solid #dc2626; }
-        
-        .receipt-title { font-size: 1.4rem; font-weight: 900; color: #1e293b; margin-bottom: 5px; }
-        .receipt-status { font-size: 1rem; font-weight: bold; margin-bottom: 20px; display: inline-block; padding: 5px 15px; border-radius: 20px; }
-        .r-success-text { background: rgba(5, 150, 105, 0.1); color: #059669; }
-        .r-fail-text { background: rgba(220, 38, 38, 0.1); color: #dc2626; }
-        
-        .receipt-amount { font-size: 2rem; font-weight: 800; color: #334155; margin: 15px 0; direction: ltr; }
-        .receipt-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #cbd5e1; font-size: 0.95rem; }
-        .receipt-row:last-child { border-bottom: none; }
-        .receipt-label { color: #64748b; font-weight: 500; }
-        .receipt-val { color: #0f172a; font-weight: 700; }
-        .receipt-logo { width: 60px; height: 60px; background: #3730a3; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 15px auto; }
-        .receipt-footer { margin-top: 20px; font-size: 0.8rem; color: #94a3b8; }
-
-
         .history-btn {
             font-size: 0.8rem; background: rgba(79, 70, 229, 0.1); color: var(--primary); padding: 6px 14px; border-radius: 20px; cursor: pointer; margin-left: 10px; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; border: 1px solid transparent;
         }
@@ -812,20 +840,6 @@
             height: 300px; position: relative;
         }
 
-        /* P2P Transfer Item */
-        .p2p-item {
-            background: var(--glass-bg); border: var(--glass-border);
-            padding: 15px; border-radius: 16px; margin-bottom: 12px;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: var(--shadow-soft);
-        }
-        .p2p-info h4 { margin: 0 0 5px 0; font-size: 0.95rem; }
-        .p2p-info p { margin: 0; font-size: 0.8rem; color: var(--text-sec); }
-        .p2p-status { font-size: 0.75rem; padding: 3px 8px; border-radius: 6px; font-weight: bold; margin-top: 5px; display: inline-block; }
-        .st-pending { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
-        .st-success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
-        .st-reject { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
-
     </style>
 </head>
 <body>
@@ -836,6 +850,45 @@
 </div>
 
 <div id="toastContainer" class="toast-container"></div>
+
+<!-- RECEIPT RENDER AREA (Hidden) -->
+<div id="receiptRenderArea" class="receipt-card">
+    <div class="receipt-header">
+        <h2 style="color:var(--primary); margin:0;">رسید انتقال وجه</h2>
+        <small style="color:#888;">سیستم مدیریت سرمایه تعالی</small>
+    </div>
+    <div id="receiptStatus" class="receipt-status"></div>
+    <div class="receipt-amount" id="receiptAmount"></div>
+    
+    <div class="receipt-row">
+        <span class="receipt-label">فرستنده:</span>
+        <span class="receipt-value" id="receiptSource"></span>
+    </div>
+    <div class="receipt-row">
+        <span class="receipt-label">حساب مبدا:</span>
+        <span class="receipt-value" id="receiptSourceAcc"></span>
+    </div>
+    <div class="receipt-row">
+        <span class="receipt-label">گیرنده:</span>
+        <span class="receipt-value" id="receiptDest"></span>
+    </div>
+    <div class="receipt-row">
+        <span class="receipt-label">حساب مقصد:</span>
+        <span class="receipt-value" id="receiptDestAcc"></span>
+    </div>
+    <div class="receipt-row">
+        <span class="receipt-label">تاریخ و زمان:</span>
+        <span class="receipt-value" id="receiptTime"></span>
+    </div>
+    <div class="receipt-row">
+        <span class="receipt-label">کد رهگیری:</span>
+        <span class="receipt-value" id="receiptRef"></span>
+    </div>
+
+    <div class="receipt-footer">
+        این رسید معتبر و صادر شده توسط سیستم بانکی می‌باشد.
+    </div>
+</div>
 
 <!-- 1. LOCK SCREEN -->
 <div id="authModal" class="pin-screen" style="display: flex;">
@@ -856,7 +909,7 @@
             </div>
 
             <div id="setupS2" style="display:none;">
-                <label class="auth-label">کد ملی (جهت بازیابی و حساب):</label>
+                <label class="auth-label">کد ملی (جهت بازیابی):</label>
                 <input type="text" id="setupNatId" inputmode="numeric" placeholder="کد ملی خود را وارد کنید" style="padding:12px; border-radius:12px;">
             </div>
 
@@ -935,7 +988,7 @@
         <div class="hero-card">
             <div class="card-inner">
                 <div class="card-front" onclick="if(!event.target.closest('button') && !event.target.closest('.fa-eye')) showCardDetails()">
-                    <div class="card-number-top" id="cardAccountNumber">۳۵۴۵ ۶۵۷۶ ۸۹۲۱ ۱۰۰۴</div>
+                    <div class="card-number-top" id="cardAccountNumber">---- ---- ---- ----</div>
                     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-top:10px;">
                         <div class="card-chip"></div>
                         <i class="fas fa-wifi" style="opacity:0.7; transform: rotate(90deg); font-size:1.5rem;"></i>
@@ -951,12 +1004,12 @@
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
                         <span id="userNameDisplay" style="font-size:1rem; font-weight:700; opacity:0.95; text-shadow: 0 2px 4px rgba(0,0,0,0.3); text-transform:uppercase;">کاربر</span>
-                        <button class="card-transfer-btn" onclick="openBankTransfer(event)">
+                        <button class="card-transfer-btn" onclick="openP2PModal(event)">
                             <i class="fas fa-exchange-alt"></i> انتقال وجه
                         </button>
                     </div>
                 </div>
-                <!-- Card Back -->
+                <!-- Card Back isn't strictly needed for click interaction but kept for CSS structure -->
                 <div class="card-back">
                     <h3 style="margin:0;">خلاصه وضعیت</h3>
                     <p style="margin:5px 0; opacity:0.8;">برای مشاهده جزئیات کلیک کنید</p>
@@ -991,19 +1044,14 @@
             </div>
             <div id="checkList"></div>
         </div>
-
-        <!-- P2P Transfer Section (New Instruction 2) -->
-        <div class="glass-panel" id="p2pSection">
+        
+        <!-- NEW SECTION: P2P Transfers -->
+        <div class="glass-panel">
             <div class="header-row">
-                <h3><i class="fas fa-users"></i> انتقال وجه (همتا به همتا)</h3>
-                <div style="display:flex; gap:5px;">
-                     <button class="btn btn-primary" onclick="openP2PModal('receive')"><i class="fas fa-arrow-down"></i> دریافت</button>
-                     <button class="btn btn-outline" style="border-color:var(--primary); color:var(--primary);" onclick="openP2PModal('send')"><i class="fas fa-arrow-up"></i> ارسال</button>
-                </div>
+                <h3><i class="fas fa-users"></i> انتقال وجه مستقیم (P2P)</h3>
+                <button class="btn btn-primary" onclick="openModal('p2pReceiveModal')"><i class="fas fa-arrow-down"></i> ثبت دریافت</button>
             </div>
-            <div id="p2pList" style="min-height:50px;">
-                <p style="text-align:center; color:var(--text-sec); font-size:0.85rem;">هنوز تراکنشی ثبت نشده است.</p>
-            </div>
+            <div id="p2pList"></div>
         </div>
     </div>
 
@@ -1206,37 +1254,65 @@
 
 <!-- MODALS -->
 
-<!-- New Bank Transfer Wizard Modal -->
-<div id="bankTransferModal" class="modal">
-    <div class="modal-content" id="btContent">
-        <!-- Will be populated by JS -->
-    </div>
-</div>
-
-<!-- P2P Modal -->
+<!-- New P2P Sending Modal -->
 <div id="p2pModal" class="modal">
     <div class="modal-content">
-        <h3 id="p2pTitle">ثبت انتقال وجه</h3>
-        <input type="hidden" id="p2pMode">
+        <h3>انتقال وجه به کارت/حساب</h3>
+        <p style="font-size:0.9rem; color:var(--text-sec); margin-bottom:15px;">مشخصات مقصد را وارد کنید.</p>
         
-        <label>طرف حساب:</label>
-        <input type="text" id="p2pName" placeholder="نام شخص">
+        <label>شماره حساب یا کد ملی مقصد:</label>
+        <input type="tel" id="p2pDestInput" placeholder="کد ملی یا شماره حساب 10 رقمی" style="letter-spacing:1px; text-align:center;">
         
-        <label>شماره حساب (اختیاری):</label>
-        <input type="tel" id="p2pAcc" placeholder="شماره حساب/کارت">
-
-        <label>مبلغ:</label>
+        <label>نام صاحب حساب مقصد:</label>
+        <input type="text" id="p2pDestName" placeholder="نام گیرنده">
+        
+        <label>مبلغ انتقال:</label>
         <div class="money-input-wrapper">
-            <input type="text" id="p2pAmount" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="۰">
+            <input type="text" id="p2pAmountInput" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="۰">
             <span class="money-unit currency-text">تومان</span>
         </div>
-
+        
         <div style="margin-top:25px; display:flex; gap:12px;">
-            <button class="btn btn-primary" style="flex:1" onclick="submitP2P()">ثبت درخواست</button>
+            <button class="btn btn-primary" style="flex:1" onclick="performP2PTransfer()">تایید و انتقال</button>
             <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
         </div>
     </div>
 </div>
+
+<!-- New P2P Receive Modal -->
+<div id="p2pReceiveModal" class="modal">
+    <div class="modal-content">
+        <h3>ثبت دریافت وجه (منتظر تایید)</h3>
+        <p style="font-size:0.9rem; color:var(--text-sec); margin-bottom:15px;">اطلاعات وجهی که قرار است دریافت کنید را ثبت کنید تا پس از واریز تایید کنید.</p>
+        
+        <label>نام واریز کننده:</label>
+        <input type="text" id="p2pSenderName" placeholder="نام شخص">
+        
+        <label>مبلغ:</label>
+        <div class="money-input-wrapper">
+            <input type="text" id="p2pReceiveAmount" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="۰">
+            <span class="money-unit currency-text">تومان</span>
+        </div>
+        
+        <div style="margin-top:25px; display:flex; gap:12px;">
+            <button class="btn btn-primary" style="flex:1" onclick="submitP2PReceive()">ثبت درخواست</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
+        </div>
+    </div>
+</div>
+
+<!-- Receipt Modal -->
+<div id="receiptModal" class="modal">
+    <div class="modal-content">
+        <h3>رسید تراکنش</h3>
+        <img id="receiptImage" src="" style="width:100%; border-radius:12px; margin-bottom:20px; box-shadow:0 5px 15px rgba(0,0,0,0.1);">
+        <div style="display:flex; gap:12px;">
+            <button class="btn btn-primary" style="flex:1" onclick="downloadReceiptImage()">دانلود تصویر</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">بستن</button>
+        </div>
+    </div>
+</div>
+
 
 <!-- New Modal: Card Details & Copy -->
 <div id="cardDetailsModal" class="modal">
@@ -1730,21 +1806,6 @@
     </div>
 </div>
 
-<!-- Receipt Modal & Element -->
-<div id="receiptModal" class="modal">
-    <div class="modal-content">
-        <h3>رسید تراکنش</h3>
-        <p style="color:var(--text-sec); font-size:0.85rem; margin-bottom:15px;">تصویر رسید آماده ذخیره‌سازی است.</p>
-        <div id="receipt-capture" class="receipt-box">
-             <!-- Filled by JS -->
-        </div>
-        <div style="margin-top:20px; display:flex; gap:10px;">
-            <button class="btn btn-success" style="flex:1" onclick="downloadReceipt()"><i class="fas fa-download"></i> دانلود رسید</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">بستن</button>
-        </div>
-    </div>
-</div>
-
 <div id="printArea">
     <div class="print-header">
         <h1>گزارش جامع وضعیت مالی</h1>
@@ -1784,8 +1845,8 @@
         wallets: [],
         debts: [], 
         checks: [], 
-        loans: [], 
-        p2p: [], // New for Peer to Peer transfers
+        loans: [],
+        p2p: [], // New P2P array
         budgets: [
             {id: 1, name: "کرایه شهری", percent: 20, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: [], internalDebt: []},
             {id: 2, name: "خورد و خوراک", percent: 14, spent: 0, history: [], manualAdd: 0, isPaused: false, savedPercent: 0, subs: [], internalDebt: []},
@@ -1826,7 +1887,7 @@
     let tempDepositIndex = -1;
     let myChart1 = null; 
     let myChart2 = null; 
-    let isBalanceHidden = false; 
+    let isBalanceHidden = false;
 
     function showToast(message, icon="check-circle") {
         const container = document.getElementById('toastContainer');
@@ -1973,7 +2034,6 @@
         } else if(step === 2) {
             const natId = document.getElementById('setupNatId').value.trim();
             if(!natId) return alert("لطفا کد ملی را وارد کنید");
-            if(natId.length !== 10) return alert("کد ملی باید ۱۰ رقم باشد");
             app.security.nationalId = natId;
             document.getElementById('setupS2').style.display = 'none';
             document.getElementById('setupS3').style.display = 'block';
@@ -2201,314 +2261,215 @@
         }
     }
 
-    // --- BANK TRANSFER LOGIC (Instruction 1 & 3) ---
-    function openBankTransfer(e) {
-        e.stopPropagation();
-        const modal = document.getElementById('bankTransferModal');
-        const content = document.getElementById('btContent');
-        
-        content.innerHTML = `
-            <h3>انتقال وجه</h3>
-            <div id="btStep1">
-                <p style="color:var(--text-sec); font-size:0.9rem;">شماره کارت، حساب یا کد ملی مقصد را وارد کنید:</p>
-                <input type="tel" id="btDestInput" placeholder="xxxx-xxxx-xxxx-xxxx" style="text-align:center; letter-spacing:2px; font-weight:bold;">
-                <button class="btn btn-primary" style="width:100%; margin-bottom:10px;" onclick="bankTransferNext(1)">ادامه</button>
-                <button class="btn btn-outline" style="width:100%" onclick="closeAllModals()">انصراف</button>
-            </div>
-        `;
-        openModal('bankTransferModal');
+    function calculateAccountNumber() {
+        if(!app.security.nationalId || app.security.nationalId.length < 5) return "0000000000";
+        // Logic: Reverse National ID
+        return app.security.nationalId.split('').reverse().join('');
     }
 
-    function bankTransferNext(step) {
-        const content = document.getElementById('btContent');
+    // --- P2P Transfer & Receipt Logic ---
+
+    function openP2PModal(e) {
+        e.stopPropagation();
+        openModal('p2pModal');
+    }
+
+    function performP2PTransfer() {
+        const dest = document.getElementById('p2pDestInput').value;
+        const destName = document.getElementById('p2pDestName').value;
+        const amt = parseFormatted(document.getElementById('p2pAmountInput').value);
+
+        if(!dest || !destName) return alert("لطفا مشخصات مقصد را کامل کنید");
+        if(amt <= 0) return alert("مبلغ نامعتبر است");
+        
+        // Check Balance
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
         const fixedDebt = app.debts.reduce((a,b)=> (b.deduct !== false && b.lastPaid !== getCurMonth()) ? a+b.value : a, 0);
         const checkDebt = (app.checks || []).reduce((a,b)=> (!b.isPaid && b.deduct !== false) ? a+b.value : a, 0);
         const net = Math.max(0, income - (fixedDebt + checkDebt));
-
-        if (step === 1) {
-            let dest = document.getElementById('btDestInput').value;
-            // Check National ID Logic
-            if (dest.length === 10 && /^\d+$/.test(dest)) {
-                // If National ID entered, reverse it to get account number (Instruction 3)
-                dest = dest.split("").reverse().join("");
-                showToast("کد ملی شناسایی شد: تبدیل به شماره حساب");
-            }
-
-            if(dest.length < 4) return alert("شماره مقصد معتبر نیست");
-            
-            content.innerHTML = `
-                <h3>مبلغ انتقال</h3>
-                <p style="color:var(--text-sec); font-size:0.85rem; margin-bottom:10px;">به مقصد: ${toPersianNum(dest)}</p>
-                <div class="alloc-info-box">
-                    <span>موجودی قابل برداشت:</span>
-                    <b>${format(net)}</b>
-                </div>
-                <div class="money-input-wrapper">
-                    <input type="text" id="btAmountInput" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="۰">
-                    <span class="money-unit currency-text">${document.getElementById('currBtnText').innerText}</span>
-                </div>
-                <input type="hidden" id="btDestVal" value="${dest}">
-                <div style="display:flex; gap:10px;">
-                    <button class="btn btn-outline" style="flex:1" onclick="openBankTransfer({stopPropagation:()=>{}})">بازگشت</button>
-                    <button class="btn btn-primary" style="flex:1" onclick="bankTransferNext(2)">ادامه</button>
-                </div>
-            `;
-        } else if (step === 2) {
-            const amt = parseFormatted(document.getElementById('btAmountInput').value);
-            const dest = document.getElementById('btDestVal').value;
-            if(amt <= 0) return alert("مبلغ نامعتبر است");
-            if(amt > net) return alert("موجودی کافی نیست!");
-
-            const mockName = "کاربر مهمان (تست)";
-
-            content.innerHTML = `
-                <h3>تایید انتقال</h3>
-                <div style="background:rgba(0,0,0,0.03); padding:15px; border-radius:12px; margin-bottom:15px; text-align:center;">
-                    <div style="font-size:0.9rem; color:var(--text-sec);">انتقال مبلغ</div>
-                    <div style="font-size:1.4rem; font-weight:bold; color:var(--primary); margin:5px 0;">${format(amt)}</div>
-                    <div style="font-size:0.9rem; color:var(--text-sec);">به حساب</div>
-                    <div style="font-weight:bold;">${mockName}</div>
-                    <div style="font-size:0.8rem; margin-top:5px;">${toPersianNum(dest)}</div>
-                </div>
-                <label>رمز عبور اپلیکیشن:</label>
-                <input type="password" id="btPinInput" placeholder="****" style="text-align:center;">
-                
-                <input type="hidden" id="btDestFinal" value="${dest}">
-                <input type="hidden" id="btAmtFinal" value="${amt}">
-                
-                <div style="display:flex; gap:10px;">
-                    <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
-                    <button class="btn btn-primary" style="flex:1" onclick="bankTransferCheckPin()">تایید نهایی</button>
-                </div>
-            `;
-        }
-    }
-
-    function bankTransferCheckPin() {
-        const pin = document.getElementById('btPinInput').value;
-        const amt = parseFloat(document.getElementById('btAmtFinal').value);
-        const dest = document.getElementById('btDestFinal').value;
-
-        if (pin !== app.security.pin) return alert("رمز عبور اشتباه است!");
         
+        if(amt > net) return alert("موجودی کافی نیست");
+
+        if(!confirm(`آیا انتقال ${format(amt)} تومان به ${destName} مورد تایید است؟`)) return;
+
         withLoading(() => {
+            // Deduct
             let remaining = amt;
             for(let w of app.wallets) {
-                if (remaining <= 0) break;
-                if(w.value >= remaining) {
-                    w.value -= remaining;
-                    remaining = 0;
-                } else {
-                    remaining -= w.value;
-                    w.value = 0;
-                }
+                if(remaining <= 0) break;
+                if(w.value >= remaining) { w.value -= remaining; remaining = 0; }
+                else { remaining -= w.value; w.value = 0; }
             }
+
+            // Create Transaction Record
+            const trans = {
+                id: Date.now(),
+                type: 'send',
+                amount: amt,
+                destAcc: dest,
+                otherName: destName,
+                date: new Date().toLocaleDateString('fa-IR'),
+                time: new Date().toLocaleTimeString('fa-IR'),
+                status: 'success' // Assume instant success for sending
+            };
+            if(!app.p2p) app.p2p = [];
+            app.p2p.push(trans);
             
-            saveSectionSnap('dashboard', `انتقال وجه بانکی: ${format(amt)}`);
             saveData(); 
-            closeAllModals(); 
-            
-            // Show Receipt Logic (Instruction 1)
-            showReceipt(amt, dest, true, "کاربر مهمان");
             renderUI();
+            closeAllModals();
+            generateReceipt(trans, true);
         }, 1500);
     }
 
-    // Receipt Generation (Instruction 1)
-    function showReceipt(amount, destAcc, isSuccess, destName) {
-        const box = document.getElementById('receipt-capture');
-        const now = new Date();
-        const dateStr = toPersianNum(now.toLocaleDateString('fa-IR'));
-        const timeStr = toPersianNum(now.toLocaleTimeString('fa-IR'));
-        
-        const myNatId = app.security.nationalId || "0000000000";
-        const myAcc = myNatId.split('').reverse().join(''); // Reversed ID
+    function submitP2PReceive() {
+        const sender = document.getElementById('p2pSenderName').value;
+        const amt = parseFormatted(document.getElementById('p2pReceiveAmount').value);
+        if(!sender || amt <= 0) return alert("اطلاعات نامعتبر");
 
-        const statusClass = isSuccess ? 'receipt-success' : 'receipt-fail';
-        const statusTextClass = isSuccess ? 'r-success-text' : 'r-fail-text';
-        const statusLabel = isSuccess ? 'موفق' : 'ناموفق';
-        const icon = isSuccess ? 'check' : 'times';
-
-        box.className = `receipt-box ${statusClass}`;
-        box.innerHTML = `
-            <div class="receipt-logo"><i class="fas fa-university"></i></div>
-            <div class="receipt-title">رسید انتقال وجه</div>
-            <div class="receipt-status ${statusTextClass}">${statusLabel} <i class="fas fa-${icon}"></i></div>
-            <div class="receipt-amount">${format(amount)} ریال</div>
-            
-            <div class="receipt-row">
-                <span class="receipt-label">فرستنده:</span>
-                <span class="receipt-val">${app.user.name}</span>
-            </div>
-             <div class="receipt-row">
-                <span class="receipt-label">شماره حساب مبدا:</span>
-                <span class="receipt-val" style="letter-spacing:1px">${toPersianNum(myAcc)}</span>
-            </div>
-            <div class="receipt-row">
-                <span class="receipt-label">گیرنده:</span>
-                <span class="receipt-val">${destName}</span>
-            </div>
-            <div class="receipt-row">
-                <span class="receipt-label">شماره حساب مقصد:</span>
-                <span class="receipt-val" style="letter-spacing:1px">${toPersianNum(destAcc)}</span>
-            </div>
-            <div class="receipt-row">
-                <span class="receipt-label">تاریخ تراکنش:</span>
-                <span class="receipt-val">${dateStr} - ${timeStr}</span>
-            </div>
-            
-            <div class="receipt-footer">
-                مدیریت سرمایه تعالی - نسخه الکترونیک
-            </div>
-        `;
-        
-        // Ensure box is rendered for canvas (temporarily move it into view but hidden)
-        box.style.position = 'absolute';
-        box.style.left = '-9999px';
-        box.style.top = '0';
-        
-        openModal('receiptModal');
-    }
-
-    function downloadReceipt() {
-        const element = document.getElementById('receipt-capture');
-        // Temporarily make it visible for capture
-        element.style.left = '0';
-        element.style.zIndex = '-1';
-        
-        html2canvas(element, { scale: 2 }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = `Receipt_${Date.now()}.png`;
-            link.href = canvas.toDataURL();
-            link.click();
-            element.style.left = '-9999px';
-            showToast("رسید ذخیره شد");
-        });
-    }
-
-    // --- P2P Transfer Logic (Instruction 2) ---
-    function openP2PModal(mode) {
-        document.getElementById('p2pMode').value = mode;
-        const title = mode === 'receive' ? 'ثبت درخواست دریافت وجه' : 'ثبت ارسال وجه';
-        document.getElementById('p2pTitle').innerText = title;
-        openModal('p2pModal');
-    }
-
-    function submitP2P() {
-        const mode = document.getElementById('p2pMode').value; // 'receive' or 'send'
-        const name = document.getElementById('p2pName').value;
-        const acc = document.getElementById('p2pAcc').value;
-        const amount = parseFormatted(document.getElementById('p2pAmount').value);
-        
-        if(!name || amount <= 0) return alert("اطلاعات را کامل وارد کنید");
-        
-        if(!app.p2p) app.p2p = [];
-
-        // Logic: 
-        // If Send -> Money deducted immediately (Pending approval by other side, represented as 'Pending' status here)
-        // If Receive -> Request created, Money NOT added until user confirms receipt (Approve button)
-        
-        const newTrans = {
+        const trans = {
             id: Date.now(),
-            type: mode, // 'send' or 'receive'
-            otherName: name,
-            otherAcc: acc,
-            amount: amount,
+            type: 'receive',
+            amount: amt,
+            otherName: sender,
             date: new Date().toLocaleDateString('fa-IR'),
-            status: mode === 'send' ? 'success' : 'pending' // Send assumes immediate deduction for simplicity, Receive waits
+            time: new Date().toLocaleTimeString('fa-IR'),
+            status: 'pending' 
         };
+        if(!app.p2p) app.p2p = [];
+        app.p2p.push(trans);
+        saveData(); renderUI(); closeAllModals(); showToast("درخواست دریافت ثبت شد (منتظر تایید)");
+    }
 
-        if(mode === 'send') {
-            // Deduct immediately
-            if(app.wallets.length > 0) {
-                 if(app.wallets[0].value < amount) return alert("موجودی ناکافی");
-                 app.wallets[0].value -= amount;
-                 showReceipt(amount, acc || "نامشخص", true, name);
-            } else {
-                return alert("کیف پولی وجود ندارد");
-            }
+    function approveP2P(id) {
+        if(!confirm("آیا دریافت این وجه و واریز به حساب را تایید می‌کنید؟")) return;
+        const idx = app.p2p.findIndex(x => x.id === id);
+        if(idx === -1) return;
+        
+        const t = app.p2p[idx];
+        t.status = 'success';
+        
+        // Add to wallet
+        if(app.wallets.length > 0) app.wallets[0].value += t.amount;
+        else app.wallets.push({name: 'واریزی', value: t.amount});
+        
+        saveData(); renderUI();
+        generateReceipt(t, true);
+    }
+
+    function rejectP2P(id) {
+        if(!confirm("آیا این تراکنش را رد می‌کنید؟ (وجه برگشت داده می‌شود)")) return;
+        const idx = app.p2p.findIndex(x => x.id === id);
+        if(idx === -1) return;
+        app.p2p[idx].status = 'rejected';
+        saveData(); renderUI(); showToast("تراکنش رد شد");
+    }
+
+    function generateReceipt(t, autoDownload) {
+        const myAcc = calculateAccountNumber();
+        const myName = app.user.name;
+
+        document.getElementById('receiptAmount').innerText = format(t.amount) + " ریال"; // Standard banking format usually Rial, but used helper format
+        document.getElementById('receiptAmount').innerText = format(t.amount) + " تومان";
+        
+        document.getElementById('receiptTime').innerText = toPersianNum(t.date + " - " + t.time);
+        document.getElementById('receiptRef').innerText = toPersianNum(t.id);
+
+        if(t.type === 'send') {
+            document.getElementById('receiptSource').innerText = myName;
+            document.getElementById('receiptSourceAcc').innerText = toPersianNum(myAcc);
+            document.getElementById('receiptDest').innerText = t.otherName;
+            document.getElementById('receiptDestAcc').innerText = toPersianNum(t.destAcc || '---');
+        } else {
+            document.getElementById('receiptSource').innerText = t.otherName;
+            document.getElementById('receiptSourceAcc').innerText = "---";
+            document.getElementById('receiptDest').innerText = myName;
+            document.getElementById('receiptDestAcc').innerText = toPersianNum(myAcc);
         }
 
-        app.p2p.unshift(newTrans);
-        saveData();
-        renderP2P();
-        closeAllModals();
-        if(mode === 'receive') showToast("درخواست دریافت ثبت شد");
+        const statusEl = document.getElementById('receiptStatus');
+        if(t.status === 'success') {
+            statusEl.innerHTML = "موفق <i class='fas fa-check-circle'></i>";
+            statusEl.style.color = "var(--success)";
+        } else if (t.status === 'rejected') {
+            statusEl.innerHTML = "ناموفق / رد شده <i class='fas fa-times-circle'></i>";
+            statusEl.style.color = "var(--danger)";
+        } else {
+            statusEl.innerHTML = "در انتظار تایید <i class='fas fa-clock'></i>";
+            statusEl.style.color = "var(--warning)";
+        }
+
+        openModal('receiptModal');
+        
+        // Render Image
+        const el = document.getElementById('receiptRenderArea');
+        el.style.top = "0"; // Bring into view (obscured by modal though) or just render
+        // Actually for html2canvas to work well it needs to be visible. Let's position it absolute but visible z-index
+        
+        setTimeout(() => {
+            html2canvas(el, {scale: 2}).then(canvas => {
+                const img = document.getElementById('receiptImage');
+                img.src = canvas.toDataURL();
+                el.style.top = "-9999px";
+                if(autoDownload) showToast("رسید صادر شد");
+            });
+        }, 500);
+    }
+
+    function downloadReceiptImage() {
+        const link = document.createElement('a');
+        link.download = 'Receipt.png';
+        link.href = document.getElementById('receiptImage').src;
+        link.click();
     }
 
     function renderP2P() {
         const list = document.getElementById('p2pList');
         if(!app.p2p || app.p2p.length === 0) {
-            list.innerHTML = '<p style="text-align:center; color:var(--text-sec); font-size:0.85rem; padding:10px;">هنوز تراکنشی ثبت نشده است.</p>';
+            list.innerHTML = '<p style="text-align:center; color:var(--text-sec); font-size:0.9rem;">تراکنشی یافت نشد.</p>';
             return;
         }
 
-        list.innerHTML = app.p2p.map(t => {
-            let statusBadge = "";
-            let actions = "";
-            let icon = t.type === 'send' ? '<i class="fas fa-arrow-up" style="color:var(--danger)"></i>' : '<i class="fas fa-arrow-down" style="color:var(--success)"></i>';
-            let colorClass = t.type === 'send' ? 'text-danger' : 'text-success';
+        list.innerHTML = app.p2p.slice().reverse().map(t => {
+            let icon, color, badgeClass, badgeText;
+            
+            if(t.status === 'success') { badgeClass = 'sb-success'; badgeText = 'موفق'; }
+            else if(t.status === 'rejected') { badgeClass = 'sb-reject'; badgeText = 'رد شده'; }
+            else { badgeClass = 'sb-pending'; badgeText = 'در انتظار'; }
 
-            if(t.status === 'pending') {
-                statusBadge = `<span class="p2p-status st-pending">در انتظار تایید</span>`;
-                if(t.type === 'receive') {
-                    // Instruction 2: Option to Confirm or Reject Receipt
-                    actions = `
-                        <div style="margin-top:8px; display:flex; gap:8px;">
-                            <button class="btn-small-icon btn-check" onclick="confirmP2P(${t.id})"><i class="fas fa-check"></i> تایید و دریافت</button>
-                            <button class="btn-small-icon btn-reject" onclick="rejectP2P(${t.id})"><i class="fas fa-times"></i> رد کردن</button>
-                        </div>
-                    `;
-                }
-            } else if (t.status === 'success') {
-                statusBadge = `<span class="p2p-status st-success">موفق</span>`;
+            if(t.type === 'send') {
+                icon = 'arrow-up'; color = 'var(--danger)';
             } else {
-                statusBadge = `<span class="p2p-status st-reject">رد شده</span>`;
+                icon = 'arrow-down'; color = 'var(--success)';
+            }
+
+            let actionBtns = '';
+            if(t.type === 'receive' && t.status === 'pending') {
+                actionBtns = `
+                <div style="display:flex; gap:10px; margin-top:8px;">
+                    <button class="btn-small-icon btn-check" onclick="approveP2P(${t.id})"><i class="fas fa-check"></i></button>
+                    <button class="btn-small-icon btn-reject" onclick="rejectP2P(${t.id})"><i class="fas fa-times"></i></button>
+                </div>`;
+            } else {
+                actionBtns = `<button class="btn-small-icon btn-settings" onclick='generateReceipt(${JSON.stringify(t)}, false)' style="margin-top:5px;"><i class="fas fa-receipt"></i> رسید</button>`;
             }
 
             return `
-                <div class="p2p-item">
-                    <div class="p2p-info">
-                        <h4>${icon} ${t.type==='send'?'ارسال به':'دریافت از'} ${t.otherName}</h4>
-                        <p>${t.date} | ${t.otherAcc ? toPersianNum(t.otherAcc) : 'بدون شماره'}</p>
-                        ${statusBadge}
-                        ${actions}
-                    </div>
-                    <div style="font-weight:bold; font-size:1.1rem; direction:ltr;">
-                        ${format(t.amount)}
-                    </div>
+            <div class="p2p-item">
+                <div class="p2p-header">
+                    <span style="font-weight:bold; font-size:0.95rem;">
+                        <i class="fas fa-${icon}" style="color:${color}; margin-left:5px;"></i>
+                        ${t.type === 'send' ? 'انتقال به ' + t.otherName : 'دریافت از ' + t.otherName}
+                    </span>
+                    <span class="status-badge ${badgeClass}">${badgeText}</span>
                 </div>
-            `;
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="font-size:0.8rem; color:var(--text-sec);">${toPersianNum(t.date)}</div>
+                    <b style="font-size:1rem; color:${color};">${format(t.amount)}</b>
+                </div>
+                ${actionBtns}
+            </div>`;
         }).join('');
-    }
-
-    function confirmP2P(id) {
-        const t = app.p2p.find(x => x.id === id);
-        if(t && t.status === 'pending') {
-            if(confirm("آیا دریافت مبلغ " + format(t.amount) + " تایید است؟")) {
-                t.status = 'success';
-                // Add money to wallet
-                if(app.wallets.length === 0) app.wallets.push({name:'کیف پول اصلی', value:0});
-                app.wallets[0].value += t.amount;
-                saveData();
-                renderUI();
-                showToast("مبلغ به حساب اضافه شد");
-            }
-        }
-    }
-
-    function rejectP2P(id) {
-        const t = app.p2p.find(x => x.id === id);
-        if(t && t.status === 'pending') {
-            if(confirm("آیا این درخواست رد شود؟ مبلغی اضافه نخواهد شد.")) {
-                t.status = 'rejected';
-                // Return money to sender (conceptually, just don't add it)
-                saveData();
-                renderUI();
-                showToast("درخواست رد شد");
-            }
-        }
     }
 
     function renderUI() {
@@ -2563,7 +2524,6 @@
         }
 
         document.getElementById('userNameDisplay').innerText = app.user.name;
-        
         document.getElementById('settingsUserName').innerText = app.user.name || 'کاربر';
         document.getElementById('settingsNatId').innerText = toPersianNum(app.security.nationalId) || 'کد ملی ثبت نشده';
 
@@ -2571,20 +2531,18 @@
         document.getElementById('checkDateRow').innerHTML = createDatePickerHTML('c');
         document.getElementById('loanDateRow').innerHTML = createDatePickerHTML('l');
         
-        // --- Instruction 3: Account Number Logic (Reversed National ID) ---
-        let accNumDisplay = "۳۵۴۵ ۶۵۷۶ ۸۹۲۱ ۱۰۰۴"; // Default
-        if (app.security.nationalId && app.security.nationalId.length === 10) {
-            // Reverse the national ID string
-            const revId = app.security.nationalId.split("").reverse().join("");
-            accNumDisplay = revId.substring(0,4) + " " + revId.substring(4,7) + " " + revId.substring(7,10);
-        }
-        document.getElementById('cardAccountNumber').innerText = toPersianNum(accNumDisplay);
+        // Update Card Number based on National ID Reverse
+        const calculatedAcc = calculateAccountNumber();
+        // Format as xxxx xxxx xxxx xxxx (10 digits only? instruction says 10 digits reverse of nat id)
+        // Let's format nicely: 2372 650 203
+        const formattedAcc = calculatedAcc.replace(/(\d{4})(\d{3})(\d{3})/, "$1 $2 $3");
+        document.getElementById('cardAccountNumber').innerText = toPersianNum(formattedAcc);
 
         renderWallets();
         renderDebts();
         renderChecks(); 
         renderLoans();
-        renderP2P(); // New render
+        renderP2P(); // New Function
         renderBudgets(distributableNet); 
         renderGoals();
         renderShop();
@@ -3742,6 +3700,7 @@
         renderPriorityTiers();
         document.getElementById('newTierForm').style.display = 'none';
         
+        // Show add button only if < 100%
         const lastTier = app.priorityTiers[app.priorityTiers.length-1];
         const currentCap = lastTier ? lastTier.end : 0;
         document.getElementById('addTierBtn').style.display = currentCap >= 100 ? 'none' : 'block';
@@ -3792,6 +3751,7 @@
         saveData();
         renderPriorityTiers();
         
+        // Check if finished
         if (end < 100) {
              showAddTierForm(); 
         } else {
@@ -4087,7 +4047,6 @@
 
             let tableHTML = `
             <style>td,th{border:1px solid #000; padding:5px; font-family:'Tahoma'; text-align:center;}</style>
-            
             <h3>خلاصه وضعیت فعلی</h3>
             <table>
                 <tr style="background:#ddd"><th>نام کاربر</th><th>موجودی کل</th><th>بدهی کل</th><th>تاریخ گزارش</th></tr>
@@ -4099,7 +4058,6 @@
                 </tr>
             </table>
             <br>
-
             <h3>تاریخچه تراکنش‌های بودجه</h3>
             <table>
                 <tr style="background:#a78bfa; color:white;">
@@ -4113,7 +4071,7 @@
                             <td>${h.date}</td>
                             <td>${h.time}</td>
                             <td>${h.type === 'expense' ? 'هزینه' : (h.type === 'deposit' ? 'واریز' : 'انتقال')}</td>
-                            <td style="mso-number-format:'0'">${toEn(h.amount)}</td> 
+                            <td style="mso-number-format:'0'">${toEn(h.amount)}</td>
                             <td>${b.name}</td>
                             <td>${h.reason}</td>
                         </tr>`;
@@ -4250,7 +4208,7 @@
                     if(app.distributedAmount === undefined) app.distributedAmount = 0;
                     if(!app.security.nationalId) app.security.nationalId = "";
                     if(!app.dailyLogs) app.dailyLogs = [];
-                    if(!app.p2p) app.p2p = [];
+                    if(!app.p2p) app.p2p = []; // Ensure P2P array exists
                     
                     app.budgets.forEach(b => { 
                         if(!b.history) b.history = []; if(b.manualAdd === undefined) b.manualAdd = 0; if(b.isPaused === undefined) b.isPaused = false; if(b.savedPercent === undefined) b.savedPercent = 0; if(!b.subs) b.subs = []; if(!b.internalDebt) b.internalDebt = [];
@@ -4348,8 +4306,7 @@
             && i.id !== 'heBudgetId' && i.id !== 'heHistIndex' && i.id !== 'heType'
             && i.id !== 'setupNameInput' && i.id !== 'setupNatId' && i.id !== 'setupSecurityA'
             && i.id !== 'tierEndInput' && i.id !== 'histSearchInput'
-            && i.id !== 'btDestInput' && i.id !== 'btAmountInput' && i.id !== 'btPinInput'
-            && i.id !== 'p2pName' && i.id !== 'p2pAcc' && i.id !== 'p2pAmount' && i.id !== 'p2pMode') {
+            && i.id !== 'p2pDestInput' && i.id !== 'p2pAmountInput') { // Clean inputs
                 i.value = '';
             }
         });
