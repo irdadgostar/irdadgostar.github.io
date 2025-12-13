@@ -1,3 +1,4 @@
+
 <!DOCTYPE html> 
 <html lang="fa" dir="rtl">
 <head>
@@ -896,12 +897,12 @@
 <!-- 2. MAIN APP -->
 <div class="container" id="appContent" style="display:none;">
 
-    <!-- Header -->
+    <!-- Header (Inst 4: Removed Title, Added Date) -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-top: 10px;">
         <div>
-            <h2 style="margin:0; color:var(--primary); font-weight:900; font-size:1.6rem;">مدیریت سرمایه</h2>
+            <!-- Removed Title as per Inst 4 -->
             <div style="display:flex; align-items:center; gap:8px; margin-top:5px;">
-                <span style="font-size:0.85rem; color:var(--text-sec); font-weight:500;" id="headerDate">---</span>
+                <span style="font-size:1.1rem; color:var(--primary); font-weight:800;" id="headerDate">---</span>
                 <span style="font-size:0.75rem; background:rgba(16,185,129,0.1); color:var(--success); padding:3px 8px; border-radius:8px; font-weight:bold;" id="daysPassedLabel">روز ۰</span>
             </div>
         </div>
@@ -1246,7 +1247,7 @@
     </div>
 </div>
 
-<!-- Receipt Modal -->
+<!-- Receipt Modal (Modified Inst 2) -->
 <div id="receiptModal" class="modal">
     <div class="modal-content" style="text-align:center;">
         <h3>رسید تراکنش</h3>
@@ -1255,6 +1256,7 @@
             <!-- Receipt Node Rendered Here -->
         </div>
         <button class="btn btn-primary" style="width:100%" onclick="downloadReceipt()"><i class="fas fa-download"></i> دانلود رسید</button>
+        <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="shareReceipt()">اشتراک گذاری متن</button>
         <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="closeAllModals()">بستن</button>
     </div>
 </div>
@@ -1444,8 +1446,8 @@
         <input type="text" id="recNatId" inputmode="numeric" placeholder="کد ملی خود را وارد کنید">
         <label>کد بازیابی (PUK):</label>
         <input type="text" id="recPuk" placeholder="کد ۸ رقمی PUK" inputmode="numeric">
-        <label>رمز عبور جدید:</label>
-        <input type="password" id="recNewPass" placeholder="رمز جدید...">
+        <label>رمز عبور جدید (۴ رقم):</label>
+        <input type="password" id="recNewPass" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="رمز جدید...">
         
         <div style="margin-top:25px; display:flex; gap:12px;">
             <button class="btn btn-primary" style="flex:1" onclick="checkRecovery()">بازیابی اکانت</button>
@@ -1708,11 +1710,7 @@
     <div class="modal-content">
         <h3>مدیریت هوشمند اولویت‌ها</h3>
         <p style="font-size:0.85rem; color:var(--text-sec); margin-bottom:15px;">
-            سیستم برای کاهش خودکار، از <b>بالاترین عدد (مثلاً ۱۰)</b> شروع می‌کند.
-            <br>
-            <span style="color:var(--success)">عدد ۱ = حیاتی (آخرین گزینه حذف)</span>
-            <br>
-            <span style="color:var(--danger)">عدد بالا = غیرضروری (اولین گزینه حذف)</span>
+            اولویت‌ها به صورت خودکار بر اساس سقف درصد تعیین می‌شوند.
         </p>
         
         <div id="tierListContainer"></div>
@@ -2128,6 +2126,7 @@
         const newPass = document.getElementById('recNewPass').value.trim();
 
         if(!natId || !puk || !newPass) return alert("همه فیلدها الزامی است");
+        if(!/^\d{4}$/.test(newPass)) return alert("رمز جدید باید ۴ رقم عددی باشد."); // Inst 8
 
         toggleLoading(true);
         
@@ -2158,7 +2157,7 @@
         }
     }
 
-    // Inst 11: Change Password
+    // Inst 11: Change Password (Corrected Logic)
     function changePassword() {
         openUniversalInput("تغییر رمز عبور", "رمز عبور فعلی (۴ رقم):", false, (oldPass) => {
             if(oldPass !== app.security.password) return alert("رمز عبور فعلی اشتباه است.");
@@ -2358,6 +2357,7 @@
             content.innerHTML = `
                 <h3>مبلغ انتقال</h3>
                 <p style="color:var(--text-sec); font-size:0.85rem; margin-bottom:10px;">به مقصد: ${toPersianNum(cleanDest)}</p>
+                <div style="text-align:center; margin-bottom:5px; font-weight:bold; font-size:1.3rem; color:var(--primary);" id="btAmountDisplay">۰</div>
                 <div class="money-input-wrapper">
                     <input type="text" id="btAmountInput" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="۰">
                     <span class="money-unit currency-text">${document.getElementById('currBtnText').innerText}</span>
@@ -2561,6 +2561,20 @@
             showToast("رسید ذخیره شد");
         });
     }
+    
+    function shareReceipt() {
+        const el = document.getElementById('finalReceipt');
+        const text = el.innerText;
+        if (navigator.share) {
+            navigator.share({
+                title: 'رسید تراکنش',
+                text: text
+            }).catch(console.error);
+        } else {
+            navigator.clipboard.writeText(text);
+            showToast("متن رسید کپی شد");
+        }
+    }
 
     // Inst 8: Render Transfers (Modified)
     function renderTransfers() {
@@ -2671,6 +2685,9 @@
         } else {
              document.getElementById('daysPassedLabel').innerText = `روز ۱`;
         }
+        
+        // Inst 4: Header Date
+        document.getElementById('headerDate').innerText = toPersianNum(new Date().toLocaleDateString('fa-IR'));
 
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
         
@@ -4473,7 +4490,7 @@
                     options: { responsive: true, maintainAspectRatio: false }
                 });
                 
-const hTab = document.getElementById('printHistoryTable');
+                const hTab = document.getElementById('printHistoryTable');
                 hTab.innerHTML = logs.map(l => `<tr><td>${toPersianNum(l.date)}</td><td>${format(l.net)}</td><td>${format(l.spent)}</td></tr>`).join('');
             }
             
