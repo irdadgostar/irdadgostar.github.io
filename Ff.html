@@ -1,3 +1,4 @@
+ 
 <!DOCTYPE html> 
 <html lang="fa" dir="rtl">
 <head>
@@ -623,6 +624,30 @@
         .bg-green-highlight { background: rgba(16, 185, 129, 0.1) !important; border: 1px solid var(--success) !important; }
         .status-overdue { border: 2px solid var(--danger); background: rgba(239, 68, 68, 0.05); }
         .status-due { border: 2px solid var(--success); background: rgba(16, 185, 129, 0.05); }
+        
+        /* Accordion Styles for Debts */
+        .debt-details {
+            display: none;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(0,0,0,0.1);
+            animation: slideDown 0.3s ease-out;
+        }
+        .debt-details.active { display: block; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .installment-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px; border-radius: 8px; margin-bottom: 5px;
+            font-size: 0.85rem; background: rgba(255,255,255,0.5);
+        }
+        .inst-status-paid { color: var(--success); }
+        .inst-status-pending { color: var(--text-sec); }
+        .inst-status-overdue { color: var(--danger); font-weight: bold; }
+        .inst-status-near { color: var(--warning); font-weight: bold; }
+        
+        .anim-near { animation: pulse-yellow 2s infinite; }
+        .anim-overdue { animation: pulse-red 1.5s infinite; }
 
         /* --- Template Chips --- */
         .template-row { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; margin-bottom: 10px; scrollbar-width: none; }
@@ -821,27 +846,6 @@
         .ts-approved { background: #dcfce7; color: #166534; }
         .ts-rejected { background: #fee2e2; color: #991b1b; }
 
-        /* Accordion for Debts */
-        .accordion-content {
-            display: none;
-            padding: 10px;
-            background: rgba(0,0,0,0.02);
-            border-radius: 0 0 12px 12px;
-            margin-top: -12px;
-            border-top: 1px dashed rgba(0,0,0,0.1);
-        }
-        .accordion-active {
-            display: block;
-            animation: slideDown 0.3s ease-out;
-        }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .episode-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 0.85rem;
-        }
-        .episode-row:last-child { border-bottom: none; }
-
     </style>
 </head>
 <body>
@@ -874,7 +878,6 @@
              <input type="text" id="loginNatId" inputmode="numeric" pattern="[0-9]*" maxlength="10" placeholder="کد ملی خود را وارد کنید">
              <label class="auth-label">رمز عبور (۴ رقم):</label>
              <input type="password" id="loginPass" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="رمز عبور...">
-             <div id="loginAttemptMsg" style="color:var(--danger); font-size:0.8rem; margin-bottom:10px; display:none;"></div>
              <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="processLogin()">ورود</button>
              <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="resetAuthView()">بازگشت</button>
              <!-- Instruction 1: Forgot Password Button -->
@@ -1187,7 +1190,7 @@
 
             <div class="settings-group-title">امنیت</div>
             <div class="settings-group">
-                <div class="settings-item" onclick="changePassword()">
+                <div class="settings-item" onclick="openChangePasswordModal()">
                     <div style="display:flex; align-items:center;">
                         <div class="settings-item-icon si-orange"><i class="fas fa-key"></i></div>
                         <div class="settings-text">تغییر رمز ورود</div>
@@ -1393,25 +1396,6 @@
     </div>
 </div>
 
-<!-- Change Password Modal (Instruction 6) -->
-<div id="changePassSpecificModal" class="modal">
-    <div class="modal-content">
-        <h3>تغییر رمز عبور</h3>
-        <p style="font-size:0.9rem; color:var(--text-sec); margin-bottom:15px;">لطفاً رمز عبور فعلی و جدید خود را وارد کنید (فقط عدد ۴ رقمی).</p>
-        
-        <label>رمز فعلی:</label>
-        <input type="password" id="cpOldPass" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="****" style="text-align:center;">
-        
-        <label>رمز جدید:</label>
-        <input type="password" id="cpNewPass" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="****" style="text-align:center;">
-        
-        <div style="margin-top:25px; display:flex; gap:12px;">
-            <button class="btn btn-primary" style="flex:1" onclick="performChangePassword()">تغییر رمز</button>
-            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
-        </div>
-    </div>
-</div>
-
 <!-- Sub-Budget Manager -->
 <div id="subBudgetModal" class="modal">
     <div class="modal-content">
@@ -1494,6 +1478,25 @@
     </div>
 </div>
 
+<!-- Change Password Modal (Instruction 6) -->
+<div id="changePassModal" class="modal">
+    <div class="modal-content">
+        <h3>تغییر رمز عبور</h3>
+        <p style="color:var(--text-sec); font-size:0.9rem; margin-bottom:15px;">رمز عبور باید دقیقاً ۴ رقم عددی باشد.</p>
+        
+        <label>رمز عبور قدیمی:</label>
+        <input type="password" id="cpOldPass" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="****">
+        
+        <label>رمز عبور جدید:</label>
+        <input type="password" id="cpNewPass" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="****">
+        
+        <div style="margin-top:25px; display:flex; gap:12px;">
+            <button class="btn btn-primary" style="flex:1" onclick="submitChangePassword()">تغییر رمز</button>
+            <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">انصراف</button>
+        </div>
+    </div>
+</div>
+
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h3><i class="fas fa-edit"></i> ویرایش آیتم</h3>
@@ -1556,43 +1559,44 @@
     </div>
 </div>
 
-<!-- Instruction 3 & 4: Enhanced Debt Modal -->
+<!-- Debt Modal (Modified for Instruction 3, 4, 5) -->
 <div id="debtModal" class="modal">
     <div class="modal-content">
-        <h3>افزودن اقساط ماهانه</h3>
-        <label>عنوان وام/قسط:</label>
+        <h3>افزودن قسط ثابت</h3>
+        <label>عنوان قسط:</label>
         <input type="text" id="dName" placeholder="مثلاً: وام مسکن">
-        
         <label>مبلغ هر قسط:</label>
         <div class="money-input-wrapper">
             <input type="text" id="dVal" onkeyup="formatCurrency(this)" inputmode="numeric" placeholder="۰">
             <span class="money-unit currency-text">تومان</span>
         </div>
         
-        <!-- Instruction 4: Start and End/Count -->
-        <label>تاریخ اولین قسط:</label>
-        <div class="date-picker-row" id="debtStartDateRow"></div>
-        
-        <label>تعداد کل اقساط (ماه):</label>
-        <input type="number" id="dCount" inputmode="numeric" placeholder="مثلا ۱۲">
-        
-        <!-- Instruction 5: Penalty -->
-        <label>درصد جریمه دیرکرد (اختیاری):</label>
-        <input type="number" id="dPenalty" inputmode="numeric" placeholder="مثلا ۲">
+        <div style="display:flex; gap:10px;">
+            <div style="flex:1;">
+                <label>تاریخ اولین قسط:</label>
+                <div class="date-picker-row" id="debtStartDateRow"></div>
+            </div>
+            <div style="flex:1;">
+                <label>تعداد اقساط (ماه):</label>
+                <input type="number" id="dCount" placeholder="مثلاً ۱۲" style="text-align:center;">
+            </div>
+        </div>
 
-        <!-- Instruction 3: Source Selection Logic -->
+        <label>درصد جریمه دیرکرد (%):</label>
+        <input type="number" id="dLateFee" placeholder="مثلاً ۵" style="text-align:center;">
+
         <label class="checkbox-wrapper" style="margin-top:15px;">
             <input type="checkbox" id="dDeduct" checked onchange="toggleDebtSourceSelect()">
-            <span style="font-size:0.9rem;">کسر از موجودی سیستم (تعیین منابع)</span>
+            <span style="font-size:0.9rem;">کسر از موجودی سیستم (هوشمند)</span>
         </label>
         
-        <div id="debtSourceWrapper" style="display:block; background:rgba(0,0,0,0.03); padding:10px; border-radius:12px; margin-bottom:15px;">
-             <p style="font-size:0.8rem; color:var(--text-sec); margin-top:0;">سقف برداشت از هر کیف پول برای هر قسط:</p>
-             <div id="debtWalletList" style="max-height:150px; overflow-y:auto;"></div>
+        <div id="debtSourceSelect" style="display:block; background:rgba(0,0,0,0.03); padding:10px; border-radius:12px; margin-bottom:15px;">
+            <p style="font-size:0.8rem; color:var(--text-sec); margin-top:0;">تعیین سقف برداشت از هر کیف پول:</p>
+            <div id="debtWalletList" style="max-height:150px; overflow-y:auto;"></div>
         </div>
         
         <div style="margin-top:25px; display:flex; gap:12px;">
-            <button class="btn btn-primary" style="flex:1" onclick="addDebt()">ثبت اقساط</button>
+            <button class="btn btn-primary" style="flex:1" onclick="addDebt()">ثبت</button>
             <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
         </div>
     </div>
@@ -1610,10 +1614,16 @@
         </div>
         <label>تاریخ سررسید:</label>
         <div class="date-picker-row" id="checkDateRow"></div>
+        
         <label class="checkbox-wrapper" style="margin-top:15px;">
-            <input type="checkbox" id="cDeduct" checked>
-            <span style="font-size:0.9rem;">کسر از موجودی کل حساب سیستم</span>
+            <input type="checkbox" id="cDeduct" checked onchange="toggleCheckSourceSelect()">
+            <span style="font-size:0.9rem;">کسر از موجودی سیستم (هوشمند)</span>
         </label>
+
+        <div id="checkSourceSelect" style="display:block; background:rgba(0,0,0,0.03); padding:10px; border-radius:12px; margin-bottom:15px;">
+            <p style="font-size:0.8rem; color:var(--text-sec); margin-top:0;">تعیین سقف برداشت از هر کیف پول:</p>
+            <div id="checkWalletList" style="max-height:150px; overflow-y:auto;"></div>
+        </div>
         
         <div style="margin-top:25px; display:flex; gap:12px;">
             <button class="btn btn-primary" style="flex:1" onclick="addCheck()">ثبت</button>
@@ -1845,7 +1855,7 @@
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzLum9qk7WmBan9jNI7HhS5Jjq-rc9h0i7p2bTxm2kF1FOpjyaYEwNJ5Pu5C7sC6ymt/exec";
 
     const defaultState = {
-        security: { hasPin: false, pin: "", isSetup: false, questionId: 0, answer: "", nationalId: "" },
+        security: { hasPin: false, pin: "", isSetup: false, questionId: 0, answer: "", nationalId: "", loginAttempts: 0, changePassAttempts: 0 },
         user: { name: "", theme: "light", currency: "toman", startDate: Date.now() },
         settings: { globalDeduct: true }, 
         wallets: [],
@@ -1885,10 +1895,6 @@
     let myChart1 = null; 
     let myChart2 = null; 
     let isBalanceHidden = false;
-    
-    // Instruction 7: Login Attempts
-    let failedLoginAttempts = 0;
-    let failedChangePassAttempts = 0;
 
     // --- Helper Function for Google API ---
     async function googleApi(funcName, ...args) {
@@ -1983,9 +1989,8 @@
     }
 
     function setupDatePickers() { 
-        document.getElementById('debtStartDateRow').innerHTML = createDatePickerHTML('ds');
+        document.getElementById('debtStartDateRow').innerHTML = createDatePickerHTML('dStart');
     }
-
     function createDatePickerHTML(prefix, defaultD=1, defaultM=1, defaultY=1403) {
         return `<select id="${prefix}Day" class="date-sel">${genOpts(1,31, defaultD)}</select>
                 <select id="${prefix}Month" class="date-sel">${genOpts(1,12, defaultM)}</select>
@@ -2036,6 +2041,7 @@
 
         const targetNum = parseInt(yStr + (mStr.length<2?'0'+mStr:mStr) + (dStr.length<2?'0'+dStr:dStr)); 
         
+        // Get Today in Persian
         const today = new Date().toLocaleDateString('fa-IR-u-nu-latn').split('/');
         const ty = today[0];
         const tm = today[1].length === 1 ? '0'+today[1] : today[1];
@@ -2043,26 +2049,6 @@
         const todayNum = parseInt(ty + tm + td);
         
         return targetNum - todayNum; // Negative = Past, 0 = Today, Positive = Future
-    }
-
-    function addMonthsToDate(startDateStr, monthsToAdd) {
-        // Input: 1403/01/01
-        const parts = startDateStr.split('/');
-        const normalize = (s) => parseInt(s.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
-        let y = normalize(parts[0]);
-        let m = normalize(parts[1]);
-        let d = normalize(parts[2]);
-        
-        // Add months
-        m += monthsToAdd;
-        while (m > 12) {
-            m -= 12;
-            y += 1;
-        }
-        
-        const mStr = m < 10 ? '0' + m : m;
-        const dStr = d < 10 ? '0' + d : d;
-        return toPersianNum(`${y}/${mStr}/${dStr}`);
     }
 
     // --- NEW AUTHENTICATION LOGIC ---
@@ -2082,7 +2068,6 @@
         
         document.getElementById('loginNatId').value = '';
         document.getElementById('loginPass').value = '';
-        document.getElementById('loginAttemptMsg').style.display = 'none';
     }
 
     function showLoginForm() {
@@ -2175,20 +2160,21 @@
         showLoginForm();
     }
 
-    // Instruction 7: Enhanced Security on Login
+    // Instruction 7: Login Security
     function processLogin() {
-        if (failedLoginAttempts >= 3) {
-            alert("به دلیل تلاش‌های ناموفق بیش از حد، حساب شما موقتاً قفل شده است. لطفاً بازیابی کنید.");
-            startRecovery();
-            return;
-        }
-
         const natId = document.getElementById('loginNatId').value.trim();
         const pass = document.getElementById('loginPass').value;
-        const msgBox = document.getElementById('loginAttemptMsg');
         
         if(!isValidIranianNationalId(natId)) return alert("کد ملی نامعتبر است");
         if(!/^\d{4}$/.test(pass)) return alert("رمز عبور باید ۴ رقم باشد");
+
+        // Check local attempts first (if stored)
+        let attempts = parseInt(localStorage.getItem('loginAttempts_' + natId) || 0);
+        if (attempts >= 3) {
+            alert("حساب شما به دلیل تلاش‌های ناموفق قفل شده است. لطفاً بازیابی کنید.");
+            startRecovery();
+            return;
+        }
 
         toggleLoading(true);
         
@@ -2196,10 +2182,7 @@
         .then(response => {
             toggleLoading(false);
             if(response.success) {
-                // Success - Reset attempts
-                failedLoginAttempts = 0;
-                msgBox.style.display = 'none';
-                
+                localStorage.setItem('loginAttempts_' + natId, 0); // Reset on success
                 const cloudData = response.userData.appData;
                 const securityData = response.userData.security;
                 
@@ -2213,17 +2196,13 @@
                 renderUI();
                 showToast("خوش آمدید", "user-check");
             } else {
-                // Fail
-                failedLoginAttempts++;
-                const remaining = 3 - failedLoginAttempts;
-                msgBox.style.display = 'block';
-                if(remaining > 0) {
-                    msgBox.innerText = `رمز عبور اشتباه است. ${toPersianNum(remaining)} فرصت باقی‌مانده.`;
-                    alert(response.message);
-                } else {
-                    msgBox.innerText = `حساب قفل شد. لطفاً بازیابی کنید.`;
-                    alert("حساب شما قفل شد. لطفاً از طریق گزینه بازیابی رمز عبور اقدام کنید.");
+                attempts++;
+                localStorage.setItem('loginAttempts_' + natId, attempts);
+                if (attempts >= 3) {
+                    alert("رمز عبور ۳ بار اشتباه وارد شد. حساب قفل گردید.");
                     startRecovery();
+                } else {
+                    alert(`رمز عبور اشتباه است. (${3 - attempts} فرصت باقی‌مانده)`);
                 }
             }
         })
@@ -2245,6 +2224,7 @@
     }
 
     function startRecovery() {
+        closeAllModals();
         openModal('recoveryModal');
     }
     
@@ -2263,8 +2243,8 @@
         .then(response => {
             toggleLoading(false);
             if(response.success) {
+                localStorage.setItem('loginAttempts_' + natId, 0); // Reset lock
                 alert(response.message);
-                failedLoginAttempts = 0; // Reset logic lock
                 closeAllModals();
                 showLoginForm();
             } else {
@@ -2286,34 +2266,35 @@
         }
     }
 
-    // Instruction 6: Change Password Logic (Modified - Specific Modal)
-    function changePassword() {
-        failedChangePassAttempts = 0; // Reset specific counter for this session
+    // Instruction 6: Change Password Logic (Modified)
+    function openChangePasswordModal() {
         document.getElementById('cpOldPass').value = '';
         document.getElementById('cpNewPass').value = '';
-        openModal('changePassSpecificModal');
+        openModal('changePassModal');
     }
 
-    function performChangePassword() {
+    function submitChangePassword() {
         const oldPass = document.getElementById('cpOldPass').value;
         const newPass = document.getElementById('cpNewPass').value;
 
-        if(!/^\d{4}$/.test(oldPass)) return alert("رمز فعلی باید ۴ رقم عددی باشد.");
-        if(!/^\d{4}$/.test(newPass)) return alert("رمز جدید باید ۴ رقم عددی باشد.");
+        if(!/^\d{4}$/.test(oldPass) || !/^\d{4}$/.test(newPass)) {
+            return alert("رمز عبور باید دقیقاً ۴ رقم عددی باشد.");
+        }
 
         if(oldPass !== app.security.password) {
-            failedChangePassAttempts++;
-            if(failedChangePassAttempts >= 3) {
-                 alert("شما ۳ بار رمز را اشتباه وارد کردید. سیستم قفل شد. لطفاً بازیابی کنید.");
-                 closeAllModals();
-                 logout(); // Force logout to recovery
-                 return;
+            app.security.changePassAttempts = (app.security.changePassAttempts || 0) + 1;
+            if(app.security.changePassAttempts >= 3) {
+                alert("تعداد تلاش‌های ناموفق بیش از حد مجاز است. حساب قفل شد.");
+                closeAllModals();
+                logout(); // Force logout/recovery
+                return;
             }
-            alert(`رمز فعلی اشتباه است. (${toPersianNum(3 - failedChangePassAttempts)} فرصت باقی‌مانده)`);
+            alert(`رمز عبور فعلی اشتباه است. (${3 - app.security.changePassAttempts} فرصت باقی‌مانده)`);
             return;
         }
 
         app.security.password = newPass;
+        app.security.changePassAttempts = 0;
         saveData();
         closeAllModals();
         showToast("رمز عبور با موفقیت تغییر کرد");
@@ -2471,7 +2452,7 @@
         }
     }
 
-    // Inst 1 & 2: Enhanced Transfer Logic (Fixed Back Button)
+    // Inst 1: Enhanced Transfer Logic (Fix Back Button)
     function openBankTransfer(e) {
         e.stopPropagation();
         if(isGuestMode) return alert("در حالت مهمان امکان انتقال وجه وجود ندارد."); 
@@ -2509,7 +2490,7 @@
             if(cleanDest.length !== 10) return alert("شماره حساب باید دقیقاً ۱۰ رقم و عددی باشد.");
             app.wizardState.dest = cleanDest;
             
-            // Render Step 2 (Amount)
+            // Render Step 2
             content.innerHTML = `
                 <h3>مبلغ انتقال</h3>
                 <p style="color:var(--text-sec); font-size:0.85rem; margin-bottom:10px;">به مقصد: ${toPersianNum(cleanDest)}</p>
@@ -2530,7 +2511,7 @@
             app.wizardState.amount = amt;
             app.wizardState.amountDisplay = amtVal;
             
-            // Render Step 3 (Wallet Selection) - Instruction 2: "Back" button should work
+            // Instruction 2: Fix Back Button Logic
             let walletsHtml = '';
             app.wallets.forEach((w, idx) => {
                 walletsHtml += `
@@ -2553,7 +2534,6 @@
                 <div style="max-height:200px; overflow-y:auto;">${walletsHtml}</div>
                 
                 <div style="display:flex; gap:10px; margin-top:10px;">
-                    <!-- Corrected Back Button for Inst 2 -->
                     <button class="btn btn-outline" style="flex:1" onclick="bankTransferNext(1)">بازگشت</button>
                     <button class="btn btn-primary" style="flex:1" onclick="bankTransferNext(3)">تایید و ادامه</button>
                 </div>
@@ -2585,7 +2565,7 @@
              const mockName = "کاربر مهمان (تست)";
              const dest = app.wizardState.dest;
 
-             // Inst 2: "Cancel" button in final confirmation needs to be corrected
+             // Instruction 2: Fix Cancel Button Logic
              content.innerHTML = `
                 <h3>تایید نهایی</h3>
                 <div style="background:rgba(0,0,0,0.03); padding:15px; border-radius:12px; margin-bottom:15px; text-align:center;">
@@ -2599,8 +2579,7 @@
                 <input type="password" id="btPinInput" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="****" style="text-align:center;">
                 
                 <div style="display:flex; gap:10px;">
-                    <!-- Corrected Cancel Button for Inst 2 (Goes back to step 2 selection) -->
-                    <button class="btn btn-outline" style="flex:1" onclick="bankTransferNext(2)">لغو / بازگشت</button>
+                    <button class="btn btn-outline" style="flex:1" onclick="bankTransferNext(2)">لغو</button>
                     <button class="btn btn-primary" style="flex:1" onclick="bankTransferCheckPin()">تایید نهایی</button>
                 </div>
             `;
@@ -2614,7 +2593,7 @@
             let val = inp.value.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[^0-9]/g, '');
             if(val) {
                 total += parseInt(val);
-                inp.value = parseInt(val).toLocaleString('en-US'); 
+                inp.value = parseInt(val).toLocaleString('en-US'); // Simple format
             }
         });
         const req = app.wizardState.amount;
@@ -2668,16 +2647,13 @@
         }, 1500);
     }
 
-    // Instruction 2 & 1: Graphical Receipt with User Name
+    // Instruction 2: Graphical Receipt
     function showReceipt(success, amount, sourceAcc, sourceName, destAcc, destName) {
         closeAllModals();
         const container = document.getElementById('receiptContainer');
         const statusClass = success ? 'status-success' : 'status-fail';
         const statusText = success ? 'موفق' : 'ناموفق';
         const color = success ? '#059669' : '#dc2626';
-
-        // Ensure Source Name is current App User Name
-        const realSourceName = app.user.name || sourceName;
 
         container.innerHTML = `
             <div class="receipt-card" id="finalReceipt">
@@ -2693,7 +2669,7 @@
                 </div>
                 <div class="receipt-row">
                     <span class="receipt-label">نام فرستنده</span>
-                    <span class="receipt-val">${realSourceName}</span>
+                    <span class="receipt-val">${sourceName}</span>
                 </div>
                  <hr style="border:0; border-top:1px dashed #eee; margin:10px 0;">
                 <div class="receipt-row">
@@ -2799,10 +2775,14 @@
                  wIdx = parseInt(val);
              }
              
+             const amount = app.transfers[tIndex].amount;
              app.transfers[tIndex].status = 'approved';
-             app.wallets[wIdx].value += app.transfers[tIndex].amount;
+             app.wallets[wIdx].value += amount;
              app.transfers[tIndex].details = `واریز به: ${app.wallets[wIdx].name}`;
              
+             // Instruction 3: Trigger Auto Deduction
+             checkAutoDeductions(wIdx, amount);
+
              saveData(); renderUI(); showToast("مبلغ به کیف پول افزوده شد");
         }, true);
     }
@@ -2826,6 +2806,7 @@
         
         document.getElementById('globalDeductCheck').checked = (app.settings && app.settings.globalDeduct !== false);
 
+        // Inst 3: Fix Day Counter
         if(app.meta && app.meta.created_at) {
             const start = new Date(app.meta.created_at).getTime();
             const now = Date.now();
@@ -2838,26 +2819,16 @@
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
         
         const currentMonth = getCurMonth();
-        // Updated Debt calculation logic based on instruction 3 & 4 (episodes)
-        let totalDebtCalc = 0;
-        app.debts.forEach(d => {
-             // Calculate remaining debt from episodes
-             if(d.episodes) {
-                 d.episodes.forEach(ep => {
-                     if(ep.status !== 'paid') totalDebtCalc += d.installmentAmount;
-                 });
-             } else {
-                 // Legacy support
-                 if (d.deduct !== false && d.lastPaid !== currentMonth) totalDebtCalc += d.value;
-             }
-        });
+        const fixedDebt = app.debts.reduce((a,b)=> {
+             return (b.deduct !== false && b.lastPaid !== currentMonth) ? a+b.value : a;
+        }, 0);
         
         const checkDebt = (app.checks || []).reduce((a,b)=> {
              return (!b.isPaid && b.deduct !== false) ? a+b.value : a;
         }, 0); 
         
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
-        const totalDeductibleDebt = totalDebtCalc + checkDebt;
+        const totalDeductibleDebt = fixedDebt + checkDebt;
         
         let cardNet = income - totalDeductibleDebt;
         if (cardNet < 0) cardNet = 0;
@@ -2869,8 +2840,7 @@
         const balEl = document.getElementById('totalBalance');
         if(!isBalanceHidden) balEl.innerText = format(cardNet);
 
-        // Instruction 1: Ensure User Name Display
-        document.getElementById('userNameDisplay').innerText = app.user.name || "کاربر";
+        document.getElementById('userNameDisplay').innerText = app.user.name;
         
         document.getElementById('settingsUserName').innerText = app.user.name || 'کاربر';
         document.getElementById('settingsNatId').innerText = toPersianNum(app.security.nationalId) || 'کد ملی ثبت نشده';
@@ -2892,20 +2862,17 @@
     }
 
     function showCardDetails() {
-        // ... (Logic kept same, just refreshing UI)
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
-        // Recalculate based on new structure
-        let debtVal = 0;
-        app.debts.forEach(d => {
-            if(d.episodes) {
-                d.episodes.forEach(e => { if(e.status !== 'paid') debtVal += d.installmentAmount; });
-            } else { debtVal += d.value; }
-        });
+        const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
         const checkDebt = (app.checks || []).reduce((a,b)=>!b.isPaid ? a+b.value : a, 0); 
-        const totalDebt = debtVal + checkDebt;
+        const totalDebt = fixedDebt + checkDebt;
         
         const gross = income;
-        let net = income - totalDebt;
+        
+        const currentMonth = getCurMonth();
+        const deductibleFixed = app.debts.reduce((a,b)=> (b.deduct !== false && b.lastPaid !== currentMonth) ? a+b.value : a, 0);
+        const deductibleCheck = (app.checks || []).reduce((a,b)=> (!b.isPaid && b.deduct !== false) ? a+b.value : a, 0);
+        let net = income - (deductibleFixed + deductibleCheck);
         if(net < 0) net = 0;
 
         const shoppingTotal = app.shopping.reduce((a,b) => {
@@ -2992,146 +2959,107 @@
             </div>`).join('');
     }
 
-    // Instruction 3, 4, 5: Logic to handle Source Selection
+    // Instruction 3: Toggle Source Select
     function toggleDebtSourceSelect() {
-        const check = document.getElementById('dDeduct').checked;
-        const wrapper = document.getElementById('debtSourceWrapper');
-        if (check) {
-             wrapper.style.display = 'block';
-             const list = document.getElementById('debtWalletList');
-             let html = '';
-             app.wallets.forEach((w, idx) => {
-                 html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-                     <span style="font-size:0.8rem;">${w.name}</span>
-                     <input type="number" class="debt-source-input" data-idx="${idx}" placeholder="سقف (تومان)" style="width:100px; padding:5px; font-size:0.8rem; margin:0;">
-                 </div>`;
-             });
-             if(app.wallets.length === 0) html = '<small>هیچ کیف پولی موجود نیست.</small>';
-             list.innerHTML = html;
-        } else {
-             wrapper.style.display = 'none';
-        }
+        const checked = document.getElementById('dDeduct').checked;
+        document.getElementById('debtSourceSelect').style.display = checked ? 'block' : 'none';
+        if(checked) renderSourceWallets('debtWalletList', 'dSource');
+    }
+    function toggleCheckSourceSelect() {
+        const checked = document.getElementById('cDeduct').checked;
+        document.getElementById('checkSourceSelect').style.display = checked ? 'block' : 'none';
+        if(checked) renderSourceWallets('checkWalletList', 'cSource');
     }
 
-    // Instruction 4: Accordion Render for Debts
-    function toggleAccordion(id) {
-        const el = document.getElementById('debtAcc_' + id);
-        if (el.classList.contains('accordion-active')) {
-            el.classList.remove('accordion-active');
-        } else {
-            el.classList.add('accordion-active');
-        }
+    function renderSourceWallets(containerId, prefix) {
+        const div = document.getElementById(containerId);
+        div.innerHTML = app.wallets.map((w, i) => `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span style="font-size:0.85rem;">${w.name} (${format(w.value)})</span>
+                <input type="text" class="${prefix}-input" data-idx="${i}" placeholder="سقف برداشت" style="width:100px; padding:8px; font-size:0.8rem; margin:0;" onkeyup="formatCurrency(this)">
+            </div>
+        `).join('');
     }
 
+    // Instruction 4: Render Debts with Accordion
     function renderDebts() {
         const div = document.getElementById('debtList');
         
         div.innerHTML = app.debts.map((d, i) => {
-            // New Logic for Instruction 4
-            let totalEpisodes = 0;
-            let paidCount = 0;
-            let overdueCount = 0;
-            let totalSum = 0;
-            let startDate = "---";
-            let endDate = "---";
-
-            if (d.episodes && d.episodes.length > 0) {
-                totalEpisodes = d.episodes.length;
-                startDate = d.episodes[0].date;
-                endDate = d.episodes[d.episodes.length - 1].date;
-                
-                d.episodes.forEach(ep => {
-                    totalSum += d.installmentAmount;
-                    if(ep.status === 'paid') paidCount++;
-                    else {
-                        if(compareDates(ep.date) < 0) overdueCount++;
-                    }
-                });
-            } else {
-                // Backward compatibility (should not happen for new items)
-                totalSum = d.value;
-            }
-
-            const remaining = totalEpisodes - paidCount;
-            const isFinished = (remaining === 0 && totalEpisodes > 0);
+            // Calculate Summary
+            const totalInst = d.installments ? d.installments.length : 0;
+            const paidInst = d.installments ? d.installments.filter(x => x.paid).length : 0;
+            const overdueInst = d.installments ? d.installments.filter(x => !x.paid && compareDates(x.date) < 0).length : 0;
+            const totalAmount = d.installments ? d.installments.reduce((a,b) => a + b.amount + (b.lateFee || 0), 0) : 0;
             
-            // Generate Episode HTML
-            let episodesHtml = '';
-            if(d.episodes) {
-                d.episodes.forEach((ep, epIdx) => {
-                    const diff = compareDates(ep.date);
-                    let rowClass = "";
-                    let statusLabel = "";
-                    let rowAction = "";
-                    let feeHtml = "";
+            let statusText = `${toPersianNum(paidInst)} از ${toPersianNum(totalInst)} قسط پرداخت شده`;
+            if(overdueInst > 0) statusText += ` | <span style="color:var(--danger)">${toPersianNum(overdueInst)} معوق</span>`;
 
-                    // Instruction 5: Penalty Logic
-                    let displayAmount = d.installmentAmount;
-                    if (ep.status !== 'paid' && diff < 0 && d.penaltyPercent > 0) {
-                         const penalty = Math.round((d.installmentAmount * d.penaltyPercent) / 100);
-                         displayAmount += penalty;
-                         feeHtml = `<span style="color:var(--danger); font-size:0.7rem; margin-right:5px;">(+${format(penalty)} دیرکرد)</span>`;
-                    }
-
-                    if (ep.status === 'paid') {
-                        statusLabel = `<span style="color:var(--success)">پرداخت شده (${toPersianNum(ep.paidDate)})</span>`;
-                        rowAction = `<i class="fas fa-check-circle" style="color:var(--success)"></i>`;
-                    } else {
-                        // Animation Logic (Inst 4)
-                        if (diff < 0) {
-                             statusLabel = `<span style="color:var(--danger)">معوق</span> ${feeHtml}`;
-                             rowClass = "bg-red-highlight"; // We can define this or use existing style
-                        } else if (diff === 0) {
-                             statusLabel = `<span style="color:var(--warning)">سررسید امروز</span>`;
-                        } else {
-                             statusLabel = `${toPersianNum(diff)} روز مانده`;
+            // Render Installments
+            let instHtml = "";
+            if(d.installments) {
+                d.installments.forEach((inst, idx) => {
+                    const diff = compareDates(inst.date);
+                    let stClass = "inst-status-pending";
+                    let stLabel = "در انتظار";
+                    let anim = "";
+                    
+                    // Instruction 5: Late Fee Logic
+                    let lateFeeHtml = "";
+                    if (!inst.paid && diff < 0) {
+                        stClass = "inst-status-overdue";
+                        stLabel = "معوق";
+                        anim = "anim-overdue";
+                        if(d.lateFeePercent > 0) {
+                            const fee = Math.round(inst.amount * d.lateFeePercent / 100);
+                            inst.lateFee = fee; // Update model (should save later)
+                            lateFeeHtml = `<span style="color:var(--danger); font-size:0.75rem;">+ ${format(fee)} دیرکرد</span>`;
                         }
-                        // Pay Button for specific episode
-                        rowAction = `<button class="btn-small-icon btn-check" onclick="payDebtEpisode(${i}, ${epIdx})" style="height:28px; width:28px;"><i class="fas fa-check" style="font-size:0.7rem;"></i></button>`;
+                    } else if (!inst.paid && diff === 0) {
+                        stClass = "inst-status-near";
+                        stLabel = "سررسید امروز";
+                        anim = "anim-near";
+                    } else if (!inst.paid && diff <= 3) {
+                        stClass = "inst-status-near";
+                        stLabel = "نزدیک";
+                        anim = "anim-near";
+                    } else if (inst.paid) {
+                        stClass = "inst-status-paid";
+                        stLabel = "پرداخت شده";
                     }
 
-                    episodesHtml += `
-                    <div class="episode-row">
-                        <div style="flex:1;">قسط ${toPersianNum(epIdx + 1)} - ${ep.date}</div>
-                        <div style="flex:1; text-align:center;">${statusLabel}</div>
-                        <div style="flex:1; text-align:left; font-weight:bold; display:flex; justify-content:flex-end; align-items:center; gap:5px;">
-                            ${format(displayAmount)} ${rowAction}
+                    instHtml += `
+                    <div class="installment-item ${anim}">
+                        <div>
+                            <span>قسط ${toPersianNum(idx+1)}</span>
+                            <span style="margin-right:10px; font-size:0.8rem;">${inst.date}</span>
                         </div>
+                        <div style="text-align:left;">
+                            <div>${format(inst.amount)} ${lateFeeHtml}</div>
+                            <div class="${stClass}" style="font-size:0.75rem;">${stLabel}</div>
+                        </div>
+                        ${!inst.paid ? `<button class="btn-small-icon btn-check" onclick="paySingleInstallment(${i}, ${idx})" title="پرداخت"><i class="fas fa-check"></i></button>` : '<i class="fas fa-check-circle" style="color:var(--success); margin-left:8px;"></i>'}
                     </div>`;
                 });
             }
 
-            // Main Item Status
-            let mainStatus = "";
-            let mainClass = "";
-            if (isFinished) {
-                mainStatus = "تکمیل شده";
-                mainClass = "status-success"; // Reuse check status
-            } else if (overdueCount > 0) {
-                mainStatus = `${toPersianNum(overdueCount)} قسط معوق!`;
-                mainClass = "status-overdue pulse-danger";
-            } else {
-                mainStatus = "فعال";
-            }
+            const isDeducted = (d.deduct !== false);
+            const deductIcon = isDeducted ? '<i class="fas fa-robot" title="کسر هوشمند" style="color:var(--primary); margin-right:5px; font-size:0.8rem;"></i>' : '';
 
-            return `
-            <div class="bento-item ${mainClass}" style="padding:15px; margin-bottom:15px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleAccordion(${i})">
+            return `<div style="border-bottom:1px solid #eee; padding:12px; border-radius:12px; margin-bottom:10px; background:rgba(255,255,255,0.5);">
+                <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleDebtDetails(${i})">
                     <div>
-                        <div style="font-weight:bold; font-size:1rem;">${d.name} <small style="font-weight:normal; opacity:0.7;">(${mainStatus})</small></div>
-                        <div style="font-size:0.8rem; color:var(--text-sec); margin-top:5px;">
-                            شروع: ${startDate} | پایان: ${endDate}
-                        </div>
+                        <span style="font-weight:bold;">${d.name} ${deductIcon}</span>
+                        <div style="font-size:0.8rem; margin-top:4px; color:var(--text-sec);">${statusText}</div>
                     </div>
-                    <div style="text-align:left;">
-                        <div style="font-weight:bold; color:var(--primary);">${format(totalSum)}</div>
-                        <div style="font-size:0.8rem; color:var(--text-sec);">${toPersianNum(paidCount)}/${toPersianNum(totalEpisodes)} پرداخت شده</div>
+                    <div style="display:flex; align-items:center;">
+                        <b style="color:var(--text-main); margin-left:10px;">${format(totalAmount)}</b>
+                        <i class="fas fa-chevron-down" style="color:var(--text-sec);"></i>
                     </div>
-                    <i class="fas fa-chevron-down" style="color:var(--text-sec);"></i>
                 </div>
-                <div id="debtAcc_${i}" class="accordion-content">
-                    ${episodesHtml}
-                    <div style="text-align:left; margin-top:10px;">
+                <div id="debtDetails_${i}" class="debt-details">
+                    ${instHtml}
+                    <div style="text-align:center; margin-top:10px;">
                         <button class="btn-small-icon btn-del" onclick="delDebt(${i})"><i class="fas fa-trash"></i> حذف کل وام</button>
                     </div>
                 </div>
@@ -3139,135 +3067,17 @@
         }).join('');
     }
 
-    // Instruction 3 & 4: Add Debt Logic
-    function addDebt() {
-        const n = document.getElementById('dName').value;
-        const val = parseFormatted(document.getElementById('dVal').value);
-        const count = parseInt(document.getElementById('dCount').value);
-        const penalty = parseInt(document.getElementById('dPenalty').value) || 0;
-        const deduct = document.getElementById('dDeduct').checked;
-        const startDateStr = getDateString('ds');
-
-        if(!n || !val || !count || count <= 0) return alert("لطفا مقادیر معتبر وارد کنید");
-
-        // Source Config Capture
-        let sourceConfig = [];
-        if (deduct) {
-            const inputs = document.querySelectorAll('.debt-source-input');
-            let totalCap = 0;
-            inputs.forEach(inp => {
-                const cap = parseInt(inp.value) || 0;
-                if (cap > 0) {
-                    sourceConfig.push({ walletIdx: inp.dataset.idx, limit: cap });
-                    totalCap += cap;
-                }
-            });
-            // Validation: Does source map cover installment amount?
-            // The user said: "Take 60 from Sepah, 40 from Melli... if 200 comes to Sepah, take 60."
-            // We assume the SUM of limits should allow paying the installment eventually.
-            if (totalCap < val) {
-                 if(!confirm(`مجموع سقف‌های تعیین شده (${format(totalCap)}) کمتر از مبلغ قسط (${format(val)}) است. آیا مطمئن هستید؟`)) return;
-            }
-        }
-
-        // Generate Episodes
-        let episodes = [];
-        let currDate = startDateStr;
-        for(let j=0; j<count; j++) {
-            episodes.push({
-                id: Date.now() + j,
-                date: currDate,
-                status: 'pending'
-            });
-            currDate = addMonthsToDate(currDate, 1);
-        }
-
-        const newDebt = {
-            name: n,
-            installmentAmount: val,
-            count: count,
-            startDate: startDateStr,
-            penaltyPercent: penalty,
-            deduct: deduct,
-            sourceConfig: sourceConfig,
-            episodes: episodes,
-            totalValue: val * count // For stats
-        };
-
-        saveSectionSnap('dashboard', `افزودن وام ${n}`);
-        app.debts.push(newDebt);
-        saveData(); renderUI(); closeAllModals();
+    function toggleDebtDetails(i) {
+        const el = document.getElementById(`debtDetails_${i}`);
+        if(el.classList.contains('active')) el.classList.remove('active');
+        else el.classList.add('active');
     }
 
-    // Instruction 3: Payment Logic using Pre-defined Source
-    function payDebtEpisode(debtIdx, epIdx) {
-        if(!confirm("آیا پرداخت این قسط را تایید می‌کنید؟")) return;
-        
-        const debt = app.debts[debtIdx];
-        const episode = debt.episodes[epIdx];
-        
-        let amountToPay = debt.installmentAmount;
-        // Check penalty
-        const diff = compareDates(episode.date);
-        if(diff < 0 && debt.penaltyPercent > 0) {
-            amountToPay += Math.round((debt.installmentAmount * debt.penaltyPercent) / 100);
+    function paySingleInstallment(debtIdx, instIdx) {
+        if(confirm("آیا پرداخت این قسط را تایید می‌کنید؟")) {
+            app.debts[debtIdx].installments[instIdx].paid = true;
+            saveData(); renderUI(); showToast("قسط پرداخت شد");
         }
-
-        // If deduct is enabled, use sourceConfig
-        if (debt.deduct && debt.sourceConfig && debt.sourceConfig.length > 0) {
-            // Check wallet balances according to plan
-            let canPay = true;
-            let deductionLog = []; // To commit only if all success (or handle partial)
-            
-            // Logic: The user defined "Caps". We need to find `amountToPay` from these caps.
-            // Wait, the instruction says: "Determines which wallet... e.g. 60 from Sepah. If money comes... it takes."
-            // This implies a strict mapping. We will try to deduct strictly based on the map.
-            
-            // However, `sourceConfig` usually defines a distribution. E.g. 60% Sepah, 40% Melli? Or fixed amounts?
-            // The instruction example: "100k debt -> 60k Sepah, 40k Melli". 
-            // So we iterate config.
-            
-            let paidSoFar = 0;
-            let tempWallets = JSON.parse(JSON.stringify(app.wallets)); // Simulation
-
-            for (let sc of debt.sourceConfig) {
-                const wIdx = parseInt(sc.walletIdx);
-                const limit = sc.limit; // This is the amount for THIS installment from THIS wallet
-                
-                // Safety check
-                if (tempWallets[wIdx].value < limit) {
-                     alert(`موجودی کیف پول "${tempWallets[wIdx].name}" کافی نیست. (نیاز: ${format(limit)}، موجود: ${format(tempWallets[wIdx].value)})`);
-                     canPay = false;
-                     break;
-                }
-                
-                tempWallets[wIdx].value -= limit;
-                deductionLog.push({ wIdx: wIdx, amt: limit });
-                paidSoFar += limit;
-            }
-
-            if (!canPay) return;
-
-            if (paidSoFar < amountToPay) {
-                // If the config covers less than the total (maybe penalty added?)
-                // We ask user or fail. Let's assume user must cover remainder manually or fail.
-                 alert(`مجموع مبالغ تعریف شده (${format(paidSoFar)}) کمتر از مبلغ قابل پرداخت با جریمه (${format(amountToPay)}) است. لطفاً دستی پرداخت کنید.`);
-                 return;
-            }
-
-            // Commit transaction
-            deductionLog.forEach(d => {
-                app.wallets[d.wIdx].value -= d.amt;
-            });
-            showToast("مبالغ طبق دستور از کیف پول‌ها کسر شد");
-        } 
-        
-        // Mark as paid
-        episode.status = 'paid';
-        episode.paidDate = new Date().toLocaleDateString('fa-IR');
-        
-        saveSectionSnap('dashboard', `پرداخت قسط ${debt.name} (شماره ${epIdx+1})`);
-        saveData(); renderUI();
     }
 
     function renderChecks() {
@@ -3303,7 +3113,7 @@
             }
 
             const isDeducted = (c.deduct !== false);
-            const deductIcon = isDeducted ? '' : '<i class="fas fa-eye-slash" title="عدم کسر از موجودی" style="color:var(--text-sec); margin-right:5px; font-size:0.8rem;"></i>';
+            const deductIcon = isDeducted ? '<i class="fas fa-robot" title="کسر هوشمند" style="color:var(--primary); margin-right:5px; font-size:0.8rem;"></i>' : '';
             
             return `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px;" class="${animClass}">
                 <div>${c.name} ${deductIcon} <br><small style="color:${animClass?'var(--danger)':'var(--text-sec)'}; font-weight:bold;">${statusMsg}</small></div>
@@ -3322,91 +3132,9 @@
     // Inst 5: Check Payment Logic
     function passCheck(i) {
         if(confirm("آیا این چک/بدهی پاس شده است؟")) {
-            const check = app.checks[i];
-            if (check.deduct !== false) {
-                 // Reuse logic from payDebt but for check
-                 const modal = document.getElementById('bankTransferModal');
-                 const content = document.getElementById('btContent');
-                 
-                 let walletsHtml = '';
-                 app.wallets.forEach((w, idx) => {
-                    walletsHtml += `
-                    <div style="margin-bottom:10px; border:1px solid #eee; padding:10px; border-radius:10px;">
-                        <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
-                            <span>${w.name}</span>
-                            <span>موجودی: ${format(w.value)}</span>
-                        </div>
-                        <label style="font-size:0.8rem;">برداشت:</label>
-                        <div class="money-input-wrapper" style="margin-bottom:0;">
-                             <input type="text" class="wallet-deduct-input" data-idx="${idx}" onkeyup="updateDebtTotal(${check.value})" placeholder="۰">
-                        </div>
-                    </div>`;
-                 });
-
-                 content.innerHTML = `
-                    <h3>پاس کردن چک: ${check.name}</h3>
-                    <p style="color:var(--text-sec); font-size:0.85rem;">مبلغ کل: <b>${format(check.value)}</b></p>
-                    <p id="debtProgress" style="font-size:0.9rem; font-weight:bold; color:var(--primary);">انتخاب شده: ۰</p>
-                    <div style="max-height:200px; overflow-y:auto;">${walletsHtml}</div>
-                    
-                    <div style="display:flex; gap:10px; margin-top:10px;">
-                        <button class="btn btn-outline" style="flex:1" onclick="closeAllModals()">لغو</button>
-                        <button class="btn btn-primary" style="flex:1" onclick="confirmCheckPayment(${i})">تایید پرداخت</button>
-                    </div>
-                 `;
-                 openModal('bankTransferModal');
-            } else {
-                app.checks[i].isPaid = true;
-                saveData(); renderUI(); showToast("وضعیت به پاس شده تغییر یافت");
-            }
+            app.checks[i].isPaid = true;
+            saveData(); renderUI(); showToast("وضعیت به پاس شده تغییر یافت");
         }
-    }
-    
-    function updateDebtTotal(req) {
-        const inputs = document.querySelectorAll('.wallet-deduct-input');
-        let total = 0;
-        inputs.forEach(inp => {
-            let val = inp.value.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[^0-9]/g, '');
-            if(val) {
-                total += parseInt(val);
-                inp.value = parseInt(val).toLocaleString('en-US');
-            }
-        });
-        const el = document.getElementById('debtProgress');
-        el.innerText = `انتخاب شده: ${format(total)} / ${format(req)}`;
-        if(total === req) el.style.color = 'var(--success)';
-        else el.style.color = 'var(--danger)';
-    }
-
-    function confirmCheckPayment(i) {
-        const check = app.checks[i];
-        const inputs = document.querySelectorAll('.wallet-deduct-input');
-        let totalDeducted = 0;
-        let deductionPlan = [];
-
-        inputs.forEach(inp => {
-             const val = parseFormatted(inp.value);
-             const idx = inp.dataset.idx;
-             if (val > 0) {
-                 if (val > app.wallets[idx].value) {
-                     alert(`موجودی کیف ${app.wallets[idx].name} کافی نیست.`);
-                     throw new Error("Insufficient funds");
-                 }
-                 totalDeducted += val;
-                 deductionPlan.push({idx: idx, amount: val});
-             }
-        });
-
-        if (totalDeducted !== check.value) return alert(`مجموع مبالغ انتخابی برابر با مبلغ چک نیست.`);
-
-        deductionPlan.forEach(p => {
-            app.wallets[p.idx].value -= p.amount;
-        });
-
-        app.checks[i].isPaid = true;
-        
-        saveSectionSnap('dashboard', `پاس شدن چک ${check.name}`);
-        saveData(); renderUI(); closeAllModals(); showToast("چک پاس شد");
     }
 
     function renderLoans() {
@@ -3763,7 +3491,11 @@
                         app.wallets[wIdx].value += val;
                     } else {
                         app.wallets.push({name: targetWalletName, value: val});
+                        wIdx = app.wallets.length - 1;
                     }
+                    
+                    // Instruction 3: Trigger Auto Deduction
+                    checkAutoDeductions(wIdx, val);
 
                     saveData(); renderUI(); showToast("واریز مستقیم ثبت شد");
                  }
@@ -4043,7 +3775,7 @@
         let showDeduct = false; 
 
         if(type === 'wallet') item = app.wallets[index];
-        else if(type === 'debt') { alert('امکان ویرایش این آیتم در حال حاضر وجود ندارد. حذف و دوباره ایجاد کنید.'); closeAllModals(); return; } // Simplified for now due to complex structure
+        else if(type === 'debt') { item = app.debts[index]; showDate = false; showDeduct = true; } // Date handled differently now
         else if(type === 'check') { item = app.checks[index]; showDate = true; showDeduct = true; }
         else if(type === 'loan') { item = app.loans[index]; showDate = true; }
         else if(type === 'budget') { item = app.budgets[index]; showPercent = true; showAmount = false; }
@@ -4057,6 +3789,7 @@
             let val = 0;
             if(type === 'goal') val = item.target;
             else if(type === 'shop') val = item.price || 0;
+            else if(type === 'debt') val = item.installments && item.installments.length > 0 ? item.installments[0].amount : 0;
             else val = item.value;
             
             document.getElementById('editVal').value = val;
@@ -4101,6 +3834,12 @@
                 saveSectionSnap('dashboard', `ویرایش کیف پول ${newName}`);
                 app.wallets[index].name = newName;
                 app.wallets[index].value = parseFormatted(document.getElementById('editVal').value);
+            } else if(type === 'debt') {
+                saveSectionSnap('dashboard', `ویرایش قسط ${newName}`);
+                app.debts[index].name = newName;
+                // Note: Editing amount for existing installments is complex, so we just update name/deduct here for simplicity or update all future?
+                // For safety, we only update name and deduct status in this simple edit.
+                app.debts[index].deduct = document.getElementById('editDeductCheck').checked;
             } else if(type === 'check') {
                 saveSectionSnap('dashboard', `ویرایش چک ${newName}`);
                 app.checks[index].name = newName;
@@ -4184,10 +3923,74 @@
     function addWallet() {
         const n = document.getElementById('wName').value;
         const v = parseFormatted(document.getElementById('wVal').value);
-        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن کیف پول ${n}`); app.wallets.push({name:n, value:v}); saveData(); renderUI(); closeAllModals(); }
+        if(n && !isNaN(v)) { 
+            saveSectionSnap('dashboard', `افزودن کیف پول ${n}`); 
+            app.wallets.push({name:n, value:v}); 
+            
+            // Instruction 3: Trigger Auto Deduction on new wallet creation (if it has funds)
+            if(v > 0) checkAutoDeductions(app.wallets.length - 1, v);
+
+            saveData(); renderUI(); closeAllModals(); 
+        }
     }
     function delWallet(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', `حذف کیف پول ${app.wallets[i].name}`); app.wallets.splice(i,1); saveData(); renderUI(); } }
 
+    // Instruction 3 & 4: Add Debt with Source Rules and Installments
+    function addDebt() {
+        const n = document.getElementById('dName').value;
+        const v = parseFormatted(document.getElementById('dVal').value);
+        const count = parseInt(document.getElementById('dCount').value);
+        const lateFee = parseFloat(document.getElementById('dLateFee').value) || 0;
+        const deduct = document.getElementById('dDeduct').checked; 
+        
+        if(!n || isNaN(v) || isNaN(count) || count < 1) return alert("اطلاعات نامعتبر است");
+
+        // Generate Installments
+        const installments = [];
+        const startDay = parseInt(document.getElementById('dStartDay').value);
+        const startMonth = parseInt(document.getElementById('dStartMonth').value);
+        const startYear = parseInt(document.getElementById('dStartYear').value);
+        
+        let currentY = startYear;
+        let currentM = startMonth;
+
+        for(let i=0; i<count; i++) {
+            const dateStr = `${currentY}/${currentM < 10 ? '0'+currentM : currentM}/${startDay < 10 ? '0'+startDay : startDay}`;
+            installments.push({
+                id: Date.now() + i,
+                date: dateStr,
+                amount: v,
+                paid: false,
+                lateFee: 0
+            });
+            
+            currentM++;
+            if(currentM > 12) { currentM = 1; currentY++; }
+        }
+
+        // Capture Source Rules
+        const sourceRules = [];
+        if(deduct) {
+            const inputs = document.querySelectorAll('.dSource-input');
+            inputs.forEach(inp => {
+                const limit = parseFormatted(inp.value);
+                if(limit > 0) {
+                    sourceRules.push({ walletIdx: parseInt(inp.dataset.idx), limit: limit, deducted: 0 });
+                }
+            });
+        }
+
+        saveSectionSnap('dashboard', `افزودن وام ${n}`); 
+        app.debts.push({
+            name: n, 
+            installments: installments, 
+            deduct: deduct, 
+            sourceRules: sourceRules,
+            lateFeePercent: lateFee
+        }); 
+        
+        saveData(); renderUI(); closeAllModals();
+    }
     function delDebt(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', `حذف قسط ${app.debts[i].name}`); app.debts.splice(i,1); saveData(); renderUI(); } }
 
     function addCheck() {
@@ -4195,9 +3998,72 @@
         const v = parseFormatted(document.getElementById('cVal').value);
         const d = getDateString('c');
         const deduct = document.getElementById('cDeduct').checked; 
-        if(n && !isNaN(v)) { saveSectionSnap('dashboard', `افزودن چک ${n}`); if(!app.checks) app.checks = []; app.checks.push({name:n, value:v, date:d, isPaid: false, deduct: deduct}); saveData(); renderUI(); closeAllModals(); }
+        
+        if(n && !isNaN(v)) { 
+            // Capture Source Rules
+            const sourceRules = [];
+            if(deduct) {
+                const inputs = document.querySelectorAll('.cSource-input');
+                inputs.forEach(inp => {
+                    const limit = parseFormatted(inp.value);
+                    if(limit > 0) {
+                        sourceRules.push({ walletIdx: parseInt(inp.dataset.idx), limit: limit, deducted: 0 });
+                    }
+                });
+            }
+
+            saveSectionSnap('dashboard', `افزودن چک ${n}`); 
+            if(!app.checks) app.checks = []; 
+            app.checks.push({name:n, value:v, date:d, isPaid: false, deduct: deduct, sourceRules: sourceRules}); 
+            saveData(); renderUI(); closeAllModals(); 
+        }
     }
     function delCheck(i) { if(confirm('حذف؟')) { saveSectionSnap('dashboard', `حذف چک ${app.checks[i].name}`); app.checks.splice(i,1); saveData(); renderUI(); } }
+
+    // Instruction 3: Auto Deduction Logic
+    function checkAutoDeductions(walletIdx, amountAdded) {
+        let remaining = amountAdded;
+        
+        // Check Debts (Installments)
+        app.debts.forEach(d => {
+            if(d.deduct && d.sourceRules) {
+                const rule = d.sourceRules.find(r => r.walletIdx === walletIdx);
+                if(rule && rule.deducted < rule.limit) {
+                    // Find unpaid installments
+                    d.installments.forEach(inst => {
+                        if(!inst.paid && remaining > 0) {
+                            const canTake = Math.min(remaining, rule.limit - rule.deducted, inst.amount);
+                            if(canTake >= inst.amount) {
+                                // Full pay
+                                inst.paid = true;
+                                rule.deducted += inst.amount;
+                                app.wallets[walletIdx].value -= inst.amount;
+                                remaining -= inst.amount;
+                                showToast(`قسط ${d.name} خودکار پرداخت شد`);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
+        // Check Checks
+        app.checks.forEach(c => {
+            if(!c.isPaid && c.deduct && c.sourceRules) {
+                const rule = c.sourceRules.find(r => r.walletIdx === walletIdx);
+                if(rule && rule.deducted < rule.limit && remaining > 0) {
+                     const canTake = Math.min(remaining, rule.limit - rule.deducted, c.value);
+                     if(canTake >= c.value) {
+                         c.isPaid = true;
+                         rule.deducted += c.value;
+                         app.wallets[walletIdx].value -= c.value;
+                         remaining -= c.value;
+                         showToast(`چک ${c.name} خودکار پاس شد`);
+                     }
+                }
+            }
+        });
+    }
 
     function addLoan() {
         const n = document.getElementById('lName').value;
