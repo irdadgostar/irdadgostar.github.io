@@ -300,7 +300,24 @@
         .btn-copy:hover { background: var(--text-main); color: white; }
         .btn-check { color: var(--success); background: rgba(16, 185, 129, 0.15); }
         .btn-check:hover { background: var(--success); color: white; }
-        .btn-transfer-small { color: var(--info); background: rgba(14, 165, 233, 0.15); } /* New for special wallets */
+        
+        .btn-charge {
+            background: rgba(14, 165, 233, 0.1);
+            color: var(--info);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.2s;
+        }
+        .btn-charge:hover {
+            background: var(--info);
+            color: white;
+        }
 
         .currency-toggle-btn {
             background: var(--glass-bg);
@@ -449,20 +466,6 @@
 
         .auth-link { margin-top: 20px; color: var(--text-sec); font-size: 0.8rem; cursor: pointer; transition: 0.2s; }
         .auth-link:hover { color: var(--primary); }
-
-        .guest-btn {
-            margin-top: 15px;
-            background: transparent;
-            border: 1px dashed var(--warning);
-            color: var(--warning);
-            padding: 10px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            width: 100%;
-            transition: 0.2s;
-        }
-        .guest-btn:hover { background: rgba(245, 158, 11, 0.1); }
 
         /* --- Identity Card Styles --- */
         .identity-card-container {
@@ -1042,9 +1045,7 @@
 
         <!-- Actions -->
         <div id="authActions" style="width:100%; margin-top:10px;">
-            <button class="guest-btn" onclick="enterGuestMode()">
-                ورود به عنوان مهمان
-            </button>
+            <!-- Guest Mode Removed -->
         </div>
     </div>
 </div>
@@ -1097,12 +1098,13 @@
                     </div>
 
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-                        <span id="userNameDisplay" style="font-size:1rem; font-weight:700; opacity:0.95; text-shadow: 0 2px 4px rgba(0,0,0,0.3); text-transform:uppercase;">کاربر</span>
+                        <!-- Name Removed, Transaction Button Added Here -->
+                        <span id="userNameDisplay" style="display:none;"></span> 
+                        <button id="btnHist" class="card-transfer-btn" onclick="openGlobalHistory(event)" style="margin-left:auto; margin-right:0;">
+                            <i class="fas fa-history"></i> تراکنش‌ها
+                        </button>
+                        
                         <div style="display:flex; gap:8px;">
-                             <!-- History Button added here -->
-                             <button id="btnHist" class="card-transfer-btn" onclick="openGlobalHistory(event)">
-                                <i class="fas fa-history"></i> تراکنش‌ها
-                            </button>
                             <button class="card-transfer-btn" onclick="openBankTransfer(event)">
                                 <i class="fas fa-exchange-alt"></i> انتقال وجه
                             </button>
@@ -1131,7 +1133,10 @@
         <div class="glass-panel">
             <div class="header-row">
                 <h3><i class="fas fa-file-invoice-dollar"></i> اقساط ثابت (ماهانه)</h3>
-                <button class="btn btn-primary" onclick="openModal('debtModal')"><i class="fas fa-plus"></i> افزودن</button>
+                <div style="display:flex; gap:5px;">
+                    <button class="btn btn-charge" onclick="openInternalTransfer('اقساط ماهانه')"><i class="fas fa-wallet"></i> شارژ کیف</button>
+                    <button class="btn btn-primary" onclick="openModal('debtModal')"><i class="fas fa-plus"></i> افزودن</button>
+                </div>
             </div>
             <p style="font-size:0.8rem; color:var(--text-sec); margin-bottom:10px;">توجه: مبلغ این بخش از کیف پول اختصاصی "اقساط ماهانه" پرداخت می‌شود.</p>
             <div id="debtList"></div>
@@ -1140,7 +1145,10 @@
         <div class="glass-panel">
             <div class="header-row">
                 <h3><i class="fas fa-money-check-alt"></i> چک و بدهی</h3>
-                <button class="btn btn-primary" onclick="openModal('checkModal')"><i class="fas fa-plus"></i> افزودن</button>
+                <div style="display:flex; gap:5px;">
+                    <button class="btn btn-charge" onclick="openInternalTransfer('چک و بدهی')"><i class="fas fa-wallet"></i> شارژ کیف</button>
+                    <button class="btn btn-primary" onclick="openModal('checkModal')"><i class="fas fa-plus"></i> افزودن</button>
+                </div>
             </div>
             <p style="font-size:0.8rem; color:var(--text-sec); margin-bottom:10px;">توجه: مبلغ این بخش از کیف پول اختصاصی "چک و بدهی" پرداخت می‌شود.</p>
             <div id="checkList"></div>
@@ -1351,7 +1359,11 @@
 <div id="globalHistoryModal" class="modal">
     <div class="modal-content">
         <h3>تاریخچه تراکنش‌ها</h3>
-        <p style="font-size:0.85rem; color:var(--text-sec); margin-bottom:15px;">ریز تمام عملیات‌های مالی</p>
+        <div class="search-bar">
+            <input type="text" id="globalHistSearch" onkeyup="filterGlobalHistory()" placeholder="جستجو (شناسه، توضیحات)...">
+            <i class="fas fa-search"></i>
+        </div>
+        <p style="font-size:0.85rem; color:var(--text-sec); margin-bottom:15px;">برای مشاهده رسید روی تراکنش کلیک کنید.</p>
         <div id="globalHistoryList" style="max-height:400px; overflow-y:auto;">
             <!-- Rendered via JS -->
         </div>
@@ -1401,7 +1413,7 @@
 <!-- Internal Transfer Modal (Wallet to Wallet) -->
 <div id="internalTransferModal" class="modal">
     <div class="modal-content">
-        <h3>انتقال وجه داخلی</h3>
+        <h3>انتقال وجه داخلی (شارژ کیف)</h3>
         <p style="font-size:0.9rem; color:var(--text-sec); margin-bottom:15px;">
             شارژ کیف پول: <b><span id="itTargetName"></span></b>
         </p>
@@ -1409,6 +1421,11 @@
         <label>انتخاب کیف پول مبدا:</label>
         <select id="itSourceSelect"></select>
         <p style="font-size:0.8rem; color:var(--info); margin-bottom:15px;" id="itSourceBalance">موجودی: ---</p>
+
+        <div style="background:rgba(0,0,0,0.03); padding:10px; border-radius:10px; margin-bottom:15px;">
+             <span style="font-size:0.8rem; color:var(--text-sec);">مبلغ آزاد (توزیع نشده در سیستم):</span><br>
+             <b id="itFreeFundsDisplay" style="color:var(--success); font-size:1rem; direction:ltr;">---</b>
+        </div>
 
         <label>مبلغ انتقال:</label>
         <div class="money-input-wrapper">
@@ -1672,7 +1689,6 @@
             </div>
         </div>
         
-        <!-- Deduct wrapper removed/hidden for Debt/Checks as requested in new logic they pay from specific wallets -->
         <div id="editDeductWrapper" style="display:none; margin-bottom:15px;"></div>
 
         <div id="editDateWrapper" style="display:none;">
@@ -2013,7 +2029,6 @@
     let app = JSON.parse(JSON.stringify(defaultState));
     let rate = 1;
     let tempBudget = null;
-    let isGuestMode = false;
     let tempSubIndex = -1;
     let universalCallback = null;
     let tempDepositIndex = -1;
@@ -2087,7 +2102,6 @@
     }
 
     function getAccountNumber() {
-        if(isGuestMode) return "مهمان - بدون شماره";
         const natId = app.security.nationalId || "";
         if(!natId || natId.length !== 10) return "۰۰۰۰ ۰۰۰۰ ۰۰۰۰ ۰۰۰۰";
         const reversed = natId.split('').reverse().join('');
@@ -2101,15 +2115,11 @@
     }
 
     function processDailyLog() {
-        if(isGuestMode) return;
         const today = new Date().toLocaleDateString('fa-IR');
         if(!app.dailyLogs) app.dailyLogs = [];
         const lastLog = app.dailyLogs.length > 0 ? app.dailyLogs[app.dailyLogs.length-1] : null;
 
         if (!lastLog || lastLog.date !== today) {
-            // Recalculate Logic: Only include normal wallets, exclude debt/check wallets?
-            // Usually Net Worth includes all assets. But "Spent" and "Net" need to be consistent.
-            // I will keep standard logic for daily log total wealth.
             const income = app.wallets.reduce((a,b)=>a+b.value,0);
             const fixedDebt = app.debts.reduce((a,b)=> (b.deduct !== false && b.lastPaid !== getCurMonth()) ? a+b.value : a, 0);
             const checkDebt = (app.checks || []).reduce((a,b)=> (!b.isPaid && b.deduct !== false) ? a+b.value : a, 0);
@@ -2326,17 +2336,6 @@
             });
     }
 
-    function enterGuestMode() {
-        if(confirm("در حالت ورود آزاد، هیچ اطلاعاتی ذخیره نمی‌شود. آیا ادامه می‌دهید؟")) {
-            isGuestMode = true;
-            app = JSON.parse(JSON.stringify(defaultState));
-            app.user.name = "مهمان گرامی";
-            document.getElementById('authModal').style.display = 'none';
-            document.getElementById('appContent').style.display = 'block';
-            renderUI();
-        }
-    }
-
     function startRecovery() {
         openModal('recoveryModal');
     }
@@ -2414,7 +2413,7 @@
     function logSystemTransaction(type, amount, from, to, desc) {
         if(!app.transactionLog) app.transactionLog = [];
         app.transactionLog.unshift({
-            id: Date.now() + Math.random(),
+            id: Date.now() + Math.floor(Math.random() * 1000), // More unique
             date: new Date().toLocaleDateString('fa-IR'),
             time: new Date().toLocaleTimeString('fa-IR'),
             type: type, // 'expense', 'deposit', 'transfer'
@@ -2423,45 +2422,70 @@
             to: to,
             desc: desc
         });
-        // Limit log size to prevent bloat (e.g. 200 items)
-        if(app.transactionLog.length > 200) app.transactionLog.pop();
+        // Keep logs manageable
+        if(app.transactionLog.length > 500) app.transactionLog.pop();
         saveData();
     }
 
     function openGlobalHistory(e) {
         e.stopPropagation();
+        filterGlobalHistory(); // Init Render
+        openModal('globalHistoryModal');
+    }
+
+    function filterGlobalHistory() {
+        const query = document.getElementById('globalHistSearch').value.toLowerCase();
         const list = document.getElementById('globalHistoryList');
+        
         if(!app.transactionLog || app.transactionLog.length === 0) {
             list.innerHTML = `<p style="text-align:center; padding:20px; color:var(--text-sec);">تراکنشی ثبت نشده است.</p>`;
-        } else {
-            list.innerHTML = app.transactionLog.map(t => {
-                let icon = "fa-exchange-alt";
-                let color = "var(--info)";
-                if(t.type === 'deposit') { icon = "fa-arrow-down"; color = "var(--success)"; }
-                if(t.type === 'expense') { icon = "fa-arrow-up"; color = "var(--danger)"; }
-                
-                return `
-                <div class="timeline-item">
-                    <div class="timeline-icon">
-                        <i class="fas ${icon}" style="color:${color}"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                            <span style="font-weight:bold; font-size:0.95rem;">${t.desc || 'تراکنش'}</span>
-                            <span style="font-weight:bold; color:${color}; direction:ltr;">${format(t.amount)}</span>
-                        </div>
-                        <div style="font-size:0.85rem; margin-top:5px;">
-                           ${t.from ? `<span>از: ${t.from}</span>` : ''} 
-                           ${t.to ? `<span style="margin-right:10px;">به: ${t.to}</span>` : ''}
-                        </div>
-                        <div style="font-size:0.75rem; color:var(--text-sec); margin-top:5px; text-align:left;">
-                            ${t.date} - ${t.time}
-                        </div>
-                    </div>
-                </div>`;
-            }).join('');
+            return;
         }
-        openModal('globalHistoryModal');
+
+        const filtered = app.transactionLog.filter(t => {
+            const txt = (t.desc + " " + t.id + " " + t.from + " " + t.to).toLowerCase();
+            return txt.includes(query);
+        });
+
+        if(filtered.length === 0) {
+            list.innerHTML = `<p style="text-align:center; padding:20px; color:var(--text-sec);">موردی یافت نشد.</p>`;
+            return;
+        }
+
+        list.innerHTML = filtered.map(t => {
+            let icon = "fa-exchange-alt";
+            let color = "var(--info)";
+            if(t.type === 'deposit') { icon = "fa-arrow-down"; color = "var(--success)"; }
+            if(t.type === 'expense') { icon = "fa-arrow-up"; color = "var(--danger)"; }
+            
+            // Serialize for onclick to pass object safely
+            const dataStr = encodeURIComponent(JSON.stringify(t));
+
+            return `
+            <div class="timeline-item" onclick="showTransactionReceipt('${dataStr}')" style="cursor:pointer;">
+                <div class="timeline-icon">
+                    <i class="fas ${icon}" style="color:${color}"></i>
+                </div>
+                <div class="timeline-content">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <span style="font-weight:bold; font-size:0.95rem;">${t.desc || 'تراکنش'}</span>
+                        <span style="font-weight:bold; color:${color}; direction:ltr;">${format(t.amount)}</span>
+                    </div>
+                    <div style="font-size:0.85rem; margin-top:5px;">
+                       ${t.from ? `<span>از: ${t.from}</span>` : ''} 
+                       ${t.to ? `<span style="margin-right:10px;">به: ${t.to}</span>` : ''}
+                    </div>
+                    <div style="font-size:0.75rem; color:var(--text-sec); margin-top:5px; text-align:left; direction:ltr;">
+                        ID: ${t.id} | ${t.date} - ${t.time}
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function showTransactionReceipt(dataStr) {
+        const t = JSON.parse(decodeURIComponent(dataStr));
+        showReceipt(true, t.amount, t.from || 'سیستم', '---', t.to || '---', t.desc, t.id, t.date + ' ' + t.time);
     }
 
     // --- HELPER FUNCTIONS ---
@@ -2487,14 +2511,10 @@
         document.getElementById('itTargetName').innerText = targetWalletName;
         
         // Populate Source Select (exclude current target)
-        // Also exclude other special wallets if needed? No, user just said receive FROM other wallets.
         const sel = document.getElementById('itSourceSelect');
         sel.innerHTML = app.wallets
             .map((w, i) => {
                 if (w.name === targetWalletName) return '';
-                // NEW: Exclude special wallets from being SOURCE? 
-                // "mbalagh az digar kif pool ha...". Usually borrowing from debt wallet is bad practice but not forbidden.
-                // However, logic dictates taking from "General" wallets.
                 return `<option value="${i}">${w.name} (موجودی: ${format(w.value)})</option>`;
             }).join('');
         
@@ -2502,6 +2522,28 @@
         document.getElementById('itAmount').value = '';
         document.getElementById('itSourceBalance').innerText = 'موجودی: ---';
         
+        // Calculate Free Funds logic
+        // Logic: Total Money in Wallets - Money currently in Restricted Wallets (Debt/Check) - Money already allocated to Budgets (Manual Adds + Distributed %)
+        // Wait, "Distributed Amount" in app.distributedAmount is the TOTAL distributable funds that were allocated.
+        
+        const income = app.wallets.reduce((a,b)=>a+b.value,0);
+        const restrictedWallets = [CONST_WALLET_DEBT, CONST_WALLET_CHECK];
+        const restrictedValue = app.wallets.filter(w => restrictedWallets.includes(w.name)).reduce((a,w) => a+w.value, 0);
+        const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
+        
+        // Distributable Net calculated in renderUI
+        let distributableNet = income - restrictedValue - manualDeductions;
+        if (distributableNet < 0) distributableNet = 0;
+        
+        // "Free Funds" typically means funds NOT yet distributed to the % system.
+        // `app.distributedAmount` stores the value that WAS distributed.
+        // So Free = distributableNet - app.distributedAmount.
+        
+        let freeFunds = distributableNet - app.distributedAmount;
+        if (freeFunds < 0) freeFunds = 0; // Should not happen usually unless spent
+
+        document.getElementById('itFreeFundsDisplay').innerText = format(freeFunds) + " تومان";
+
         // Attach change listener
         sel.onchange = function() {
             const idx = this.value;
@@ -2528,29 +2570,46 @@
         const sourceWallet = app.wallets[sourceIdx];
         const targetWallet = app.wallets.find(w => w.name === targetName);
 
-        if (!targetWallet) return alert("کیف پول مقصد یافت نشد."); // Should not happen
+        if (!targetWallet) {
+             ensureSpecialWalletExists(targetName);
+             // Re-fetch
+             return performInternalTransfer(); 
+        }
 
         // Condition 1: Budget Limit
         if (sourceWallet.value < amount) return alert("موجودی کیف پول مبدا کافی نیست.");
 
-        // Condition 2: Not previously divided in Budget section
-        // To strictly enforce this: We assume wallets like "Salary Card" hold the money. 
-        // "Distributed" amount tracks what is assigned to budget items.
-        // We calculate "Free Cash" = Total Cash in (Non-Special) Wallets - Distributed Budget.
-        // But here we are moving cash between wallets. 
-        // If Source is a "General Wallet", moving money to "Debt Wallet" essentially IS distributing it (allocating it).
-        // So we just need to ensure we have the cash physically. 
-        // The Prompt said: "Amounts not previously divided...". 
-        // Implementation: We check if (SourceWallet.value) is part of available funds. 
-        // Simplest check: Just ensure SourceWallet.value >= Amount. 
-        // Logic refinement: Moving from General to Debt Wallet is actually "Using" the money for debt.
+        // Condition 2: Not previously divided check (using Free Funds logic)
+        // We re-calculate free funds to ensure correctness
+        const income = app.wallets.reduce((a,b)=>a+b.value,0);
+        const restrictedWallets = [CONST_WALLET_DEBT, CONST_WALLET_CHECK];
+        const restrictedValue = app.wallets.filter(w => restrictedWallets.includes(w.name)).reduce((a,w) => a+w.value, 0);
+        const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
+        let distributableNet = income - restrictedValue - manualDeductions;
+        let freeFunds = distributableNet - app.distributedAmount;
         
+        // This check ensures we aren't moving money that is already "claimed" by the budget distribution system
+        // However, if the source IS a normal wallet, moving it to a restricted wallet REDUCES distributable net.
+        // If we move money that was part of "distributedAmount", we break the budget.
+        // So we must ensure: amount <= freeFunds + (funds inside source if source was already restricted... but source is usually general).
+        
+        // Simplifying: If Source is General Wallet -> We are moving General to Restricted.
+        // This decreases Distributable Net. 
+        // Current Distributable Net = X. Distributed Amount = Y. Free = X - Y.
+        // New Distributable Net = X - Amount.
+        // We need New Distributable Net >= Distributed Amount (Y).
+        // So X - Amount >= Y  =>  X - Y >= Amount => Free >= Amount.
+        
+        if (freeFunds < amount) {
+            return alert(`خطا: مبلغ وارد شده (${format(amount)}) بیشتر از مبلغ آزاد سیستم (${format(freeFunds)}) است. بخشی از این پول قبلاً در بودجه‌بندی توزیع شده است.`);
+        }
+
         // Execute Transfer
         sourceWallet.value -= amount;
         targetWallet.value += amount;
 
         // Log it
-        logSystemTransaction('transfer', amount, sourceWallet.name, targetWallet.name, 'انتقال وجه داخلی');
+        logSystemTransaction('transfer', amount, sourceWallet.name, targetWallet.name, 'شارژ کیف پول (انتقال داخلی)');
         
         saveData();
         renderUI();
@@ -2649,7 +2708,6 @@
     }
 
     function saveSectionSnap(section, description = "تغییر بدون توضیح") {
-        if(isGuestMode) return;
         let snap = null;
         if(section === 'dashboard') {
             snap = JSON.stringify({ wallets: app.wallets, debts: app.debts, checks: app.checks, loans: app.loans });
@@ -2726,8 +2784,6 @@
     // --- BANK TRANSFER WIZARD ---
     function openBankTransfer(e) {
         e.stopPropagation();
-        if(isGuestMode) return alert("در حالت مهمان امکان انتقال وجه وجود ندارد.");
-        
         app.wizardState = {};
         renderTransferStep1();
         openModal('bankTransferModal');
@@ -2820,7 +2876,7 @@
             if (totalDeducted !== amt) return alert(`مجموع مبالغ انتخابی (${format(totalDeducted)}) با مبلغ کل انتقال (${format(amt)}) برابر نیست.`);
             app.wizardState.plan = deductionPlan;
 
-            const mockName = "کاربر مهمان (تست)";
+            const mockName = "حساب مقصد";
             const dest = app.wizardState.dest;
 
             content.innerHTML = `
@@ -2865,7 +2921,7 @@
         const pin = document.getElementById('btPinInput').value;
         const amt = app.wizardState.amount;
         const dest = app.wizardState.dest;
-        const destName = "کاربر مهمان (تست)";
+        const destName = "حساب مقصد";
 
         if (pin !== app.security.password) return alert("رمز عبور اشتباه است!");
 
@@ -2899,12 +2955,12 @@
             renderUI();
 
             setTimeout(() => {
-                showReceipt(true, amt, getAccountNumber(), app.user.name, dest, destName);
+                showReceipt(true, amt, getAccountNumber(), app.user.name, dest, destName, newTransfer.id, dateStr + ' ' + new Date().toLocaleTimeString('fa-IR'));
             }, 500);
         }, 1500);
     }
 
-    function showReceipt(success, amount, sourceAcc, sourceName, destAcc, destName) {
+    function showReceipt(success, amount, sourceAcc, sourceName, destAcc, destName, txId, dateTime) {
         closeAllModals();
         const container = document.getElementById('receiptContainer');
         const statusClass = success ? 'status-success' : 'status-fail';
@@ -2914,12 +2970,13 @@
         container.innerHTML = `
           <div class="receipt-card" id="finalReceipt">
              <div class="receipt-header">
-                <h2 class="receipt-title">رسید انتقال وجه</h2>
+                <h2 class="receipt-title">رسید تراکنش</h2>
                 <div class="receipt-status ${statusClass}">${statusText}</div>
              </div>
              <div class="receipt-amount" style="color:${color}">${format(amount)} ریال</div>
+             
              <div class="receipt-row">
-                <span class="receipt-label">حساب مبدا</span>
+                <span class="receipt-label">مبدا</span>
                 <span class="receipt-val">${toPersianNum(sourceAcc)}</span>
              </div>
              <div class="receipt-row">
@@ -2928,16 +2985,21 @@
              </div>
              <hr style="border:0; border-top:1px dashed #eee; margin:10px 0;">
              <div class="receipt-row">
-                <span class="receipt-label">حساب مقصد</span>
+                <span class="receipt-label">مقصد</span>
                 <span class="receipt-val">${toPersianNum(destAcc)}</span>
              </div>
              <div class="receipt-row">
-                <span class="receipt-label">نام گیرنده</span>
+                <span class="receipt-label">گیرنده/شرح</span>
                 <span class="receipt-val">${destName}</span>
              </div>
+             <hr style="border:0; border-top:1px dashed #eee; margin:10px 0;">
              <div class="receipt-row">
-                <span class="receipt-label">تاریخ</span>
-                <span class="receipt-val">${toPersianNum(new Date().toLocaleDateString('fa-IR'))}</span>
+                <span class="receipt-label">زمان</span>
+                <span class="receipt-val">${toPersianNum(dateTime || '')}</span>
+             </div>
+             <div class="receipt-row">
+                <span class="receipt-label">شناسه</span>
+                <span class="receipt-val">${toPersianNum(txId || '')}</span>
              </div>
           </div>
         `;
@@ -3071,18 +3133,9 @@
 
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
         
-        // BUDGET CALCULATION MODIFICATION:
-        // Exclude dedicated wallets (monthly installments, checks) from distribution
+        // BUDGET CALCULATION
         const restrictedWallets = [CONST_WALLET_DEBT, CONST_WALLET_CHECK];
         const restrictedValue = app.wallets.filter(w => restrictedWallets.includes(w.name)).reduce((a,w) => a+w.value, 0);
-        
-        // Debts are now PAID manually from these wallets, so we don't auto-deduct 'fixedDebt' from the budget flow 
-        // unless they are standard debts not covered by these wallets. 
-        // But the prompt implies new system uses wallets.
-        // For backwards compatibility/standard display:
-        // Distributable Net = (Total Wallet Value) - (Restricted Wallets) - (Manual Deductions in Budget)
-        // We assume debt/checks are paid from restricted wallets, so we don't double subtract them here.
-        
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
         
         let cardNet = income; // Card shows total assets
@@ -3118,12 +3171,10 @@
     function showCardDetails() {
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
         
-        // Debt calculation for display
         const fixedDebt = app.debts.reduce((a,b)=>a+b.value,0);
         const checkDebt = (app.checks || []).reduce((a,b)=>!b.isPaid ? a+b.value : a, 0);
         const totalDebt = fixedDebt + checkDebt;
 
-        // Net = Income - Debt (Simple View)
         let net = income - totalDebt;
         if(net < 0) net = 0;
 
@@ -3219,9 +3270,6 @@
                 btnHtml = `<button class="btn-small-icon btn-check" onclick="payDebt(${i})" title="پرداخت"><i class="fas fa-money-bill-wave"></i></button>`;
             }
 
-            // Wallet Funding Button for Debt
-            const fundBtn = `<button class="btn-small-icon btn-transfer-small" onclick="openInternalTransfer('${CONST_WALLET_DEBT}')" title="شارژ کیف پول اقساط"><i class="fas fa-wallet"></i></button>`;
-
             return `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px; transition:0.3s;" class="${animClass}">
                 <div>
                    <span style="font-weight:bold;">${d.name}</span>
@@ -3230,7 +3278,6 @@
                 <div style="display:flex; align-items:center;">
                    <b style="color:var(--danger); margin-left:10px;">${format(d.value)}</b>
                    <span style="display:flex; gap:5px;">
-                      ${fundBtn}
                       ${btnHtml}
                       <button class="btn-small-icon btn-edit" onclick="openEdit('debt', ${i})"><i class="fas fa-edit"></i></button>
                       <button class="btn-small-icon btn-del" onclick="delDebt(${i})"><i class="fas fa-trash"></i></button>
@@ -3309,15 +3356,11 @@
                 if (diff <= 3) animClass = "status-due pulse-warning";
             }
 
-            // Fund button logic
-            const fundBtn = `<button class="btn-small-icon btn-transfer-small" onclick="openInternalTransfer('${CONST_WALLET_CHECK}')" title="شارژ کیف چک"><i class="fas fa-wallet"></i></button>`;
-
             return `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px;" class="${animClass}">
                 <div>${c.name} <br><small style="color:${animClass?'var(--danger)':'var(--text-sec)'}; font-weight:bold;">${statusMsg}</small></div>
                 <div style="display:flex; align-items:center;">
                    <b style="color:var(--danger);">${format(c.value)}</b>
                    <span style="margin-right:15px; display:flex; gap:5px;">
-                      ${fundBtn}
                       <button class="btn-small-icon btn-check" onclick="passCheck(${i})" title="پاس کردن"><i class="fas fa-money-check"></i></button>
                       <button class="btn-small-icon btn-edit" onclick="openEdit('check', ${i})"><i class="fas fa-edit"></i></button>
                       <button class="btn-small-icon btn-del" onclick="delCheck(${i})"><i class="fas fa-trash"></i></button>
@@ -3654,10 +3697,8 @@
     }
 
     function openDepositOptions(index) {
-        if(isGuestMode) return alert("در حالت مهمان امکان واریز وجود ندارد.");
         tempDepositIndex = index;
         
-        // Recalculate surplus logic with the new restricted wallet logic
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
         const restrictedWallets = [CONST_WALLET_DEBT, CONST_WALLET_CHECK];
         const restrictedValue = app.wallets.filter(w => restrictedWallets.includes(w.name)).reduce((a,w) => a+w.value, 0);
@@ -4751,7 +4792,7 @@
     }
 
     function renderLineChart() {
-        const ctx = document.getElementById('netWorthChart').getContext('2d');
+const ctx = document.getElementById('netWorthChart').getContext('2d');
         if (myChart2) myChart2.destroy();
 
         const logs = app.dailyLogs.slice(-30);
@@ -4784,7 +4825,7 @@
         });
     }
 
-function exportExcel() {
+    function exportExcel() {
         withLoading(() => {
             const toEn = (str) => str ? str.toString().replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)) : '';
             let tableHTML = `
@@ -4855,22 +4896,21 @@ function exportExcel() {
         }, 1500);
     }
 
+    // Instruction 5: Comprehensive Image Report
     function generateReportImage() {
         withLoading(() => {
             const income = app.wallets.reduce((a,b)=>a+b.value,0);
             
-            // Recalculate Logic for report
-            const fixedDebt = app.debts.reduce((a,b)=> a+b.value, 0); // Total fixed debt
+            const fixedDebt = app.debts.reduce((a,b)=> a+b.value, 0); 
             const checkDebt = (app.checks || []).reduce((a,b)=> !b.isPaid ? a+b.value : 0, 0);
             const totalDebt = fixedDebt + checkDebt;
             
-            // Calculate Net for display (Total Wallet - Debts)
-            // Note: This is a general financial health check
             let net = income - totalDebt;
             if (net < 0) net = 0;
 
             const days = app.user.startDate ? Math.floor((Date.now() - app.user.startDate)/(1000*60*60*24))+1 : 0;
 
+            // Header Info
             document.getElementById('printDate').innerText = toPersianNum(new Date().toLocaleDateString('fa-IR'));
             document.getElementById('printUser').innerText = app.user.name;
             document.getElementById('printDays').innerText = toPersianNum(days);
@@ -4878,6 +4918,7 @@ function exportExcel() {
             document.getElementById('printDebt').innerText = format(totalDebt);
             document.getElementById('printNet').innerText = format(net);
 
+            // Chart
             if(app.dailyLogs && app.dailyLogs.length > 0) {
                 const ctx = document.getElementById('printChart').getContext('2d');
                 if(window.myPrintChart) window.myPrintChart.destroy();
@@ -4897,10 +4938,12 @@ function exportExcel() {
                     options: { responsive: true, maintainAspectRatio: false }
                 });
 
+                // History Table
                 const hTab = document.getElementById('printHistoryTable');
                 hTab.innerHTML = logs.map(l => `<tr><td>${toPersianNum(l.date)}</td><td>${format(l.net)}</td><td>${format(l.spent)}</td></tr>`).join('');
             }
 
+            // Budgets Table
             const tb = document.getElementById('printBody');
             tb.innerHTML = '';
             app.budgets.forEach(b => {
@@ -4909,20 +4952,59 @@ function exportExcel() {
                 tb.innerHTML += `<tr><td>${b.name}</td><td>${toPersianNum(b.percent)}%</td><td>${format(s)}</td><td>${format(b.spent)}</td><td>${format(s-b.spent)}</td></tr>`;
             });
 
-            const dList = document.getElementById('printDebtsList');
-            let debtHtml = "";
-            app.debts.forEach(d => {
-                debtHtml += `<div>${d.name}: ${format(d.value)}</div>`;
+            // Detailed Lists (Instruction 5 Requirement)
+            
+            // 1. Wallets
+            let walletsHtml = "<h4>منابع مالی (کیف پول‌ها)</h4><table class='print-table'><thead><tr><th>نام کیف</th><th>موجودی</th></tr></thead><tbody>";
+            app.wallets.forEach(w => {
+                walletsHtml += `<tr><td>${w.name}</td><td>${format(w.value)}</td></tr>`;
             });
-            dList.innerHTML = debtHtml || "ندارد";
+            walletsHtml += "</tbody></table>";
 
-            const gList = document.getElementById('printGoalsList');
-            let goalHtml = "";
-            app.goals.forEach(g => {
-                let status = g.curr >= g.target ? " (تکمیل)" : "";
-                goalHtml += `<div>${g.name}${status}: ${format(g.curr)} / ${format(g.target)}</div>`;
+            // 2. Debts
+            let debtsHtml = "<h4>اقساط و بدهی‌ها</h4><table class='print-table'><thead><tr><th>عنوان</th><th>مبلغ</th><th>نوع</th><th>وضعیت</th></tr></thead><tbody>";
+            app.debts.forEach(d => {
+                debtsHtml += `<tr><td>${d.name}</td><td>${format(d.value)}</td><td>قسط ثابت</td><td>${d.lastPaid === getCurMonth() ? 'پرداخت شده' : 'مانده'}</td></tr>`;
             });
-            gList.innerHTML = goalHtml || "ندارد";
+            app.checks.forEach(c => {
+                debtsHtml += `<tr><td>${c.name}</td><td>${format(c.value)}</td><td>چک/بدهی</td><td>${c.isPaid ? 'پاس شده' : 'مانده'}</td></tr>`;
+            });
+            debtsHtml += "</tbody></table>";
+
+            // 3. Goals
+            let goalsHtml = "<h4>اهداف پس‌انداز</h4><table class='print-table'><thead><tr><th>هدف</th><th>هدف کل</th><th>جمع شده</th><th>مانده</th></tr></thead><tbody>";
+            app.goals.forEach(g => {
+                goalsHtml += `<tr><td>${g.name}</td><td>${format(g.target)}</td><td>${format(g.curr)}</td><td>${format(g.target - g.curr)}</td></tr>`;
+            });
+            goalsHtml += "</tbody></table>";
+
+            // 4. Shopping
+            let shopHtml = "<h4>لیست خرید</h4><table class='print-table'><thead><tr><th>کالا</th><th>قیمت تقریبی</th><th>پرداخت شده</th></tr></thead><tbody>";
+            app.shopping.forEach(s => {
+                shopHtml += `<tr><td>${s.name}</td><td>${format(s.price||0)}</td><td>${format(s.paid||0)}</td></tr>`;
+            });
+            shopHtml += "</tbody></table>";
+
+            // 5. Loans (Given)
+            let loansHtml = "<h4>طلب‌ها (قرض داده شده)</h4><table class='print-table'><thead><tr><th>شخص</th><th>مبلغ</th><th>وضعیت</th></tr></thead><tbody>";
+            app.loans.forEach(l => {
+                loansHtml += `<tr><td>${l.name}</td><td>${format(l.value)}</td><td>${l.isReceived ? 'وصول شد' : 'مانده'}</td></tr>`;
+            });
+            loansHtml += "</tbody></table>";
+
+            // 6. Recent Transfers (Instruction 5)
+            let transHtml = "<h4>آخرین انتقال‌ها (وجه به وجه)</h4><table class='print-table'><thead><tr><th>نوع</th><th>مبلغ</th><th>جزئیات</th></tr></thead><tbody>";
+            if(app.transfers) {
+                app.transfers.slice(-5).forEach(t => {
+                    transHtml += `<tr><td>${t.type==='incoming'?'دریافت':'ارسال'}</td><td>${format(t.amount)}</td><td>${t.status}</td></tr>`;
+                });
+            }
+            transHtml += "</tbody></table>";
+
+            // Append all to print area
+            const listsContainer = document.getElementById('printDebtsList');
+            listsContainer.innerHTML = walletsHtml + debtsHtml;
+            document.getElementById('printGoalsList').innerHTML = goalsHtml + shopHtml + loansHtml + transHtml;
 
             const el = document.getElementById('printArea');
             el.style.top = "0";
@@ -4930,7 +5012,7 @@ function exportExcel() {
             setTimeout(() => {
                 html2canvas(el, { scale: 2 }).then(c => {
                     const a = document.createElement('a');
-                    a.download = `Financial_Report_${days}Days.png`;
+                    a.download = `Financial_Full_Report_${days}Days.png`;
                     a.href = c.toDataURL();
                     a.click();
                     el.style.top = "-9999px";
@@ -4947,11 +5029,12 @@ function exportExcel() {
             a.href = str;
             a.download = "backup.json";
             a.click();
-            if(!isGuestMode) {
-                app.history.unshift({date: Date.now(), name: "بکاپ دستی"});
-                if(app.history.length > 5) app.history.pop();
-                saveData();
-            }
+            
+            // Logic for Guest Mode removed here as requested
+            app.history.unshift({date: Date.now(), name: "بکاپ دستی"});
+            if(app.history.length > 5) app.history.pop();
+            saveData();
+            
         }, 1500);
     }
 
@@ -4995,7 +5078,6 @@ function exportExcel() {
                     });
                     app.debts.forEach(d => {
                         if(d.lastPaid === undefined) d.lastPaid = null;
-                        // deduct property is less relevant now with wallets but kept for consistency
                         if(d.deduct === undefined) d.deduct = true; 
                     });
                     app.checks.forEach(c => {
@@ -5056,19 +5138,19 @@ function exportExcel() {
 
     // --- SAVING DATA ---
     function saveData() {
-        if(!isGuestMode) {
-            // Local Backup
-            localStorage.setItem('amir_fin_v9', JSON.stringify(app));
+        // Instruction 1: Guest Mode check removed. Saving is mandatory.
+        
+        // Local Backup
+        localStorage.setItem('amir_fin_v9', JSON.stringify(app));
 
-            // Cloud Backup (if logged in)
-            if(app.security && app.security.nationalId) {
-                // Send appData to cloud
-                googleApi('apiSaveData', app.security.nationalId, JSON.stringify(app))
-                    .then(res => {
-                        if(!res.success) console.error("Cloud Save Failed: " + res.message);
-                    })
-                    .catch(err => console.error("Cloud Save Network Error", err));
-            }
+        // Cloud Backup (if logged in)
+        if(app.security && app.security.nationalId) {
+            // Send appData to cloud
+            googleApi('apiSaveData', app.security.nationalId, JSON.stringify(app))
+                .then(res => {
+                    if(!res.success) console.error("Cloud Save Failed: " + res.message);
+                })
+                .catch(err => console.error("Cloud Save Network Error", err));
         }
     }
 
