@@ -4,36 +4,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تعالی همدلی</title>
+  <title>تعالی همدلی | سامانه مهرورزی</title>
   
   <!-- فونت وزیرمتن -->
   <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
   <!-- آیکون‌ها -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- بوت‌استرپ -->
+  <!-- بوت‌استرپ 5 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
-  <!-- آلرت‌ها -->
+  <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
     :root {
       --primary: #0f172a; /* سرمه‌ای بسیار تیره و رسمی */
-      --accent: #ca8a04; /* طلایی پخته */
+      --accent: #ca8a04; /* طلایی تیره */
       --bg-body: #f8fafc;
-      --text-main: #334155;
-      --card-bg: #ffffff;
+      --text-gray: #64748b;
     }
 
     body {
       font-family: 'Vazirmatn', sans-serif;
       background-color: var(--bg-body);
-      color: var(--text-main);
-      line-height: 1.8;
+      color: #334155;
     }
 
     /* هدر */
-    .hero {
-      background: linear-gradient(180deg, var(--primary) 0%, #1e293b 100%);
+    .hero-header {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
       color: white;
       padding: 4rem 1rem 6rem 1rem;
       text-align: center;
@@ -41,29 +39,30 @@
       position: relative;
       overflow: hidden;
     }
-
-    .hero::before {
+    
+    .hero-header::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      background-image: url("https://www.transparenttextures.com/patterns/cubes.png");
+      opacity: 0.05;
     }
 
     .brand-title {
-      font-weight: 900;
+      font-weight: 800;
       font-size: 2.5rem;
       letter-spacing: -1px;
-      margin-bottom: 0.5rem;
+      margin-bottom: 10px;
       color: #f1f5f9;
     }
 
     .brand-subtitle {
       font-weight: 300;
       opacity: 0.8;
-      font-size: 1rem;
+      font-size: 1.1rem;
     }
 
-    /* کارت اصلی */
+    /* کانتینر اصلی */
     .main-container {
       max-width: 750px;
       margin: -4rem auto 2rem auto;
@@ -72,56 +71,65 @@
       z-index: 10;
     }
 
-    .glass-card {
-      background: var(--card-bg);
+    .content-card {
+      background: white;
       border-radius: 24px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-      border: 1px solid rgba(255,255,255,0.5);
+      border: none;
       overflow: hidden;
     }
 
     /* تب‌ها */
-    .nav-tabs {
+    .custom-tabs {
       border-bottom: 1px solid #e2e8f0;
-      background: #f1f5f9;
+      background: #fff;
     }
 
     .nav-link {
-      color: #64748b;
-      font-weight: 700;
-      padding: 1.2rem 1rem;
+      color: var(--text-gray);
+      font-weight: 600;
+      padding: 20px 10px;
       border: none;
       border-bottom: 3px solid transparent;
-      transition: all 0.3s ease;
+      transition: all 0.3s;
+    }
+
+    .nav-link:hover {
+      color: var(--primary);
+      background: #f1f5f9;
     }
 
     .nav-link.active {
       color: var(--primary);
       background: transparent;
-      border-bottom-color: var(--accent);
+      border-bottom: 3px solid var(--accent);
     }
 
-    .nav-link:hover {
-      color: var(--primary);
+    .nav-icon { font-size: 1.2rem; margin-left: 5px; vertical-align: middle; }
+
+    /* استایل‌های اختصاصی بخش‌ها */
+    .donation-box {
+      text-align: center;
+      padding: 2rem 1rem;
     }
 
-    /* محتوا */
-    .content-area {
-      padding: 2.5rem;
-    }
-
-    .section-title {
-      font-weight: 800;
-      color: var(--primary);
+    .heart-icon {
+      font-size: 4rem;
+      color: #e11d48;
       margin-bottom: 1rem;
-      font-size: 1.4rem;
+      animation: beat 2s infinite;
+    }
+
+    @keyframes beat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
     }
 
     .emotional-text {
-      font-size: 1rem;
+      font-size: 1.1rem;
+      line-height: 1.8;
       color: #475569;
       margin-bottom: 2rem;
-      text-align: justify;
     }
 
     .highlight {
@@ -129,63 +137,61 @@
       font-weight: 700;
     }
 
-    /* دکمه‌ها و فیلدها */
-    .form-control, .form-select {
-      padding: 14px;
-      border-radius: 12px;
-      border: 1px solid #cbd5e1;
-      background: #fff;
-      font-size: 0.95rem;
-      transition: 0.2s;
+    .btn-pay {
+      background: #10b981;
+      color: white;
+      font-size: 1.3rem;
+      font-weight: 800;
+      padding: 15px 40px;
+      border-radius: 50px;
+      border: none;
+      box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+      width: 100%;
+      max-width: 350px;
     }
 
-    .form-control:focus {
+    .btn-pay:hover {
+      background: #059669;
+      transform: translateY(-3px);
+      box-shadow: 0 15px 25px rgba(16, 185, 129, 0.4);
+    }
+
+    /* فرم‌ها */
+    .form-floating > .form-control {
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+    }
+    
+    .form-floating > .form-control:focus {
       border-color: var(--primary);
       box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.1);
     }
 
-    .form-label {
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: var(--primary);
-      margin-bottom: 8px;
-    }
-
-    .btn-cta {
-      background: linear-gradient(135deg, var(--primary) 0%, #334155 100%);
-      color: white;
-      width: 100%;
-      padding: 16px;
-      border-radius: 14px;
-      font-weight: 800;
-      font-size: 1.1rem;
-      border: none;
-      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .btn-cta:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 15px 30px rgba(15, 23, 42, 0.25);
-      color: #fff;
-    }
-
-    .btn-cta i {
-      margin-left: 8px;
-    }
-
-    /* باکس‌های هشدار */
-    .dignity-box {
-      background: #fffbeb;
-      border: 1px solid #fcd34d;
-      border-radius: 12px;
+    .dignity-alert {
+      background-color: #fff7ed;
+      border-right: 4px solid #f97316;
+      color: #9a3412;
       padding: 15px;
-      font-size: 0.9rem;
-      color: #92400e;
+      border-radius: 8px;
+      font-size: 0.95rem;
       margin-bottom: 20px;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
+      line-height: 1.6;
+    }
+
+    .btn-submit-form {
+      background: var(--primary);
+      color: white;
+      padding: 14px;
+      border-radius: 12px;
+      font-weight: bold;
+      width: 100%;
+      border: none;
+      transition: 0.3s;
+    }
+
+    .btn-submit-form:hover {
+      background: #1e293b;
     }
 
     /* فوتر */
@@ -193,237 +199,212 @@
       text-align: center;
       padding: 3rem 1rem;
       color: #64748b;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
     }
 
-    .footer strong {
-      display: block;
-      color: var(--primary);
-      font-size: 1rem;
-      margin-bottom: 5px;
-    }
-
-    .footer a {
-      color: var(--text-main);
-      text-decoration: none;
-      transition: 0.2s;
-    }
-    
-    .footer a:hover {
-      color: var(--accent);
-    }
-
-    .contact-info {
-      margin-top: 15px;
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-    
     .contact-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      display: inline-block;
+      margin: 0 10px;
+      background: white;
+      padding: 8px 15px;
+      border-radius: 50px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      margin-bottom: 10px;
     }
+    
+    .contact-item i { color: var(--primary); margin-left: 5px; }
+    .footer a { color: var(--primary); text-decoration: none; font-weight: bold; }
 
-    /* موبایل */
-    @media (max-width: 576px) {
-      .content-area { padding: 1.5rem; }
-      .brand-title { font-size: 2rem; }
-      .contact-info { flex-direction: column; gap: 10px; }
-    }
   </style>
 </head>
 <body>
 
   <!-- هدر -->
-  <header class="hero">
-    <div class="container">
-      <h1 class="brand-title">تعالی همدلی</h1>
-      <p class="brand-subtitle">مسیر رشد مهربانی</p>
-    </div>
+  <header class="hero-header">
+    <h1 class="brand-title">تعالی همدلی</h1>
+    <p class="brand-subtitle">پلی میان دستان بخشنده و قلب‌های امیدوار</p>
   </header>
 
-  <!-- کانتینر اصلی -->
   <div class="main-container">
-    <div class="glass-card">
+    <div class="content-card">
       
       <!-- تب‌ها -->
-      <ul class="nav nav-tabs nav-fill" id="myTab" role="tablist">
+      <ul class="nav nav-pills nav-fill custom-tabs" id="pills-tab" role="tablist">
         <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="cash-tab" data-bs-toggle="tab" data-bs-target="#cash-pane" type="button">
-            <i class="fas fa-heart"></i> حمایت نقدی
+          <button class="nav-link active" id="tab-cash" data-bs-toggle="pill" data-bs-target="#content-cash" type="button">
+            <i class="fas fa-heart nav-icon"></i> همدلی مالی
           </button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="goods-tab" data-bs-toggle="tab" data-bs-target="#goods-pane" type="button">
-            <i class="fas fa-gift"></i> اهدای کالا
+          <button class="nav-link" id="tab-goods" data-bs-toggle="pill" data-bs-target="#content-goods" type="button">
+            <i class="fas fa-gift nav-icon"></i> اهدای کالا
           </button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="skills-tab" data-bs-toggle="tab" data-bs-target="#skills-pane" type="button">
-            <i class="fas fa-briefcase"></i> نذر تخصص
+          <button class="nav-link" id="tab-skills" data-bs-toggle="pill" data-bs-target="#content-skills" type="button">
+            <i class="fas fa-user-md nav-icon"></i> نذر تخصص
           </button>
         </li>
       </ul>
 
-      <!-- محتوای تب‌ها -->
-      <div class="tab-content" id="myTabContent">
+      <div class="tab-content" id="pills-tabContent">
         
-        <!-- ۱. تب حمایت نقدی (بدون فرم، فقط متن و دکمه) -->
-        <div class="tab-pane fade show active" id="cash-pane" role="tabpanel">
-          <div class="content-area text-center">
-            <div class="mb-4">
-              <i class="fas fa-hand-holding-heart fa-3x" style="color: var(--accent);"></i>
-            </div>
-            <h2 class="section-title">قطره‌قطره جمع گردد...</h2>
+        <!-- ۱. بخش همدلی مالی (بدون فرم، تمرکز بر احساس) -->
+        <div class="tab-pane fade show active" id="content-cash">
+          <div class="donation-box">
+            <div class="heart-icon"><i class="fas fa-hand-holding-heart"></i></div>
+            <h3 class="mb-4 fw-bold text-dark">قطره دریاست اگر با دریاست</h3>
             
-            <p class="emotional-text text-center">
-              همراه عزیز، گاهی تصور می‌کنیم برای کار خیر باید مبالغ هنگفتی داشته باشیم. اما در تعالی همدلی، باور داریم که 
-              <span class="highlight">هر محبت کوچکی، معجزه‌ای بزرگ است.</span>
-              <br><br>
-              شاید مبلغی که برای خرید یک <strong>قرص نان</strong>، یک <strong>کلاه گرم زمستانی</strong>، یا حتی یک <strong>کیلو عدس</strong> هزینه می‌شود، برای ما ناچیز باشد؛ اما همین مبلغ می‌تواند سفره‌ای خالی را رنگین کند و دلی را گرم نگه دارد.
-              <br>
-              بدون نیاز به ثبت نام، همین حالا می‌توانید در این زنجیره مهربانی سهیم باشید.
+            <p class="emotional-text">
+              مهربان عزیز؛<br>
+              گاهی گمان می‌کنیم برای کمک کردن باید ثروتمند باشیم.<br>
+              اما اینجا، حتی 
+              <span class="highlight">هزینه یک قرص نان</span>، 
+              <span class="highlight">یک کاسه آش گرم</span>، 
+              یا <span class="highlight">یک کلاه بافتنی</span> 
+              برای کودکی در سرما، معجزه می‌کند.<br>
+              شاید مبلغی که پرداخت می‌کنید اندک به نظر برسد، اما در سفره خانواده‌ای نیازمند، 
+              <span class="highlight">برکت و امید</span> می‌شود.
             </p>
 
-            <button onclick="handleCashClick()" class="btn-cta">
-              پرداخت و همدلی <i class="fas fa-chevron-left"></i>
+            <button onclick="handleCashClick()" class="btn-pay">
+              <i class="fas fa-check-circle ms-2"></i> پرداخت و همدلی
             </button>
+            <p class="mt-3 small text-muted">انتقال مستقیم به درگاه امن بانکی</p>
           </div>
         </div>
 
-        <!-- ۲. تب اهدای کالا -->
-        <div class="tab-pane fade" id="goods-pane" role="tabpanel">
-          <div class="content-area">
-            <h2 class="section-title">اهدای کالا و اقلام</h2>
-            
-            <div class="dignity-box">
-              <i class="fas fa-exclamation-circle mt-1"></i>
-              <div>
-                <strong>حفظ کرامت انسانی اولویت ماست:</strong>
-                <br>
-                لطفاً اقلام اهدایی (پوشاک، لوازم منزل و...) حتماً <strong>نو</strong> یا <strong>در حد نو، کاملاً سالم و تمیز</strong> باشند. بیایید آنچه را که برای عزیزان خود می‌پسندیم، هدیه دهیم.
+        <!-- ۲. بخش اهدای کالا (تاکید بر کرامت) -->
+        <div class="tab-pane fade p-4" id="content-goods">
+          <h4 class="mb-3 fw-bold text-dark">ثبت اقلام اهدایی</h4>
+          
+          <div class="dignity-alert">
+            <i class="fas fa-exclamation-triangle ms-2"></i>
+            <strong>توجه به کرامت انسانی:</strong><br>
+            لطفاً دقت فرمایید که وسایل اهدایی (پوشاک، لوازم منزل و...) 
+            حتماً <strong>نو، در حد نو، تمیز و کاملاً سالم</strong> باشند.<br>
+            ما متعهدیم که شأن و منزلت خانواده‌های تحت پوشش در بالاترین سطح حفظ شود.
+          </div>
+
+          <form id="form-goods" onsubmit="handleFormSubmit(event, 'goods')">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="gName" name="name" placeholder="نام" required>
+                  <label for="gName">نام خیر</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <input type="tel" class="form-control" id="gPhone" name="phone" placeholder="موبایل" required pattern="[0-9]{11}">
+                  <label for="gPhone">شماره تماس (جهت هماهنگی)</label>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-floating">
+                  <select class="form-select" id="gCat" name="category" required>
+                    <option value="" selected disabled>انتخاب کنید...</option>
+                    <option value="ارزاق و مواد غذایی">ارزاق و مواد غذایی (برنج، روغن، حبوبات...)</option>
+                    <option value="پوشاک و البسه">پوشاک و البسه (مناسب فصل)</option>
+                    <option value="لوازم تحریر">لوازم تحریر و آموزشی</option>
+                    <option value="لوازم خانگی">لوازم خانگی ضروری</option>
+                    <option value="دارو">دارو و تجهیزات درمانی</option>
+                  </select>
+                  <label for="gCat">دسته‌بندی کالا</label>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-floating">
+                  <textarea class="form-control" id="gDesc" name="desc" style="height: 100px" placeholder="توضیحات" required></textarea>
+                  <label for="gDesc">توضیحات (نوع کالا، تعداد، آدرس حدودی)</label>
+                </div>
               </div>
             </div>
-
-            <form id="form-goods" onsubmit="handleFormSubmit(event, 'goods')">
-              <div class="row g-3">
-                <div class="col-md-6">
-                  <label class="form-label">نام و نام خانوادگی</label>
-                  <input type="text" class="form-control" name="name" required>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">شماره همراه (جهت هماهنگی)</label>
-                  <input type="tel" class="form-control" name="phone" required pattern="[0-9]{11}">
-                </div>
-                <div class="col-12">
-                  <label class="form-label">دسته‌بندی کالا</label>
-                  <select class="form-select" name="category" required>
-                    <option value="" selected disabled>انتخاب کنید...</option>
-                    <option value="ارزاق و مواد غذایی">ارزاق و مواد غذایی (خشکبار، برنج، روغن...)</option>
-                    <option value="پوشاک و البسه">پوشاک و البسه (مناسب فصل)</option>
-                    <option value="لوازم خانگی">لوازم خانگی ضروری</option>
-                    <option value="لوازم تحریر">لوازم تحریر و آموزشی</option>
-                    <option value="تجهیزات درمانی">دارو و تجهیزات درمانی</option>
-                  </select>
-                </div>
-                <div class="col-12">
-                  <label class="form-label">توضیحات کالا و محدوده آدرس</label>
-                  <textarea class="form-control" name="desc" rows="3" required></textarea>
-                </div>
-              </div>
-              <button type="submit" class="btn-cta mt-4">ثبت جهت هماهنگی دریافت</button>
-            </form>
-          </div>
+            <button type="submit" class="btn-submit-form mt-4">ثبت جهت هماهنگی پیک</button>
+          </form>
         </div>
 
-        <!-- ۳. تب نذر تخصص -->
-        <div class="tab-pane fade" id="skills-pane" role="tabpanel">
-          <div class="content-area">
-            <h2 class="section-title">نذر تخصص و مهارت</h2>
-            <p class="emotional-text mb-4">
-              بزرگترین سرمایه، دانش و مهارت شماست. اگر پزشک، معلم، وکیل، مشاور، فنی‌کار یا هنرمند هستید، می‌توانید با اهدای ساعاتی از وقت خود، گره‌ای از کار نیازمندان باز کنید.
-            </p>
+        <!-- ۳. بخش نذر تخصص -->
+        <div class="tab-pane fade p-4" id="content-skills">
+          <h4 class="mb-3 fw-bold text-dark">نذر تخصص و مهارت</h4>
+          <p class="text-muted mb-4 small">
+            اگر پزشک، معلم، تعمیرکار، مشاور یا صاحب هر مهارت دیگری هستید، می‌توانید بخشی از وقت خود را نذر یاری رساندن کنید.
+          </p>
 
-            <form id="form-skills" onsubmit="handleFormSubmit(event, 'skills')">
-              <div class="row g-3">
-                <div class="col-md-6">
-                  <label class="form-label">نام و نام خانوادگی</label>
-                  <input type="text" class="form-control" name="name" required>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">شماره تماس</label>
-                  <input type="tel" class="form-control" name="phone" required>
-                </div>
-                <div class="col-12">
-                  <label class="form-label">عنوان تخصص / مهارت</label>
-                  <input type="text" class="form-control" name="expertise" required>
-                </div>
-                <div class="col-12">
-                  <label class="form-label">روزها و ساعات امکان همکاری</label>
-                  <input type="text" class="form-control" name="availability" required>
+          <form id="form-skills" onsubmit="handleFormSubmit(event, 'skills')">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="sName" name="name" placeholder="نام" required>
+                  <label for="sName">نام متخصص</label>
                 </div>
               </div>
-              <button type="submit" class="btn-cta mt-4">اعلام آمادگی</button>
-            </form>
-          </div>
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <input type="tel" class="form-control" id="sPhone" name="phone" placeholder="موبایل" required pattern="[0-9]{11}">
+                  <label for="sPhone">شماره تماس</label>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="sExpert" name="expertise" placeholder="تخصص" required>
+                  <label for="sExpert">زمینه تخصص (مثال: دندانپزشک، لوله‌کش، وکیل)</label>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="sAvail" name="availability" placeholder="زمان" required>
+                  <label for="sAvail">زمان‌های امکان همکاری (مثال: عصر سه‌شنبه‌ها)</label>
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="btn-submit-form mt-4">اعلام آمادگی</button>
+          </form>
         </div>
 
       </div>
     </div>
 
-    <!-- فوتر -->
+    <!-- فوتر با اطلاعات تماس -->
     <footer class="footer">
-      <strong>موسسه تعالی اندیشه و رشد</strong>
-      <p class="mb-3">تلاش برای ساختن دنیایی مهربان‌تر</p>
-      
-      <div class="contact-info">
+      <div class="mb-4">
         <div class="contact-item">
-          <i class="fas fa-map-marker-alt text-primary"></i>
-          <span>آدرس: تهران، [آدرس دقیق موسسه را اینجا بنویسید]</span>
+          <i class="fas fa-map-marker-alt"></i> 
+          تهران، [آدرس دقیق موسسه وارد شود]
         </div>
         <div class="contact-item">
-          <i class="fas fa-phone-alt text-primary"></i>
-          <span>تلفن: [شماره تماس]</span>
-        </div>
-        <div class="contact-item">
-          <i class="fas fa-globe text-primary"></i>
-          <a href="https://tashacol.ir" target="_blank">tashacol.ir</a>
+          <i class="fas fa-phone-alt"></i> 
+          [021-00000000]
         </div>
       </div>
+      
+      <p class="mb-1">وابسته به <a href="https://tashacol.ir" target="_blank">موسسه تعالی اندیشه و رشد</a></p>
+      <p class="small text-muted">&copy; تمامی حقوق برای مهربانی محفوظ است.</p>
     </footer>
   </div>
 
+  <!-- اسکریپت‌ها -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // تابع مخصوص دکمه پرداخت (بدون فرم)
+    // هندل کردن دکمه پرداخت نقدی (بدون فرم)
     function handleCashClick() {
+      // نمایش لودینگ
       Swal.fire({
         title: 'در حال انتقال...',
-        text: 'سپاس از قلب مهربان شما. در حال انتقال به درگاه امن بانکی.',
-        icon: 'info',
-        showConfirmButton: false,
-        timer: 2000,
+        text: 'سپاس از قلب مهربان شما',
+        timer: 1500,
         timerProgressBar: true,
-        didOpen: () => {
-          Swal.showLoading();
-        }
+        showConfirmButton: false,
+        didOpen: () => { Swal.showLoading() }
       });
 
-      // ارسال درخواست به سرور فقط برای ثبت آمار
-      const formData = { type: 'cash' };
-      google.script.run
-        .withSuccessHandler((response) => {
-          if (response.status === 'success') {
-            window.location.href = response.redirectUrl;
-          }
-        })
-        .processForm(formData);
+      // ارسال درخواست به سرور فقط برای لاگ کردن
+      google.script.run.withSuccessHandler((response) => {
+        window.location.href = response.redirectUrl;
+      }).processForm({ type: 'cash' });
     }
 
-    // تابع برای فرم‌های کالا و تخصص
+    // هندل کردن فرم‌های کالا و تخصص
     function handleFormSubmit(e, type) {
       e.preventDefault();
       
@@ -432,7 +413,7 @@
       const originalBtnText = submitBtn.innerHTML;
 
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> لطفا صبر کنید...';
+      submitBtn.innerHTML = 'در حال ثبت...';
 
       const formData = { type: type };
       new FormData(form).forEach((value, key) => formData[key] = value);
@@ -447,8 +428,8 @@
               icon: 'success',
               title: 'ثبت شد',
               text: response.message,
-              confirmButtonText: 'سپاس',
-              confirmButtonColor: '#0f172a'
+              confirmButtonColor: '#0f172a',
+              confirmButtonText: 'سپاس'
             });
             form.reset();
           } else {
@@ -462,11 +443,7 @@
         .withFailureHandler((error) => {
           submitBtn.disabled = false;
           submitBtn.innerHTML = originalBtnText;
-          Swal.fire({
-            icon: 'error',
-            title: 'خطای ارتباط',
-            text: 'لطفا اتصال اینترنت را بررسی کنید.'
-          });
+          Swal.fire({ icon: 'error', title: 'خطای ارتباط', text: 'لطفا اینترنت را بررسی کنید.' });
         })
         .processForm(formData);
     }
