@@ -1,4 +1,3 @@
- 
 
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
@@ -18,7 +17,7 @@
 
   <style>
     :root {
-      --primary: #0f172a; /* سرمه‌ای بسیار تیره و رسمی */
+      --primary: #0f172a; /* سرمه‌ای بسیار تیره */
       --accent: #ca8a04; /* طلایی پخته */
       --bg-body: #f8fafc;
       --text-main: #334155;
@@ -44,7 +43,6 @@
       box-shadow: 0 10px 30px rgba(15, 23, 42, 0.2);
     }
 
-    /* پترن پس‌زمینه */
     .hero::before {
       content: '';
       position: absolute;
@@ -115,10 +113,6 @@
       background-color: #e2e8f0;
     }
 
-    .nav-link i {
-      font-size: 1.2em;
-    }
-
     /* محتوا */
     .content-area {
       padding: 2.5rem;
@@ -141,7 +135,7 @@
     .emotional-text {
       font-size: 1.05rem;
       color: #475569;
-      margin-bottom: 2.5rem;
+      margin-bottom: 2rem;
       text-align: justify;
       line-height: 2;
     }
@@ -151,6 +145,49 @@
       font-weight: 800;
       border-bottom: 2px solid rgba(202, 138, 4, 0.2);
     }
+
+    /* نمایش شماره کارت */
+    .card-display-box {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 16px;
+      text-align: center;
+      margin-bottom: 25px;
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .card-label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .card-number {
+      font-family: 'Courier New', monospace;
+      font-size: 1.4rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+      direction: ltr;
+      display: block;
+      margin-bottom: 10px;
+      color: #fbbf24;
+    }
+
+    .copy-btn {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white;
+      font-size: 0.8rem;
+      padding: 5px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.2); }
 
     /* دکمه‌ها و فیلدها */
     .form-control, .form-select {
@@ -195,19 +232,6 @@
       transform: translateY(-3px);
       box-shadow: 0 15px 30px rgba(15, 23, 42, 0.25);
       color: #fff;
-    }
-
-    /* آیکون مالی بزرگ */
-    .cash-icon-container {
-      background: #ecfdf5;
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 1.5rem auto;
-      border: 2px solid #10b981;
     }
 
     /* باکس‌های هشدار */
@@ -313,26 +337,28 @@
         
         <!-- ۱. تب حمایت نقدی -->
         <div class="tab-pane fade show active" id="cash-pane" role="tabpanel">
-          <div class="content-area text-center">
+          <div class="content-area">
             
-            <div class="mb-4">
-               <!-- آیکونی شبیه به طراحی قبلی که خواستی -->
-               <img src="https://cdn-icons-png.flaticon.com/512/2953/2953363.png" width="90" alt="Donate">
-            </div>
-
             <h2 class="section-title">قطره‌قطره جمع گردد...</h2>
             
             <p class="emotional-text text-center">
               همراه عزیز، گاهی تصور می‌کنیم برای کار خیر باید مبالغ هنگفتی داشته باشیم. اما در <strong>تعالی همدلی</strong>، باور داریم که 
               <span class="highlight">هر محبت کوچکی، معجزه‌ای بزرگ است.</span>
-              <br><br>
-              شاید مبلغی که برای خرید یک <strong>قرص نان</strong>، یک <strong>کلاه گرم</strong>، یا حتی یک <strong>کیلو عدس</strong> هزینه می‌شود برای ما ناچیز باشد؛ اما همین مبلغ می‌تواند سفره‌ای خالی را رنگین کند.
               <br>
-              بدون نیاز به ثبت نام، همین حالا در این زنجیره مهربانی سهیم باشید.
+              برای حمایت، می‌توانید از طریق کارت به کارت یا درگاه پرداخت آنلاین اقدام نمایید.
             </p>
 
+            <!-- باکس شماره کارت -->
+            <div class="card-display-box">
+              <span class="card-label">شماره کارت جهت واریز</span>
+              <span class="card-number" id="cardNumberTxt">0000 0000 0000 0000</span>
+              <button class="copy-btn" onclick="copyCard()">
+                <i class="fas fa-copy"></i> کپی شماره کارت
+              </button>
+            </div>
+
             <button onclick="handleCashClick()" class="btn-cta">
-              پرداخت و همدلی <i class="fas fa-chevron-left"></i>
+              پرداخت از طریق درگاه آنلاین <i class="fas fa-chevron-left"></i>
             </button>
           </div>
         </div>
@@ -340,12 +366,6 @@
         <!-- ۲. تب اهدای کالا -->
         <div class="tab-pane fade" id="goods-pane" role="tabpanel">
           <div class="content-area">
-            
-            <div class="text-center mb-4">
-               <!-- آیکون مرتبط -->
-               <img src="https://cdn-icons-png.flaticon.com/512/4521/4521931.png" width="70" alt="Gift">
-            </div>
-
             <h2 class="section-title">اهدای کالا و اقلام</h2>
             
             <div class="dignity-box">
@@ -392,12 +412,6 @@
         <!-- ۳. تب نذر تخصص -->
         <div class="tab-pane fade" id="skills-pane" role="tabpanel">
           <div class="content-area">
-            
-            <div class="text-center mb-4">
-               <!-- آیکون مرتبط -->
-               <img src="https://cdn-icons-png.flaticon.com/512/3281/3281306.png" width="70" alt="Skill">
-            </div>
-
             <h2 class="section-title">نذر تخصص و مهارت</h2>
             <p class="emotional-text mb-4 text-center">
               بزرگترین سرمایه، دانش و مهارت شماست. اگر پزشک، معلم، وکیل، مشاور، فنی‌کار یا هنرمند هستید، می‌توانید با اهدای ساعاتی از وقت خود، گره‌ای از کار نیازمندان باز کنید.
@@ -438,11 +452,11 @@
       <div class="contact-info">
         <div class="contact-item">
           <i class="fas fa-map-marker-alt" style="color: var(--accent);"></i>
-          <span>تهران، [آدرس دقیق خود را اینجا بنویسید]</span>
+          <span>قم، بلوار امام موسی صدر، الهادی</span>
         </div>
         <div class="contact-item">
           <i class="fas fa-phone-alt" style="color: var(--accent);"></i>
-          <span>[شماره تماس]</span>
+          <a href="tel:09136395562">09136395562</a>
         </div>
         <div class="contact-item">
           <i class="fas fa-globe" style="color: var(--accent);"></i>
@@ -454,45 +468,56 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // ----------------------------------------------------
-    // تابع دکمه پرداخت (بدون فرم، مستقیم به درگاه)
-    // ----------------------------------------------------
+    // ************************************************
+    // تنظیمات اصلی (لینک پرداخت را اینجا وارد کنید)
+    // ************************************************
+    const PAYMENT_LINK = "https://zarinp.al/YOUR_LINK"; 
+    // ************************************************
+
+    // تابع کپی شماره کارت
+    function copyCard() {
+      const cardNum = "0000000000000000"; // شماره کارت بدون فاصله برای کپی
+      navigator.clipboard.writeText(cardNum).then(() => {
+        Swal.fire({
+          icon: 'success',
+          title: 'کپی شد',
+          text: 'شماره کارت در حافظه کپی شد.',
+          timer: 1500,
+          showConfirmButton: false
+        });
+      });
+    }
+
+    // تابع دکمه پرداخت (مستقیم به درگاه)
     function handleCashClick() {
-      // نمایش لودینگ زیبا
+      // 1. نمایش لودینگ
       Swal.fire({
         title: 'در حال انتقال...',
         text: 'سپاس از قلب مهربان شما. در حال اتصال به درگاه امن بانکی.',
         icon: 'info',
         showConfirmButton: false,
-        timer: 4000, // زمان احتیاطی
+        timer: 3000, 
         timerProgressBar: true,
-        allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
         }
       });
 
-      // ارسال درخواست به سرور (Google Apps Script)
+      // 2. ثبت آمار در گوگل شیت
       const formData = { type: 'cash' };
-      
       google.script.run
-        .withSuccessHandler((response) => {
-          if (response.status === 'success' && response.redirectUrl) {
-            // هدایت کاربر به لینک پرداخت
-            window.location.href = response.redirectUrl;
-          } else {
-            Swal.fire('خطا', 'لینک پرداخت یافت نشد.', 'error');
-          }
-        })
-        .withFailureHandler((error) => {
-          Swal.fire('خطا', 'مشکل در برقراری ارتباط.', 'error');
+        .withSuccessHandler(() => {
+           // موفقیت ثبت در شیت مهم نیست، ریدایرکت انجام می‌شود
         })
         .processForm(formData);
+
+      // 3. انتقال به درگاه (با کمی تاخیر برای نمایش پیام)
+      setTimeout(() => {
+        window.location.href = PAYMENT_LINK;
+      }, 1000);
     }
 
-    // ----------------------------------------------------
     // تابع ارسال فرم‌های کالا و تخصص
-    // ----------------------------------------------------
     function handleFormSubmit(e, type) {
       e.preventDefault();
       
@@ -500,11 +525,9 @@
       const submitBtn = form.querySelector('button[type="submit"]');
       const originalBtnText = submitBtn.innerHTML;
 
-      // تغییر دکمه به حالت لودینگ
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> لطفا صبر کنید...';
 
-      // جمع‌آوری داده‌ها
       const formData = { type: type };
       new FormData(form).forEach((value, key) => formData[key] = value);
 
