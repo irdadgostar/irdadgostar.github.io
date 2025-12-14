@@ -4,289 +4,276 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تعالی همدلی | سامانه مهرورزی</title>
-  
+  <title>سامانه تعالی همدلی</title>
   <!-- فونت وزیرمتن -->
   <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+  <!-- بوت‌استرپ ۵ (مدرن‌ترین نسخه) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
   <!-- آیکون‌ها -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- بوت‌استرپ 5 -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
-  <!-- SweetAlert2 -->
+  <!-- سوییت الرت -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
     :root {
-      --primary: #0f172a; /* سرمه‌ای بسیار تیره و رسمی */
-      --accent: #ca8a04; /* طلایی تیره */
-      --bg-body: #f8fafc;
-      --text-gray: #64748b;
+      --primary-color: #2c3e50;
+      --accent-color: #d35400; /* رنگ آجری گرم برای دکمه‌ها */
+      --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+      --card-shadow: 0 15px 35px rgba(0,0,0,0.1);
     }
 
     body {
       font-family: 'Vazirmatn', sans-serif;
-      background-color: var(--bg-body);
-      color: #334155;
+      background: var(--bg-gradient);
+      color: var(--primary-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
-    /* هدر */
-    .hero-header {
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-      color: white;
-      padding: 4rem 1rem 6rem 1rem;
+    /* هدر سایت */
+    .site-header {
+      background: #ffffff;
+      padding: 2rem 0;
       text-align: center;
-      border-radius: 0 0 40px 40px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
       position: relative;
       overflow: hidden;
     }
     
-    .hero-header::before {
+    .site-header::before {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-image: url("https://www.transparenttextures.com/patterns/cubes.png");
-      opacity: 0.05;
+      top: 0; right: 0; width: 100%; height: 5px;
+      background: linear-gradient(90deg, #2c3e50, #3498db);
     }
 
-    .brand-title {
-      font-weight: 800;
-      font-size: 2.5rem;
+    .main-title {
+      font-weight: 900;
+      font-size: 2rem;
+      color: #2c3e50;
       letter-spacing: -1px;
-      margin-bottom: 10px;
-      color: #f1f5f9;
+      margin-bottom: 0.5rem;
     }
 
-    .brand-subtitle {
+    .sub-title {
+      font-size: 0.9rem;
+      color: #7f8c8d;
       font-weight: 300;
-      opacity: 0.8;
-      font-size: 1.1rem;
     }
 
     /* کانتینر اصلی */
     .main-container {
-      max-width: 750px;
-      margin: -4rem auto 2rem auto;
-      padding: 0 15px;
+      max-width: 700px;
+      margin: -30px auto 0;
+      padding: 20px;
       position: relative;
       z-index: 10;
+      flex: 1;
     }
 
-    .content-card {
-      background: white;
-      border-radius: 24px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-      border: none;
-      overflow: hidden;
-    }
-
-    /* تب‌ها */
-    .custom-tabs {
-      border-bottom: 1px solid #e2e8f0;
+    /* کارت‌ها و تب‌ها */
+    .nav-pills {
       background: #fff;
+      padding: 10px;
+      border-radius: 50px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      margin-bottom: 25px;
+      justify-content: center;
+      gap: 10px;
     }
 
     .nav-link {
-      color: var(--text-gray);
-      font-weight: 600;
-      padding: 20px 10px;
-      border: none;
-      border-bottom: 3px solid transparent;
-      transition: all 0.3s;
-    }
-
-    .nav-link:hover {
-      color: var(--primary);
-      background: #f1f5f9;
+      color: #7f8c8d;
+      border-radius: 40px !important;
+      padding: 10px 25px;
+      font-weight: 700;
+      transition: all 0.3s ease;
     }
 
     .nav-link.active {
-      color: var(--primary);
-      background: transparent;
-      border-bottom: 3px solid var(--accent);
+      background-color: var(--primary-color) !important;
+      color: #fff !important;
+      box-shadow: 0 5px 15px rgba(44, 62, 80, 0.3);
+      transform: translateY(-2px);
     }
 
-    .nav-icon { font-size: 1.2rem; margin-left: 5px; vertical-align: middle; }
-
-    /* استایل‌های اختصاصی بخش‌ها */
-    .donation-box {
-      text-align: center;
-      padding: 2rem 1rem;
+    .content-card {
+      background: #ffffff;
+      border-radius: 25px;
+      padding: 40px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid rgba(255,255,255,0.8);
+      animation: fadeIn 0.6s ease-out;
     }
 
-    .heart-icon {
-      font-size: 4rem;
-      color: #e11d48;
-      margin-bottom: 1rem;
-      animation: beat 2s infinite;
-    }
-
-    @keyframes beat {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-    }
-
-    .emotional-text {
-      font-size: 1.1rem;
-      line-height: 1.8;
-      color: #475569;
-      margin-bottom: 2rem;
-    }
-
-    .highlight {
-      color: var(--accent);
-      font-weight: 700;
-    }
-
-    .btn-pay {
-      background: #10b981;
-      color: white;
-      font-size: 1.3rem;
-      font-weight: 800;
-      padding: 15px 40px;
-      border-radius: 50px;
-      border: none;
-      box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
-      transition: transform 0.2s, box-shadow 0.2s;
-      width: 100%;
-      max-width: 350px;
-    }
-
-    .btn-pay:hover {
-      background: #059669;
-      transform: translateY(-3px);
-      box-shadow: 0 15px 25px rgba(16, 185, 129, 0.4);
-    }
-
-    /* فرم‌ها */
+    /* استایل فرم‌ها */
     .form-floating > .form-control {
-      border-radius: 12px;
-      border: 1px solid #cbd5e1;
+      border-radius: 15px;
+      border: 1px solid #e0e0e0;
+      background: #f9f9f9;
     }
     
     .form-floating > .form-control:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.1);
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.25rem rgba(44, 62, 80, 0.1);
+      background: #fff;
     }
 
-    .dignity-alert {
-      background-color: #fff7ed;
-      border-right: 4px solid #f97316;
-      color: #9a3412;
-      padding: 15px;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      margin-bottom: 20px;
-      line-height: 1.6;
+    .form-floating > label {
+      color: #95a5a6;
     }
 
-    .btn-submit-form {
-      background: var(--primary);
+    /* دکمه‌ها */
+    .btn-action {
+      background: var(--accent-color);
       color: white;
-      padding: 14px;
-      border-radius: 12px;
-      font-weight: bold;
-      width: 100%;
       border: none;
-      transition: 0.3s;
+      padding: 15px 30px;
+      border-radius: 15px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      width: 100%;
+      box-shadow: 0 10px 20px rgba(211, 84, 0, 0.2);
+      transition: all 0.3s;
+      margin-top: 20px;
     }
 
-    .btn-submit-form:hover {
-      background: #1e293b;
+    .btn-action:hover {
+      background: #e67e22;
+      transform: translateY(-3px);
+      box-shadow: 0 15px 25px rgba(211, 84, 0, 0.3);
+    }
+
+    /* بخش متن انگیزشی (پول) */
+    .donation-quote {
+      text-align: center;
+      line-height: 2;
+      font-size: 1.1rem;
+      color: #34495e;
+    }
+    
+    .donation-quote strong {
+      color: var(--accent-color);
+    }
+
+    .highlight-icon {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+      background: -webkit-linear-gradient(#2c3e50, #3498db);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* بخش هشدار کرامت انسانی */
+    .dignity-notice {
+      background-color: #fef9e7;
+      border-right: 4px solid #f1c40f;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      color: #7f6000;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     /* فوتر */
-    .footer {
+    .site-footer {
+      background: #2c3e50;
+      color: #bdc3c7;
       text-align: center;
-      padding: 3rem 1rem;
-      color: #64748b;
+      padding: 30px 0;
+      margin-top: auto;
       font-size: 0.9rem;
     }
-
-    .contact-item {
-      display: inline-block;
-      margin: 0 10px;
-      background: white;
-      padding: 8px 15px;
-      border-radius: 50px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      margin-bottom: 10px;
-    }
     
-    .contact-item i { color: var(--primary); margin-left: 5px; }
-    .footer a { color: var(--primary); text-decoration: none; font-weight: bold; }
+    .site-footer a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+      border-bottom: 1px dashed #7f8c8d;
+    }
 
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
 
-  <!-- هدر -->
-  <header class="hero-header">
-    <h1 class="brand-title">تعالی همدلی</h1>
-    <p class="brand-subtitle">پلی میان دستان بخشنده و قلب‌های امیدوار</p>
+  <!-- هدر رسمی -->
+  <header class="site-header">
+    <div class="container">
+      <h1 class="main-title">سامانه تعالی همدلی</h1>
+      <p class="sub-title">پلی میان دستان بخشنده و قلب‌های امیدوار</p>
+    </div>
   </header>
 
+  <!-- بدنه اصلی -->
   <div class="main-container">
-    <div class="content-card">
+    
+    <!-- تب‌ها -->
+    <ul class="nav nav-pills" id="pills-tab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tab-money" data-bs-toggle="pill" data-bs-target="#content-money" type="button">
+          <i class="fas fa-heart me-1"></i> همیاری مالی
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-goods" data-bs-toggle="pill" data-bs-target="#content-goods" type="button">
+          <i class="fas fa-box-open me-1"></i> اهدای کالا
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-skills" data-bs-toggle="pill" data-bs-target="#content-skills" type="button">
+          <i class="fas fa-user-md me-1"></i> نذر تخصص
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content">
       
-      <!-- تب‌ها -->
-      <ul class="nav nav-pills nav-fill custom-tabs" id="pills-tab" role="tablist">
-        <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="tab-cash" data-bs-toggle="pill" data-bs-target="#content-cash" type="button">
-            <i class="fas fa-heart nav-icon"></i> همدلی مالی
-          </button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="tab-goods" data-bs-toggle="pill" data-bs-target="#content-goods" type="button">
-            <i class="fas fa-gift nav-icon"></i> اهدای کالا
-          </button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="tab-skills" data-bs-toggle="pill" data-bs-target="#content-skills" type="button">
-            <i class="fas fa-user-md nav-icon"></i> نذر تخصص
-          </button>
-        </li>
-      </ul>
-
-      <div class="tab-content" id="pills-tabContent">
-        
-        <!-- ۱. بخش همدلی مالی (بدون فرم، تمرکز بر احساس) -->
-        <div class="tab-pane fade show active" id="content-cash">
-          <div class="donation-box">
-            <div class="heart-icon"><i class="fas fa-hand-holding-heart"></i></div>
-            <h3 class="mb-4 fw-bold text-dark">قطره دریاست اگر با دریاست</h3>
-            
-            <p class="emotional-text">
-              مهربان عزیز؛<br>
-              گاهی گمان می‌کنیم برای کمک کردن باید ثروتمند باشیم.<br>
-              اما اینجا، حتی 
-              <span class="highlight">هزینه یک قرص نان</span>، 
-              <span class="highlight">یک کاسه آش گرم</span>، 
-              یا <span class="highlight">یک کلاه بافتنی</span> 
-              برای کودکی در سرما، معجزه می‌کند.<br>
-              شاید مبلغی که پرداخت می‌کنید اندک به نظر برسد، اما در سفره خانواده‌ای نیازمند، 
-              <span class="highlight">برکت و امید</span> می‌شود.
-            </p>
-
-            <button onclick="handleCashClick()" class="btn-pay">
-              <i class="fas fa-check-circle ms-2"></i> پرداخت و همدلی
+      <!-- ۱. بخش همیاری مالی (بدون فرم، مستقیم) -->
+      <div class="tab-pane fade show active" id="content-money">
+        <div class="content-card">
+          <div class="text-center">
+            <i class="fas fa-hand-holding-heart highlight-icon"></i>
+            <h4 class="mb-4 fw-bold">سهیم شدن در لبخند</h4>
+            <div class="donation-quote">
+              <p>گاهی مبلغ <strong>یک نان گرم</strong>، دل یک پدر را شاد می‌کند.</p>
+              <p>گاهی هزینه <strong>یک کاسه آش</strong>، گرمابخش سفره‌ای سرد می‌شود.</p>
+              <p>گاهی خرید <strong>یک کلاه کوچک</strong>، کودکی را از زمستان حفظ می‌کند.</p>
+              <p class="mt-3 text-muted" style="font-size: 0.9rem;">
+                در اینجا مبلغ مهم نیست؛ همدلی شما معجزه می‌کند. <br>
+                برای کمک نیازی به ثبت نام نیست.
+              </p>
+            </div>
+            <button onclick="goToPayment()" class="btn-action">
+              <i class="fas fa-credit-card me-2"></i> انتقال به درگاه مهربانی
             </button>
-            <p class="mt-3 small text-muted">انتقال مستقیم به درگاه امن بانکی</p>
           </div>
         </div>
+      </div>
 
-        <!-- ۲. بخش اهدای کالا (تاکید بر کرامت) -->
-        <div class="tab-pane fade p-4" id="content-goods">
-          <h4 class="mb-3 fw-bold text-dark">ثبت اقلام اهدایی</h4>
-          
-          <div class="dignity-alert">
-            <i class="fas fa-exclamation-triangle ms-2"></i>
-            <strong>توجه به کرامت انسانی:</strong><br>
-            لطفاً دقت فرمایید که وسایل اهدایی (پوشاک، لوازم منزل و...) 
-            حتماً <strong>نو، در حد نو، تمیز و کاملاً سالم</strong> باشند.<br>
-            ما متعهدیم که شأن و منزلت خانواده‌های تحت پوشش در بالاترین سطح حفظ شود.
+      <!-- ۲. بخش اهدای کالا -->
+      <div class="tab-pane fade" id="content-goods">
+        <div class="content-card">
+          <div class="text-center mb-4">
+            <h5 class="fw-bold"><i class="fas fa-gift me-2 text-warning"></i> اهدای اقلام و کالا</h5>
           </div>
 
-          <form id="form-goods" onsubmit="handleFormSubmit(event, 'goods')">
+          <!-- پیام کرامت انسانی -->
+          <div class="dignity-notice">
+            <i class="fas fa-info-circle fa-lg"></i>
+            <div>
+              <strong>نکته مهم:</strong> جهت حفظ شأن و کرامت عزیزانمان، لطفاً تنها وسایلی که <strong>نو</strong>، <strong>سالم</strong> و <strong>تمیز</strong> هستند را اهدا فرمایید.
+            </div>
+          </div>
+
+          <form id="form-goods" onsubmit="handleForm(event, 'goods')">
             <div class="row g-3">
               <div class="col-md-6">
                 <div class="form-floating">
@@ -296,42 +283,44 @@
               </div>
               <div class="col-md-6">
                 <div class="form-floating">
-                  <input type="tel" class="form-control" id="gPhone" name="phone" placeholder="موبایل" required pattern="[0-9]{11}">
-                  <label for="gPhone">شماره تماس (جهت هماهنگی)</label>
+                  <input type="tel" class="form-control" id="gPhone" name="phone" placeholder="موبایل" required>
+                  <label for="gPhone">شماره همراه</label>
                 </div>
               </div>
               <div class="col-12">
                 <div class="form-floating">
                   <select class="form-select" id="gCat" name="category" required>
                     <option value="" selected disabled>انتخاب کنید...</option>
-                    <option value="ارزاق و مواد غذایی">ارزاق و مواد غذایی (برنج، روغن، حبوبات...)</option>
-                    <option value="پوشاک و البسه">پوشاک و البسه (مناسب فصل)</option>
-                    <option value="لوازم تحریر">لوازم تحریر و آموزشی</option>
-                    <option value="لوازم خانگی">لوازم خانگی ضروری</option>
-                    <option value="دارو">دارو و تجهیزات درمانی</option>
+                    <option value="مواد غذایی">مواد غذایی (برنج، روغن، حبوبات...)</option>
+                    <option value="پوشاک و پتو">پوشاک گرم و پتو (نو/سالم)</option>
+                    <option value="لوازم تحصیل">لوازم التحریر و آموزشی</option>
+                    <option value="درمانی">دارو و اقلام بهداشتی</option>
+                    <option value="سایر">سایر موارد</option>
                   </select>
-                  <label for="gCat">دسته‌بندی کالا</label>
+                  <label for="gCat">دسته‌بندی اهدا</label>
                 </div>
               </div>
               <div class="col-12">
                 <div class="form-floating">
-                  <textarea class="form-control" id="gDesc" name="desc" style="height: 100px" placeholder="توضیحات" required></textarea>
-                  <label for="gDesc">توضیحات (نوع کالا، تعداد، آدرس حدودی)</label>
+                  <textarea class="form-control" id="gDesc" name="desc" placeholder="توضیحات" style="height: 100px" required></textarea>
+                  <label for="gDesc">آدرس حدودی یا توضیحات کالا</label>
                 </div>
               </div>
             </div>
-            <button type="submit" class="btn-submit-form mt-4">ثبت جهت هماهنگی پیک</button>
+            <button type="submit" class="btn-action">ثبت جهت هماهنگی</button>
           </form>
         </div>
+      </div>
 
-        <!-- ۳. بخش نذر تخصص -->
-        <div class="tab-pane fade p-4" id="content-skills">
-          <h4 class="mb-3 fw-bold text-dark">نذر تخصص و مهارت</h4>
-          <p class="text-muted mb-4 small">
-            اگر پزشک، معلم، تعمیرکار، مشاور یا صاحب هر مهارت دیگری هستید، می‌توانید بخشی از وقت خود را نذر یاری رساندن کنید.
-          </p>
+      <!-- ۳. بخش نذر تخصص -->
+      <div class="tab-pane fade" id="content-skills">
+        <div class="content-card">
+          <div class="text-center mb-4">
+            <h5 class="fw-bold"><i class="fas fa-tools me-2 text-info"></i> نذر وقت و تخصص</h5>
+            <p class="text-muted small">شاید تخصص شما، گره‌ای بزرگ را باز کند.</p>
+          </div>
 
-          <form id="form-skills" onsubmit="handleFormSubmit(event, 'skills')">
+          <form id="form-skills" onsubmit="handleForm(event, 'skills')">
             <div class="row g-3">
               <div class="col-md-6">
                 <div class="form-floating">
@@ -341,111 +330,94 @@
               </div>
               <div class="col-md-6">
                 <div class="form-floating">
-                  <input type="tel" class="form-control" id="sPhone" name="phone" placeholder="موبایل" required pattern="[0-9]{11}">
-                  <label for="sPhone">شماره تماس</label>
+                  <input type="tel" class="form-control" id="sPhone" name="phone" placeholder="موبایل" required>
+                  <label for="sPhone">شماره همراه</label>
                 </div>
               </div>
               <div class="col-12">
                 <div class="form-floating">
-                  <input type="text" class="form-control" id="sExpert" name="expertise" placeholder="تخصص" required>
-                  <label for="sExpert">زمینه تخصص (مثال: دندانپزشک، لوله‌کش، وکیل)</label>
+                  <input type="text" class="form-control" id="sSkill" name="skill" placeholder="تخصص" required>
+                  <label for="sSkill">عنوان تخصص (پزشک، معلم، فنی و...)</label>
                 </div>
               </div>
               <div class="col-12">
                 <div class="form-floating">
-                  <input type="text" class="form-control" id="sAvail" name="availability" placeholder="زمان" required>
-                  <label for="sAvail">زمان‌های امکان همکاری (مثال: عصر سه‌شنبه‌ها)</label>
+                  <textarea class="form-control" id="sDesc" name="desc" placeholder="توضیحات" style="height: 100px" required></textarea>
+                  <label for="sDesc">زمانی که می‌توانید اختصاص دهید</label>
                 </div>
               </div>
             </div>
-            <button type="submit" class="btn-submit-form mt-4">اعلام آمادگی</button>
+            <button type="submit" class="btn-action" style="background-color: #3498db;">اعلام آمادگی</button>
           </form>
         </div>
-
       </div>
+
     </div>
-
-    <!-- فوتر با اطلاعات تماس -->
-    <footer class="footer">
-      <div class="mb-4">
-        <div class="contact-item">
-          <i class="fas fa-map-marker-alt"></i> 
-          تهران، [آدرس دقیق موسسه وارد شود]
-        </div>
-        <div class="contact-item">
-          <i class="fas fa-phone-alt"></i> 
-          [021-00000000]
-        </div>
-      </div>
-      
-      <p class="mb-1">وابسته به <a href="https://tashacol.ir" target="_blank">موسسه تعالی اندیشه و رشد</a></p>
-      <p class="small text-muted">&copy; تمامی حقوق برای مهربانی محفوظ است.</p>
-    </footer>
   </div>
+
+  <!-- فوتر -->
+  <footer class="site-footer">
+    <div class="container">
+      <p class="mb-2">این سامانه وابسته به <strong>موسسه تعالی اندیشه و رشد</strong> می‌باشد.</p>
+      <div class="mb-3">
+        <a href="https://tashacol.ir" target="_blank">www.tashacol.ir</a>
+      </div>
+      <p class="small text-muted mb-0">
+        <i class="fas fa-map-marker-alt me-1"></i> آدرس: تهران، [آدرس دقیق موسسه را اینجا بنویسید] <br>
+        <i class="fas fa-phone me-1"></i> تلفن تماس: [شماره تماس]
+      </p>
+    </div>
+  </footer>
 
   <!-- اسکریپت‌ها -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // هندل کردن دکمه پرداخت نقدی (بدون فرم)
-    function handleCashClick() {
-      // نمایش لودینگ
-      Swal.fire({
-        title: 'در حال انتقال...',
-        text: 'سپاس از قلب مهربان شما',
-        timer: 1500,
-        timerProgressBar: true,
-        showConfirmButton: false,
-        didOpen: () => { Swal.showLoading() }
-      });
-
-      // ارسال درخواست به سرور فقط برای لاگ کردن
-      google.script.run.withSuccessHandler((response) => {
-        window.location.href = response.redirectUrl;
-      }).processForm({ type: 'cash' });
+    // هدایت به لینک پرداخت (سمت سرور لینک را می‌گیرد)
+    function goToPayment() {
+      google.script.run.withSuccessHandler(url => {
+        window.location.href = url;
+      }).getPaymentUrl();
     }
 
-    // هندل کردن فرم‌های کالا و تخصص
-    function handleFormSubmit(e, type) {
+    // ارسال فرم‌ها
+    function handleForm(e, type) {
       e.preventDefault();
       
-      const form = document.getElementById('form-' + type);
-      const submitBtn = form.querySelector('button[type="submit"]');
-      const originalBtnText = submitBtn.innerHTML;
+      const btn = e.target.querySelector('button[type="submit"]');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال ثبت...';
+      btn.disabled = true;
 
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = 'در حال ثبت...';
-
-      const formData = { type: type };
+      var form = document.getElementById('form-' + type);
+      var formData = { type: type };
       new FormData(form).forEach((value, key) => formData[key] = value);
 
-      google.script.run
-        .withSuccessHandler((response) => {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = originalBtnText;
+      google.script.run.withSuccessHandler(response => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
 
-          if (response.status === 'success') {
-            Swal.fire({
-              icon: 'success',
-              title: 'ثبت شد',
-              text: response.message,
-              confirmButtonColor: '#0f172a',
-              confirmButtonText: 'سپاس'
-            });
-            form.reset();
-          } else {
-            Swal.fire({
-              icon: 'error',
-              title: 'خطا',
-              text: 'مشکلی پیش آمد.'
-            });
-          }
-        })
-        .withFailureHandler((error) => {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = originalBtnText;
-          Swal.fire({ icon: 'error', title: 'خطای ارتباط', text: 'لطفا اینترنت را بررسی کنید.' });
-        })
-        .processForm(formData);
+        if (response.status === 'success') {
+          Swal.fire({
+            icon: 'success',
+            title: 'سپاس بی‌کران',
+            text: response.message,
+            confirmButtonColor: '#2c3e50',
+            confirmButtonText: 'بستن'
+          });
+          form.reset();
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'خطا',
+            text: response.message,
+            confirmButtonText: 'تلاش مجدد'
+          });
+        }
+      }).withFailureHandler(error => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        Swal.fire({icon: 'error', title: 'خطا در ارتباط', text: 'لطفا اتصال اینترنت را بررسی کنید.'});
+      }).processData(formData);
     }
   </script>
 </body>
