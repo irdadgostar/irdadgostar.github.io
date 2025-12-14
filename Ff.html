@@ -1098,8 +1098,8 @@
                     </div>
 
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-                        <!-- Name Removed, Transaction Button Added Here -->
-                        <span id="userNameDisplay" style="display:none;"></span> 
+                        <!-- Name Display -->
+                        <span id="userNameDisplay" style="font-size:0.9rem; font-weight:bold; opacity:0.9;">کاربر</span> 
                         <button id="btnHist" class="card-transfer-btn" onclick="openGlobalHistory(event)" style="margin-left:auto; margin-right:0;">
                             <i class="fas fa-history"></i> تراکنش‌ها
                         </button>
@@ -1993,6 +1993,7 @@
 
     const CONST_WALLET_DEBT = "اقساط ماهانه";
     const CONST_WALLET_CHECK = "چک و بدهی";
+    const RESTRICTED_SOURCES = ["کیف پول بیرونی", "External Wallet", "کیف پول دریافت وجه", "Receive Wallet"];
 
     const defaultState = {
         security: { hasPin: false, pin: "", isSetup: false, questionId: 0, answer: "", nationalId: "" },
@@ -2485,7 +2486,7 @@
 
     function showTransactionReceipt(dataStr) {
         const t = JSON.parse(decodeURIComponent(dataStr));
-        showReceipt(true, t.amount, t.from || 'سیستم', '---', t.to || '---', t.desc, t.id, t.date + ' ' + t.time);
+        showReceipt(true, t.amount, t.from || 'سیستم', app.user.name, t.to || '---', t.desc, t.id, t.date + ' ' + t.time);
     }
 
     // --- HELPER FUNCTIONS ---
@@ -2510,11 +2511,12 @@
         tempInternalTargetName = targetWalletName;
         document.getElementById('itTargetName').innerText = targetWalletName;
         
-        // Populate Source Select (exclude current target)
+        // Populate Source Select (exclude current target AND restricted wallets)
         const sel = document.getElementById('itSourceSelect');
         sel.innerHTML = app.wallets
             .map((w, i) => {
                 if (w.name === targetWalletName) return '';
+                if (RESTRICTED_SOURCES.includes(w.name)) return ''; // Filter out External Wallets
                 return `<option value="${i}">${w.name} (موجودی: ${format(w.value)})</option>`;
             }).join('');
         
@@ -2524,23 +2526,17 @@
         
         // Calculate Free Funds logic
         // Logic: Total Money in Wallets - Money currently in Restricted Wallets (Debt/Check) - Money already allocated to Budgets (Manual Adds + Distributed %)
-        // Wait, "Distributed Amount" in app.distributedAmount is the TOTAL distributable funds that were allocated.
         
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
         const restrictedWallets = [CONST_WALLET_DEBT, CONST_WALLET_CHECK];
         const restrictedValue = app.wallets.filter(w => restrictedWallets.includes(w.name)).reduce((a,w) => a+w.value, 0);
         const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
         
-        // Distributable Net calculated in renderUI
         let distributableNet = income - restrictedValue - manualDeductions;
         if (distributableNet < 0) distributableNet = 0;
         
-        // "Free Funds" typically means funds NOT yet distributed to the % system.
-        // `app.distributedAmount` stores the value that WAS distributed.
-        // So Free = distributableNet - app.distributedAmount.
-        
         let freeFunds = distributableNet - app.distributedAmount;
-        if (freeFunds < 0) freeFunds = 0; // Should not happen usually unless spent
+        if (freeFunds < 0) freeFunds = 0; 
 
         document.getElementById('itFreeFundsDisplay').innerText = format(freeFunds) + " تومان";
 
@@ -2572,7 +2568,6 @@
 
         if (!targetWallet) {
              ensureSpecialWalletExists(targetName);
-             // Re-fetch
              return performInternalTransfer(); 
         }
 
@@ -2580,7 +2575,6 @@
         if (sourceWallet.value < amount) return alert("موجودی کیف پول مبدا کافی نیست.");
 
         // Condition 2: Not previously divided check (using Free Funds logic)
-        // We re-calculate free funds to ensure correctness
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
         const restrictedWallets = [CONST_WALLET_DEBT, CONST_WALLET_CHECK];
         const restrictedValue = app.wallets.filter(w => restrictedWallets.includes(w.name)).reduce((a,w) => a+w.value, 0);
@@ -2589,17 +2583,6 @@
         let freeFunds = distributableNet - app.distributedAmount;
         
         // This check ensures we aren't moving money that is already "claimed" by the budget distribution system
-        // However, if the source IS a normal wallet, moving it to a restricted wallet REDUCES distributable net.
-        // If we move money that was part of "distributedAmount", we break the budget.
-        // So we must ensure: amount <= freeFunds + (funds inside source if source was already restricted... but source is usually general).
-        
-        // Simplifying: If Source is General Wallet -> We are moving General to Restricted.
-        // This decreases Distributable Net. 
-        // Current Distributable Net = X. Distributed Amount = Y. Free = X - Y.
-        // New Distributable Net = X - Amount.
-        // We need New Distributable Net >= Distributed Amount (Y).
-        // So X - Amount >= Y  =>  X - Y >= Amount => Free >= Amount.
-        
         if (freeFunds < amount) {
             return alert(`خطا: مبلغ وارد شده (${format(amount)}) بیشتر از مبلغ آزاد سیستم (${format(freeFunds)}) است. بخشی از این پول قبلاً در بودجه‌بندی توزیع شده است.`);
         }
@@ -2673,6 +2656,8 @@
                 renderUI();
             }
         });
+        // Pre-fill name
+        document.getElementById('uInputText').value = app.user.name;
     }
 
     function formatCurrency(input) {
@@ -2832,6 +2817,9 @@
 
             let walletsHtml = '';
             app.wallets.forEach((w, idx) => {
+                // Filter Restricted Sources for Bank Transfer too
+                if (RESTRICTED_SOURCES.includes(w.name)) return;
+
                 walletsHtml += `
                  <div style="margin-bottom:10px; border:1px solid #eee; padding:10px; border-radius:10px;">
                     <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
@@ -3147,8 +3135,10 @@
         const balEl = document.getElementById('totalBalance');
         if(!isBalanceHidden) balEl.innerText = format(cardNet);
 
-        document.getElementById('userNameDisplay').innerText = app.user.name;
-        document.getElementById('settingsUserName').innerText = app.user.name || 'کاربر';
+        // Name Update Here
+        const uName = app.user.name || 'کاربر';
+        document.getElementById('userNameDisplay').innerText = uName;
+        document.getElementById('settingsUserName').innerText = uName;
         document.getElementById('settingsNatId').innerText = toPersianNum(app.security.nationalId) || 'کد ملی ثبت نشده';
 
         document.getElementById('dDay').innerHTML = genOpts(1,31,1);
@@ -3565,6 +3555,11 @@
 
     function triggerDistribution() {
         withLoading(() => {
+            // FIX: Ensure Budgets Exist on first run
+            if(!app.budgets || app.budgets.length === 0) {
+                applyTemplate('default'); // Load default immediately if empty
+            }
+
             const income = app.wallets.reduce((a,b)=>a+b.value,0);
             
             // Recalculate distributable (Same logic as renderUI)
@@ -3812,6 +3807,19 @@
             const remaining = Math.max(0, g.target - g.curr);
             const autoBadge = g.autoConfig && g.autoConfig.type !== 'none' ? '<i class="fas fa-robot" style="color:var(--primary)" title="برداشت خودکار فعال"></i>' : '';
             
+            // Build Auto-Alloc Detail String
+            let autoDetail = "";
+            if(g.autoConfig && g.autoConfig.type !== 'none') {
+                const conf = g.autoConfig;
+                let srcName = conf.sourceId === 'main' ? 'ورودی اصلی' : 'ردیف بودجه';
+                if(conf.sourceId !== 'main') {
+                    const b = app.budgets.find(item => item.id == conf.sourceId);
+                    if(b) srcName = b.name;
+                }
+                const val = conf.type === 'percent' ? toPersianNum(conf.percent) + '%' : format(conf.amount) + ' ت';
+                autoDetail = `<div style="font-size:0.75rem; color:var(--info); margin-bottom:5px;">برداشت خودکار: <b>${val}</b> از <b>${srcName}</b></div>`;
+            }
+
             let statusHTML = `<span>مانده: <b style="color:var(--danger)">${format(remaining)}</b></span>`;
             let completeMsg = "";
             if (g.curr >= g.target) {
@@ -3829,6 +3837,7 @@
                        <button class="btn-small-icon btn-edit" onclick="openEdit('goal', ${i})"><i class="fas fa-edit"></i></button>
                     </span>
                 </div>
+                ${autoDetail}
                 <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-sec); margin-top:5px;">
                     <span>جمع‌شده: <b style="color:var(--success)">${format(g.curr)}</b></span>
                     ${statusHTML}
@@ -3884,6 +3893,19 @@
             const remaining = price > 0 ? Math.max(0, price - paid) : 0;
             let isComplete = (price > 0 && paid >= price);
             if(isComplete && s.autoConfig.type !== 'none') s.autoConfig.type = 'none';
+            
+            // Build Auto-Alloc Detail String for Shop
+            let autoDetail = "";
+            if(s.autoConfig && s.autoConfig.type !== 'none') {
+                const conf = s.autoConfig;
+                let srcName = conf.sourceId === 'main' ? 'ورودی اصلی' : 'ردیف بودجه';
+                if(conf.sourceId !== 'main') {
+                    const b = app.budgets.find(item => item.id == conf.sourceId);
+                    if(b) srcName = b.name;
+                }
+                const val = conf.type === 'percent' ? toPersianNum(conf.percent) + '%' : format(conf.amount) + ' ت';
+                autoDetail = `<div style="font-size:0.75rem; color:var(--info); margin-top:2px;">برداشت خودکار: <b>${val}</b> از <b>${srcName}</b></div>`;
+            }
 
             let msg = "";
             if(isComplete) msg = `<span class="complete-badge">خرید کامل شد</span>`;
@@ -3896,6 +3918,7 @@
                         <span style="color:var(--success)">پرداخت: ${format(paid)}</span>
                         ${price ? ` | <span style="color:var(--danger)">مانده: ${format(remaining)}</span>` : ''}
                     </div>
+                    ${autoDetail}
                 </div>
                 <div style="display:flex; gap:8px; align-items:center; margin-top:5px;">
                     <button class="btn btn-primary" style="font-size:0.8rem;" onclick="openAllocate('shop', ${i})" ${isComplete ? 'disabled style="opacity:0.5"' : ''}>خرید</button>
@@ -4061,6 +4084,16 @@
     }
 
     function openEdit(type, index) {
+        // Prevent editing External/Receive Wallets amount
+        if (type === 'wallet') {
+            const wName = app.wallets[index].name;
+            if (RESTRICTED_SOURCES.includes(wName)) {
+                // We allow changing name maybe (though better not), but DEFINITELY not adding balance via simple edit
+                // However, to be strict per Instruction 5 "Cannot add funds... via dashboard", I will disable amount.
+                // The modal opens now, logic handled below.
+            }
+        }
+
         openModal('editModal');
         document.getElementById('editType').value = type;
         document.getElementById('editIndex').value = index;
@@ -4069,7 +4102,7 @@
         let showPercent = false;
         let showAmount = true;
         let showDate = false;
-        let showDeduct = false; // Kept as var but logic changed
+        let showDeduct = false; 
 
         if(type === 'wallet') item = app.wallets[index];
         else if(type === 'debt') { item = app.debts[index]; showDate = true; }
@@ -4090,16 +4123,20 @@
             
             document.getElementById('editVal').value = val;
             formatCurrency(document.getElementById('editVal'));
+
+            // Instruction 5 Restriction Check
+            if (type === 'wallet' && RESTRICTED_SOURCES.includes(item.name)) {
+                document.getElementById('editVal').disabled = true;
+                document.getElementById('editVal').placeholder = "غیرقابل ویرایش دستی";
+            } else {
+                document.getElementById('editVal').disabled = false;
+            }
+
         } else {
             document.getElementById('editAmountWrapper').style.display = 'none';
         }
 
-        if(showDeduct) {
-            document.getElementById('editDeductWrapper').style.display = 'block';
-            // Logic for edit deduct check removed as per new instructions
-        } else {
-            document.getElementById('editDeductWrapper').style.display = 'none';
-        }
+        document.getElementById('editDeductWrapper').style.display = 'none';
 
         if(showPercent) {
             document.getElementById('editPercentWrapper').style.display = 'block';
@@ -4114,8 +4151,17 @@
             if(type === 'debt') {
                 row.innerHTML = `<select id="editDDay" class="date-sel" style="width:100%">${genOpts(1,31, item.day)}</select>`;
             } else {
-                const parts = item.date ? item.date.split('/') : [1403, 1, 1];
-                row.innerHTML = createDatePickerHTML('editD', parseInt(parts[2]), parseInt(parts[1]), parseInt(parts[0]));
+                // Instruction 3: Parse Existing Date
+                let d = 1, m = 1, y = 1403;
+                if (item.date) {
+                    const parts = item.date.split('/');
+                    if(parts.length === 3) {
+                        y = parseInt(parts[0]);
+                        m = parseInt(parts[1]);
+                        d = parseInt(parts[2]);
+                    }
+                }
+                row.innerHTML = createDatePickerHTML('editD', d, m, y);
             }
         } else {
             document.getElementById('editDateWrapper').style.display = 'none';
@@ -4132,6 +4178,18 @@
             let desc = "ویرایش آیتم";
 
             if(type === 'wallet') {
+                // Restriction check
+                if (RESTRICTED_SOURCES.includes(app.wallets[index].name)) {
+                   // Only allow name change if really needed, but generally these are system wallets.
+                   // Balance edit is blocked by UI, but double check here.
+                   const oldVal = app.wallets[index].value;
+                   const newVal = parseFormatted(document.getElementById('editVal').value);
+                   if (oldVal !== newVal) {
+                       alert("موجودی این کیف پول سیستمی قابل ویرایش دستی نیست.");
+                       return;
+                   }
+                }
+
                 saveSectionSnap('dashboard', `ویرایش کیف پول ${newName}`);
                 app.wallets[index].name = newName;
                 app.wallets[index].value = parseFormatted(document.getElementById('editVal').value);
@@ -4237,6 +4295,11 @@
         const n = document.getElementById('wName').value;
         const v = parseFormatted(document.getElementById('wVal').value);
         if(n && !isNaN(v)) {
+            // Instruction 5 Restriction: Check manual creation
+            if (RESTRICTED_SOURCES.includes(n)) {
+                return alert("ساخت کیف پول با این نام مجاز نیست (کیف پول سیستمی است).");
+            }
+
             saveSectionSnap('dashboard', `افزودن کیف پول ${n}`);
             app.wallets.push({name:n, value:v});
             saveData();
@@ -4603,7 +4666,7 @@
         });
     }
 
-    function editHistoryItem(budgetIdx, histId) {
+   function editHistoryItem(budgetIdx, histId) {
         closeAllModals();
         const budget = app.budgets[budgetIdx];
         const hIndex = budget.history.findIndex(h => h.id == histId);
@@ -4792,7 +4855,7 @@
     }
 
     function renderLineChart() {
-const ctx = document.getElementById('netWorthChart').getContext('2d');
+        const ctx = document.getElementById('netWorthChart').getContext('2d');
         if (myChart2) myChart2.destroy();
 
         const logs = app.dailyLogs.slice(-30);
@@ -5199,4 +5262,4 @@ const ctx = document.getElementById('netWorthChart').getContext('2d');
     }
 </script>
 </body>
-</html>
+</html>  
