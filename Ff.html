@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -1034,6 +1035,12 @@
             <input type="text" id="loginNatId" inputmode="numeric" pattern="[0-9]*" maxlength="10" placeholder="کد ملی خود را وارد کنید">
             <label class="auth-label">رمز عبور (۴ رقم):</label>
             <input type="password" id="loginPass" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="رمز عبور...">
+            
+            <!-- Biometric Login Button (New Instruction) -->
+            <button id="bioLoginBtn" class="btn btn-success" style="width:100%; margin-top:10px; display:none;" onclick="loginWithBiometric()">
+                <i class="fas fa-fingerprint"></i> ورود با اثر انگشت
+            </button>
+
             <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="processLogin()">ورود</button>
             <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="resetAuthView()">بازگشت</button>
             
@@ -1286,6 +1293,14 @@
                     <div style="display:flex; align-items:center;">
                         <div class="settings-item-icon si-blue"><i class="fas fa-moon"></i></div>
                         <div class="settings-text">حالت شب / روز</div>
+                    </div>
+                    <i class="fas fa-chevron-left settings-chevron"></i>
+                </div>
+                <!-- New: Biometric Settings -->
+                <div class="settings-item" onclick="setupBiometric()">
+                    <div style="display:flex; align-items:center;">
+                        <div class="settings-item-icon si-green"><i class="fas fa-fingerprint"></i></div>
+                        <div class="settings-text">فعال‌سازی ورود با اثر انگشت/فیس‌آیدی</div>
                     </div>
                     <i class="fas fa-chevron-left settings-chevron"></i>
                 </div>
@@ -2053,11 +2068,12 @@
     const CONST_WALLET_DEBT = "اقساط ماهانه";
     const CONST_WALLET_CHECK = "چک و بدهی";
     const RESTRICTED_SOURCES = ["کیف پول بیرونی", "External Wallet", "کیف پول دریافت وجه", "Receive Wallet"];
+    const LOCAL_STORAGE_KEY = 'amir_fin_v9';
 
     const defaultState = {
         security: { hasPin: false, pin: "", isSetup: false, questionId: 0, answer: "", nationalId: "" },
         user: { name: "", theme: "light", currency: "toman", startDate: Date.now() },
-        settings: { globalDeduct: true },
+        settings: { globalDeduct: true, biometricEnabled: false },
         wallets: [],
         debts: [],
         checks: [],
@@ -2306,6 +2322,17 @@
     function checkAuth() {
         document.getElementById('authModal').style.display = 'flex';
         resetAuthView();
+        
+        // بررسی فعال بودن ورود بیومتریک از لوکال استوریج
+        const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (localData) {
+            try {
+                const parsed = JSON.parse(localData);
+                if (parsed.settings && parsed.settings.biometricEnabled) {
+                    document.getElementById('bioLoginBtn').style.display = 'block';
+                }
+            } catch (e) { console.error("Error checking auth", e); }
+        }
     }
 
     function resetAuthView() {
@@ -2412,6 +2439,8 @@
         if(!/^\d{4}$/.test(pass)) return alert("رمز عبور باید ۴ رقم باشد");
 
         toggleLoading(true);
+
+        // تلاش اول: اتصال به سرور (آنلاین)
         googleApi('apiLogin', natId, pass)
             .then(response => {
                 toggleLoading(false);
@@ -2420,8 +2449,12 @@
                     const cloudData = response.userData.appData;
                     const securityData = response.userData.security;
                     app = { ...defaultState, ...cloudData };
-                    if(!app.transactionLog) app.transactionLog = []; // Init Log if missing
+                    if(!app.transactionLog) app.transactionLog = []; 
                     app.security = securityData;
+                    
+                    // ذخیره کامل در لوکال استوریج برای استفاده‌های بعدی (آفلاین)
+                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(app));
+
                     document.getElementById('authModal').style.display = 'none';
                     document.getElementById('appContent').style.display = 'block';
                     processDailyLog();
@@ -2442,9 +2475,111 @@
                 }
             })
             .catch(err => {
-                toggleLoading(false);
-                alert("خطا در ورود: " + err);
+                // حالت آفلاین: اگر سرور پاسخ نداد، از حافظه بخوان
+                console.warn("Server unreachable, trying local storage...", err);
+                const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (localData) {
+                    try {
+                        const json = JSON.parse(localData);
+                        // بررسی اعتبار در حالت آفلاین
+                        if (json.security && json.security.nationalId === natId && json.security.password === pass) {
+                            app = json;
+                            toggleLoading(false);
+                            document.getElementById('authModal').style.display = 'none';
+                            document.getElementById('appContent').style.display = 'block';
+                            processDailyLog();
+                            updateDate();
+                            renderUI();
+                            showToast("ورود آفلاین موفق", "wifi-slash");
+                            return;
+                        } else {
+                            toggleLoading(false);
+                            alert("اطلاعات ورود اشتباه است (آفلاین)");
+                        }
+                    } catch (e) {
+                        toggleLoading(false);
+                        alert("خطا در خواندن اطلاعات ذخیره شده.");
+                    }
+                } else {
+                    toggleLoading(false);
+                    alert("خطا در ارتباط با سرور و عدم وجود اطلاعات ذخیره شده: " + err);
+                }
             });
+    }
+
+    // --- Biometric Setup & Login ---
+    async function setupBiometric() {
+        if (!window.PublicKeyCredential) {
+            return alert("دستگاه شما از قابلیت ورود بیومتریک پشتیبانی نمی‌کند.");
+        }
+
+        try {
+            // ایجاد یک چالش تصادفی (در یک برنامه واقعی باید از سرور بیاید)
+            const challenge = new Uint8Array(32);
+            window.crypto.getRandomValues(challenge);
+
+            const publicKey = {
+                challenge: challenge,
+                rp: { name: "Capital Management App" },
+                user: {
+                    id: Uint8Array.from(app.security.nationalId, c => c.charCodeAt(0)),
+                    name: app.security.nationalId,
+                    displayName: app.user.name
+                },
+                pubKeyCredParams: [{ type: "public-key", alg: -7 }],
+                authenticatorSelection: { authenticatorAttachment: "platform" },
+                timeout: 60000
+            };
+
+            const credential = await navigator.credentials.create({ publicKey });
+            
+            if (credential) {
+                app.settings.biometricEnabled = true;
+                saveData();
+                showToast("ورود بیومتریک فعال شد");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("خطا در فعال‌سازی بیومتریک: " + err.message);
+        }
+    }
+
+    async function loginWithBiometric() {
+        if (!window.PublicKeyCredential) {
+            return alert("بیومتریک پشتیبانی نمی‌شود.");
+        }
+
+        // خواندن اطلاعات از حافظه
+        const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (!localData) return alert("اطلاعات کاربری یافت نشد. لطفاً ابتدا با رمز عبور وارد شوید.");
+
+        try {
+            const challenge = new Uint8Array(32);
+            window.crypto.getRandomValues(challenge);
+
+            const credential = await navigator.credentials.get({
+                publicKey: {
+                    challenge: challenge,
+                    timeout: 60000
+                }
+            });
+
+            if (credential) {
+                // اگر تایید شد، داده‌های لوکال را بارگذاری کن
+                const json = JSON.parse(localData);
+                app = json;
+                
+                document.getElementById('authModal').style.display = 'none';
+                document.getElementById('appContent').style.display = 'block';
+                processDailyLog();
+                updateDate();
+                renderUI();
+                showToast("ورود موفق با اثر انگشت", "fingerprint");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("احراز هویت ناموفق بود.");
+        }
     }
 
     // Instruction 3: Refresh Data Function
@@ -4589,7 +4724,7 @@
                     d = parseInt(parts[2]);
                 }
             }
-            // ارسال مقادیر استخراج شده به تابع سازنده
+// ارسال مقادیر استخراج شده به تابع سازنده
             row.innerHTML = createDatePickerHTML('editD', d, m, y);
         } else {
             document.getElementById('editDateWrapper').style.display = 'none';
@@ -4833,7 +4968,7 @@
         }
     }
 
-function delCheck(i) {
+    function delCheck(i) {
         if(confirm('حذف؟')) {
             saveSectionSnap('dashboard', `حذف چک ${app.checks[i].name}`);
             app.checks.splice(i,1);
@@ -5764,15 +5899,13 @@ function delCheck(i) {
         showToast("کپی شد: " + txt);
     }
 
-    // --- SAVING DATA ---
+    // --- SAVING DATA (Updated for Instruction 7) ---
     function saveData() {
-        // Instruction 1: Guest Mode check removed. Saving is mandatory.
-        
-        // Local Backup
-        localStorage.setItem('amir_fin_v9', JSON.stringify(app));
+        // Local Backup (Essential for offline access)
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(app));
 
-        // Cloud Backup (if logged in)
-        if(app.security && app.security.nationalId) {
+        // Cloud Backup (if logged in and online)
+        if(app.security && app.security.nationalId && navigator.onLine) {
             // Send appData to cloud
             googleApi('apiSaveData', app.security.nationalId, JSON.stringify(app))
                 .then(res => {
