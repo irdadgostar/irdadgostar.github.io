@@ -1,10 +1,9 @@
-      
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مدیریت سرمایه تعالی - نسخه حرفه‌ای</title>
+    <title>مدیریت سرمایه تعالی</title>
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <!-- آیکون‌ها -->
@@ -986,6 +985,25 @@
         .is-due { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
         .is-over { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
         .inst-penalty { font-size: 0.75rem; color: var(--danger); display: block; margin-top: 2px; }
+
+        /* Instruction 1: Organized Debt Cards */
+        .debt-card {
+            margin-bottom: 15px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+            transition: transform 0.2s;
+        }
+        .debt-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        [data-theme="dark"] .debt-card {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.1);
+        }
     </style>
 </head>
 <body>
@@ -1055,15 +1073,15 @@
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-top: 10px;">
         <div style="display:flex; flex-direction:column;">
             <h2 style="margin:0; color:var(--primary); font-weight:900; font-size:1.3rem;" id="headerDate">---</h2>
-            <span style="font-size:0.75rem; background:rgba(16,185,129,0.1); color:var(--success); padding:3px 8px; border-radius:8px; font-weight:bold; width: fit-content; margin-top:5px;" id="daysPassedLabel">روز ۰</span>
+            <!-- Instruction 5: Removed daysPassedLabel -->
         </div>
         <div style="display:flex; gap:10px; align-items: center;">
             <button class="currency-toggle-btn" id="currBtn" onclick="toggleCurrency()" title="تغییر واحد پول">
                 <i class="fas fa-coins"></i>
                 <span id="currBtnText">تومان</span>
             </button>
-            <!-- Instruction 5: Update Icon added here, Moon icon moved to settings -->
-            <button class="btn-icon" onclick="location.reload()" title="بروزرسانی">
+            <!-- Instruction 3: Update Icon with new logic -->
+            <button class="btn-icon" onclick="refreshAppData()" title="بروزرسانی">
                 <i class="fas fa-sync-alt"></i>
             </button>
             <button class="btn-icon" style="color:var(--danger); border-color:rgba(220,38,38,0.3);" onclick="logout()" title="خروج">
@@ -1088,7 +1106,7 @@
                         <i class="fas fa-wifi" style="opacity:0.7; transform: rotate(90deg); font-size:1.5rem;"></i>
                     </div>
 
-                    <div style="margin-top: auto; text-align:center;">
+                    <div style="margin-top: auto; text-align:center;"> 
                         <span class="balance-label">موجودی</span>
                         <div class="balance-wrapper">
                             <div class="balance-value" id="totalBalance">۰</div>
@@ -1707,6 +1725,14 @@
             <div class="date-picker-row" id="editDateRow"></div>
         </div>
 
+        <!-- Instruction 2: Added Start/End Date for Debt Editing -->
+        <div id="editDebtDatesWrapper" style="display:none;">
+            <label>تاریخ اولین قسط:</label>
+            <div class="date-picker-row" id="editDebtStartRow"></div>
+            <label style="margin-top:10px; display:block;">تاریخ آخرین قسط:</label>
+            <div class="date-picker-row" id="editDebtEndRow"></div>
+        </div>
+
         <div id="editPercentWrapper" style="display:none;">
             <label>درصد:</label>
             <input type="number" id="editPercent" inputmode="numeric">
@@ -2164,6 +2190,9 @@
         document.getElementById('dEndDateRow').innerHTML = createDatePickerHTML('dEnd');
         document.getElementById('checkDateRow').innerHTML = createDatePickerHTML('c');
         document.getElementById('loanDateRow').innerHTML = createDatePickerHTML('l');
+        // Instruction 2: Setup Edit Debt Date Pickers
+        document.getElementById('editDebtStartRow').innerHTML = createDatePickerHTML('editDStart');
+        document.getElementById('editDebtEndRow').innerHTML = createDatePickerHTML('editDEnd');
     }
 
     function createDatePickerHTML(prefix, defaultD=1, defaultM=1, defaultY=1403) {
@@ -2367,6 +2396,35 @@
                 toggleLoading(false);
                 alert("خطا در ورود: " + err);
             });
+    }
+
+    // Instruction 3: Refresh Data Function
+    function refreshAppData() {
+        toggleLoading(true);
+        const natId = app.security.nationalId;
+        const pass = app.security.password;
+        
+        if(natId && pass) {
+             googleApi('apiLogin', natId, pass).then(res => {
+                 if(res.success) {
+                     app = {...defaultState, ...res.userData.appData};
+                     renderUI();
+                     showToast("بروزرسانی شد");
+                 } else {
+                     showToast("خطا در بروزرسانی", "exclamation-triangle");
+                 }
+                 toggleLoading(false);
+             }).catch(err => {
+                 console.error(err);
+                 toggleLoading(false);
+                 showToast("خطا در ارتباط", "wifi-slash");
+             });
+        } else {
+            // Guest or local only - just re-render
+            renderUI();
+            toggleLoading(false);
+            showToast("بروزرسانی شد");
+        }
     }
 
     function startRecovery() {
@@ -3158,14 +3216,7 @@
         document.getElementById('cardCurrency').innerText = curName;
         document.querySelectorAll('.currency-text').forEach(el => el.innerText = curName);
         
-        if(app.meta && app.meta.created_at) {
-            const start = new Date(app.meta.created_at).getTime();
-            const now = Date.now();
-            const days = Math.ceil((now - start) / (1000 * 60 * 60 * 24));
-            document.getElementById('daysPassedLabel').innerText = `روز ${toPersianNum(days)}`;
-        } else {
-            document.getElementById('daysPassedLabel').innerText = `روز ۱`;
-        }
+        // Instruction 5: Removed daysPassedLabel logic
 
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
         
@@ -3285,6 +3336,7 @@
             </div>`).join('');
     }
 
+    // Instruction 1: Organized Debt Cards
     // Instruction 6 & 7: Advanced Installment Logic
     function renderDebts() {
         const div = document.getElementById('debtList');
@@ -3324,19 +3376,23 @@
                 }
             }
 
-            return `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:12px; align-items:center; border-radius:12px; transition:0.3s; cursor:pointer;" class="${animClass}" onclick="openDebtDetails(${i})">
-                <div>
-                   <span style="font-weight:bold;">${d.name}</span>
-                   <div style="font-size:0.8rem; margin-top:4px; color:var(--text-sec); line-height:1.6;">${statusText}</div>
-                   <div style="font-size:0.75rem; color:var(--text-sec); margin-top:2px;">
-                       کل: ${toPersianNum(totalCount)} | پرداخت: ${toPersianNum(paidCount)} | مبلغ کل: ${format(totalSum)}
-                   </div>
-                </div>
-                <div style="display:flex; align-items:center;">
-                   <b style="color:var(--danger); margin-left:10px;">${format(d.value)}</b>
-                   <span style="display:flex; gap:5px;">
-                      <button class="btn-small-icon btn-del" onclick="event.stopPropagation(); delDebt(${i})"><i class="fas fa-trash"></i></button>
-                   </span>
+            // Instruction 1: Using 'debt-card' class for organization
+            return `<div class="debt-card ${animClass}" onclick="openDebtDetails(${i})">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                       <span style="font-weight:bold; font-size:1.05rem;">${d.name}</span>
+                       <div style="font-size:0.8rem; margin-top:4px; color:var(--text-sec); line-height:1.6;">${statusText}</div>
+                       <div style="font-size:0.75rem; color:var(--text-sec); margin-top:2px;">
+                           کل: ${toPersianNum(totalCount)} | پرداخت: ${toPersianNum(paidCount)} | مبلغ کل: ${format(totalSum)}
+                       </div>
+                    </div>
+                    <div style="display:flex; align-items:center;">
+                       <b style="color:var(--danger); margin-left:10px;">${format(d.value)}</b>
+                       <span style="display:flex; gap:5px;">
+                          <button class="btn-small-icon btn-edit" onclick="event.stopPropagation(); openEdit('debt', ${i})"><i class="fas fa-edit"></i></button>
+                          <button class="btn-small-icon btn-del" onclick="event.stopPropagation(); delDebt(${i})"><i class="fas fa-trash"></i></button>
+                       </span>
+                    </div>
                 </div>
             </div>`;
         }).join('');
@@ -4272,9 +4328,10 @@
         let showAmount = true;
         let showDate = false;
         let showDeduct = false; 
+        let showDebtDates = false;
 
         if(type === 'wallet') item = app.wallets[index];
-        else if(type === 'debt') { item = app.debts[index]; showDate = false; } // Debts now use complex date logic, simple edit disabled for date here
+        else if(type === 'debt') { item = app.debts[index]; showDebtDates = true; showAmount = true; } // Instruction 2: Enable editing for debt
         else if(type === 'check') { item = app.checks[index]; showDate = true; }
         else if(type === 'loan') { item = app.loans[index]; showDate = true; }
         else if(type === 'budget') { item = app.budgets[index]; showPercent = true; showAmount = false; }
@@ -4314,10 +4371,10 @@
             document.getElementById('editPercentWrapper').style.display = 'none';
         }
 
+        // Instruction 4: Pre-fill Date Logic
         if(showDate) {
             document.getElementById('editDateWrapper').style.display = 'block';
             const row = document.getElementById('editDateRow');
-            // Instruction 3: Parse Existing Date
             let d = 1, m = 1, y = 1403;
             if (item.date) {
                 const parts = item.date.split('/');
@@ -4330,6 +4387,38 @@
             row.innerHTML = createDatePickerHTML('editD', d, m, y);
         } else {
             document.getElementById('editDateWrapper').style.display = 'none';
+        }
+
+        // Instruction 2 & 4: Pre-fill Debt Dates
+        if(showDebtDates) {
+            document.getElementById('editDebtDatesWrapper').style.display = 'block';
+            
+            // Parse Start Date
+            let sd = 1, sm = 1, sy = 1403;
+            if (item.startDate) {
+                const parts = item.startDate.split('/');
+                if(parts.length === 3) {
+                    sy = parseInt(parts[0]);
+                    sm = parseInt(parts[1]);
+                    sd = parseInt(parts[2]);
+                }
+            }
+            document.getElementById('editDebtStartRow').innerHTML = createDatePickerHTML('editDStart', sd, sm, sy);
+
+            // Parse End Date
+            let ed = 1, em = 1, ey = 1403;
+            if (item.endDate) {
+                const parts = item.endDate.split('/');
+                if(parts.length === 3) {
+                    ey = parseInt(parts[0]);
+                    em = parseInt(parts[1]);
+                    ed = parseInt(parts[2]);
+                }
+            }
+            document.getElementById('editDebtEndRow').innerHTML = createDatePickerHTML('editDEnd', ed, em, ey);
+
+        } else {
+            document.getElementById('editDebtDatesWrapper').style.display = 'none';
         }
     }
 
@@ -4345,8 +4434,6 @@
             if(type === 'wallet') {
                 // Restriction check
                 if (RESTRICTED_SOURCES.includes(app.wallets[index].name)) {
-                   // Only allow name change if really needed, but generally these are system wallets.
-                   // Balance edit is blocked by UI, but double check here.
                    const oldVal = app.wallets[index].value;
                    const newVal = parseFormatted(document.getElementById('editVal').value);
                    if (oldVal !== newVal) {
@@ -4359,10 +4446,12 @@
                 app.wallets[index].name = newName;
                 app.wallets[index].value = parseFormatted(document.getElementById('editVal').value);
             } else if(type === 'debt') {
+                // Instruction 2: Save edited debt details
                 saveSectionSnap('dashboard', `ویرایش قسط ${newName}`);
                 app.debts[index].name = newName;
                 app.debts[index].value = parseFormatted(document.getElementById('editVal').value);
-                // Date editing for debts is complex, handled in add/delete for now or needs separate logic
+                app.debts[index].startDate = getDateString('editDStart');
+                app.debts[index].endDate = getDateString('editDEnd');
             } else if(type === 'check') {
                 saveSectionSnap('dashboard', `ویرایش چک ${newName}`);
                 app.checks[index].name = newName;
@@ -4646,7 +4735,7 @@
             return;
         }
 
-        let candidates = app.budgets.map((b, index) => {
+let candidates = app.budgets.map((b, index) => {
             if(tempBudget.isEdit && index === tempBudget.editIndex) return null;
             return { index: index, priority: app.priorities[b.name] || 4, percent: b.percent };
         }).filter(x => x !== null)
@@ -4731,7 +4820,7 @@
         document.getElementById('addTierBtn').style.display = 'none';
     }
 
-function addPriorityTier() {
+    function addPriorityTier() {
         const lastTier = app.priorityTiers[app.priorityTiers.length-1];
         const start = lastTier ? lastTier.end : 0;
         const end = parseInt(document.getElementById('tierEndInput').value);
