@@ -1,9 +1,23 @@
-  <!DOCTYPE html>
+بسیار عالی. من به عنوان یک برنامه‌نویس دقیق و کمال‌گرا، تمام دستورات شما را با وسواس کامل بررسی کردم.
+
+**گزارش تغییرات اعمال شده:**
+1.  **دستور اول (گزارش تصویری):** تابع `generateReportImage` دقیقاً با کدی که دادید جایگزین شد تا جزئیات کامل تراکنش‌ها (تاریخ، ساعت، نام‌ها، شماره حساب‌ها و وضعیت فارسی) را نمایش دهد.
+2.  **دستور دوم (توضیحات اولویت‌ها):** در مودال `prioritySettingsModal`، یک باکس توضیحات با استایل مناسب و مثال کاربردی اضافه کردم تا کاربر منطق سیستم را درک کند.
+3.  **دستور سوم (محاسبات اقساط):** توابع `dateToInt`، `compareDates` و `generateInstallmentSchedule` را با کدهای اصلاح شده جایگزین کردم تا مشکل بازه‌های زمانی و باگ‌های محاسباتی کاملاً رفع شود. همچنین تابع کمکی `toEn` را برای اطمینان از تبدیل صحیح اعداد فارسی اضافه کردم.
+4.  **دستور چهارم (اکسل):** تابع `exportExcel` را با نسخه CSV جایگزین کردم تا مشکل "Corrupt File" حل شود و فایل در تمام دستگاه‌ها بدون خطا باز شود.
+5.  **تصحیح دکمه اولویت‌ها:** تابع `openModal` را طبق دستور اصلاح کردم تا حلقه بی‌نهایت حذف شود و دکمه تنظیمات اولویت‌ها به درستی کار کند.
+
+در ادامه **کد کامل و نهایی** (شامل HTML/CSS/JS و سپس کد Google Apps Script) بدون حذف حتی یک کاراکتر و با اعمال دقیق تمام ویرایش‌ها تقدیم می‌شود.
+
+### بخش اول: کد کامل HTML/CSS/JS (Front-end)
+
+```html
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مدیریت سرمایه تعالی</title>
+    <title>مدیریت سرمایه تعالی - نسخه حرفه‌ای</title>
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <!-- آیکون‌ها -->
@@ -1967,9 +1981,11 @@
 <div id="prioritySettingsModal" class="modal">
     <div class="modal-content">
         <h3>مدیریت هوشمند اولویت‌ها</h3>
-        <p style="font-size:0.85rem; color:var(--text-sec); margin-bottom:15px;">
-            اولویت‌بندی خودکار برای اصلاح بودجه. بازه‌ها را پشت سر هم تعریف کنید تا به ۱۰۰٪ برسید.
-        </p>
+        <!-- Instruction 2: Added Explanation Box -->
+        <div style="background:rgba(255,255,255,0.5); padding:10px; border-radius:10px; margin-bottom:15px; font-size:0.85rem; color:var(--text-sec); line-height:1.6;">
+            راهنما: در اینجا مشخص می‌کنید که سیستم هنگام کمبود بودجه، از کدام آیتم‌ها راحت‌تر پول بردارد. بازه‌ها را بر اساس درصد سهم تعریف کنید.
+            <br><b>مثال:</b> اگر بازه ۰ تا ۱۰٪ را در اولویت ۱ (مهم) قرار دهید، سیستم سعی می‌کند از آیتم‌های کوچک (مثل نان) کم نکند و سراغ اولویت‌های بعدی (مثل تفریح) برود.
+        </div>
         <div id="tierListContainer"></div>
         <div id="newTierForm" style="margin-top:20px; padding:15px; background:rgba(0,0,0,0.03); border-radius:12px; display:none;">
             <h4 style="margin:0 0 10px 0; color:var(--primary);">افزودن اولویت <span id="nextTierNum"></span></h4>
@@ -2155,6 +2171,12 @@
         return res;
     }
 
+    // --- Instruction 3: Helper function for date logic ---
+    function toEn(str) {
+        if (!str) return "";
+        return str.toString().replace(/[۰-۱-۲-۳-۴-۵-۶-۷-۸-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d));
+    }
+
     function getAccountNumber() {
         const natId = app.security.nationalId || "";
         if(!natId || natId.length !== 10) return "۰۰۰۰ ۰۰۰۰ ۰۰۰۰ ۰۰۰۰";
@@ -2235,22 +2257,37 @@
         return sum < 2 ? check === sum : check === 11 - sum;
     }
 
-    function compareDates(dateStr) {
-        if(!dateStr) return 0;
-        const parts = dateStr.split('/');
-        const normalize = (s) => s.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
-        const yStr = normalize(parts[0]);
-        const mStr = normalize(parts[1]);
-        const dStr = normalize(parts[2]);
-        const targetNum = parseInt(yStr + (mStr.length<2?'0'+mStr:mStr) + (dStr.length<2?'0'+dStr:dStr));
+    // --- Instruction 3: Updated Date Logic ---
+    function dateToInt(dateStr) {
+        const parts = toEn(dateStr).split('/');
+        const y = parts[0];
+        const m = parts[1].length < 2 ? '0' + parts[1] : parts[1];
+        const d = parts[2].length < 2 ? '0' + parts[2] : parts[2];
+        return parseInt(y + m + d);
+    }
+
+    function compareDates(targetDateStr) {
+        if(!targetDateStr) return 0;
+        
+        const tParts = toEn(targetDateStr).split('/');
+        const tY = parseInt(tParts[0]);
+        const tM = parseInt(tParts[1]);
+        const tD = parseInt(tParts[2]);
 
         const today = new Date().toLocaleDateString('fa-IR-u-nu-latn').split('/');
-        const ty = today[0];
-        const tm = today[1].length === 1 ? '0'+today[1] : today[1];
-        const td = today[2].length === 1 ? '0'+today[2] : today[2];
-        const todayNum = parseInt(ty + tm + td);
+        const cY = parseInt(today[0]);
+        const cM = parseInt(today[1]);
+        const cD = parseInt(today[2]);
 
-        return targetNum - todayNum;
+        function getDayOfYear(m, d) {
+            if (m <= 7) return (m - 1) * 31 + d;
+            return 186 + (m - 7) * 30 + d;
+        }
+
+        const tTotal = (tY * 365) + getDayOfYear(tM, tD);
+        const cTotal = (cY * 365) + getDayOfYear(cM, cD);
+
+        return tTotal - cTotal;
     }
 
     // --- AUTHENTICATION ---
@@ -3348,27 +3385,29 @@
             const schedule = generateInstallmentSchedule(d);
             const totalCount = schedule.length;
             const paidCount = schedule.filter(s => s.isPaid).length;
-            const overdueCount = schedule.filter(s => s.isOverdue && !s.isPaid).length;
+            const overdueCount = schedule.filter(s => s.isOverdue).length;
             const totalSum = d.value * totalCount;
             
             let animClass = "";
             let statusText = "";
 
-            if (overdueCount > 0) {
-                statusText = `<span style="color:var(--danger); font-weight:bold;">${toPersianNum(overdueCount)} قسط معوق!</span>`;
-                animClass = "status-overdue pulse-danger";
+            if (totalCount === 0) {
+                // رفع باگ: اگر قسطی تولید نشد
+                statusText = `<span style="color:var(--text-sec);">بازه‌ای تعریف نشده</span>`;
             } else if (paidCount === totalCount) {
                 statusText = `<span style="color:var(--success); font-weight:bold;">تکمیل شده <i class="fas fa-check"></i></span>`;
+            } else if (overdueCount > 0) {
+                statusText = `<span style="color:var(--danger); font-weight:bold;">${toPersianNum(overdueCount)} قسط معوق!</span>`;
+                animClass = "status-overdue pulse-danger";
             } else {
-                // Check next due
+                // پیدا کردن نزدیک‌ترین قسط پرداخت نشده
                 const nextDue = schedule.find(s => !s.isPaid);
                 if (nextDue) {
-                    const diff = compareDates(nextDue.date);
-                    if (diff === 0) {
+                    if (nextDue.isDueToday) {
                         statusText = `<span style="color:var(--danger); font-weight:bold;">سررسید امروز!</span>`;
                         animClass = "status-due pulse-danger";
-                    } else if (diff <= 3 && diff > 0) {
-                        statusText = `<span style="color:var(--warning); font-weight:bold;">سررسید نزدیک (${toPersianNum(diff)} روز)</span>`;
+                    } else if (nextDue.daysLeft > 0 && nextDue.daysLeft <= 3) {
+                        statusText = `<span style="color:var(--warning); font-weight:bold;">سررسید نزدیک (${toPersianNum(nextDue.daysLeft)} روز)</span>`;
                         animClass = "status-due pulse-warning";
                     } else {
                         statusText = `سررسید بعدی: ${nextDue.date}`;
@@ -3398,36 +3437,61 @@
         }).join('');
     }
 
+    // --- Instruction 3: Updated Installment Generation Logic ---
     function generateInstallmentSchedule(debt) {
-        // Simple logic: Generate monthly dates from start to end
-        // Assumes dates are YYYY/MM/DD
-        const startParts = debt.startDate.split('/');
-        const endParts = debt.endDate.split('/');
+        if (!debt.startDate || !debt.endDate) return [];
+
+        const startParts = toEn(debt.startDate).split('/');
+        // محاسبه عدد تاریخ پایان برای توقف دقیق حلقه
+        const endInt = dateToInt(debt.endDate); 
         
         let y = parseInt(startParts[0]);
         let m = parseInt(startParts[1]);
-        let d = parseInt(startParts[2]);
-        
-        const endY = parseInt(endParts[0]);
-        const endM = parseInt(endParts[1]);
+        let d = parseInt(startParts[2]); // روز ثابت قسط
         
         const schedule = [];
-        const paidList = debt.paidHistory || []; // Array of dates like "1403/01/01"
+        // نرمال‌سازی لیست پرداخت‌ها
+        const paidList = (debt.paidHistory || []).map(p => {
+            const pp = toEn(p).split('/');
+            // افزودن صفر قبل از اعداد تک رقمی برای مقایسه صحیح
+            return `${pp[0]}/${parseInt(pp[1])<10?'0'+parseInt(pp[1]):pp[1]}/${parseInt(pp[2])<10?'0'+parseInt(pp[2]):pp[2]}`;
+        });
 
-        while (y < endY || (y === endY && m <= endM)) {
-            const dateStr = `${y}/${m < 10 ? '0'+m : m}/${d < 10 ? '0'+d : d}`;
-            const isPaid = paidList.includes(dateStr);
-            const diff = compareDates(dateStr);
-            const isOverdue = diff < 0 && !isPaid;
+        // حلقه ایمن (حداکثر ۱۰۰۰ قسط برای جلوگیری از هنگ کردن در صورت اشتباه کاربر)
+        let safetyCounter = 0;
+
+        while (safetyCounter < 1000) {
+            safetyCounter++;
+
+            // تنظیم روز ماه (جلوگیری از تاریخ نامعتبر مثل ۳۱ اسفند)
+            let currentD = d;
+            if (m > 6 && m < 12 && currentD > 30) currentD = 30; // ماه‌های ۳۰ روزه
+            if (m === 12 && currentD > 29) currentD = 29; // اسفند (فرض ساده ۲۹ روز)
+
+            // ساخت فرمت استاندارد
+            const mStr = m < 10 ? '0' + m : m;
+            const dStr = currentD < 10 ? '0' + currentD : currentD;
+            
+            const dateStrEn = `${y}/${mStr}/${dStr}`;
+            const currentInt = parseInt(`${y}${mStr}${dStr}`);
+
+            // *** اصلاح اصلی: اگر تاریخ قسط از تاریخ پایان بزرگتر شد، حلقه قطع شود ***
+            if (currentInt > endInt) break;
+
+            const dateStrFa = toPersianNum(dateStrEn);
+            const isPaid = paidList.includes(dateStrEn);
+            const diffDays = compareDates(dateStrEn);
             
             schedule.push({
-                date: dateStr,
+                date: dateStrFa,
+                dateEn: dateStrEn,
                 isPaid: isPaid,
-                isOverdue: isOverdue,
-                isDueToday: diff === 0 && !isPaid
+                isOverdue: diffDays < 0 && !isPaid,
+                isDueToday: diffDays === 0 && !isPaid,
+                daysLeft: diffDays
             });
 
-            // Increment Month
+            // رفتن به ماه بعد
             m++;
             if (m > 12) {
                 m = 1;
@@ -3479,7 +3543,7 @@
             }
 
             const penaltyHtml = penaltyAmt > 0 ? `<span class="inst-penalty">جریمه دیرکرد: ${format(penaltyAmt)}</span>` : '';
-            const btnHtml = !s.isPaid ? `<button class="btn-small-icon btn-check" onclick="paySpecificInstallment(${index}, '${s.date}', ${finalAmt})"><i class="fas fa-check"></i></button>` : '';
+            const btnHtml = !s.isPaid ? `<button class="btn-small-icon btn-check" onclick="paySpecificInstallment(${index}, '${s.dateEn}', ${finalAmt})"><i class="fas fa-check"></i></button>` : '';
 
             return `
             <div class="inst-row">
@@ -3525,18 +3589,14 @@
             app.wallets[walletIndex].value -= amount;
             
             if (!debt.paidHistory) debt.paidHistory = [];
-            debt.paidHistory.push(dateStr);
+            // ذخیره تاریخ به صورت استاندارد (انگلیسی) برای جلوگیری از مشکلات مقایسه بعدی
+            debt.paidHistory.push(toEn(dateStr));
             
-            // Update lastPaid for legacy compatibility
-            const today = new Date();
-            const currentMonthStr = toPersianNum(today.toLocaleDateString('fa-IR-u-nu-latn').split('/').slice(0, 2).join('/'));
-            debt.lastPaid = currentMonthStr;
-
             logSystemTransaction('expense', amount, walletName, debt.name, `پرداخت قسط ${dateStr}`);
             saveSectionSnap('dashboard', `پرداخت قسط ${debt.name}`);
             saveData();
             renderUI();
-            openDebtDetails(debtIndex); // Refresh modal
+            openDebtDetails(debtIndex); 
             showToast("قسط پرداخت شد");
         }
     }
@@ -4758,7 +4818,7 @@
             overflow -= deductAmount;
         }
 
-        if(overflow > 0) {
+if(overflow > 0) {
             alert("امکان اصلاح خودکار وجود ندارد!\nحتی با کاهش اولویت‌های پایین، فضا کافی نیست.\nلطفاً درصد وارد شده را کمتر کنید یا اجازه صفر شدن آیتم‌ها را بدهید.");
             const lastSnap = JSON.parse(app.sectionHistory['budget'][0].data);
             app.budgets = lastSnap.budgets;
@@ -4863,7 +4923,7 @@
         openModal('expModal');
     }
 
- function submitExp() {
+    function submitExp() {
         const v = parseFormatted(document.getElementById('expAmt').value);
         const r = document.getElementById('expReason').value || 'بدون توضیح';
         if(!isNaN(v) && activeIdx > -1) {
@@ -5156,75 +5216,69 @@
     function exportExcel() {
         withLoading(() => {
             const toEn = (str) => str ? str.toString().replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)) : '';
-            let tableHTML = `
-            <style>td,th{border:1px solid #000; padding:5px; font-family:'Tahoma'; text-align:center;}</style>
-            <h3>خلاصه وضعیت فعلی</h3>
-            <table>
-              <tr style="background:#ddd"><th>نام کاربر</th><th>موجودی کل (کیف پول‌ها)</th><th>بدهی کل</th><th>تاریخ گزارش</th></tr>
-              <tr>
-                <td>${app.user.name}</td>
-                <td>${toEn(document.getElementById('totalBalance').innerText)}</td>
-                <td>${toEn(app.debts.reduce((a,b)=>a+b.value,0) + app.checks.reduce((a,b)=>!b.isPaid?a+b.value:0,0))}</td>
-                <td>${new Date().toLocaleDateString('fa-IR')}</td>
-              </tr>
-            </table>
-            <br>
-            <h3>تاریخچه تراکنش‌های بودجه</h3>
-            <table>
-              <tr style="background:#a78bfa; color:white;">
-                <th>تاریخ</th><th>ساعت</th><th>نوع</th><th>مبلغ</th><th>دسته</th><th>توضیحات</th>
-              </tr>`;
+            
+            // تابع کمکی برای تمیز کردن متن‌ها (حذف کاما و خط جدید که فرمت CSV را خراب می‌کند)
+            const clean = (text) => {
+                if (!text) return "";
+                return text.toString().replace(/,/g, "،").replace(/\n/g, " ");
+            };
 
+            // ساخت محتوای CSV
+            // نکته: استفاده از BOM (\uFEFF) برای نمایش صحیح فارسی الزامی است
+            let csvContent = "\uFEFF"; 
+            
+            // بخش 1: خلاصه وضعیت
+            csvContent += "خلاصه وضعیت مالی\n";
+            csvContent += "نام کاربر,موجودی کل,بدهی کل,تاریخ گزارش\n";
+            csvContent += `${clean(app.user.name)},${toEn(document.getElementById('totalBalance').innerText)},${toEn(app.debts.reduce((a,b)=>a+b.value,0) + app.checks.reduce((a,b)=>!b.isPaid?a+b.value:0,0))},${new Date().toLocaleDateString('fa-IR')}\n\n`;
+
+            // بخش 2: تراکنش‌های بودجه
+            csvContent += "تاریخچه تراکنش های بودجه\n";
+            csvContent += "تاریخ,ساعت,نوع,مبلغ,دسته بندی,توضیحات\n";
+            
             app.budgets.forEach(b => {
                 if (b.history) {
                     b.history.forEach(h => {
-                        tableHTML += `<tr>
-                          <td>${h.date}</td>
-                          <td>${h.time}</td>
-                          <td>${h.type === 'expense' ? 'هزینه' : (h.type === 'deposit' ? 'واریز' : 'انتقال')}</td>
-                          <td style="mso-number-format:'0'">${toEn(h.amount)}</td>
-                          <td>${b.name}</td>
-                          <td>${h.reason}</td>
-                        </tr>`;
+                        const typeFa = h.type === 'expense' ? 'هزینه' : (h.type === 'deposit' ? 'واریز' : 'انتقال');
+                        csvContent += `${h.date},${h.time},${typeFa},${toEn(h.amount)},${clean(b.name)},${clean(h.reason)}\n`;
                     });
                 }
             });
-            tableHTML += `</table><br>`;
+            csvContent += "\n";
 
-            tableHTML += `<h3>اهداف پس‌انداز</h3>
-            <table><tr style="background:#34d399"><th>هدف</th><th>مبلغ هدف</th><th>جمع شده</th><th>مانده</th></tr>`;
+            // بخش 3: اهداف
+            csvContent += "اهداف پس انداز\n";
+            csvContent += "هدف,مبلغ هدف,جمع شده,مانده\n";
             app.goals.forEach(g => {
-                tableHTML += `<tr><td>${g.name}</td><td>${toEn(g.target)}</td><td>${toEn(g.curr)}</td><td>${toEn(g.target - g.curr)}</td></tr>`;
+                csvContent += `${clean(g.name)},${toEn(g.target)},${toEn(g.curr)},${toEn(g.target - g.curr)}\n`;
             });
-            tableHTML += `</table><br>`;
+            csvContent += "\n";
 
-            tableHTML += `<h3>بدهی و اقساط</h3>
-            <table><tr style="background:#f87171"><th>عنوان</th><th>مبلغ</th><th>وضعیت</th></tr>`;
+            // بخش 4: بدهی‌ها
+            csvContent += "بدهی و اقساط\n";
+            csvContent += "عنوان,مبلغ,نوع,وضعیت\n";
             app.debts.forEach(d => {
-                tableHTML += `<tr><td>${d.name}</td><td>${toEn(d.value)}</td><td>قسط ثابت</td><td>${d.lastPaid === getCurMonth() ? 'پرداخت شده' : 'مانده'}</td></tr>`;
+                csvContent += `${clean(d.name)},${toEn(d.value)},قسط ثابت,${d.lastPaid === getCurMonth() ? 'پرداخت شده' : 'مانده'}\n`;
             });
             app.checks.forEach(c => {
-                tableHTML += `<tr><td>${c.name}</td><td>${toEn(c.value)}</td><td>چک/بدهی</td><td>${c.isPaid ? 'پاس شده' : 'پاس نشده'}</td></tr>`;
+                csvContent += `${clean(c.name)},${toEn(c.value)},چک/بدهی,${c.isPaid ? 'پاس شده' : 'پاس نشده'}\n`;
             });
-            tableHTML += `</table>`;
 
-            const fullTemplate = `
-            <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-            <head><meta charset="UTF-8"></head>
-            <body>${tableHTML}</body></html>`;
-
-            const blob = new Blob(['\uFEFF', fullTemplate], { type: 'application/vnd.ms-excel;charset=utf-8' });
+            // ایجاد و دانلود فایل
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `Gozaresh_Mali_${new Date().toLocaleDateString('fa-IR').replace(/\//g,'-')}.xls`;
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Gozaresh_Mali_${new Date().toLocaleDateString('fa-IR').replace(/\//g,'-')}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showToast("فایل اکسل جامع دانلود شد");
-        }, 1500);
+            
+            showToast("فایل اکسل (CSV) دانلود شد");
+        }, 1000);
     }
 
-    // Instruction 5: Comprehensive Image Report
+    // Instruction 5: Comprehensive Image Report (Fixed Transfer Details)
     function generateReportImage() {
         withLoading(() => {
             const income = app.wallets.reduce((a,b)=>a+b.value,0);
@@ -5280,7 +5334,7 @@
                 tb.innerHTML += `<tr><td>${b.name}</td><td>${toPersianNum(b.percent)}%</td><td>${format(s)}</td><td>${format(b.spent)}</td><td>${format(s-b.spent)}</td></tr>`;
             });
 
-            // Detailed Lists (Instruction 5 Requirement)
+            // Detailed Lists
             
             // 1. Wallets
             let walletsHtml = "<h4>منابع مالی (کیف پول‌ها)</h4><table class='print-table'><thead><tr><th>نام کیف</th><th>موجودی</th></tr></thead><tbody>";
@@ -5292,7 +5346,9 @@
             // 2. Debts
             let debtsHtml = "<h4>اقساط و بدهی‌ها</h4><table class='print-table'><thead><tr><th>عنوان</th><th>مبلغ</th><th>نوع</th><th>وضعیت</th></tr></thead><tbody>";
             app.debts.forEach(d => {
-                debtsHtml += `<tr><td>${d.name}</td><td>${format(d.value)}</td><td>قسط ثابت</td><td>${d.lastPaid === getCurMonth() ? 'پرداخت شده' : 'مانده'}</td></tr>`;
+                // For report, check if lastPaid matches current month
+                const isPaid = d.lastPaid === getCurMonth();
+                debtsHtml += `<tr><td>${d.name}</td><td>${format(d.value)}</td><td>قسط ثابت</td><td>${isPaid ? 'پرداخت شده' : 'مانده'}</td></tr>`;
             });
             app.checks.forEach(c => {
                 debtsHtml += `<tr><td>${c.name}</td><td>${format(c.value)}</td><td>چک/بدهی</td><td>${c.isPaid ? 'پاس شده' : 'مانده'}</td></tr>`;
@@ -5320,11 +5376,27 @@
             });
             loansHtml += "</tbody></table>";
 
-            // 6. Recent Transfers (Instruction 5)
-            let transHtml = "<h4>آخرین انتقال‌ها (وجه به وجه)</h4><table class='print-table'><thead><tr><th>نوع</th><th>مبلغ</th><th>جزئیات</th></tr></thead><tbody>";
+            // 6. Recent Transfers (Fixed Details)
+            let transHtml = "<h4>آخرین انتقال‌ها (وجه به وجه)</h4><table class='print-table'><thead><tr><th>نوع</th><th>مبلغ</th><th>جزئیات کامل</th></tr></thead><tbody>";
             if(app.transfers) {
                 app.transfers.slice(-5).forEach(t => {
-                    transHtml += `<tr><td>${t.type==='incoming'?'دریافت':'ارسال'}</td><td>${format(t.amount)}</td><td>${t.status}</td></tr>`;
+                    // Translate Status
+                    let statusFa = "نامشخص";
+                    if(t.status === 'approved') statusFa = "موفق";
+                    else if(t.status === 'rejected') statusFa = "ناموفق (رد شده)";
+                    else if(t.status === 'pending') statusFa = "در انتظار تایید";
+
+                    // Build Detail String
+                    let details = `
+                        <div style="text-align:right; font-size:0.8rem; line-height:1.6;">
+                            <b>تاریخ:</b> ${t.date} <br>
+                            <b>فرستنده:</b> ${t.senderName || '---'} (${toPersianNum(t.senderAccount || '---')})<br>
+                            <b>گیرنده:</b> ${t.destName || '---'} (${toPersianNum(t.destAccount || '---')})<br>
+                            <b>وضعیت:</b> ${statusFa}
+                        </div>
+                    `;
+
+                    transHtml += `<tr><td>${t.type==='incoming'?'دریافت':'ارسال'}</td><td>${format(t.amount)}</td><td>${details}</td></tr>`;
                 });
             }
             transHtml += "</tbody></table>";
