@@ -1,10 +1,9 @@
-  
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>مدیریت سرمایه تعالی - نسخه حرفه‌ای</title>
+    <title>مدیریت سرمایه تعالی</title>
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <!-- آیکون‌ها -->
@@ -2563,18 +2562,72 @@
         const query = document.getElementById('globalHistSearch').value.toLowerCase();
         const list = document.getElementById('globalHistoryList');
         
-        if(!app.transactionLog || app.transactionLog.length === 0) {
-            list.innerHTML = `<p style="text-align:center; padding:20px; color:var(--text-sec);">تراکنشی ثبت نشده است.</p>`;
-            return;
+        // 1. جمع‌آوری تمام تراکنش‌ها از منابع مختلف
+        let allTransactions = [];
+
+        // الف) لاگ‌های سیستمی (موجود)
+        if (app.transactionLog) {
+            allTransactions = allTransactions.concat(app.transactionLog.map(t => ({...t, source: 'system'})));
         }
 
-        const filtered = app.transactionLog.filter(t => {
-            const txt = (t.desc + " " + t.id + " " + t.from + " " + t.to).toLowerCase();
+        // ب) تراکنش‌های بودجه (هزینه و واریز)
+        if (app.budgets) {
+            app.budgets.forEach(b => {
+                if (b.history) {
+                    b.history.forEach(h => {
+                        allTransactions.push({
+                            id: h.id || Date.now() + Math.random(),
+                            date: h.date,
+                            time: h.time,
+                            type: h.type, // expense, deposit, transferOut, transferIn
+                            amount: h.amount,
+                            desc: `${h.reason} (${b.name})`, // افزودن نام بودجه به توضیحات
+                            from: h.type === 'deposit' ? 'منبع خارجی' : b.name,
+                            to: h.type === 'expense' ? 'هزینه' : b.name,
+                            source: 'budget'
+                        });
+                    });
+                }
+            });
+        }
+
+        // ج) انتقال‌های وجه به وجه (بانکی)
+        if (app.transfers) {
+            app.transfers.forEach(t => {
+                let type = t.type === 'incoming' ? 'deposit' : 'expense';
+                let desc = t.type === 'incoming' ? `دریافت از ${t.senderName || 'ناشناس'}` : `انتقال به ${t.destName || 'ناشناس'}`;
+                
+                allTransactions.push({
+                    id: t.id,
+                    date: t.date,
+                    time: "00:00", // معمولاً در ترنسفرها ساعت دقیق نداریم مگر اینکه اضافه کرده باشید
+                    type: type,
+                    amount: t.amount,
+                    desc: desc,
+                    from: t.type === 'incoming' ? t.senderName : 'کیف پول من',
+                    to: t.type === 'incoming' ? 'کیف پول من' : t.destName,
+                    source: 'transfer'
+                });
+            });
+        }
+
+        // 2. فیلتر کردن بر اساس جستجو
+        const filtered = allTransactions.filter(t => {
+            const txt = (t.desc + " " + t.amount + " " + t.date + " " + t.from + " " + t.to).toLowerCase();
             return txt.includes(query);
         });
 
+        // 3. مرتب‌سازی بر اساس تاریخ و زمان (نزولی - جدیدترین اول)
+        // نکته: چون فرمت تاریخ شمسی است، مقایسه رشته‌ای معمولاً جواب می‌دهد (سال/ماه/روز)
+        filtered.sort((a, b) => {
+            const dateA = a.date + " " + a.time;
+            const dateB = b.date + " " + b.time;
+            return dateB.localeCompare(dateA);
+        });
+
+        // 4. نمایش در HTML
         if(filtered.length === 0) {
-            list.innerHTML = `<p style="text-align:center; padding:20px; color:var(--text-sec);">موردی یافت نشد.</p>`;
+            list.innerHTML = `<p style="text-align:center; padding:20px; color:var(--text-sec);">تراکنشی یافت نشد.</p>`;
             return;
         }
 
@@ -2592,22 +2645,37 @@
         html += filtered.map(t => {
             let iconClass = "ht-trf";
             let icon = "fa-exchange-alt";
-            if(t.type === 'deposit') { iconClass = "ht-inc"; icon = "fa-arrow-down"; }
-            if(t.type === 'expense') { iconClass = "ht-exp"; icon = "fa-arrow-up"; }
+            // تشخیص نوع برای آیکون و رنگ
+            if(t.type === 'deposit' || t.type === 'incoming' || t.type === 'transferIn') { 
+                iconClass = "ht-inc"; icon = "fa-arrow-down"; 
+            }
+            if(t.type === 'expense' || t.type === 'outgoing' || t.type === 'transferOut') { 
+                iconClass = "ht-exp"; icon = "fa-arrow-up"; 
+            }
             
-            const dataStr = encodeURIComponent(JSON.stringify(t));
+            // آماده‌سازی داده برای نمایش رسید (فقط فیلدهای ضروری)
+            const receiptData = {
+                amount: t.amount,
+                from: t.from || '---',
+                to: t.to || '---',
+                desc: t.desc,
+                id: t.id,
+                date: t.date,
+                time: t.time
+            };
+            const dataStr = encodeURIComponent(JSON.stringify(receiptData));
 
             return `
             <tr onclick="showTransactionReceipt('${dataStr}')">
                 <td><div class="ht-icon ${iconClass}"><i class="fas ${icon}"></i></div></td>
                 <td>
-                    <div style="font-weight:bold;">${t.desc || 'تراکنش'}</div>
-                    <div style="font-size:0.75rem; color:var(--text-sec);">از: ${t.from} به: ${t.to}</div>
+                    <div style="font-weight:bold; font-size:0.85rem;">${t.desc}</div>
+                    <div style="font-size:0.7rem; color:var(--text-sec);">${t.source === 'budget' ? 'بودجه' : (t.source === 'transfer' ? 'بانکی' : 'سیستمی')}</div>
                 </td>
                 <td class="ht-amount">${format(t.amount)}</td>
                 <td>
                     <span class="ht-date">${t.date}</span>
-                    <span class="ht-date">${t.time}</span>
+                    <span class="ht-date" style="font-size:0.65rem;">${t.time}</span>
                 </td>
             </tr>`;
         }).join('');
@@ -3098,24 +3166,50 @@
         openModal('receiptModal');
     }
 
-    // Instruction 2: Fix Freeze on Download
+    // Instruction 1: Fix Freeze on Download (Optimized)
     function downloadReceipt() {
         const el = document.getElementById('finalReceipt');
-        document.getElementById('receiptModal').style.display = 'flex';
         
-        // Use try-catch and ensure loading is toggled off
-        withLoading(() => {
-            html2canvas(el, { scale: 2, useCORS: true }).then(canvas => {
-                const a = document.createElement('a');
-                a.download = `Receipt_${Date.now()}.png`;
-                a.href = canvas.toDataURL();
-                a.click();
-                showToast("رسید ذخیره شد");
+        // اطمینان از اینکه مودال باز است و المنت وجود دارد
+        if (!el) {
+            showToast("خطا: رسید یافت نشد", "exclamation-triangle");
+            return;
+        }
+
+        // نمایش لودینگ
+        toggleLoading(true);
+
+        // استفاده از setTimeout برای جلوگیری از فریز شدن UI قبل از شروع رندر
+        setTimeout(() => {
+            html2canvas(el, { 
+                scale: 2, // کیفیت بهتر
+                useCORS: true, // حل مشکل آیکون‌ها و فونت‌های خارجی
+                logging: false, // غیرفعال کردن لاگ‌های اضافی
+                backgroundColor: '#ffffff' // اطمینان از پس‌زمینه سفید
+            }).then(canvas => {
+                try {
+                    // ایجاد لینک دانلود
+                    const a = document.createElement('a');
+                    a.download = `Receipt_${Date.now()}.png`;
+                    a.href = canvas.toDataURL('image/png');
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    
+                    showToast("رسید با موفقیت ذخیره شد");
+                } catch (err) {
+                    console.error("Save Error:", err);
+                    alert("خطا در ذخیره فایل: " + err.message);
+                } finally {
+                    // *** نکته کلیدی: حتماً لودینگ را خاموش کن ***
+                    toggleLoading(false);
+                }
             }).catch(err => {
-                console.error(err);
-                alert("خطا در دانلود رسید");
+                console.error("Render Error:", err);
+                alert("خطا در ایجاد تصویر رسید: " + err.message);
+                toggleLoading(false); // در صورت خطا هم لودینگ خاموش شود
             });
-        }, 1000); // Small delay to ensure rendering
+        }, 100); // تاخیر 100 میلی‌ثانیه‌ای برای پایداری
     }
 
     // --- OTHER UI LOGIC ---
@@ -3267,7 +3361,14 @@
         document.getElementById('cardCurrency').innerText = curName;
         document.querySelectorAll('.currency-text').forEach(el => el.innerText = curName);
         
-        // Instruction 5: Removed daysPassedLabel logic
+        // --- اصلاح جدید: اعمال خودکار قالب پیش‌فرض اگر بودجه خالی بود ---
+        if (!app.budgets || app.budgets.length === 0) {
+            // بارگذاری قالب پیش‌فرض بدون پرسش از کاربر (چون بار اول است)
+            app.budgets = JSON.parse(JSON.stringify(defaultState.budgets));
+            // ذخیره فوری تا در دفعات بعد هم بماند
+            saveData();
+        }
+        // --------------------------------------------------------------
 
         const income = app.wallets.reduce((a,b)=>a+b.value,0);
         
@@ -4388,8 +4489,6 @@
             const wName = app.wallets[index].name;
             if (RESTRICTED_SOURCES.includes(wName)) {
                 // We allow changing name maybe (though better not), but DEFINITELY not adding balance via simple edit
-                // However, to be strict per Instruction 5 "Cannot add funds... via dashboard", I will disable amount.
-                // The modal opens now, logic handled below.
             }
         }
 
@@ -4405,7 +4504,7 @@
         let showDebtDates = false;
 
         if(type === 'wallet') item = app.wallets[index];
-        else if(type === 'debt') { item = app.debts[index]; showDebtDates = true; showAmount = true; } // Instruction 2: Enable editing for debt
+        else if(type === 'debt') { item = app.debts[index]; showDebtDates = true; showAmount = true; } 
         else if(type === 'check') { item = app.checks[index]; showDate = true; }
         else if(type === 'loan') { item = app.loans[index]; showDate = true; }
         else if(type === 'budget') { item = app.budgets[index]; showPercent = true; showAmount = false; }
@@ -4424,7 +4523,6 @@
             document.getElementById('editVal').value = val;
             formatCurrency(document.getElementById('editVal'));
 
-            // Instruction 5 Restriction Check
             if (type === 'wallet' && RESTRICTED_SOURCES.includes(item.name)) {
                 document.getElementById('editVal').disabled = true;
                 document.getElementById('editVal').placeholder = "غیرقابل ویرایش دستی";
@@ -4445,48 +4543,55 @@
             document.getElementById('editPercentWrapper').style.display = 'none';
         }
 
-        // Instruction 4: Pre-fill Date Logic
+        // --- اصلاح بخش تاریخ (چک و وام) ---
         if(showDate) {
             document.getElementById('editDateWrapper').style.display = 'block';
             const row = document.getElementById('editDateRow');
-            let d = 1, m = 1, y = 1403;
+            
+            // پیش‌فرض: امروز
+            let d = null, m = null, y = null;
+            
+            // اگر آیتم تاریخ داشت، آن را تجزیه کن
             if (item.date) {
-                const parts = item.date.split('/');
+                // تبدیل اعداد فارسی به انگلیسی برای پارس صحیح
+                const dateStr = toEn(item.date);
+                const parts = dateStr.split('/');
                 if(parts.length === 3) {
                     y = parseInt(parts[0]);
                     m = parseInt(parts[1]);
                     d = parseInt(parts[2]);
                 }
             }
+            // ارسال مقادیر استخراج شده به تابع سازنده
             row.innerHTML = createDatePickerHTML('editD', d, m, y);
         } else {
             document.getElementById('editDateWrapper').style.display = 'none';
         }
 
-        // Instruction 2 & 4: Pre-fill Debt Dates
+        // --- اصلاح بخش تاریخ اقساط (شروع و پایان) ---
         if(showDebtDates) {
             document.getElementById('editDebtDatesWrapper').style.display = 'block';
             
-            // Parse Start Date
-            let sd = 1, sm = 1, sy = 1403;
+            // تاریخ شروع
+            let sd = null, sm = null, sy = null;
             if (item.startDate) {
-                const parts = item.startDate.split('/');
-                if(parts.length === 3) {
-                    sy = parseInt(parts[0]);
-                    sm = parseInt(parts[1]);
-                    sd = parseInt(parts[2]);
+                const sParts = toEn(item.startDate).split('/');
+                if(sParts.length === 3) {
+                    sy = parseInt(sParts[0]);
+                    sm = parseInt(sParts[1]);
+                    sd = parseInt(sParts[2]);
                 }
             }
             document.getElementById('editDebtStartRow').innerHTML = createDatePickerHTML('editDStart', sd, sm, sy);
 
-            // Parse End Date
-            let ed = 1, em = 1, ey = 1403;
+            // تاریخ پایان
+            let ed = null, em = null, ey = null;
             if (item.endDate) {
-                const parts = item.endDate.split('/');
-                if(parts.length === 3) {
-                    ey = parseInt(parts[0]);
-                    em = parseInt(parts[1]);
-                    ed = parseInt(parts[2]);
+                const eParts = toEn(item.endDate).split('/');
+                if(eParts.length === 3) {
+                    ey = parseInt(eParts[0]);
+                    em = parseInt(eParts[1]);
+                    ed = parseInt(eParts[2]);
                 }
             }
             document.getElementById('editDebtEndRow').innerHTML = createDatePickerHTML('editDEnd', ed, em, ey);
@@ -4934,22 +5039,77 @@ let candidates = app.budgets.map((b, index) => {
     let activeIdx = -1;
     function openExp(i) {
         activeIdx = i;
+        
+        const modalContent = document.querySelector('#expModal .modal-content');
+        let walletSelectDiv = document.getElementById('expWalletWrapper');
+        
+        if (!walletSelectDiv) {
+            walletSelectDiv = document.createElement('div');
+            walletSelectDiv.id = 'expWalletWrapper';
+            walletSelectDiv.style.marginBottom = '15px';
+            const label = document.createElement('label');
+            label.innerText = 'پرداخت از کیف پول:';
+            const select = document.createElement('select');
+            select.id = 'expWalletSelect';
+            walletSelectDiv.appendChild(label);
+            walletSelectDiv.appendChild(select);
+            const btnContainer = modalContent.querySelector('div[style*="margin-top"]');
+            modalContent.insertBefore(walletSelectDiv, btnContainer);
+        }
+
+        const restrictedWallets = [CONST_WALLET_DEBT, CONST_WALLET_CHECK];
+        const sel = document.getElementById('expWalletSelect');
+        sel.innerHTML = app.wallets.map((w, idx) => {
+            if (restrictedWallets.includes(w.name)) return '';
+            return `<option value="${idx}">${w.name} (موجودی: ${format(w.value)})</option>`;
+        }).join('');
+
+        document.getElementById('expAmt').value = '';
+        document.getElementById('expReason').value = '';
         openModal('expModal');
     }
 
     function submitExp() {
         const v = parseFormatted(document.getElementById('expAmt').value);
         const r = document.getElementById('expReason').value || 'بدون توضیح';
-        if(!isNaN(v) && activeIdx > -1) {
-            saveSectionSnap('budget', `هزینه ${format(v)} برای ${app.budgets[activeIdx].name}`);
-            app.budgets[activeIdx].spent += v;
-            addToHistory(activeIdx, v, r, 'expense');
-            logSystemTransaction('expense', v, 'Budget', r, `هزینه بودجه: ${app.budgets[activeIdx].name}`);
-            saveData();
-            renderUI();
-            closeAllModals();
-            showToast("هزینه ثبت شد");
+        const wIdx = document.getElementById('expWalletSelect').value;
+
+        if (isNaN(v) || v <= 0) return alert("مبلغ نامعتبر است");
+        if (activeIdx === -1) return;
+        if (wIdx === "") return alert("لطفاً کیف پول را انتخاب کنید");
+
+        const wallet = app.wallets[wIdx];
+        const budgetItem = app.budgets[activeIdx];
+
+        if (wallet.value < v) return alert(`موجودی کیف پول "${wallet.name}" کافی نیست.`);
+
+        const totalShare = Math.round((app.distributedAmount * budgetItem.percent) / 100) + (budgetItem.manualAdd || 0);
+        const remainingBudget = totalShare - budgetItem.spent;
+
+        if (v > remainingBudget) {
+            if (!confirm(`هشدار: مبلغ هزینه (${format(v)}) از مانده بودجه این ردیف (${format(remainingBudget)}) بیشتر است.\nآیا ادامه می‌دهید؟`)) {
+                return;
+            }
         }
+
+        wallet.value -= v;
+
+        if (app.distributedAmount >= v) {
+            app.distributedAmount -= v;
+        } else {
+            app.distributedAmount = 0;
+        }
+
+        budgetItem.spent += v;
+
+        saveSectionSnap('budget', `هزینه ${format(v)} برای ${budgetItem.name}`);
+        addToHistory(activeIdx, v, r, 'expense');
+        logSystemTransaction('expense', v, wallet.name, budgetItem.name, r);
+        
+        saveData();
+        renderUI();
+        closeAllModals();
+        showToast("هزینه ثبت و از حساب کسر شد");
     }
 
     function addToHistory(bIdx, amount, reason, type = 'expense') {
@@ -5617,3 +5777,377 @@ let candidates = app.budgets.map((b, index) => {
 </script>
 </body>
 </html>
+
+
+// ************************************************************
+// تنظیمات اصلی سامانه مدیریت سرمایه تعالی
+// ************************************************************
+
+// شناسه پوشه گوگل درایو (دیتابیس)
+const DATA_FOLDER_ID = "1QqTnEHHcBbmfiVi5tV07I7anD2iALLlg"; 
+
+// ************************************************************
+// توابع ارتباطی وب (API Router)
+// ************************************************************
+
+function doGet(e) {
+  return ContentService.createTextOutput("سامانه مدیریت سرمایه فعال است. لطفا از متد POST استفاده کنید.");
+}
+
+function doPost(e) {
+  try {
+    if (!e || !e.postData || !e.postData.contents) {
+      return responseJSON({ success: false, message: "داده‌ای ارسال نشده است." });
+    }
+
+    const requestData = JSON.parse(e.postData.contents);
+    const functionName = requestData.functionName;
+    const args = requestData.args || [];
+
+    let result;
+
+    if (functionName === 'apiRegister') {
+      result = apiRegister(args[0], args[1], args[2]);
+    } else if (functionName === 'apiLogin') {
+      result = apiLogin(args[0], args[1]);
+    } else if (functionName === 'apiSaveData') {
+      result = apiSaveData(args[0], args[1]);
+    } else if (functionName === 'apiRecoverAccount') {
+      result = apiRecoverAccount(args[0], args[1], args[2]);
+    } else if (functionName === 'apiChangePasswordSecure') {
+      result = apiChangePasswordSecure(args[0], args[1], args[2]);
+    } else if (functionName === 'apiGetAccountName') {
+      result = apiGetAccountName(args[0]);
+    } else if (functionName === 'apiInitiateTransfer') {
+      result = apiInitiateTransfer(args[0], args[1], args[2], args[3], args[4], args[5]);
+    } else if (functionName === 'apiProcessTransfer') {
+      result = apiProcessTransfer(args[0], args[1], args[2], args[3]);
+    } else {
+      return responseJSON({ success: false, message: "تابع مورد نظر یافت نشد: " + functionName });
+    }
+
+    return responseJSON(result);
+
+  } catch (err) {
+    return responseJSON({ success: false, message: "خطای سرور: " + err.toString() });
+  }
+}
+
+function responseJSON(data) {
+  return ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ************************************************************
+// منطق اصلی برنامه (Business Logic)
+// ************************************************************
+
+function apiRegister(name, nationalId, password) {
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(30000);
+    const folder = DriveApp.getFolderById(DATA_FOLDER_ID);
+    const fileName = nationalId + ".json";
+    
+    const files = folder.getFilesByName(fileName);
+    if (files.hasNext()) {
+      return { success: false, message: "این کد ملی قبلاً ثبت شده است." };
+    }
+
+    const accountNumber = nationalId.split('').reverse().join('');
+    const pukCode = Math.floor(10000000 + Math.random() * 90000000).toString();
+
+    const userData = {
+      meta: { created_at: new Date().toString(), version: "2.0" },
+      security: {
+        name: name, nationalId: nationalId, password: password,
+        accountNumber: accountNumber, puk: pukCode, isLocked: false, failedPukAttempts: 0
+      },
+      appData: {
+        user: { name: name, theme: "light", currency: "toman", startDate: Date.now() },
+        wallets: [], debts: [], checks: [], loans: [], budgets: [], goals: [], shopping: [],
+        history: [], transfers: [], dailyLogs: [],
+        sectionHistory: { dashboard: [], budget: [], tools: [] },
+        distributedAmount: 0, settings: { globalDeduct: true }
+      }
+    };
+
+    folder.createFile(fileName, JSON.stringify(userData, null, 2), MimeType.PLAIN_TEXT);
+
+    return { 
+      success: true, 
+      data: { name: name, accountNumber: accountNumber, puk: pukCode, nationalId: nationalId }
+    };
+
+  } catch (e) {
+    return { success: false, message: "خطا در ثبت نام: " + e.toString() };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function apiLogin(nationalId, password) {
+  try {
+    const folder = DriveApp.getFolderById(DATA_FOLDER_ID);
+    const fileName = nationalId + ".json";
+    const files = folder.getFilesByName(fileName);
+
+    if (!files.hasNext()) {
+      return { success: false, message: "حسابی با این کد ملی یافت نشد." };
+    }
+
+    const file = files.next();
+    const content = file.getBlob().getDataAsString();
+    const json = JSON.parse(content);
+
+    if (json.security.isLocked) {
+      return { success: false, message: "حساب شما مسدود شده است. با پشتیبانی تماس بگیرید." };
+    }
+
+    if (json.security.password !== password) {
+      return { success: false, message: "رمز عبور اشتباه است." };
+    }
+
+    return { success: true, userData: json };
+
+  } catch (e) {
+    return { success: false, message: "خطا در ورود: " + e.toString() };
+  }
+}
+
+function apiSaveData(nationalId, fullAppDataStr) {
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(30000); 
+    const folder = DriveApp.getFolderById(DATA_FOLDER_ID);
+    const fileName = nationalId + ".json";
+    const files = folder.getFilesByName(fileName);
+
+    if (!files.hasNext()) {
+      return { success: false, message: "فایل کاربر یافت نشد." };
+    }
+
+    const file = files.next();
+    const content = file.getBlob().getDataAsString();
+    let json = JSON.parse(content);
+
+    const newAppData = JSON.parse(fullAppDataStr);
+    json.appData = newAppData;
+    
+    if(newAppData.user && newAppData.user.name) {
+        json.security.name = newAppData.user.name;
+    }
+
+    json.meta.last_updated = new Date().toString();
+    file.setContent(JSON.stringify(json, null, 2));
+
+    return { success: true };
+
+  } catch (e) {
+    return { success: false, message: "خطا در ذخیره‌سازی: " + e.toString() };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function apiRecoverAccount(nationalId, pukInput, newPassword) {
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(30000);
+    const folder = DriveApp.getFolderById(DATA_FOLDER_ID);
+    const fileName = nationalId + ".json";
+    const files = folder.getFilesByName(fileName);
+
+    if (!files.hasNext()) {
+      return { success: false, message: "کاربری با این کد ملی وجود ندارد." };
+    }
+
+    const file = files.next();
+    const content = file.getBlob().getDataAsString();
+    let json = JSON.parse(content);
+
+    if (json.security.isLocked) {
+      return { success: false, message: "حساب مسدود است. با پشتیبانی تماس بگیرید." };
+    }
+
+    if (json.security.puk === pukInput) {
+      json.security.password = newPassword;
+      json.security.failedPukAttempts = 0;
+      file.setContent(JSON.stringify(json, null, 2));
+      return { success: true, message: "رمز عبور با موفقیت تغییر کرد." };
+    } else {
+      if (!json.security.failedPukAttempts) json.security.failedPukAttempts = 0;
+      json.security.failedPukAttempts += 1;
+
+      if (json.security.failedPukAttempts >= 3) {
+        json.security.isLocked = true;
+        file.setContent(JSON.stringify(json, null, 2));
+        return { success: false, message: "تلاش بیش از حد مجاز. حساب شما قفل شد.", locked: true };
+      } else {
+        file.setContent(JSON.stringify(json, null, 2));
+        const remain = 3 - json.security.failedPukAttempts;
+        return { success: false, message: `کد PUK اشتباه است. ${remain} تلاش باقی‌مانده.`, locked: false };
+      }
+    }
+
+  } catch (e) {
+    return { success: false, message: "خطا در بازیابی: " + e.toString() };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function apiChangePasswordSecure(nationalId, oldPass, newPass) {
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(10000);
+    const folder = DriveApp.getFolderById(DATA_FOLDER_ID);
+    const fileName = nationalId + ".json";
+    const files = folder.getFilesByName(fileName);
+    
+    if (!files.hasNext()) return { success: false, message: "کاربر یافت نشد." };
+    
+    const file = files.next();
+    let json = JSON.parse(file.getBlob().getDataAsString());
+    
+    if (json.security.password !== oldPass) {
+      return { success: false, message: "رمز عبور فعلی اشتباه است." };
+    }
+    
+    json.security.password = newPass;
+    file.setContent(JSON.stringify(json, null, 2));
+    
+    return { success: true, message: "رمز عبور با موفقیت تغییر کرد." };
+  } catch (e) {
+    return { success: false, message: "خطا: " + e.toString() };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function apiGetAccountName(accountNumber) {
+  const targetNatId = accountNumber.split('').reverse().join('');
+  const folder = DriveApp.getFolderById(DATA_FOLDER_ID);
+  const files = folder.getFilesByName(targetNatId + ".json");
+  
+  if (files.hasNext()) {
+    const json = JSON.parse(files.next().getBlob().getDataAsString());
+    return { success: true, name: json.security.name, nationalId: targetNatId };
+  }
+  return { success: false, message: "شماره حساب یافت نشد." };
+}
+
+function apiInitiateTransfer(senderNatId, receiverNatId, amount, walletIndex, senderName, senderAccount) {
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(30000);
+    const folder = DriveApp.getFolderById(DATA_FOLDER_ID);
+    
+    const senderFileIter = folder.getFilesByName(senderNatId + ".json");
+    const senderFile = senderFileIter.next();
+    let senderJson = JSON.parse(senderFile.getBlob().getDataAsString());
+    
+    if (senderJson.appData.wallets[walletIndex].value < amount) {
+      return { success: false, message: "موجودی کافی نیست." };
+    }
+    
+    const receiverFileIter = folder.getFilesByName(receiverNatId + ".json");
+    if (!receiverFileIter.hasNext()) return { success: false, message: "حساب مقصد نامعتبر است." };
+    const receiverFile = receiverFileIter.next();
+    let receiverJson = JSON.parse(receiverFile.getBlob().getDataAsString());
+    
+    senderJson.appData.wallets[walletIndex].value -= amount;
+    
+    const txId = Date.now().toString();
+    const dateStr = new Date().toLocaleDateString('fa-IR');
+    
+    senderJson.appData.transfers.push({
+      id: txId,
+      type: 'outgoing',
+      amount: amount,
+      date: dateStr,
+      otherPartyName: receiverJson.security.name,
+      otherPartyAccount: receiverJson.security.accountNumber,
+      status: 'pending_approval',
+      walletName: senderJson.appData.wallets[walletIndex].name
+    });
+    
+    receiverJson.appData.transfers.push({
+      id: txId,
+      type: 'incoming',
+      amount: amount,
+      date: dateStr,
+      otherPartyName: senderName,
+      otherPartyAccount: senderAccount,
+      otherPartyNatId: senderNatId,
+      status: 'pending_action'
+    });
+    
+    senderFile.setContent(JSON.stringify(senderJson, null, 2));
+    receiverFile.setContent(JSON.stringify(receiverJson, null, 2));
+    
+    return { success: true, appData: senderJson.appData };
+    
+  } catch (e) {
+    return { success: false, message: "خطا: " + e.toString() };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function apiProcessTransfer(receiverNatId, txId, action, walletIndexForDeposit) {
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(30000);
+    const folder = DriveApp.getFolderById(DATA_FOLDER_ID);
+    
+    const receiverFileIter = folder.getFilesByName(receiverNatId + ".json");
+    const receiverFile = receiverFileIter.next();
+    let receiverJson = JSON.parse(receiverFile.getBlob().getDataAsString());
+    
+    const rTxIndex = receiverJson.appData.transfers.findIndex(t => t.id === txId);
+    if (rTxIndex === -1) return { success: false, message: "تراکنش یافت نشد." };
+    const rTx = receiverJson.appData.transfers[rTxIndex];
+    
+    if (rTx.status !== 'pending_action') return { success: false, message: "این تراکنش قبلاً پردازش شده است." };
+    
+    const senderFileIter = folder.getFilesByName(rTx.otherPartyNatId + ".json");
+    const senderFile = senderFileIter.next();
+    let senderJson = JSON.parse(senderFile.getBlob().getDataAsString());
+    const sTxIndex = senderJson.appData.transfers.findIndex(t => t.id === txId);
+    
+    if (action === 'approve') {
+      if (walletIndexForDeposit === 'new') {
+         receiverJson.appData.wallets.push({ name: "دریافتی جدید", value: rTx.amount });
+      } else {
+         receiverJson.appData.wallets[walletIndexForDeposit].value += rTx.amount;
+      }
+      
+      rTx.status = 'success';
+      if (sTxIndex > -1) senderJson.appData.transfers[sTxIndex].status = 'success';
+      
+    } else if (action === 'reject') {
+      const walletName = senderJson.appData.transfers[sTxIndex].walletName;
+      const wIndex = senderJson.appData.wallets.findIndex(w => w.name === walletName);
+      
+      if (wIndex > -1) {
+        senderJson.appData.wallets[wIndex].value += rTx.amount;
+      } else {
+        senderJson.appData.wallets[0].value += rTx.amount;
+      }
+      
+      rTx.status = 'rejected';
+      if (sTxIndex > -1) senderJson.appData.transfers[sTxIndex].status = 'rejected';
+    }
+    
+    receiverFile.setContent(JSON.stringify(receiverJson, null, 2));
+    senderFile.setContent(JSON.stringify(senderJson, null, 2));
+    
+    return { success: true, appData: receiverJson.appData };
+    
+  } catch (e) {
+    return { success: false, message: "خطا: " + e.toString() };
+  } finally {
+    lock.releaseLock();
+  }
+}
