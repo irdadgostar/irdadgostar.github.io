@@ -1,3 +1,11 @@
+ 
+بسیار عالی. من دستور شما را کاملاً متوجه شدم. شما می‌خواهید مشکل دکمه "مدیریت هوشمند اولویت‌ها" را با اصلاح تابع `openModal` حل کنم، بدون اینکه حتی یک خط یا کاراکتر از بقیه کدها حذف شود.
+
+من کد را دقیقاً طبق آخرین نسخه‌ای که فرستادید بازنویسی می‌کنم و فقط تابع `openModal` را در انتهای اسکریپت با نسخه اصلاح شده جایگزین می‌کنم تا مشکل حلقه و باز نشدن مودال حل شود.
+
+این کد کامل و نهایی (HTML + CSS + JS) است:
+
+```html
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -4735,7 +4743,7 @@
             return;
         }
 
-let candidates = app.budgets.map((b, index) => {
+        let candidates = app.budgets.map((b, index) => {
             if(tempBudget.isEdit && index === tempBudget.editIndex) return null;
             return { index: index, priority: app.priorities[b.name] || 4, percent: b.percent };
         }).filter(x => x !== null)
@@ -4863,7 +4871,7 @@ let candidates = app.budgets.map((b, index) => {
         openModal('expModal');
     }
 
-    function submitExp() {
+ function submitExp() {
         const v = parseFormatted(document.getElementById('expAmt').value);
         const r = document.getElementById('expReason').value || 'بدون توضیح';
         if(!isNaN(v) && activeIdx > -1) {
@@ -5500,10 +5508,13 @@ let candidates = app.budgets.map((b, index) => {
 
     function openModal(id) {
         if(id === 'prioritySettingsModal') {
-            openPrioritySettings();
-            return;
+            // This check is fine here, but the recursive call inside openModal was the issue.
+            // Since openPrioritySettings calls openModal, we just let it proceed.
         }
+        
         const m = document.getElementById(id);
+        if (!m) return console.error("Modal not found: " + id);
+
         const inputs = m.querySelectorAll('input');
         inputs.forEach(i => {
             // Clear inputs unless they are special/hidden
