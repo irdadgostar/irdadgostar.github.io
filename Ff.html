@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -1024,7 +1025,11 @@
 
         <!-- Initial Buttons -->
         <div id="authInitial" style="width:100%;">
-            <button class="btn btn-primary" style="width:100%; margin-bottom:10px;" onclick="showLoginForm()">ورود به سیستم</button>
+            <!-- Biometric Login Button (Moved here for better UX) -->
+            <button id="bioLoginBtnInitial" class="btn btn-success" style="width:100%; margin-bottom:10px; display:none;" onclick="loginWithBiometric()">
+                <i class="fas fa-fingerprint"></i> ورود با اثر انگشت
+            </button>
+            <button class="btn btn-primary" style="width:100%; margin-bottom:10px;" onclick="showLoginForm()">ورود با رمز عبور</button>
             <button class="btn btn-outline" style="width:100%;" onclick="showRegisterForm()">ثبت نام جدید</button>
         </div>
 
@@ -1034,6 +1039,7 @@
             <input type="text" id="loginNatId" inputmode="numeric" pattern="[0-9]*" maxlength="10" placeholder="کد ملی خود را وارد کنید">
             <label class="auth-label">رمز عبور (۴ رقم):</label>
             <input type="password" id="loginPass" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="رمز عبور...">
+            
             <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="processLogin()">ورود</button>
             <button class="btn btn-outline" style="width:100%; margin-top:10px;" onclick="resetAuthView()">بازگشت</button>
             
@@ -1289,24 +1295,32 @@
                     </div>
                     <i class="fas fa-chevron-left settings-chevron"></i>
                 </div>
+                <!-- New: Biometric Settings -->
+                <div class="settings-item" onclick="setupBiometric()">
+                    <div style="display:flex; align-items:center;">
+                        <div class="settings-item-icon si-green"><i class="fas fa-fingerprint"></i></div>
+                        <div class="settings-text">ورود با اثرانگشت</div>
+                    </div>
+                    <i class="fas fa-chevron-left settings-chevron"></i>
+                </div>
                 <div class="settings-item" onclick="openPrioritySettings()">
                     <div style="display:flex; align-items:center;">
                         <div class="settings-item-icon si-orange"><i class="fas fa-sort-amount-up"></i></div>
-                        <div class="settings-text">مدیریت هوشمند اولویت‌ها</div>
+                        <div class="settings-text">مدیریت اولویت‌ها</div>
                     </div>
                     <i class="fas fa-chevron-left settings-chevron"></i>
                 </div>
                 <div class="settings-item" onclick="changeecUserName()">
                     <div style="display:flex; align-items:center;">
                         <div class="settings-item-icon si-blue"><i class="fas fa-user-edit"></i></div>
-                        <div class="settings-text">تغییر نام کاربر</div>
+                        <div class="settings-text">تغییر نام</div>
                     </div>
                     <i class="fas fa-chevron-left settings-chevron"></i>
                 </div>
                 <label class="settings-item" style="cursor:pointer; display:flex;">
                     <div style="display:flex; align-items:center;">
                         <div class="settings-item-icon si-gray"><i class="fas fa-copy"></i></div>
-                        <div class="settings-text">کپی خام (بدون فرمت)</div>
+                        <div class="settings-text">کپی ارقام بدون ممیز</div>
                     </div>
                     <input type="checkbox" id="rawCopyCheck" style="width:20px; height:20px; margin:0;">
                 </label>
@@ -1317,14 +1331,14 @@
                 <div class="settings-item" onclick="exportExcel()">
                     <div style="display:flex; align-items:center;">
                         <div class="settings-item-icon si-green"><i class="fas fa-file-excel"></i></div>
-                        <div class="settings-text">دانلود فایل اکسل ساده</div>
+                        <div class="settings-text">فایل اکسل</div>
                     </div>
                     <i class="fas fa-chevron-left settings-chevron"></i>
                 </div>
                 <div class="settings-item" onclick="generateReportImage()">
                     <div style="display:flex; align-items:center;">
                         <div class="settings-item-icon si-blue"><i class="fas fa-file-image"></i></div>
-                        <div class="settings-text">دانلود گزارش تصویری</div>
+                        <div class="settings-text">فایل تصویری</div>
                     </div>
                     <i class="fas fa-chevron-left settings-chevron"></i>
                 </div>
@@ -1364,7 +1378,7 @@
                 <div class="settings-item" onclick="resetAll()">
                     <div style="display:flex; align-items:center;">
                         <div class="settings-item-icon si-red"><i class="fas fa-trash-alt"></i></div>
-                        <div class="settings-text" style="color:var(--danger)">ریست فکتوری (حذف کامل)</div>
+                        <div class="settings-text" style="color:var(--danger)">پاکسازی تمام سیستم</div>
                     </div>
                     <i class="fas fa-chevron-left settings-chevron"></i>
                 </div>
@@ -2053,11 +2067,12 @@
     const CONST_WALLET_DEBT = "اقساط ماهانه";
     const CONST_WALLET_CHECK = "چک و بدهی";
     const RESTRICTED_SOURCES = ["کیف پول بیرونی", "External Wallet", "کیف پول دریافت وجه", "Receive Wallet"];
+    const LOCAL_STORAGE_KEY = 'amir_fin_v9';
 
     const defaultState = {
         security: { hasPin: false, pin: "", isSetup: false, questionId: 0, answer: "", nationalId: "" },
         user: { name: "", theme: "light", currency: "toman", startDate: Date.now() },
-        settings: { globalDeduct: true },
+        settings: { globalDeduct: true, biometricEnabled: false, biometricId: null },
         wallets: [],
         debts: [],
         checks: [],
@@ -2306,6 +2321,20 @@
     function checkAuth() {
         document.getElementById('authModal').style.display = 'flex';
         resetAuthView();
+        
+        // بررسی فعال بودن ورود بیومتریک از لوکال استوریج
+        const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (localData) {
+            try {
+                const parsed = JSON.parse(localData);
+                // اگر بیومتریک فعال است، دکمه را نمایش بده
+                if (parsed.settings && parsed.settings.biometricEnabled && parsed.settings.biometricId) {
+                    document.getElementById('bioLoginBtnInitial').style.display = 'block';
+                    // پیش‌بارگذاری داده‌ها برای دسترسی سریع‌تر به ID بیومتریک
+                    app = parsed; 
+                }
+            } catch (e) { console.error("Error checking auth", e); }
+        }
     }
 
     function resetAuthView() {
@@ -2412,6 +2441,8 @@
         if(!/^\d{4}$/.test(pass)) return alert("رمز عبور باید ۴ رقم باشد");
 
         toggleLoading(true);
+
+        // تلاش اول: اتصال به سرور (آنلاین)
         googleApi('apiLogin', natId, pass)
             .then(response => {
                 toggleLoading(false);
@@ -2420,8 +2451,12 @@
                     const cloudData = response.userData.appData;
                     const securityData = response.userData.security;
                     app = { ...defaultState, ...cloudData };
-                    if(!app.transactionLog) app.transactionLog = []; // Init Log if missing
+                    if(!app.transactionLog) app.transactionLog = []; 
                     app.security = securityData;
+                    
+                    // ذخیره کامل در لوکال استوریج برای استفاده‌های بعدی (آفلاین)
+                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(app));
+
                     document.getElementById('authModal').style.display = 'none';
                     document.getElementById('appContent').style.display = 'block';
                     processDailyLog();
@@ -2442,9 +2477,145 @@
                 }
             })
             .catch(err => {
-                toggleLoading(false);
-                alert("خطا در ورود: " + err);
+                // حالت آفلاین: اگر سرور پاسخ نداد، از حافظه بخوان
+                console.warn("Server unreachable, trying local storage...", err);
+                const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (localData) {
+                    try {
+                        const json = JSON.parse(localData);
+                        // بررسی اعتبار در حالت آفلاین
+                        if (json.security && json.security.nationalId === natId && json.security.password === pass) {
+                            app = json;
+                            toggleLoading(false);
+                            document.getElementById('authModal').style.display = 'none';
+                            document.getElementById('appContent').style.display = 'block';
+                            processDailyLog();
+                            updateDate();
+                            renderUI();
+                            showToast("ورود آفلاین موفق", "wifi-slash");
+                            return;
+                        } else {
+                            toggleLoading(false);
+                            alert("اطلاعات ورود اشتباه است (آفلاین)");
+                        }
+                    } catch (e) {
+                        toggleLoading(false);
+                        alert("خطا در خواندن اطلاعات ذخیره شده.");
+                    }
+                } else {
+                    toggleLoading(false);
+                    alert("خطا در ارتباط با سرور و عدم وجود اطلاعات ذخیره شده: " + err);
+                }
             });
+    }
+
+    // --- Helpers for Base64 Conversion ---
+    function bufferToBase64(buffer) {
+        return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+    }
+
+    function base64ToBuffer(base64) {
+        const binaryString = atob(base64);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        return bytes.buffer;
+    }
+
+    // --- Biometric Setup & Login ---
+    async function setupBiometric() {
+        if (!window.PublicKeyCredential) {
+            return alert("دستگاه شما از قابلیت ورود بیومتریک پشتیبانی نمی‌کند.");
+        }
+
+        try {
+            const challenge = new Uint8Array(32);
+            window.crypto.getRandomValues(challenge);
+
+            const publicKey = {
+                challenge: challenge,
+                rp: { name: "Capital Management App" },
+                user: {
+                    id: Uint8Array.from(app.security.nationalId, c => c.charCodeAt(0)),
+                    name: app.security.nationalId,
+                    displayName: app.user.name
+                },
+                pubKeyCredParams: [{ type: "public-key", alg: -7 }],
+                authenticatorSelection: { authenticatorAttachment: "platform" },
+                timeout: 60000
+            };
+
+            const credential = await navigator.credentials.create({ publicKey });
+            
+            if (credential) {
+                // ذخیره شناسه اثر انگشت (Credential ID) به صورت رشته Base64
+                app.settings.biometricEnabled = true;
+                app.settings.biometricId = bufferToBase64(credential.rawId);
+                
+                saveData();
+                showToast("ورود بیومتریک با موفقیت فعال شد");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("خطا در فعال‌سازی بیومتریک: " + err.message);
+        }
+    }
+
+    async function loginWithBiometric() {
+        if (!window.PublicKeyCredential) {
+            return alert("بیومتریک پشتیبانی نمی‌شود.");
+        }
+
+        const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (!localData) return alert("اطلاعات کاربری یافت نشد. لطفاً ابتدا با رمز عبور وارد شوید.");
+
+        let parsedApp;
+        try {
+            parsedApp = JSON.parse(localData);
+        } catch(e) {
+            return alert("خطا در خواندن داده‌ها.");
+        }
+
+        if (!parsedApp.settings || !parsedApp.settings.biometricId) {
+            return alert("اثر انگشت برای این حساب فعال نشده است. لطفاً از تنظیمات فعال کنید.");
+        }
+
+        try {
+            const challenge = new Uint8Array(32);
+            window.crypto.getRandomValues(challenge);
+
+            // بازیابی شناسه اثر انگشت از رشته Base64 به بافر
+            const savedCredentialId = base64ToBuffer(parsedApp.settings.biometricId);
+
+            const credential = await navigator.credentials.get({
+                publicKey: {
+                    challenge: challenge,
+                    allowCredentials: [{
+                        id: savedCredentialId,
+                        type: 'public-key',
+                        transports: ['internal']
+                    }],
+                    userVerification: "required",
+                    timeout: 60000
+                }
+            });
+
+            if (credential) {
+                // اگر تایید شد، داده‌های لوکال را بارگذاری کن
+                app = parsedApp;
+                
+                document.getElementById('authModal').style.display = 'none';
+                document.getElementById('appContent').style.display = 'block';
+                processDailyLog();
+                updateDate();
+                renderUI();
+                showToast("ورود موفق با اثر انگشت", "fingerprint");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("احراز هویت ناموفق بود یا لغو شد.");
+        }
     }
 
     // Instruction 3: Refresh Data Function
@@ -4833,7 +5004,7 @@
         }
     }
 
-function delCheck(i) {
+    function delCheck(i) {
         if(confirm('حذف؟')) {
             saveSectionSnap('dashboard', `حذف چک ${app.checks[i].name}`);
             app.checks.splice(i,1);
@@ -4842,7 +5013,7 @@ function delCheck(i) {
         }
     }
 
-    function addLoan() {
+function addLoan() {
         const n = document.getElementById('lName').value;
         const v = parseFormatted(document.getElementById('lVal').value);
         const d = getDateString('l');
@@ -5764,15 +5935,13 @@ function delCheck(i) {
         showToast("کپی شد: " + txt);
     }
 
-    // --- SAVING DATA ---
+    // --- SAVING DATA (Updated for Instruction 7) ---
     function saveData() {
-        // Instruction 1: Guest Mode check removed. Saving is mandatory.
-        
-        // Local Backup
-        localStorage.setItem('amir_fin_v9', JSON.stringify(app));
+        // Local Backup (Essential for offline access)
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(app));
 
-        // Cloud Backup (if logged in)
-        if(app.security && app.security.nationalId) {
+        // Cloud Backup (if logged in and online)
+        if(app.security && app.security.nationalId && navigator.onLine) {
             // Send appData to cloud
             googleApi('apiSaveData', app.security.nationalId, JSON.stringify(app))
                 .then(res => {
@@ -5830,4 +5999,4 @@ function delCheck(i) {
     }
 </script>
 </body>
-</html>
+    </html>
