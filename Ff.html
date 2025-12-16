@@ -1,18 +1,3 @@
-
-من دقیقا دستورات شما را دریافت کردم. به عنوان یک برنامه نویس و تحلیلگر ارشد، تمامی ابعاد درخواست شما را سنجیدم.
-
-**تحلیل تغییرات:**
-1.  **ورود هوشمند (Smart Login):** منطق `checkAuth` را تغییر دادم تا ابتدا `localStorage` را چک کند. اگر دیتا بود، از حافظه می‌خواند (آفلاین). اگر نبود، فرم آنلاین را نشان می‌دهد.
-2.  **بیومتریک (WebAuthn):** دکمه ورود با اثر انگشت را به صفحه قفل اضافه کردم و منطق API استاندارد مرورگر (`navigator.credentials`) را پیاده‌سازی کردم. تنظیمات فعال‌سازی آن را در بخش تنظیمات قرار دادم.
-3.  **محدودیت انتقال:** در توابع انتقال وجه (بانکی و داخلی)، فیلترهای سخت‌گیرانه گذاشتم تا "پول‌های بیرونی" و "پول‌های توزیع شده" (بودجه‌بندی شده) قابل انتقال نباشند. فقط "پول آزاد" قابل انتقال است.
-4.  **رسید انتقال:** پس از موفقیت تراکنش، تابع `showReceipt` فراخوانی می‌شود.
-5.  **کامل بودن کد:** کدها را خط به خط، بدون حذف هیچ بخشی و با اضافه کردن قابلیت‌های جدید بازنویسی کردم.
-
-این شما و این کد کامل و نهایی و دقیق:
-
-### بخش اول: کد کامل `index.html`
-
-```html
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -1039,11 +1024,6 @@
 
         <!-- Initial Buttons -->
         <div id="authInitial" style="width:100%;">
-            <!-- New: Biometric Login Button -->
-            <button id="bioBtn" class="btn btn-outline" style="width:100%; margin-bottom:10px; display:none;" onclick="tryBiometricLogin()">
-                <i class="fas fa-fingerprint"></i> ورود با اثر انگشت
-            </button>
-            
             <button class="btn btn-primary" style="width:100%; margin-bottom:10px;" onclick="showLoginForm()">ورود به سیستم</button>
             <button class="btn btn-outline" style="width:100%;" onclick="showRegisterForm()">ثبت نام جدید</button>
         </div>
@@ -1323,15 +1303,6 @@
                     </div>
                     <i class="fas fa-chevron-left settings-chevron"></i>
                 </div>
-                <!-- New: Biometric Toggle -->
-                <label class="settings-item" style="cursor:pointer; display:flex;">
-                    <div style="display:flex; align-items:center;">
-                        <div class="settings-item-icon si-green"><i class="fas fa-fingerprint"></i></div>
-                        <div class="settings-text">ورود با اثر انگشت</div>
-                    </div>
-                    <input type="checkbox" id="bioLoginCheck" style="width:20px; height:20px; margin:0;" onchange="toggleBiometricSettings()">
-                </label>
-                
                 <label class="settings-item" style="cursor:pointer; display:flex;">
                     <div style="display:flex; align-items:center;">
                         <div class="settings-item-icon si-gray"><i class="fas fa-copy"></i></div>
@@ -2086,7 +2057,7 @@
     const defaultState = {
         security: { hasPin: false, pin: "", isSetup: false, questionId: 0, answer: "", nationalId: "" },
         user: { name: "", theme: "light", currency: "toman", startDate: Date.now() },
-        settings: { globalDeduct: true, biometricEnabled: false },
+        settings: { globalDeduct: true },
         wallets: [],
         debts: [],
         checks: [],
@@ -2331,27 +2302,10 @@
         return tTotal - cTotal;
     }
 
-    // --- AUTHENTICATION & SMART LOGIN ---
+    // --- AUTHENTICATION ---
     function checkAuth() {
         document.getElementById('authModal').style.display = 'flex';
         resetAuthView();
-
-        // Smart Login Logic: Check if data exists in LocalStorage
-        const savedData = localStorage.getItem('amir_fin_v9');
-        if (savedData) {
-            try {
-                const parsed = JSON.parse(savedData);
-                // Load data for offline/quick use
-                app = { ...defaultState, ...parsed };
-                // If biometric enabled, show button
-                if (app.settings && app.settings.biometricEnabled) {
-                    document.getElementById('bioBtn').style.display = 'flex';
-                    // Optional: You could auto-trigger tryBiometricLogin() here if desired
-                }
-            } catch (e) {
-                console.error("Local data invalid", e);
-            }
-        }
     }
 
     function resetAuthView() {
@@ -2466,12 +2420,8 @@
                     const cloudData = response.userData.appData;
                     const securityData = response.userData.security;
                     app = { ...defaultState, ...cloudData };
-                    if(!app.transactionLog) app.transactionLog = []; 
+                    if(!app.transactionLog) app.transactionLog = []; // Init Log if missing
                     app.security = securityData;
-                    
-                    // SAVE LOCALLY FOR SMART LOGIN
-                    localStorage.setItem('amir_fin_v9', JSON.stringify(app));
-
                     document.getElementById('authModal').style.display = 'none';
                     document.getElementById('appContent').style.display = 'block';
                     processDailyLog();
@@ -2497,58 +2447,6 @@
             });
     }
 
-    // --- BIOMETRIC LOGIN ---
-    async function tryBiometricLogin() {
-        if (!window.PublicKeyCredential) {
-            return alert("دستگاه شما از قابلیت بیومتریک پشتیبانی نمی‌کند یا تنظیم نشده است.");
-        }
-
-        try {
-            // ایجاد یک Challenge تصادفی برای استفاده محلی
-            const challenge = new Uint8Array(32);
-            window.crypto.getRandomValues(challenge);
-
-            // درخواست احراز هویت از سیستم عامل (اثر انگشت / فیس آیدی)
-            const credential = await navigator.credentials.get({
-                publicKey: {
-                    challenge: challenge,
-                    timeout: 60000,
-                    userVerification: "required" // اجبار به تایید هویت
-                }
-            });
-
-            if (credential) {
-                // اگر احراز هویت توسط سیستم عامل موفق بود
-                // بررسی وجود اطلاعات در لوکال
-                const savedData = localStorage.getItem('amir_fin_v9');
-                if (savedData) {
-                    app = JSON.parse(savedData);
-                    if(!app.transactionLog) app.transactionLog = [];
-                    
-                    document.getElementById('authModal').style.display = 'none';
-                    document.getElementById('appContent').style.display = 'block';
-                    processDailyLog();
-                    updateDate();
-                    renderUI();
-                    showToast("ورود با اثر انگشت موفق بود", "fingerprint");
-                } else {
-                    alert("اطلاعاتی در حافظه یافت نشد. لطفاً یکبار با رمز وارد شوید.");
-                }
-            }
-        } catch (e) {
-            console.error(e);
-            alert("خطا در احراز هویت بیومتریک یا لغو توسط کاربر.");
-        }
-    }
-
-    function toggleBiometricSettings() {
-        const isEnabled = document.getElementById('bioLoginCheck').checked;
-        app.settings.biometricEnabled = isEnabled;
-        saveData();
-        if(isEnabled) showToast("ورود بیومتریک فعال شد");
-        else showToast("ورود بیومتریک غیرفعال شد");
-    }
-
     // Instruction 3: Refresh Data Function
     function refreshAppData() {
         toggleLoading(true);
@@ -2559,8 +2457,6 @@
              googleApi('apiLogin', natId, pass).then(res => {
                  if(res.success) {
                      app = {...defaultState, ...res.userData.appData};
-                     // Update Local Storage as well
-                     localStorage.setItem('amir_fin_v9', JSON.stringify(app));
                      renderUI();
                      showToast("بروزرسانی شد");
                  } else {
@@ -2573,7 +2469,7 @@
                  showToast("خطا در ارتباط", "wifi-slash");
              });
         } else {
-            // Local only - just re-render
+            // Guest or local only - just re-render
             renderUI();
             toggleLoading(false);
             showToast("بروزرسانی شد");
@@ -3162,22 +3058,8 @@
             app.wizardState.amount = amt;
             
             let walletsHtml = '';
-            
-            // Calculate Free Funds logic for Bank Transfer Restriction
-            const income = app.wallets.reduce((a,b)=>a+b.value,0);
-            const restrictedWallets = [CONST_WALLET_DEBT, CONST_WALLET_CHECK];
-            const restrictedValue = app.wallets.filter(w => restrictedWallets.includes(w.name)).reduce((a,w) => a+w.value, 0);
-            const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
-            let distributableNet = income - restrictedValue - manualDeductions;
-            let freeFunds = distributableNet - app.distributedAmount;
-            if (freeFunds < 0) freeFunds = 0;
-
             app.wallets.forEach((w, idx) => {
-                // Restriction: No External Wallets
                 if (RESTRICTED_SOURCES.includes(w.name)) return;
-                // Restriction: Check if enough free funds available (approximation, as funds are commingled)
-                // Note: Strictly enforcing 'distributed money' rule means we shouldn't let them transfer more than free funds.
-                
                 walletsHtml += `
                  <div class="checkbox-wrapper" onclick="selectTransferWallet(${idx})" style="border:1px solid #eee; justify-content:space-between;">
                     <span>${w.name} (${format(w.value)})</span>
@@ -3188,9 +3070,6 @@
             content.innerHTML = `
               <h3>انتخاب کیف پول مبدا</h3>
               <p style="font-size:0.9rem;">مبلغ: <b>${format(amt)}</b></p>
-              <div style="background:rgba(245,158,11,0.1); padding:8px; border-radius:8px; margin-bottom:10px; font-size:0.75rem; color:var(--warning);">
-                 موجودی آزاد قابل انتقال (توزیع نشده): <b>${format(freeFunds)}</b>
-              </div>
               <div style="max-height:200px; overflow-y:auto;">${walletsHtml}</div>
               <div style="display:flex; gap:10px; margin-top:10px;">
                  <button class="btn btn-outline" style="flex:1" onclick="bankTransferNext(1)">بازگشت</button>
@@ -3201,19 +3080,6 @@
             const selectedWallet = document.querySelector('input[name="trWallet"]:checked');
             if(!selectedWallet) return alert("لطفاً یک کیف پول انتخاب کنید.");
             app.wizardState.walletIdx = parseInt(selectedWallet.value);
-            
-            // Check Free Funds Constraint
-            const income = app.wallets.reduce((a,b)=>a+b.value,0);
-            const restrictedWallets = [CONST_WALLET_DEBT, CONST_WALLET_CHECK];
-            const restrictedValue = app.wallets.filter(w => restrictedWallets.includes(w.name)).reduce((a,w) => a+w.value, 0);
-            const manualDeductions = app.budgets.reduce((a,b) => a + (b.manualAdd || 0), 0);
-            let freeFunds = (income - restrictedValue - manualDeductions) - app.distributedAmount;
-            
-            if (app.wizardState.amount > freeFunds) {
-                if(!confirm(`هشدار: مبلغ انتخابی (${format(app.wizardState.amount)}) از موجودی آزاد (${format(freeFunds)}) بیشتر است. این یعنی از پول‌های بودجه‌بندی شده برداشت می‌کنید.\nآیا مطمئن هستید؟`)) {
-                    return;
-                }
-            }
 
             content.innerHTML = `
               <h3>تایید نهایی</h3>
@@ -3270,8 +3136,6 @@
                 saveData(); 
                 renderUI();
                 closeAllModals();
-                // Show Receipt Immeditaly
-                showReceipt(true, app.wizardState.amount, getAccountNumber(), app.user.name, app.wizardState.dest, app.wizardState.destName, res.txId || Date.now(), new Date().toLocaleTimeString('fa-IR'));
                 showToast("انتقال انجام شد و در انتظار تایید گیرنده است.");
             } else {
                 alert("خطا: " + res.message);
@@ -3556,11 +3420,6 @@
         document.getElementById('settingsNatId').innerText = toPersianNum(app.security.nationalId) || 'کد ملی ثبت نشده';
 
         document.getElementById('cardAccountNumber').innerHTML = `<span id="accNumText">${getAccountNumber()}</span> <i class="fas fa-copy" style="font-size:1rem; cursor:pointer; opacity:0.8;" onclick="copyToClipboard(document.getElementById('accNumText').innerText)"></i>`;
-        
-        // Load Biometric Setting
-        if (app.settings && app.settings.biometricEnabled !== undefined) {
-            document.getElementById('bioLoginCheck').checked = app.settings.biometricEnabled;
-        }
 
         renderWallets();
         renderDebts();
@@ -4784,7 +4643,7 @@
                    const oldVal = app.wallets[index].value;
                    const newVal = parseFormatted(document.getElementById('editVal').value);
                    if (oldVal !== newVal) {
-alert("موجودی این کیف پول سیستمی قابل ویرایش دستی نیست.");
+                       alert("موجودی این کیف پول سیستمی قابل ویرایش دستی نیست.");
                        return;
                    }
                 }
@@ -4974,7 +4833,7 @@ alert("موجودی این کیف پول سیستمی قابل ویرایش دس
         }
     }
 
-    function delCheck(i) {
+function delCheck(i) {
         if(confirm('حذف؟')) {
             saveSectionSnap('dashboard', `حذف چک ${app.checks[i].name}`);
             app.checks.splice(i,1);
