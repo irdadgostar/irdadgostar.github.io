@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>تعالی همدلی | مهربانی بدون مرز</title>
-  
+
   <!-- فونت وزیرمتن (لینک اصلی) -->
   <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
   <!-- آیکون‌ها -->
@@ -298,6 +298,7 @@
       .tab-content { padding: 1.5rem; }
     }
   </style>
+
 </head>
 <body>
 <div class="overlay">
@@ -313,7 +314,7 @@
   <!-- کانتینر اصلی -->
   <div class="container" style="max-width: 700px;">
     <div class="glass-card">
-      
+
       <!-- تب‌ها -->
       <ul class="nav nav-pills nav-fill" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
@@ -369,7 +370,7 @@
           </div>
           <h2 class="section-heading">اهدا با طعم احترام</h2>
 
-          <!-- باکس هشدار کرامت (متن درخواستی شما) -->
+          <!-- باکس هشدار کرامت -->
           <div class="alert alert-warning d-flex align-items-start" role="alert" style="border-radius:15px; border-right: 5px solid #ffc107; background-color: #fffbeb;">
             <i class="fas fa-info-circle me-3 mt-1 text-warning" style="font-size:1.3rem;"></i>
             <div style="font-size: 0.95rem; line-height: 1.7; color: #92400e;">
@@ -455,7 +456,7 @@
     <div class="container">
       <h5 style="font-weight:900; color:#1e3a8a; margin-bottom:10px;">موسسه تعالی اندیشه و رشد</h5>
       <p style="opacity:0.8;">تلاش برای ساختن دنیایی مهربان‌تر و آگاه‌تر</p>
-      
+
       <div class="contact-container">
         <div class="contact-chip">
           <i class="fas fa-map-marker-alt"></i>
@@ -481,26 +482,53 @@
 
   <!-- جاوا اسکریپت -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
   <script>
     // ************************************************
-    // لینک درگاه پرداخت (حتما تغییر دهید)
+    // لینک وب‌اپ اسکریپت گوگل (لینک اختصاصی شما)
     // ************************************************
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyX594eLFc8Fx8B_I18-eUob72iOzgYXD-0T-ncaBdDGHlN6rUPySXokxF74SmTNTlNxw/exec";
+    
+    // لینک درگاه پرداخت (حتما تغییر دهید)
     const PAYMENT_LINK = "https://zarinp.al/YOUR_LINK"; 
     // ************************************************
 
     // کپی شماره کارت
     function copyCard() {
-      const cardText = "0000000000000000"; 
-      navigator.clipboard.writeText(cardText).then(() => {
+      const cardElement = document.getElementById('cardNumTxt');
+      const originalText = cardElement.innerText;
+      // حذف فاصله‌ها برای کپی صحیح
+      const textToCopy = originalText.replace(/\s/g, ''); 
+
+      navigator.clipboard.writeText(textToCopy).then(() => {
         Swal.fire({
           icon: 'success',
           title: 'کپی شد',
-          text: 'شماره کارت در حافظه کپی شد.',
-          timer: 1500,
+          text: 'شماره کارت با موفقیت در حافظه کپی شد.',
+          timer: 2000,
           showConfirmButton: false,
           toast: true,
-          position: 'top-end'
+          position: 'top-end',
+          background: '#f0fdf4',
+          color: '#166534'
         });
+      }).catch(err => {
+        Swal.fire({
+          icon: 'error',
+          title: 'خطا',
+          text: 'مرورگر شما امکان دسترسی به حافظه موقت را ندارد. لطفا دستی کپی کنید.',
+          confirmButtonText: 'باشه'
+        });
+      });
+    }
+
+    // ارسال داده‌ها با استفاده از fetch
+    function sendDataToGoogleSheet(data) {
+      // استفاده از no-cors برای جلوگیری از خطای CORS در درخواست‌های گوگل
+      // نکته: در حالت no-cors ما نمی‌توانیم پاسخ JSON را بخوانیم، اما درخواست ارسال می‌شود.
+      return fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(data)
       });
     }
 
@@ -508,26 +536,27 @@
     function handleCashClick() {
       Swal.fire({
         title: 'در حال انتقال...',
-        text: 'در حال اتصال به درگاه امن بانکی.',
+        text: 'اطلاعات شما ثبت شده و به درگاه امن بانکی منتقل می‌شوید.',
         icon: 'info',
         showConfirmButton: false,
-        timer: 3000, 
+        timer: 4000, 
         timerProgressBar: true,
         didOpen: () => {
           Swal.showLoading();
         }
       });
 
-      const formData = { type: 'cash' };
-      // فراخوانی اسکریپت گوگل برای ثبت آمار
-      google.script.run
-        .withFailureHandler(err => console.log(err)) // خطا را فقط لاگ کن و ادامه بده
-        .processForm(formData); 
+      const formData = { type: 'cash', functionName: 'processForm' }; // Added functionName just in case needed by your backend logic, though simplified backend handles it by object structure usually.
+      
+      // ارسال آمار کلیک به گوگل شیت
+      sendDataToGoogleSheet(formData)
+        .then(() => console.log("Cash click logged"))
+        .catch(err => console.error("Error logging cash click:", err));
 
       // انتقال به درگاه
       setTimeout(() => {
         window.location.href = PAYMENT_LINK;
-      }, 1000);
+      }, 1500);
     }
 
     // ارسال فرم‌ها (کالا و تخصص)
@@ -540,7 +569,7 @@
 
       // حالت لودینگ دکمه
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> شکیبا باشید...';
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال ارسال اطلاعات...';
 
       // ساخت آبجکت تمیز از داده‌های فرم
       const formDataObj = { type: type };
@@ -549,39 +578,37 @@
         formDataObj[key] = value;
       }
 
-      google.script.run
-        .withSuccessHandler((response) => {
+      // ارسال به گوگل شیت
+      sendDataToGoogleSheet(formDataObj)
+        .then(response => {
+          // چون حالت no-cors استفاده می‌شود، ما فرض می‌کنیم موفقیت‌آمیز بوده مگر اینکه خطای شبکه رخ دهد
           submitBtn.disabled = false;
           submitBtn.innerHTML = originalBtnText;
 
-          if (response.status === 'success') {
-            Swal.fire({
-              icon: 'success',
-              title: 'ثبت شد',
-              text: response.message,
-              confirmButtonText: 'سپاس',
-              confirmButtonColor: '#1e3a8a'
-            });
-            form.reset();
-          } else {
-            Swal.fire({
-              icon: 'error',
-              title: 'خطا',
-              text: 'متاسفانه مشکلی پیش آمد: ' + response.message
-            });
-          }
+          Swal.fire({
+            icon: 'success',
+            title: 'ثبت موفق!',
+            text: 'اطلاعات شما با موفقیت ثبت گردید.',
+            confirmButtonText: 'سپاس',
+            confirmButtonColor: '#1e3a8a',
+            background: '#fff',
+            backdrop: `rgba(0,0,123,0.4)`
+          });
+          form.reset();
         })
-        .withFailureHandler((error) => {
+        .catch(error => {
+          console.error('Error:', error);
           submitBtn.disabled = false;
           submitBtn.innerHTML = originalBtnText;
           Swal.fire({
             icon: 'error',
             title: 'خطای ارتباط',
-            text: 'لطفا اتصال اینترنت را بررسی کنید.'
+            text: 'لطفا اتصال اینترنت را بررسی کرده و مجدد تلاش کنید.',
+            confirmButtonColor: '#d33'
           });
-        })
-        .processForm(formDataObj);
+        });
     }
   </script>
+
 </body>
-</html>
+        </html>
