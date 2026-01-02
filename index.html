@@ -1,441 +1,529 @@
-  
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>سایت شخصی امیرحسین دادگستر</title>
-    <meta name="description" content="سایت شخصی امیرحسین دادگستر">
+    <title>امیرحسین دادگستر | پرتال رسمی</title>
     
-    <!-- Fonts -->
+    <!-- فونت وزیر متن -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
 
     <style>
         :root {
-            --primary: #0f172a; /* سرمه‌ای بسیار تیره و باکلاس */
-            --accent: #3b82f6; /* آبی سلطنتی برای تاکید */
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.8);
-            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-            --text-main: #1e293b;
-            --text-light: #64748b;
-            --radius: 24px;
-            --font: 'Vazirmatn', sans-serif;
+            --bg-deep: #0f172a;
+            --bg-glass: rgba(30, 41, 59, 0.7);
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --accent-glow: rgba(56, 189, 248, 0.3);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --card-radius: 20px;
+            --font-main: 'Vazirmatn', sans-serif;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-        
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; outline: none; }
+
         body {
-            font-family: var(--font);
-            background-color: #f0f4f8;
-            color: var(--text-main);
-            line-height: 1.6;
-            min-height: 100vh;
+            background-color: var(--bg-deep);
+            color: var(--text-primary);
+            font-family: var(--font-main);
             overflow-x: hidden;
+            min-height: 100vh;
             position: relative;
         }
 
-        /* --- 1. Dynamic Background (Aurora Effect) --- */
-        .ambient-light {
+        /* --- QUANTUM BACKGROUND (CANVAS) --- */
+        #quantum-canvas {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             z-index: -1;
-            overflow: hidden;
-            background: linear-gradient(125deg, #eff6ff 0%, #f8fafc 100%);
-        }
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.6;
-            animation: float 20s infinite ease-in-out alternate;
-        }
-        .orb-1 { width: 50vw; height: 50vw; background: #bfdbfe; top: -10%; left: -10%; animation-duration: 25s; }
-        .orb-2 { width: 40vw; height: 40vw; background: #e9d5ff; bottom: -10%; right: -5%; animation-duration: 30s; animation-direction: alternate-reverse; }
-        
-        @keyframes float { 
-            0% { transform: translate(0, 0) rotate(0deg); } 
-            100% { transform: translate(30px, 50px) rotate(10deg); } 
+            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
         }
 
-        /* --- 2. Layout & Typography --- */
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-            position: relative;
-            z-index: 1;
+        /* --- HEADER & NAV --- */
+        .glass-header {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 1000px;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 50px;
+            padding: 10px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
         }
 
-        /* Header / Hero */
-        .hero {
-            padding-top: 5rem;
-            padding-bottom: 3rem;
-            text-align: center;
-        }
-
-        .avatar-placeholder {
-            width: 80px; height: 80px;
-            background: linear-gradient(135deg, var(--primary), #334155);
-            border-radius: 50%;
-            margin: 0 auto 1.5rem;
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 2rem; font-weight: bold;
-            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2);
-        }
-
-        h1 {
-            font-size: 2.5rem;
+        .brand-logo {
             font-weight: 800;
-            letter-spacing: -1px;
-            margin-bottom: 0.5rem;
-            background: -webkit-linear-gradient(45deg, #0f172a, #475569);
+            font-size: 1.1rem;
+            background: linear-gradient(90deg, #fff, #94a3b8);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .subtitle { font-size: 1.1rem; color: var(--text-light); margin-bottom: 2.5rem; }
-
-        /* --- 3. Premium Glass Buttons --- */
-        .btn-group {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 3rem;
-            flex-wrap: wrap;
+        /* --- HERO SECTION --- */
+        .hero-container {
+            padding-top: 140px;
+            padding-bottom: 60px;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
         }
 
-        .btn {
-            position: relative;
-            padding: 1rem 2rem;
-            border-radius: 16px;
-            font-weight: 600;
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 10px;
+            text-shadow: 0 0 40px rgba(255,255,255,0.1);
+        }
+
+        .hero-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+        }
+
+        /* --- 3D BUTTONS (MICROSOFT STYLE) --- */
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 600px;
+            margin: 0 auto 50px auto;
+        }
+
+        .fluent-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            padding: 20px;
             text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
-            display: inline-flex;
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fluent-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at center, var(--accent-glow), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .fluent-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: rgba(255,255,255,0.3);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+        }
+        .fluent-card:hover::before { opacity: 1; }
+
+        /* شبیه سازی آیکون سه بعدی با CSS و ایموجی (چون امکان اپلود فایل نداریم) 
+           اما ظاهرش بسیار شبیه به 3D رندر شده است */
+        .icon-3d-wrapper {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
+            transition: transform 0.3s ease;
+        }
+        
+        .fluent-card:hover .icon-3d-wrapper {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .btn-text {
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.1rem;
+            z-index: 2;
+        }
+
+        /* --- SEARCH CAPSULE --- */
+        .search-capsule {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto 60px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 50px;
+            padding: 5px;
+            border: 1px solid var(--border-glass);
+            display: flex;
+            align-items: center;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .search-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #fff;
+            padding: 15px 20px;
+            font-family: var(--font-main);
             font-size: 1rem;
         }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.3);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .btn-glass {
-            background: rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            color: var(--primary);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-        }
-
-        .btn:hover { transform: translateY(-3px) scale(1.02); }
-        .btn-primary:hover { box-shadow: 0 10px 25px rgba(15, 23, 42, 0.4); }
-        .btn-glass:hover { background: rgba(255, 255, 255, 0.8); }
-
-        /* --- 4. Modern Search --- */
-        .search-box {
-            position: sticky;
-            top: 20px;
-            z-index: 100;
-            margin: 0 auto 3rem;
-            max-width: 600px;
-        }
+        .search-input::placeholder { color: rgba(255,255,255,0.4); }
         
-        .input-wrapper {
-            position: relative;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-radius: 20px;
-            padding: 0.5rem;
-            box-shadow: var(--glass-shadow), 0 0 0 1px rgba(255,255,255,0.5);
-            transition: transform 0.3s, box-shadow 0.3s;
-            display: flex;
-            align-items: center;
-        }
-        
-        .input-wrapper:focus-within {
-            transform: scale(1.01);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.08), 0 0 0 2px var(--primary);
-        }
-
-        .search-icon { width: 24px; height: 24px; color: var(--text-light); margin: 0 1rem; }
-        
-        #search-input {
-            width: 100%;
+        .search-btn {
+            background: #3b82f6;
+            width: 45px; height: 45px;
+            border-radius: 50%;
             border: none;
-            background: transparent;
-            font-size: 1.05rem;
-            font-family: var(--font);
-            padding: 0.8rem 0;
-            color: var(--text-main);
-        }
-        #search-input::placeholder { color: #94a3b8; }
-
-        /* --- 5. The Cards (Glassmorphism) --- */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 2rem;
-            padding-bottom: 5rem;
-        }
-
-        .card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius);
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            color: white;
+            display: flex; align-items: center; justify-content: center;
             cursor: pointer;
-            box-shadow: var(--glass-shadow);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+            margin-left: 5px;
+        }
+
+        /* --- BENTO GRID CONTENT --- */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px 100px 20px;
+        }
+
+        .bento-card {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--card-radius);
+            overflow: hidden;
+            backdrop-filter: blur(15px);
+            transition: all 0.3s ease;
+            cursor: pointer;
             display: flex;
             flex-direction: column;
             position: relative;
         }
 
-        .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-            border-color: white;
-            z-index: 2;
+        .bento-card:hover {
+            border-color: rgba(255,255,255,0.4);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.6);
         }
 
-        /* Image handling */
-        .card-img-container {
+        .card-img-wrap {
+            height: 180px;
             width: 100%;
-            aspect-ratio: 16/9;
-            background: #e2e8f0;
+            background: #1e293b;
             position: relative;
-            overflow: hidden;
         }
-        
+
         .card-img {
             width: 100%; height: 100%;
             object-fit: cover;
-            transition: transform 0.7s ease;
+            transition: transform 0.5s ease;
         }
-        
-        .card:hover .card-img { transform: scale(1.08); }
+        .bento-card:hover .card-img { transform: scale(1.1); }
 
-        .card-body { padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column; }
+        .card-content { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
         
-        .card-date {
-            font-size: 0.85rem;
-            color: var(--accent);
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            display: flex; align-items: center; gap: 0.4rem;
-        }
-        
-        .card-title {
-            font-size: 1.25rem;
+        .card-tag {
+            font-size: 0.8rem;
+            color: #38bdf8;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             font-weight: 700;
-            line-height: 1.5;
-            margin-bottom: 0.5rem;
-            color: var(--text-main);
         }
-        
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
         .card-desc {
-            font-size: 0.95rem;
-            color: var(--text-light);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            margin-top: auto;
         }
 
-        .arrow-icon {
-            position: absolute;
-            bottom: 1.5rem;
-            left: 1.5rem;
-            opacity: 0;
-            transform: translateX(10px);
-            transition: all 0.3s ease;
-            color: var(--primary);
-        }
-        
-        .card:hover .arrow-icon { opacity: 1; transform: translateX(0); }
-
-        /* --- 6. Mobile Optimization --- */
-        @media (max-width: 768px) {
-            .hero { padding-top: 3rem; }
-            h1 { font-size: 2rem; }
-            .btn-group { flex-direction: column; gap: 1rem; width: 100%; }
-            .btn { width: 100%; padding: 1.1rem; } /* Big touch targets */
-            .grid { grid-template-columns: 1fr; gap: 1.5rem; }
-            .search-box { top: 10px; margin-bottom: 2rem; }
-            .input-wrapper { padding: 0.3rem; }
-            
-            /* Remove hover effects on mobile to prevent sticky states */
-            .card:hover { transform: none; } 
-            .card:active { transform: scale(0.98); }
-        }
-
-        /* --- 7. Modal (Pop-up) --- */
-        .modal-backdrop {
+        /* --- MODERN MODAL --- */
+        .modal-overlay {
             position: fixed; inset: 0;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
             z-index: 2000;
-            opacity: 0; pointer-events: none;
-            transition: opacity 0.3s;
             display: flex; align-items: center; justify-content: center;
-            padding: 1rem;
+            opacity: 0; pointer-events: none;
+            transition: all 0.4s ease;
         }
-        .modal-backdrop.active { opacity: 1; pointer-events: all; }
-        
-        .modal-window {
-            background: #fff;
-            width: 100%; max-width: 600px;
-            max-height: 90vh;
-            border-radius: 24px;
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+
+        .modal-pane {
+            background: #1e293b;
+            width: 90%; max-width: 650px;
+            max-height: 85vh;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
             overflow-y: auto;
             position: relative;
-            transform: scale(0.95) translateY(20px);
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transform: translateY(50px) scale(0.9);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.8);
         }
-        .modal-backdrop.active .modal-window { transform: scale(1) translateY(0); }
+        .modal-overlay.active .modal-pane { transform: translateY(0) scale(1); }
 
-        .modal-content { padding: 2rem; }
-        .modal-close {
-            position: absolute; top: 1.5rem; left: 1.5rem;
-            background: #f1f5f9; border: none;
-            width: 36px; height: 36px; border-radius: 50%;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; color: var(--text-main);
-            transition: background 0.2s;
+        .modal-header {
+            padding: 20px;
+            position: sticky; top: 0;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-glass);
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 10;
         }
-        .modal-close:hover { background: #e2e8f0; }
+
+        .close-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            width: 35px; height: 35px; border-radius: 50%;
+            color: white; cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .modal-body { padding: 25px; }
+        .modal-img { width: 100%; border-radius: 15px; margin-bottom: 20px; border: 1px solid var(--border-glass); }
         
-        .modal-img { width: 100%; border-radius: 16px; margin-bottom: 1.5rem; }
-        .modal-btn {
-            display: block; width: 100%; text-align: center;
-            background: var(--primary); color: white;
-            padding: 1rem; border-radius: 12px; margin-top: 1.5rem;
+        .download-btn {
+            display: block; width: 100%;
+            background: linear-gradient(90deg, #2563eb, #3b82f6);
+            color: white; text-align: center;
+            padding: 15px; border-radius: 15px;
             text-decoration: none; font-weight: bold;
+            margin-top: 20px;
+            box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
         }
 
-        /* Loading Skeleton */
-        .skeleton {
-            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
+        /* --- FOOTER --- */
+        .glass-footer {
+            border-top: 1px solid var(--border-glass);
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 30px 0;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
         }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        /* --- MOBILE TWEAKS --- */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2rem; }
+            .action-grid { grid-template-columns: 1fr; }
+            .bento-grid { grid-template-columns: 1fr; padding: 0 15px 80px 15px; }
+            .glass-header { width: 95%; top: 10px; padding: 10px 15px; }
+            .modal-pane { width: 100%; height: 100%; max-height: 100%; border-radius: 0; }
+        }
+
+        /* Loading Animation */
+        .skeleton-loader {
+            background: linear-gradient(90deg, #1e293b 0%, #334155 50%, #1e293b 100%);
+            background-size: 200% 100%;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
     </style>
 </head>
 <body>
 
-    <!-- Dynamic Background -->
-    <div class="ambient-light">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-    </div>
+    <!-- BACKGROUND: Quantum Particles -->
+    <canvas id="quantum-canvas"></canvas>
 
-    <div class="container">
-        
-        <!-- Hero Section -->
-        <header class="hero">
-            <div class="avatar-placeholder">A</div>
-            <h1>سایت شخصی</h1>
-            <p class="subtitle">امیرحسین دادگستر | آرشیو رسمی آثار</p>
+    <!-- HEADER -->
+    <header class="glass-header">
+        <div class="brand-logo">AMIRHOSSEIN</div>
+        <div style="width: 30px; height: 30px; background: #fff; border-radius: 50%; display:flex; align-items:center; justify-content:center; color:#000; font-weight:bold;">A</div>
+    </header>
 
-            <div class="btn-group">
-                <a href="https://drive.google.com/drive/folders/1mAAdly-AM4pP9YZwIrz_uyKwujTZABHc" target="_blank" class="btn btn-primary">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                    آرشیو نگاشته‌ها
+    <!-- MAIN -->
+    <main>
+        <section class="hero-container">
+            <h1 class="hero-title">سایت شخصی</h1>
+            <p class="hero-subtitle">امیرحسین دادگستر | آرشیو رسمی پژوهش‌ها</p>
+
+            <!-- 3D BUTTONS -->
+            <div class="action-grid">
+                <!-- Archive Button -->
+                <a href="https://drive.google.com/drive/folders/1mAAdly-AM4pP9YZwIrz_uyKwujTZABHc" target="_blank" class="fluent-card">
+                    <!-- 3D Folder Icon Representation -->
+                    <div class="icon-3d-wrapper">📂</div> 
+                    <span class="btn-text">آرشیو نگاشته‌ها</span>
                 </a>
-                <a href="https://drive.google.com/drive/folders/11Lc6JcIvYCKmkS8eEmkpdO0kkjLldU0C" target="_blank" class="btn btn-glass">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                    تصاویر
+                
+                <!-- Images Button -->
+                <a href="https://drive.google.com/drive/folders/11Lc6JcIvYCKmkS8eEmkpdO0kkjLldU0C" target="_blank" class="fluent-card">
+                     <!-- 3D Image Icon Representation -->
+                    <div class="icon-3d-wrapper">🖼️</div>
+                    <span class="btn-text">گالری تصاویر</span>
                 </a>
             </div>
-        </header>
 
-        <!-- Search Bar -->
-        <div class="search-box">
-            <div class="input-wrapper">
-                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <input type="text" id="search-input" placeholder="جستجوی مقاله، کتاب یا یادداشت...">
+            <!-- SEARCH -->
+            <div class="search-capsule">
+                <button class="search-btn">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </button>
+                <input type="text" id="search-input" class="search-input" placeholder="جستجوی هوشمند...">
             </div>
-        </div>
+        </section>
 
-        <!-- Content Grid -->
-        <main id="grid-container" class="grid">
-            <!-- JavaScript will inject cards here -->
-        </main>
-        
-        <div id="no-results" style="text-align:center; color: var(--text-light); display:none; padding: 2rem;">
-            موردی یافت نشد.
-        </div>
-        
-        <footer style="text-align: center; padding: 3rem 0; color: #94a3b8; font-size: 0.9rem;">
-            © 2026 امیرحسین دادگستر
-        </footer>
-    </div>
+        <!-- GRID -->
+        <section id="grid-container" class="bento-grid">
+            <!-- JS Injection -->
+        </section>
 
-    <!-- Modal -->
-    <div id="modal" class="modal-backdrop">
-        <div class="modal-window">
-            <button class="modal-close" onclick="closeModal()">&times;</button>
-            <div class="modal-content">
-                <img id="m-img" class="modal-img" src="" style="display:none">
-                <div style="font-size: 0.9rem; color: var(--accent); font-weight: bold; margin-bottom: 0.5rem;" id="m-date"></div>
-                <h2 id="m-title" style="margin-bottom: 1rem; font-size: 1.5rem;"></h2>
-                <p id="m-desc" style="color: var(--text-light); white-space: pre-wrap; line-height: 1.8;"></p>
-                <a id="m-link" href="#" target="_blank" class="modal-btn">مشاهده اثر</a>
+        <p id="no-results" style="text-align:center; color:#94a3b8; display:none; margin-bottom: 50px;">موردی یافت نشد.</p>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="glass-footer">
+        <div class="container">
+            <p>© 2026 امیرحسین دادگستر | طراحی شده با تکنولوژی کوانتوم وب</p>
+        </div>
+    </footer>
+
+    <!-- MODAL -->
+    <div id="modal" class="modal-overlay">
+        <div class="modal-pane">
+            <div class="modal-header">
+                <span id="m-title-mini" style="font-weight:bold; color:white;">جزئیات اثر</span>
+                <button onclick="closeModal()" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <img id="m-img" src="" class="modal-img" style="display:none;">
+                <h2 id="m-title" style="margin-bottom:15px; font-size:1.5rem;"></h2>
+                <div style="display:flex; gap:10px; margin-bottom:20px;">
+                    <span id="m-date" style="background:rgba(56, 189, 248, 0.2); color:#38bdf8; padding:5px 10px; border-radius:8px; font-size:0.85rem;"></span>
+                </div>
+                <div id="m-desc" style="color:#cbd5e1; line-height:1.8; white-space:pre-wrap;"></div>
+                <a id="m-link" href="#" target="_blank" class="download-btn">مشاهده و دریافت فایل</a>
             </div>
         </div>
     </div>
 
     <script>
-        // --- Configuration ---
+        /* =========================================
+           1. QUANTUM PARTICLE BACKGROUND (CANVAS)
+           ========================================= */
+        const canvas = document.getElementById('quantum-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let width, height;
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 2 + 1;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(56, 189, 248, 0.5)'; // Light Blue Glow
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            const count = window.innerWidth < 768 ? 40 : 80; // Fewer on mobile
+            for (let i = 0; i < count; i++) particles.push(new Particle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, width, height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                // Connect particles
+                for (let j = i; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 150) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(56, 189, 248, ${0.1 - dist/1500})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+        initParticles();
+        animateParticles();
+
+        /* =========================================
+           2. DATA & LOGIC
+           ========================================= */
         const SPREADSHEET_ID = '1A1_02ooUIz7c_9deCuUzHXUknM2VpTGY0-W4vMI4kxs';
         const API_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json`;
-
         const grid = document.getElementById('grid-container');
-        const searchInput = document.getElementById('search-input');
-        const modal = document.getElementById('modal');
         let allData = [];
 
-        // --- 1. Skeletons for perceived speed ---
-        function renderSkeletons() {
+        // Skeleton Loader
+        function showSkeletons() {
             grid.innerHTML = Array(6).fill('').map(() => `
-                <div class="card" style="pointer-events: none;">
-                    <div class="card-img-container skeleton"></div>
-                    <div class="card-body">
-                        <div class="skeleton" style="width: 30%; height: 15px; border-radius: 4px; margin-bottom: 10px;"></div>
-                        <div class="skeleton" style="width: 80%; height: 24px; border-radius: 4px; margin-bottom: 15px;"></div>
-                        <div class="skeleton" style="width: 100%; height: 60px; border-radius: 4px;"></div>
+                <div class="bento-card" style="pointer-events:none; height:350px;">
+                    <div class="skeleton-loader" style="height:180px; width:100%;"></div>
+                    <div class="card-content">
+                        <div class="skeleton-loader" style="height:20px; width:40%; margin-bottom:10px; border-radius:5px;"></div>
+                        <div class="skeleton-loader" style="height:30px; width:80%; margin-bottom:15px; border-radius:5px;"></div>
+                        <div class="skeleton-loader" style="height:60px; width:100%; border-radius:5px;"></div>
                     </div>
                 </div>
             `).join('');
         }
 
-        // --- 2. Fetch Data ---
+        // Fetch Data
         async function fetchData() {
             try {
-                const response = await fetch(API_URL);
-                const text = await response.text();
-                // Extract JSON from Google's callback wrapper
-                const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\((.*)\)/s)[1]);
-                
+                const res = await fetch(API_URL);
+                const txt = await res.text();
+                const json = JSON.parse(txt.match(/google\.visualization\.Query\.setResponse\((.*)\)/s)[1]);
                 return json.table.rows.map(row => ({
                     date: row.c[0]?.v || '',
                     title: row.c[1]?.v || 'بدون عنوان',
@@ -443,14 +531,10 @@
                     link: row.c[3]?.v || '#',
                     image: row.c[4]?.v || null
                 }));
-            } catch (error) {
-                console.error('Error:', error);
-                grid.innerHTML = '<p style="text-align:center;">خطا در دریافت اطلاعات</p>';
-                return [];
-            }
+            } catch (e) { console.error(e); return []; }
         }
 
-        // --- 3. Render Cards ---
+        // Render Cards
         function render(items) {
             if (items.length === 0) {
                 grid.innerHTML = '';
@@ -460,71 +544,47 @@
             document.getElementById('no-results').style.display = 'none';
 
             grid.innerHTML = items.map(item => `
-                <article class="card" onclick='openModal(${JSON.stringify(item).replace(/'/g, "&#39;")})'>
-                    ${item.image ? `
-                    <div class="card-img-container">
-                        <img src="${item.image}" class="card-img" loading="lazy" alt="${item.title}">
-                    </div>` : ''}
-                    <div class="card-body">
-                        ${item.date ? `<div class="card-date">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                            ${item.date}
-                        </div>` : ''}
+                <article class="bento-card" onclick='openModal(${JSON.stringify(item).replace(/'/g, "&#39;")})'>
+                    ${item.image ? `<div class="card-img-wrap"><img src="${item.image}" class="card-img" loading="lazy"></div>` : `<div class="card-img-wrap" style="display:flex;align-items:center;justify-content:center;color:#fff;"><span>بدون تصویر</span></div>`}
+                    <div class="card-content">
+                        <div class="card-tag">${item.date}</div>
                         <h3 class="card-title">${item.title}</h3>
                         <p class="card-desc">${item.desc}</p>
-                    </div>
-                    <div class="arrow-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                     </div>
                 </article>
             `).join('');
         }
 
-        // --- 4. Modal Logic ---
+        // Search
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = allData.filter(i => i.title.toLowerCase().includes(term) || i.desc.toLowerCase().includes(term));
+            render(filtered);
+        });
+
+        // Modal Logic
+        const modal = document.getElementById('modal');
         window.openModal = (item) => {
             document.getElementById('m-title').textContent = item.title;
-            document.getElementById('m-date').textContent = item.date;
             document.getElementById('m-desc').textContent = item.desc;
+            document.getElementById('m-date').textContent = item.date;
             document.getElementById('m-link').href = item.link;
-            
-            const imgEl = document.getElementById('m-img');
-            if (item.image) {
-                imgEl.src = item.image;
-                imgEl.style.display = 'block';
-            } else {
-                imgEl.style.display = 'none';
-            }
-            
+            const img = document.getElementById('m-img');
+            if (item.image) { img.src = item.image; img.style.display = 'block'; } else { img.style.display = 'none'; }
             modal.classList.add('active');
-            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            document.body.style.overflow = 'hidden';
         };
-
         window.closeModal = () => {
             modal.classList.remove('active');
             document.body.style.overflow = '';
         };
 
-        // Close modal on outside click
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
+        // Initialize
+        showSkeletons();
+        fetchData().then(data => {
+            allData = data;
+            render(data);
         });
-
-        // --- 5. Search Logic ---
-        searchInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            const filtered = allData.filter(item => 
-                item.title.toLowerCase().includes(term) || 
-                item.desc.toLowerCase().includes(term)
-            );
-            render(filtered);
-        });
-
-        // --- Initialize ---
-        (async function init() {
-            renderSkeletons();
-            allData = await fetchData();
-            render(allData);
-        })();
 
     </script>
 </body>
