@@ -490,7 +490,7 @@
             border-color: var(--accent-color);
         }
 
-        /* کارت ویدئو (بدون مدال - طراحی شده به عنوان پوستر + اطلاعات طبق دستور) */
+        /* کارت ویدئو (پرده نمایش + اطلاعات پایین کارت) */
         .video-card {
             background: var(--surface-color);
             border: 1px solid var(--border-color);
@@ -547,6 +547,26 @@
             margin-top: auto;
             flex-wrap: wrap;
         }
+
+        .video-overlay-icon {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-smooth);
+        }
+
+        .video-overlay-icon i {
+            color: #ffffff;
+            font-size: 3.5rem;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .video-card-top:hover .video-overlay-icon { background: rgba(0, 0, 0, 0.5); }
+        .video-card-top:hover .video-overlay-icon i { transform: scale(1.15); color: var(--accent-color); }
 
         /* لیست فایل‌ها و تحقیقات */
         .file-list {
@@ -694,7 +714,7 @@
             gap: 8px;
         }
 
-        /* مدال نمایش تصویر */
+        /* مدال نمایش تصویر و ویدئو */
         .viewer-modal {
             position: fixed;
             inset: 0;
@@ -738,6 +758,18 @@
             display: flex;
             justify-content: center;
             align-items: center;
+        }
+
+        /* پلیر ویدئو با آی‌فریم برای تضمین پخش و وجود دکمه بزرگنمایی */
+        .native-video-player {
+            width: 100%;
+            aspect-ratio: 16/9;
+            max-height: 95vh;
+            outline: none;
+            border: none;
+            background: #000;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border-radius: 12px;
         }
 
         .image-viewer {
@@ -818,6 +850,7 @@
             .contact-group { justify-content: center; }
             
             .modal-close-btn { top: 10px; right: 20px; }
+            .native-video-player { border-radius: 0; }
         }
     </style>
 </head>
@@ -969,7 +1002,15 @@
         </section>
     </main>
 
-    <!-- مدال تصویر (مخصوص عکس‌ها) -->
+    <!-- مدال ویدئو (استفاده مجدد از آی‌فریم برای تضمین پخش در همه دستگاه‌ها و داشتن دکمه تمام صفحه) -->
+    <div class="viewer-modal" id="videoModal">
+        <button class="modal-close-btn" onclick="closeModal('videoModal', 'siteVideoFrame')" title="بستن">&times;</button>
+        <div class="modal-content-wrapper" id="videoWrapper">
+            <iframe id="siteVideoFrame" class="native-video-player" allow="fullscreen" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <!-- مدال تصویر -->
     <div class="viewer-modal" id="imageModal">
         <button class="modal-close-btn" onclick="closeModal('imageModal', 'siteImagePlayer')" title="بستن">&times;</button>
         <div class="modal-content-wrapper">
@@ -1187,7 +1228,7 @@
             if (sectionType === 'image') {
                 cardHTML += `
                     <div class="gallery-card" style="max-width: 400px; margin: 0 auto;">
-                        <img src="${file.thumbnail}" alt="${file.name}" loading="lazy" onclick="viewImageDirectly('${file.id}')" style="cursor:pointer;">
+                        <img src="${file.thumbnail}" alt="${file.name}" loading="lazy" onclick="viewImageDirectly('${file.id}')" style="cursor:pointer;" onerror="this.onerror=null; this.src='https://dummyimage.com/600x600/151a28/cda066&text=Image';">
                         <div class="card-link-overlay">
                             <button class="btn-sm-overlay" onclick="copyDynamicLink('${file.id}', 'image', this)"><i class="fas fa-link"></i> کپی لینک</button>
                             <button class="btn-sm-overlay" onclick="downloadDirectly('${file.id}', '${safeName}', this)"><i class="fas fa-download"></i> دانلود</button>
@@ -1197,12 +1238,15 @@
                 // کارت ویدئو در لینک داینامیک مطابق دستور 1 (بدون پخش خودکار)
                 cardHTML += `
                     <div class="video-card" style="max-width: 500px; margin: 0 auto;">
-                        <img src="${file.thumbnail}" alt="${file.name}" class="video-poster">
+                        <div class="video-card-top" style="position:relative; cursor:pointer;" onclick="playVideoDirectly('${file.id}')">
+                            <img src="${file.thumbnail}" alt="${file.name}" class="video-poster" onerror="this.onerror=null; this.src='https://dummyimage.com/600x338/151a28/cda066&text=Video+Preview';">
+                            <div class="video-overlay-icon"><i class="fas fa-play"></i></div>
+                        </div>
                         <div class="video-info">
                             <div class="video-title" title="${file.name}">${file.name}</div>
                             <div class="video-meta"><i class="fas fa-hdd"></i> حجم: ${fSize}</div>
                             <div class="video-actions">
-                                <button onclick="downloadDirectly('${file.id}', '${safeName}', this)" class="btn btn-primary"><i class="fas fa-download"></i> دانلود مستقیم</button>
+                                <button onclick="downloadVideoBypass('${file.id}')" class="btn btn-primary"><i class="fas fa-download"></i> دانلود مستقیم</button>
                                 <button onclick="copyDynamicLink('${file.id}', 'video', this)" class="btn"><i class="fas fa-link"></i> کپی لینک</button>
                             </div>
                         </div>
@@ -1261,13 +1305,24 @@
             `;
         }
 
-        // ================= توابع نمایش تصویر =================
+        // ================= توابع نمایش تصویر و ویدئو در مدال =================
         function viewImageDirectly(fileId) {
             const modal = document.getElementById('imageModal');
             const img = document.getElementById('siteImagePlayer');
             img.src = `https://drive.google.com/thumbnail?sz=w1200&id=${fileId}`;
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('show'), 10);
+        }
+
+        function playVideoDirectly(fileId) {
+            const modal = document.getElementById('videoModal');
+            const frame = document.getElementById('siteVideoFrame');
+            // پخش ویدئو با آی‌فریم تضمینی بدون خطای سهمیه
+            frame.src = `https://drive.google.com/file/d/${fileId}/preview`;
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
         }
 
         // ================= بارگذاری داده‌ها =================
@@ -1323,25 +1378,27 @@
                 const fSize = formatBytes(file.size);
 
                 if (type === 'gallery') {
-                    // افزوده شدن دکمه دانلود به گالری تصاویر
                     container.innerHTML += `
                         <div class="gallery-card">
-                            <img src="${file.thumbnail}" alt="${file.name}" loading="lazy" onclick="viewImageDirectly('${file.id}')" style="cursor:pointer;">
+                            <img src="${file.thumbnail}" alt="${file.name}" loading="lazy" onclick="viewImageDirectly('${file.id}')" style="cursor:pointer;" onerror="this.onerror=null; this.src='https://dummyimage.com/600x600/151a28/cda066&text=Image';">
                             <div class="card-link-overlay">
                                 <button class="btn-sm-overlay" onclick="copyDynamicLink('${file.id}', 'image', this)" title="کپی لینک"><i class="fas fa-link"></i></button>
                                 <button class="btn-sm-overlay" onclick="downloadDirectly('${file.id}', '${safeName}', this)" title="دانلود مستقیم"><i class="fas fa-download"></i></button>
                             </div>
                         </div>`;
                 } else if (type === 'videos') {
-                    // طراحی ویدئو به صورت پرده نمایش و اطلاعات مطابق دستور 1 (بدون پخش خودکار)
+                    // طراحی ویدئو به صورت پرده نمایش و اطلاعات (بدون پخش خودکار)
                     container.innerHTML += `
                         <div class="video-card">
-                            <img src="${file.thumbnail}" alt="${file.name}" class="video-poster">
+                            <div class="video-card-top" style="position:relative; cursor:pointer;" onclick="playVideoDirectly('${file.id}')">
+                                <img src="${file.thumbnail}" alt="${file.name}" class="video-poster" onerror="this.onerror=null; this.src='https://dummyimage.com/600x338/151a28/cda066&text=Video+Preview';">
+                                <div class="video-overlay-icon"><i class="fas fa-play"></i></div>
+                            </div>
                             <div class="video-info">
                                 <div class="video-title" title="${file.name}">${file.name}</div>
                                 <div class="video-meta"><i class="fas fa-hdd"></i> حجم: ${fSize}</div>
                                 <div class="video-actions">
-                                    <button onclick="downloadDirectly('${file.id}', '${safeName}', this)" class="btn btn-primary"><i class="fas fa-download"></i> دانلود ویدئو</button>
+                                    <button onclick="downloadVideoBypass('${file.id}')" class="btn btn-primary"><i class="fas fa-download"></i> دانلود ویدئو</button>
                                     <button onclick="copyDynamicLink('${file.id}', 'video', this)" class="btn"><i class="fas fa-link"></i> کپی لینک</button>
                                 </div>
                             </div>
@@ -1454,7 +1511,7 @@
             }).join('');
         }
 
-        // ================= توابع دانلود و اجرای فایل (ایمن برای سهمیه) =================
+        // ================= توابع دانلود فایل =================
         async function downloadDirectly(fileId, fileName, btn) {
             const prevText = btn.innerHTML;
             btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> دریافت فایل...`;
@@ -1488,6 +1545,12 @@
             btn.disabled = false;
         }
 
+        // دانلود ویدئو با لینک مستقیم (دور زدن اسکریپت و صفر کردن مصرف سهمیه طبق دستور 1)
+        function downloadVideoBypass(fileId) {
+            window.open(`https://drive.google.com/uc?export=download&id=${fileId}`, '_blank');
+        }
+
+        // فایل HTML فقط در صفحه جدید باز می‌شود
         async function launchInteractiveHTML(fileId, buttonEl) {
             const originalText = buttonEl.innerHTML;
             buttonEl.innerHTML = `<i class="fas fa-spinner fa-spin"></i> در حال پردازش...`;
@@ -1534,6 +1597,7 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 if (document.getElementById('imageModal').style.display === 'flex') closeModal('imageModal', 'siteImagePlayer');
+                if (document.getElementById('videoModal').style.display === 'flex') closeModal('videoModal', 'siteVideoFrame');
             }
         });
         
@@ -1544,6 +1608,7 @@
         document.querySelectorAll('.viewer-modal').forEach(modal => {
             modal.addEventListener('click', function() {
                 if(this.id === 'imageModal') closeModal(this.id, 'siteImagePlayer');
+                if(this.id === 'videoModal') closeModal(this.id, 'siteVideoFrame');
             });
         });
     </script>
