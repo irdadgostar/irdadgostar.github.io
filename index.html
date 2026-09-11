@@ -449,6 +449,7 @@
             height: 100%;
             object-fit: cover;
             display: block;
+            cursor: pointer;
         }
 
         .card-link-overlay {
@@ -489,7 +490,7 @@
             border-color: var(--accent-color);
         }
 
-        /* کارت ویدئو (طراحی جدید بدون پخش خودکار) */
+        /* کارت ویدئو (بدون مدال - طراحی شده به عنوان پوستر + اطلاعات طبق دستور) */
         .video-card {
             background: var(--surface-color);
             border: 1px solid var(--border-color);
@@ -680,6 +681,7 @@
             margin-bottom: 40px;
             padding-bottom: 40px;
             border-bottom: 1px solid var(--border-color);
+            animation: fadeUpIn 0.4s ease forwards;
         }
         
         .dynamic-isolated-title {
@@ -967,7 +969,7 @@
         </section>
     </main>
 
-    <!-- مدال تصویر -->
+    <!-- مدال تصویر (مخصوص عکس‌ها) -->
     <div class="viewer-modal" id="imageModal">
         <button class="modal-close-btn" onclick="closeModal('imageModal', 'siteImagePlayer')" title="بستن">&times;</button>
         <div class="modal-content-wrapper">
@@ -992,6 +994,7 @@
     </footer>
 
     <script>
+        // لینک اسکریپت
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzutYjDxS07wIjQZFUobhWK_ffE1TKkXev4u44b7kw9MuCQTTl-NSVMLmL4TIT2AsYn/exec";
 
         const FOLDER_IDS = {
@@ -1040,6 +1043,10 @@
         }
 
         function switchTab(tabId) {
+            // حل مشکل شماره ۱: پاک‌سازی قطعی وضعیت داینامیک هنگام کلیک روی منو
+            window.activeDynamicRequest = null;
+            document.querySelectorAll('[id^="dynamic-link-display-"]').forEach(el => el.innerHTML = '');
+
             document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active-link'));
 
@@ -1050,15 +1057,11 @@
             document.getElementById('navLinks').classList.remove('show');
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
-            // اگر درخواست داینامیکی فعال نیست، تب را عادی لود کن
-            if (!window.activeDynamicRequest) {
-                if (tabId === 'gallery' && cache.gallery.length === 0) fetchCategoryData('gallery');
-                if (tabId === 'videos' && cache.videos.length === 0) fetchCategoryData('videos');
-                if (tabId === 'htmls' && cache.htmls.length === 0) fetchCategoryData('htmls');
-                if (tabId === 'research' && document.getElementById('research-container').innerHTML.trim() === "") {
-                    loadResearchFolder(FOLDER_IDS.researchRoot);
-                }
-            }
+            // لود مجدد و عادی داده‌ها
+            if (tabId === 'gallery') fetchCategoryData('gallery');
+            if (tabId === 'videos') fetchCategoryData('videos');
+            if (tabId === 'htmls') fetchCategoryData('htmls');
+            if (tabId === 'research') loadResearchFolder(FOLDER_IDS.researchRoot);
         }
 
         function setLocalLoader(section, isVisible) {
@@ -1077,7 +1080,7 @@
             return await response.json();
         }
 
-        // ================= ابزار تبدیل حجم فایل (بایت به مگابایت) =================
+        // ابزار تبدیل حجم فایل (بایت به مگابایت)
         function formatBytes(bytes) {
             if (!bytes || bytes === 0) return 'نامشخص';
             const k = 1024;
@@ -1086,7 +1089,7 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        // ================= سیستم لینک داینامیک پیشرفته (با انتظار برای لود سرور) =================
+        // ================= سیستم لینک داینامیک پیشرفته =================
         function copyDynamicLink(fileId, fileType, btnElement) {
             const baseUrl = window.location.origin + window.location.pathname;
             const dynamicLink = `${baseUrl}?view=${fileId}&type=${fileType}`;
@@ -1109,37 +1112,56 @@
             if(event) event.stopPropagation();
         }
 
-        // بررسی لینک داینامیک در زمان لود صفحه
+        // بررسی در زمان لود صفحه برای اجرای لینک داینامیک (حل مشکل ۳)
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const viewId = urlParams.get('view');
             const type = urlParams.get('type');
 
             if (viewId && type) {
-                // ثبت درخواست داینامیک در متغیر گلوبال
-                window.activeDynamicRequest = { id: viewId, type: type };
-                
-                // پاک کردن پارامتر از URL (بدون رفرش صفحه)
+                // پاک کردن پارامتر از URL فقط در ظاهر نوار آدرس
                 window.history.replaceState({}, document.title, window.location.pathname);
+                
+                // هدایت به تب مناسب
+                let targetTab = '';
+                if (type === 'image') targetTab = 'gallery';
+                else if (type === 'video') targetTab = 'videos';
+                else if (type === 'html') targetTab = 'htmls';
+                else if (type === 'doc') targetTab = 'research';
 
-                // رفتن به تب مربوطه و لود کردن داده‌ها برای پیدا کردن فایل
-                if (type === 'image') {
-                    switchTab('gallery');
-                    fetchCategoryData('gallery');
-                } else if (type === 'video') {
-                    switchTab('videos');
-                    fetchCategoryData('videos');
-                } else if (type === 'html') {
-                    switchTab('htmls');
-                    fetchCategoryData('htmls');
-                } else if (type === 'doc') {
-                    switchTab('research');
-                    loadResearchFolder(FOLDER_IDS.researchRoot);
-                }
+                document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+                document.getElementById(targetTab).classList.add('active');
+
+                // لودینگ هوشمند برای واکشی مستقیم اطلاعات یک فایل از سرور بدون سرچ کل پوشه‌ها
+                fetchSingleFileInfoForDynamicLink(viewId, targetTab, type);
             }
         });
 
-        // خروج از حالت نمایش ایزوله (داینامیک)
+        // درخواست اختصاصی به بک‌اند برای پیدا کردن فایل لینک داینامیک (جلوگیری از خطای یافت نشد)
+        async function fetchSingleFileInfoForDynamicLink(fileId, targetTab, fileType) {
+            setLocalLoader(targetTab, true);
+            window.activeDynamicRequest = true; // مسدود کردن لود سایر فایل‌ها تا بازگشت کاربر
+
+            try {
+                const res = await callDriveAPI({
+                    action: 'getFileInfo',
+                    fileId: fileId
+                });
+
+                setLocalLoader(targetTab, false);
+
+                if (res.error || !res.id) {
+                    renderNotFoundCard(targetTab);
+                } else {
+                    renderIsolatedCard(targetTab, res, fileType);
+                }
+            } catch (e) {
+                setLocalLoader(targetTab, false);
+                renderNotFoundCard(targetTab);
+            }
+        }
+
+        // خروج از حالت نمایش ایزوله
         function clearDynamicView(section) {
             window.activeDynamicRequest = null;
             const displayArea = document.getElementById(`dynamic-link-display-${section}`);
@@ -1148,23 +1170,23 @@
             if (section === 'research') {
                 loadResearchFolder(FOLDER_IDS.researchRoot);
             } else {
-                renderBatch(section);
+                fetchCategoryData(section);
             }
         }
 
-        // رسم کارت اختصاصی ایزوله در صورت پیدا شدن فایل
+        // رسم کارت اختصاصی ایزوله
         function renderIsolatedCard(containerId, file, sectionType) {
             const displayArea = document.getElementById(`dynamic-link-display-${containerId}`);
             if (!displayArea) return;
 
             const safeName = file.name.replace(/'/g, "\\'");
-            const fSize = file.size ? formatBytes(file.size) : 'نامشخص';
+            const fSize = formatBytes(file.size);
             let cardHTML = `<div class="dynamic-isolated-container">
                                 <div class="dynamic-isolated-title"><i class="fas fa-thumbtack"></i> فایل درخواست شده از طریق لینک:</div>`;
 
             if (sectionType === 'image') {
                 cardHTML += `
-                    <div class="gallery-card" style="max-width: 350px; margin: 0 auto;">
+                    <div class="gallery-card" style="max-width: 400px; margin: 0 auto;">
                         <img src="${file.thumbnail}" alt="${file.name}" loading="lazy" onclick="viewImageDirectly('${file.id}')" style="cursor:pointer;">
                         <div class="card-link-overlay">
                             <button class="btn-sm-overlay" onclick="copyDynamicLink('${file.id}', 'image', this)"><i class="fas fa-link"></i> کپی لینک</button>
@@ -1172,14 +1194,15 @@
                         </div>
                     </div>`;
             } else if (sectionType === 'video') {
+                // کارت ویدئو در لینک داینامیک مطابق دستور 1 (بدون پخش خودکار)
                 cardHTML += `
-                    <div class="video-card" style="max-width: 450px; margin: 0 auto;">
+                    <div class="video-card" style="max-width: 500px; margin: 0 auto;">
                         <img src="${file.thumbnail}" alt="${file.name}" class="video-poster">
                         <div class="video-info">
                             <div class="video-title" title="${file.name}">${file.name}</div>
                             <div class="video-meta"><i class="fas fa-hdd"></i> حجم: ${fSize}</div>
                             <div class="video-actions">
-                                <button onclick="downloadDirectly('${file.id}', '${safeName}', this)" class="btn btn-primary"><i class="fas fa-download"></i> دانلود ویدئو</button>
+                                <button onclick="downloadDirectly('${file.id}', '${safeName}', this)" class="btn btn-primary"><i class="fas fa-download"></i> دانلود مستقیم</button>
                                 <button onclick="copyDynamicLink('${file.id}', 'video', this)" class="btn"><i class="fas fa-link"></i> کپی لینک</button>
                             </div>
                         </div>
@@ -1218,13 +1241,14 @@
 
             cardHTML += `
                 <div style="text-align: center; margin-top: 30px;">
-                    <button class="btn" onclick="clearDynamicView('${containerId}')"><i class="fas fa-arrow-right"></i> بازگشت به لیست کامل</button>
+                    <button class="btn" onclick="clearDynamicView('${containerId}')"><i class="fas fa-arrow-right"></i> مشاهده سایر فایل‌های این بخش</button>
                 </div>
             </div>`;
 
             displayArea.innerHTML = cardHTML;
         }
 
+        // کارت پیام خطای یافت نشدن
         function renderNotFoundCard(containerId) {
             const displayArea = document.getElementById(`dynamic-link-display-${containerId}`);
             if (!displayArea) return;
@@ -1232,12 +1256,12 @@
                 <div class="dynamic-error-card">
                     <i class="fas fa-exclamation-triangle"></i>
                     <p>فایل مورد نظر در سرور موجود نیست یا حذف شده است.</p>
-                    <button class="btn btn-primary" onclick="clearDynamicView('${containerId}')">مشاهده سایر فایل‌های این بخش</button>
+                    <button class="btn btn-primary" onclick="clearDynamicView('${containerId}')">مشاهده سایر فایل‌ها</button>
                 </div>
             `;
         }
 
-        // ================= توابع نمایش تصویر در مدال =================
+        // ================= توابع نمایش تصویر =================
         function viewImageDirectly(fileId) {
             const modal = document.getElementById('imageModal');
             const img = document.getElementById('siteImagePlayer');
@@ -1246,7 +1270,7 @@
             setTimeout(() => modal.classList.add('show'), 10);
         }
 
-        // ================= بارگذاری داده‌ها (گالری، ویدئو، HTML) =================
+        // ================= بارگذاری داده‌ها =================
         async function fetchCategoryData(type) {
             const container = document.getElementById(`${type}-container`);
             const btnMore = document.getElementById(`btn-more-${type}`);
@@ -1271,23 +1295,6 @@
                 cache[type] = res.files || [];
                 displayLimit[type] = 100;
                 
-                // هندل کردن درخواست داینامیک لینک
-                if (window.activeDynamicRequest && 
-                   ((type === 'gallery' && window.activeDynamicRequest.type === 'image') ||
-                    (type === 'videos' && window.activeDynamicRequest.type === 'video') ||
-                    (type === 'htmls' && window.activeDynamicRequest.type === 'html'))) {
-                    
-                    const targetFile = cache[type].find(f => f.id === window.activeDynamicRequest.id);
-                    setLocalLoader(type, false);
-                    
-                    if (targetFile) {
-                        renderIsolatedCard(type, targetFile, window.activeDynamicRequest.type);
-                    } else {
-                        renderNotFoundCard(type);
-                    }
-                    return; // توقف رندر کردن بقیه لیست
-                }
-
                 renderBatch(type);
 
             } catch (err) {
@@ -1313,10 +1320,10 @@
 
             currentItems.forEach(file => {
                 const safeName = file.name.replace(/'/g, "\\'"); 
-                const fSize = file.size ? formatBytes(file.size) : 'نامشخص';
+                const fSize = formatBytes(file.size);
 
                 if (type === 'gallery') {
-                    // افزوده شدن دکمه دانلود به گالری تصاویر (دستور ۴)
+                    // افزوده شدن دکمه دانلود به گالری تصاویر
                     container.innerHTML += `
                         <div class="gallery-card">
                             <img src="${file.thumbnail}" alt="${file.name}" loading="lazy" onclick="viewImageDirectly('${file.id}')" style="cursor:pointer;">
@@ -1326,7 +1333,7 @@
                             </div>
                         </div>`;
                 } else if (type === 'videos') {
-                    // تغییر ساختار ویدئوها به پرده نمایش و دکمه دانلود/کپی زیر آن (دستور ۱)
+                    // طراحی ویدئو به صورت پرده نمایش و اطلاعات مطابق دستور 1 (بدون پخش خودکار)
                     container.innerHTML += `
                         <div class="video-card">
                             <img src="${file.thumbnail}" alt="${file.name}" class="video-poster">
@@ -1340,7 +1347,6 @@
                             </div>
                         </div>`;
                 } else if (type === 'htmls') {
-                    // بازگشت دکمه دانلود به اچ تی ام ال ها (دستور ۱ قبلی)
                     container.innerHTML += `
                         <div class="file-item">
                             <div class="file-info">
@@ -1397,24 +1403,7 @@
                     setLocalLoader('research', false);
                     return;
                 }
-                
-                // هندل کردن ریکوئست داینامیک برای اسناد تحقیقات
-                if (window.activeDynamicRequest && window.activeDynamicRequest.type === 'doc') {
-                    // جستجو برای فایل در پوشه فعلی
-                    const targetFile = res.files.find(f => f.id === window.activeDynamicRequest.id);
-                    setLocalLoader('research', false);
-                    
-                    if (targetFile) {
-                        renderIsolatedCard('research', targetFile, 'doc');
-                    } else {
-                        // اگر در پوشه اصلی (Root) نبود، پیام عدم وجود میدهیم 
-                        // (جستجوی تو در تو در درایو زمانبر است، فرض بر این است لینک فایل موجود در مسیر داده شده)
-                        renderNotFoundCard('research');
-                    }
-                    return;
-                }
 
-                // لیست پوشه‌ها (گزارش وضعیت و تعداد کلاً حذف شد - دستور ۳)
                 res.folders.forEach(dir => {
                     container.innerHTML += `
                         <div class="file-item" style="cursor:pointer;" onclick="loadResearchFolder('${dir.id}', '${dir.name}')">
@@ -1430,10 +1419,9 @@
                         </div>`;
                 });
 
-                // لیست اسناد
                 res.files.forEach(doc => {
                     const safeName = doc.name.replace(/'/g, "\\'");
-                    const fSize = doc.size ? formatBytes(doc.size) : 'نامشخص';
+                    const fSize = formatBytes(doc.size);
                     container.innerHTML += `
                         <div class="file-item">
                             <div class="file-info">
@@ -1466,10 +1454,10 @@
             }).join('');
         }
 
-        // ================= توابع دانلود و اجرای فایل =================
+        // ================= توابع دانلود و اجرای فایل (ایمن برای سهمیه) =================
         async function downloadDirectly(fileId, fileName, btn) {
             const prevText = btn.innerHTML;
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> در حال دریافت...`;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> دریافت فایل...`;
             btn.disabled = true;
 
             try {
@@ -1493,14 +1481,13 @@
                 document.body.removeChild(a);
                 URL.revokeObjectURL(downloadUrl);
             } catch (e) {
-                alert("خطا در دانلود فایل. اینترنت خود را بررسی کنید.");
+                alert("خطا در دانلود. ممکن است حجم فایل بالا باشد. اینترنت خود را بررسی کنید.");
             }
 
             btn.innerHTML = prevText;
             btn.disabled = false;
         }
 
-        // فایل HTML فقط در صفحه جدید باز می‌شود
         async function launchInteractiveHTML(fileId, buttonEl) {
             const originalText = buttonEl.innerHTML;
             buttonEl.innerHTML = `<i class="fas fa-spinner fa-spin"></i> در حال پردازش...`;
@@ -1519,7 +1506,7 @@
                         newWin.document.write(res.content);
                         newWin.document.close();
                     } else {
-                        alert("مرورگر شما مانع از باز شدن صفحه شد. لطفاً مسدودکننده پاپ‌آپ (Pop-up) را برای این سایت خاموش کنید.");
+                        alert("مرورگر شما مانع از باز شدن صفحه شد. لطفاً مسدودکننده پاپ‌آپ (Pop-up) را خاموش کنید.");
                     }
                 } else {
                     alert("خطا در خواندن محتوای فایل.");
@@ -1532,7 +1519,7 @@
             buttonEl.disabled = false;
         }
 
-        // ================= توابع بستن مدال‌ها =================
+        // ================= توابع بستن مدال =================
         function closeModal(modalId, elementIdToClear) {
             const modal = document.getElementById(modalId);
             const el = document.getElementById(elementIdToClear);
