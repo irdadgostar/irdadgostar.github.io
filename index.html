@@ -317,7 +317,7 @@
             line-height: 2;
         }
 
-        /* شبکه دسترسی سریع در پایین صفحه اصلی (دستور ۴) */
+        /* شبکه دسترسی سریع در پایین صفحه اصلی */
         .quick-access-grid {
             max-width: 900px;
             margin: 60px auto 0;
@@ -563,6 +563,7 @@
             display: flex;
             gap: 12px;
             flex-shrink: 0;
+            flex-wrap: wrap;
         }
 
         .breadcrumb {
@@ -602,7 +603,23 @@
             cursor: default;
         }
 
-        /* انواع مدال‌ها (پنجره‌های پاپ‌آپ) برای نمایش فایل‌ها (دستور ۱ و ۶) */
+        /* کارت نمایش فایل لینک داینامیک */
+        .dynamic-card-wrapper {
+            background: rgba(184, 134, 11, 0.05);
+            border: 2px dashed var(--accent-color);
+            padding: 20px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 30px;
+        }
+        
+        .dynamic-card-title {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        /* انواع مدال‌ها (پنجره‌های پاپ‌آپ) برای نمایش عکس و فیلم */
         .viewer-modal {
             position: fixed;
             inset: 0;
@@ -648,14 +665,16 @@
             align-items: center;
         }
 
-        /* پلیر ویدئو تمیز و خالص بدون لوگوی گوگل */
+        /* پلیر ویدئو با آی‌فریم برای تضمین پخش و وجود دکمه بزرگنمایی */
         .native-video-player {
             width: 100%;
+            aspect-ratio: 16/9;
             max-height: 95vh;
             outline: none;
             border: none;
             background: #000;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border-radius: 12px;
         }
 
         /* نمایشگر تصویر */
@@ -665,16 +684,6 @@
             object-fit: contain;
             border-radius: 8px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-        }
-
-        /* نمایشگر اسناد تحقیقات */
-        .document-viewer {
-            width: 95vw;
-            height: 95vh;
-            max-width: 1200px;
-            border: none;
-            background: #fff;
-            border-radius: 8px;
         }
 
         /* فوتر */
@@ -747,6 +756,7 @@
             .contact-group { justify-content: center; }
             
             .modal-close-btn { top: 10px; right: 20px; }
+            .native-video-player { border-radius: 0; }
         }
     </style>
 </head>
@@ -823,7 +833,7 @@
                 </div>
             </div>
 
-            <!-- شبکه دسترسی سریع در پایین صفحه اصلی (دستور ۴) -->
+            <!-- شبکه دسترسی سریع در پایین صفحه اصلی -->
             <div class="quick-access-grid">
                 <a class="quick-access-card" onclick="switchTab('gallery')">
                     <i class="fas fa-images"></i>
@@ -869,6 +879,9 @@
             <div class="section-header">
                 <h2 class="section-title">پروژه‌های تعاملی (HTML)</h2>
             </div>
+            <!-- کانتینر مخصوص نمایش کارت لینک داینامیک HTML -->
+            <div id="dynamic-link-display-htmls"></div>
+            
             <div class="file-list" id="htmls-container"></div>
             <div class="loader-container" id="loader-htmls"><div class="loader"></div></div>
             <button class="btn btn-load-more" id="btn-more-htmls" onclick="loadMore('htmls')">مشاهده ۱۰۰ مورد بعدی</button>
@@ -880,19 +893,21 @@
                 <h2 class="section-title">تحقیقات و مستندات</h2>
             </div>
             <div class="breadcrumb" id="research-breadcrumb"></div>
+            <!-- کانتینر مخصوص نمایش کارت لینک داینامیک تحقیقات -->
+            <div id="dynamic-link-display-research"></div>
+            
             <div class="file-list" id="research-container"></div>
             <div class="loader-container" id="loader-research"><div class="loader"></div></div>
         </section>
     </main>
 
-    <!-- مدال‌های نمایش (Viewers) جهت نمایش لینک‌های داینامیک بدون دانلود -->
+    <!-- مدال‌های نمایش (Viewers) جهت نمایش تصویر و فیلم -->
     
-    <!-- مدال ویدئو (تمیز، با قابلیت بزرگنمایی) -->
+    <!-- مدال ویدئو (استفاده مجدد از آی‌فریم برای تضمین پخش در همه دستگاه‌ها و داشتن دکمه تمام صفحه) -->
     <div class="viewer-modal" id="videoModal">
         <button class="modal-close-btn" onclick="closeModal('videoModal', 'siteVideoPlayer')" title="بستن">&times;</button>
         <div class="modal-content-wrapper" id="videoWrapper">
-            <!-- اضافه شدن playsinline برای موبایل و preload -->
-            <video id="siteVideoPlayer" class="native-video-player" controls controlslist="nodownload" playsinline preload="metadata"></video>
+            <iframe id="siteVideoPlayer" class="native-video-player" allow="fullscreen" allowfullscreen></iframe>
         </div>
     </div>
 
@@ -904,25 +919,17 @@
         </div>
     </div>
 
-    <!-- مدال اسناد (PDF, Word و غیره) -->
-    <div class="viewer-modal" id="documentModal">
-        <button class="modal-close-btn" onclick="closeModal('documentModal', 'siteDocumentFrame')" title="بستن">&times;</button>
-        <div class="modal-content-wrapper">
-            <iframe id="siteDocumentFrame" class="document-viewer"></iframe>
-        </div>
-    </div>
-
     <footer>
         <div class="footer-container">
             <div class="contact-group">
                 <a href="tel:+989136395562" class="contact-link"><i class="fas fa-phone-alt"></i> ۹۸۹۱۳۶۳۹۵۵۶۲+</a>
                 <a href="mailto:Irdadgostar@gmail.com" class="contact-link"><i class="fas fa-envelope"></i> Irdadgostar@gmail.com</a>
             </div>
-            <!-- لینک‌های دسترسی در فوتر به عنوان راهنمای پایین صفحه -->
+            <!-- لینک‌های دسترسی سریع در فوتر -->
             <div class="contact-group" style="gap: 15px;">
-                <a class="contact-link" onclick="switchTab('gallery')" style="cursor:pointer;">تصاویر</a> | 
-                <a class="contact-link" onclick="switchTab('videos')" style="cursor:pointer;">ویدئوها</a> | 
-                <a class="contact-link" onclick="switchTab('research')" style="cursor:pointer;">تحقیقات</a>
+                <a class="contact-link" onclick="switchTab('gallery')" style="cursor:pointer;"><i class="fas fa-image"></i> تصاویر</a>
+                <a class="contact-link" onclick="switchTab('videos')" style="cursor:pointer;"><i class="fas fa-video"></i> ویدئوها</a>
+                <a class="contact-link" onclick="switchTab('research')" style="cursor:pointer;"><i class="fas fa-book"></i> تحقیقات</a>
             </div>
             <div class="footer-note">سایت شخصی امیرحسین دادگستر ©</div>
         </div>
@@ -982,6 +989,8 @@
             if (navLink) navLink.classList.add('active-link');
 
             document.getElementById('navLinks').classList.remove('show');
+            
+            // اسکرول نرم به بالا
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
             if (tabId === 'gallery' && cache.gallery.length === 0) fetchCategoryData('gallery');
@@ -1008,11 +1017,12 @@
             return await response.json();
         }
 
-        // ================= سیستم لینک داینامیک پیشرفته (نمایش فایل به جای دانلود) =================
-        function copyDynamicLink(fileId, fileType, btnElement) {
-            // ساخت لینک داینامیک که به مرورگر می‌فهماند فایل را "نمایش" دهد
+        // ================= سیستم لینک داینامیک پیشرفته (اصلاح شده طبق دستور ۳) =================
+        function copyDynamicLink(fileId, fileType, fileName, btnElement) {
             const baseUrl = window.location.origin + window.location.pathname;
-            const dynamicLink = `${baseUrl}?view=${fileId}&type=${fileType}`;
+            const encodedName = encodeURIComponent(fileName);
+            // ثبت آیدی، نوع و اسم فایل در لینک برای رندر سریع کارت
+            const dynamicLink = `${baseUrl}?view=${fileId}&type=${fileType}&n=${encodedName}`;
             
             navigator.clipboard.writeText(dynamicLink).then(() => {
                 const originalHTML = btnElement.innerHTML;
@@ -1032,27 +1042,65 @@
             if(event) event.stopPropagation();
         }
 
-        // سیستم خواندن لینک داینامیک در زمان لود سایت (بدون ریدایرکت)
+        // تابع رسم کارت ایزوله (مخصوص فایل‌هایی که با لینک وارد میشوند)
+        function renderDynamicCard(section, fileId, fileName, type, iconClass) {
+            const displayArea = document.getElementById(`dynamic-link-display-${section}`);
+            if (!displayArea) return;
+
+            let actions = '';
+            const safeFileName = fileName.replace(/'/g, "\\'"); // جلوگیری از تداخل در رویداد کلیک
+
+            if (type === 'html') {
+                actions = `
+                    <button onclick="copyDynamicLink('${fileId}', 'html', '${safeFileName}', this)" class="btn"><i class="fas fa-link"></i> کپی لینک</button>
+                    <button onclick="downloadDirectly('${fileId}', '${safeFileName}', this)" class="btn"><i class="fas fa-download"></i> دانلود</button>
+                    <button onclick="launchInteractiveHTML('${fileId}', this)" class="btn btn-primary"><i class="fas fa-desktop"></i> نمایش در مرورگر</button>
+                `;
+            } else if (type === 'doc') {
+                actions = `
+                    <button onclick="copyDynamicLink('${fileId}', 'doc', '${safeFileName}', this)" class="btn"><i class="fas fa-link"></i> کپی لینک</button>
+                    <button onclick="downloadDirectly('${fileId}', '${safeFileName}', this)" class="btn btn-primary"><i class="fas fa-download"></i> دانلود مستقیم</button>
+                `;
+            }
+
+            displayArea.innerHTML = `
+                <div class="dynamic-card-wrapper">
+                    <div class="dynamic-card-title"><i class="fas fa-thumbtack"></i> فایل درخواست شده از طریق لینک:</div>
+                    <div class="file-item" style="margin: 0; border-color: var(--accent-color);">
+                        <div class="file-info">
+                            <i class="${iconClass}"></i>
+                            <span class="file-name" title="${fileName}">${fileName}</span>
+                        </div>
+                        <div class="file-actions">
+                            ${actions}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // بررسی در زمان لود صفحه برای اجرای لینک داینامیک بدون ریدایرکت مزاحم
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const viewId = urlParams.get('view');
             const type = urlParams.get('type');
+            const encodedName = urlParams.get('n');
 
             if (viewId && type) {
-                // اگر شخصی از طریق لینک وارد شد، بلافاصله پنجره نمایش برای او باز می‌شود
+                const fileName = encodedName ? decodeURIComponent(encodedName) : 'فایل درخواستی';
+
                 if (type === 'image') {
                     switchTab('gallery');
                     viewImageDirectly(viewId);
                 } else if (type === 'video') {
                     switchTab('videos');
-                    playVideoDirectly(viewId);
+                    playVideoDirectly(viewId); // ویدیو دیگر خودکار پخش نمیشود و منتظر کلیک است
                 } else if (type === 'html') {
                     switchTab('htmls');
-                    const dummyBtn = document.createElement('button');
-                    launchInteractiveHTML(viewId, dummyBtn);
+                    renderDynamicCard('htmls', viewId, fileName, 'html', 'fab fa-html5');
                 } else if (type === 'doc') {
                     switchTab('research');
-                    viewDocumentDirectly(viewId);
+                    renderDynamicCard('research', viewId, fileName, 'doc', 'fas fa-file-alt');
                 }
                 
                 // پاک کردن پارامتر از URL فقط در ظاهر نوار آدرس (جهت زیبایی)، بدون رفرش کردن صفحه
@@ -1060,21 +1108,11 @@
             }
         });
 
-        // ================= توابع نمایش فایل‌ها در مدال (دستور ۱) =================
-        
+        // ================= توابع نمایش تصویر =================
         function viewImageDirectly(fileId) {
             const modal = document.getElementById('imageModal');
             const img = document.getElementById('siteImagePlayer');
-            img.src = `https://drive.google.com/thumbnail?sz=w1200&id=${fileId}`; // کیفیت بالا برای نمایش در گوشی یا دسکتاپ
-            modal.style.display = 'flex';
-            setTimeout(() => modal.classList.add('show'), 10);
-        }
-
-        function viewDocumentDirectly(fileId) {
-            const modal = document.getElementById('documentModal');
-            const frame = document.getElementById('siteDocumentFrame');
-            // برای اسناد، ایمن‌ترین راه نمایش در مرورگر بدون دانلود، استفاده از Previewer استاندارد است
-            frame.src = `https://drive.google.com/file/d/${fileId}/preview`;
+            img.src = `https://drive.google.com/thumbnail?sz=w1200&id=${fileId}`;
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('show'), 10);
         }
@@ -1127,26 +1165,27 @@
             }
 
             currentItems.forEach(file => {
+                const safeName = file.name.replace(/'/g, "\\'"); // ایمن سازی نام فایل برای توابع کلیک
+
                 if (type === 'gallery') {
-                    // تغییر اکشن از دانلود به کپی لینکِ نمایش (image)
                     container.innerHTML += `
                         <div class="gallery-card">
                             <img src="${file.thumbnail}" alt="${file.name}" loading="lazy" onclick="viewImageDirectly('${file.id}')" style="cursor:pointer;">
                             <div class="card-link-overlay">
-                                <button class="btn-sm-overlay" onclick="copyDynamicLink('${file.id}', 'image', this)"><i class="fas fa-link"></i> کپی لینک نمایش</button>
+                                <button class="btn-sm-overlay" onclick="copyDynamicLink('${file.id}', 'image', '${safeName}', this)"><i class="fas fa-link"></i> کپی لینک نمایش</button>
                             </div>
                         </div>`;
                 } else if (type === 'videos') {
-                    // تغییر اکشن به video
                     container.innerHTML += `
                         <div class="gallery-card video-card" onclick="playVideoDirectly('${file.id}')">
                             <img src="${file.thumbnail}" alt="${file.name}">
                             <div class="video-overlay-icon"><i class="fas fa-play"></i></div>
                             <div class="card-link-overlay">
-                                <button class="btn-sm-overlay" onclick="copyDynamicLink('${file.id}', 'video', this)"><i class="fas fa-link"></i> کپی لینک پخش</button>
+                                <button class="btn-sm-overlay" onclick="copyDynamicLink('${file.id}', 'video', '${safeName}', this)"><i class="fas fa-link"></i> کپی لینک پخش</button>
                             </div>
                         </div>`;
                 } else if (type === 'htmls') {
+                    // قرارگیری هر سه دکمه طبق دستور ۱
                     container.innerHTML += `
                         <div class="file-item">
                             <div class="file-info">
@@ -1154,7 +1193,8 @@
                                 <span class="file-name" title="${file.name}">${file.name}</span>
                             </div>
                             <div class="file-actions">
-                                <button onclick="copyDynamicLink('${file.id}', 'html', this)" class="btn"><i class="fas fa-link"></i> کپی لینک</button>
+                                <button onclick="copyDynamicLink('${file.id}', 'html', '${safeName}', this)" class="btn"><i class="fas fa-link"></i> کپی لینک</button>
+                                <button onclick="downloadDirectly('${file.id}', '${safeName}', this)" class="btn"><i class="fas fa-download"></i> دانلود</button>
                                 <button onclick="launchInteractiveHTML('${file.id}', this)" class="btn btn-primary"><i class="fas fa-desktop"></i> نمایش در مرورگر</button>
                             </div>
                         </div>`;
@@ -1184,7 +1224,6 @@
             updateBreadcrumb();
 
             container.innerHTML = "";
-            // نکته دستور ۳: خلاصه وضعیت و تعداد فایل/پوشه‌ها به کل حذف شد
             setLocalLoader('research', true);
 
             try {
@@ -1214,7 +1253,7 @@
                 });
 
                 res.files.forEach(doc => {
-                    // افزودن دکمه کپی لینک نمایش (doc) به جای دانلود و افزودن دکمه مستقیم نمایش
+                    const safeName = doc.name.replace(/'/g, "\\'");
                     container.innerHTML += `
                         <div class="file-item">
                             <div class="file-info">
@@ -1222,8 +1261,8 @@
                                 <span class="file-name" title="${doc.name}">${doc.name}</span>
                             </div>
                             <div class="file-actions">
-                                <button onclick="copyDynamicLink('${doc.id}', 'doc', this)" class="btn"><i class="fas fa-link"></i> کپی لینک</button>
-                                <button onclick="viewDocumentDirectly('${doc.id}')" class="btn btn-primary"><i class="fas fa-eye"></i> مشاهده</button>
+                                <button onclick="copyDynamicLink('${doc.id}', 'doc', '${safeName}', this)" class="btn"><i class="fas fa-link"></i> کپی لینک</button>
+                                <button onclick="downloadDirectly('${doc.id}', '${safeName}', this)" class="btn btn-primary"><i class="fas fa-download"></i> دانلود مستقیم</button>
                             </div>
                         </div>`;
                 });
@@ -1244,8 +1283,41 @@
             }).join('');
         }
 
-        // ================= توابع اجرای فایل تعاملی (HTML) =================
+        // ================= توابع دانلود و اجرای فایل (دستور ۲) =================
+        async function downloadDirectly(fileId, fileName, btn) {
+            const prevText = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> در حال دریافت...`;
+            btn.disabled = true;
 
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=download&fileId=${fileId}`);
+                const base64Data = await res.text();
+
+                const byteCharacters = atob(base64Data);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: "application/octet-stream" });
+
+                const downloadUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(downloadUrl);
+            } catch (e) {
+                alert("خطا در دانلود خودکار. لطفاً مجدداً تلاش کنید.");
+            }
+
+            btn.innerHTML = prevText;
+            btn.disabled = false;
+        }
+
+        // فایل HTML فقط و فقط با کلیک روی نمایش و در صفحه‌ای دیگر باز می‌شود
         async function launchInteractiveHTML(fileId, buttonEl) {
             const originalText = buttonEl.innerHTML;
             buttonEl.innerHTML = `<i class="fas fa-spinner fa-spin"></i> در حال تنظیم...`;
@@ -1277,36 +1349,19 @@
             buttonEl.disabled = false;
         }
 
-        // ================= پلیر ویدئو تمیز و حرفه‌ای (دستور ۲ و ۶) =================
+        // ================= پلیر ویدئو با آی‌فریم و بدون اتوپلی (دستور ۴ و ۳) =================
         function playVideoDirectly(fileId) {
             const modal = document.getElementById('videoModal');
             const player = document.getElementById('siteVideoPlayer');
-            const wrapper = document.getElementById('videoWrapper');
             
-            // برگرداندن تگ ویدئو بومی در صورتی که قبلاً با آی‌فریم جایگزین شده باشد
-            wrapper.innerHTML = `<video id="siteVideoPlayer" class="native-video-player" controls controlslist="nodownload" playsinline preload="metadata"></video>`;
-            const newPlayer = document.getElementById('siteVideoPlayer');
+            // استفاده از Preview گوگل درایو برای تضمین اجرای بدون مشکل در تمامی دستگاه‌ها
+            // نکته: آی فریم گوگل درایو به طور پیش فرض Autoplay ندارد و کاربر خودش باید پلی کند
+            player.src = `https://drive.google.com/file/d/${fileId}/preview`;
             
-            // تلاش برای پخش ویدئو از طریق لینک مستقیم دانلود گوگل
-            newPlayer.src = `https://drive.google.com/uc?export=download&id=${fileId}`;
-            
-            // اگر گوگل به دلیل حجم بالای ویدئو صفحه هشدار اسکن ویروس را بازگرداند، پلیر بومی Error می‌دهد.
-            // این تابع onerror باهوش عمل کرده و به صورت خودکار پلیر را با آی‌فریم امن جایگزین می‌کند تا پخش تضمین شود
-            newPlayer.onerror = function() {
-                console.log("مرورگر استریم مستقیم را متوقف کرد. در حال انتقال به پلیر کمکی...");
-                wrapper.innerHTML = `<iframe src="https://drive.google.com/file/d/${fileId}/preview" class="native-video-player"></iframe>`;
-            };
-
             modal.style.display = 'flex';
             setTimeout(() => {
                 modal.classList.add('show');
             }, 10);
-
-            // اجبار مرورگر به بارگذاری مجدد سورس و پخش
-            newPlayer.load();
-            newPlayer.play().catch(e => {
-                console.log("پخش خودکار مسدود شد، نیاز به کلیک کاربر است.");
-            });
         }
 
         // ================= توابع بستن مدال‌ها =================
@@ -1318,12 +1373,7 @@
             
             setTimeout(() => {
                 if (el) {
-                    if (el.tagName === 'VIDEO') { el.pause(); el.src = ''; }
-                    else if (el.tagName === 'IMG' || el.tagName === 'IFRAME') { el.src = ''; }
-                }
-                // پاک‌سازی آی‌فریم ویدئوی کمکی در صورت وجود
-                if (modalId === 'videoModal') {
-                    document.getElementById('videoWrapper').innerHTML = '';
+                    el.src = '';
                 }
                 modal.style.display = 'none';
             }, 300);
@@ -1334,7 +1384,6 @@
             if (e.key === 'Escape') {
                 if (document.getElementById('videoModal').style.display === 'flex') closeModal('videoModal', 'siteVideoPlayer');
                 if (document.getElementById('imageModal').style.display === 'flex') closeModal('imageModal', 'siteImagePlayer');
-                if (document.getElementById('documentModal').style.display === 'flex') closeModal('documentModal', 'siteDocumentFrame');
             }
         });
         
@@ -1346,7 +1395,7 @@
         // بسته شدن مدال با کلیک در پس‌زمینه خالی
         document.querySelectorAll('.viewer-modal').forEach(modal => {
             modal.addEventListener('click', function() {
-                const elId = this.id === 'videoModal' ? 'siteVideoPlayer' : (this.id === 'imageModal' ? 'siteImagePlayer' : 'siteDocumentFrame');
+                const elId = this.id === 'videoModal' ? 'siteVideoPlayer' : 'siteImagePlayer';
                 closeModal(this.id, elId);
             });
         });
