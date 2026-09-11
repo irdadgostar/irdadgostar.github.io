@@ -1,590 +1,465 @@
-
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>امیرحسین دادگستر | AMIRDADGOSTAR </title>
-    
-    <!-- فونت وزیر متن -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>امیرحسین دادگستر | شخصی</title>
+    <!-- Font -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
-
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         :root {
-            --bg-deep: #0f172a;
-            --bg-glass: rgba(30, 41, 59, 0.7);
-            --border-glass: rgba(255, 255, 255, 0.1);
-            --accent-glow: rgba(56, 189, 248, 0.3);
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --card-radius: 20px;
-            --font-main: 'Vazirmatn', sans-serif;
+            --bg-color: #0b0f19;
+            --surface-color: #151a28;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent-color: #cda066; /* طلایی ملایم و باکلاس */
+            --accent-hover: #b08752;
+            --border-color: #1e293b;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; outline: none; }
-
-        body {
-            background-color: var(--bg-deep);
-            color: var(--text-primary);
-            font-family: var(--font-main);
-            overflow-x: hidden;
-            min-height: 100vh;
-            position: relative;
-        }
-
-        /* --- QUANTUM BACKGROUND (CANVAS) --- */
-        #quantum-canvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -1;
-            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
-        }
-
-        /* --- HEADER & NAV --- */
-        .glass-header {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 1000px;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border-glass);
-            border-radius: 50px;
-            padding: 10px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1000;
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
-        }
-
-        .brand-logo {
-            font-weight: 800;
-            font-size: 1.1rem;
-            background: linear-gradient(90deg, #fff, #94a3b8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* --- HERO SECTION --- */
-        .hero-container {
-            padding-top: 140px;
-            padding-bottom: 60px;
-            text-align: center;
-            max-width: 800px;
-            margin: 0 auto;
-            padding-left: 1.5rem;
-            padding-right: 1.5rem;
-        }
-
-        .hero-title {
-            font-size: 3rem;
-            font-weight: 900;
-            line-height: 1.2;
-            margin-bottom: 10px;
-            text-shadow: 0 0 40px rgba(255,255,255,0.1);
-        }
-
-        .hero-subtitle {
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-            margin-bottom: 40px;
-        }
-
-        /* --- 3D BUTTONS (MICROSOFT STYLE) --- */
-        .action-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            max-width: 600px;
-            margin: 0 auto 50px auto;
-        }
-
-        .fluent-card {
-            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
-            border: 1px solid var(--border-glass);
-            border-radius: 24px;
-            padding: 20px;
-            text-decoration: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .fluent-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at center, var(--accent-glow), transparent 70%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .fluent-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            border-color: rgba(255,255,255,0.3);
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
-        }
-        .fluent-card:hover::before { opacity: 1; }
-
-        /* شبیه سازی آیکون سه بعدی با CSS و ایموجی (چون امکان اپلود فایل نداریم) 
-           اما ظاهرش بسیار شبیه به 3D رندر شده است */
-        .icon-3d-wrapper {
-            font-size: 3.5rem;
-            margin-bottom: 10px;
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
-            transition: transform 0.3s ease;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Vazirmatn', sans-serif; }
         
-        .fluent-card:hover .icon-3d-wrapper {
-            transform: scale(1.1) rotate(5deg);
-        }
+        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.8; overflow-x: hidden; }
 
-        .btn-text {
-            color: #fff;
-            font-weight: 700;
-            font-size: 1.1rem;
-            z-index: 2;
-        }
+        /* Header */
+        header { background-color: rgba(11, 15, 25, 0.9); backdrop-filter: blur(10px); position: fixed; top: 0; width: 100%; z-index: 1000; border-bottom: 1px solid var(--border-color); }
+        .nav-container { max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.2rem; font-weight: 700; color: var(--accent-color); text-decoration: none; letter-spacing: 1px; }
+        .nav-links { display: flex; gap: 20px; list-style: none; }
+        .nav-links a { color: var(--text-main); text-decoration: none; font-size: 0.95rem; transition: color 0.3s; cursor: pointer; }
+        .nav-links a:hover { color: var(--accent-color); }
 
-        /* --- SEARCH CAPSULE --- */
-        .search-capsule {
-            position: relative;
-            max-width: 500px;
-            margin: 0 auto 60px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 50px;
-            padding: 5px;
-            border: 1px solid var(--border-glass);
-            display: flex;
-            align-items: center;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
-            backdrop-filter: blur(10px);
-        }
-
-        .search-input {
-            width: 100%;
-            background: transparent;
-            border: none;
-            color: #fff;
-            padding: 15px 20px;
-            font-family: var(--font-main);
-            font-size: 1rem;
-        }
-        .search-input::placeholder { color: rgba(255,255,255,0.4); }
+        /* Sections */
+        section { padding: 100px 20px 40px; max-width: 1200px; margin: 0 auto; min-height: 80vh; display: none; animation: fadeIn 0.5s ease; }
+        section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .search-btn {
-            background: #3b82f6;
-            width: 45px; height: 45px;
-            border-radius: 50%;
-            border: none;
-            color: white;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
-            margin-left: 5px;
-        }
+        .section-title { font-size: 2rem; margin-bottom: 30px; border-bottom: 2px solid var(--accent-color); display: inline-block; padding-bottom: 10px; color: var(--text-main); }
 
-        /* --- BENTO GRID CONTENT --- */
-        .bento-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 20px 100px 20px;
-        }
-
-        .bento-card {
-            background: var(--bg-glass);
-            border: 1px solid var(--border-glass);
-            border-radius: var(--card-radius);
-            overflow: hidden;
-            backdrop-filter: blur(15px);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        .bento-card:hover {
-            border-color: rgba(255,255,255,0.4);
-            transform: translateY(-5px);
-            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.6);
-        }
-
-        .card-img-wrap {
-            height: 180px;
-            width: 100%;
-            background: #1e293b;
-            position: relative;
-        }
-
-        .card-img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-        .bento-card:hover .card-img { transform: scale(1.1); }
-
-        .card-content { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        /* Hero / Bio */
+        .hero { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 30px; margin-top: 50px; }
+        /* استایل تصویر به گونه‌ای که با هر عکسی خراب نشود */
+        .profile-img { width: 250px; height: 250px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-color); box-shadow: 0 10px 30px rgba(205, 160, 102, 0.2); }
+        .philosophy-quote { font-size: 1.1rem; color: var(--text-muted); max-width: 800px; font-style: italic; border-right: 4px solid var(--accent-color); padding-right: 20px; text-align: justify; margin: 20px 0; line-height: 2; }
         
-        .card-tag {
-            font-size: 0.8rem;
-            color: #38bdf8;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 700;
-        }
+        .timeline { max-width: 800px; margin: 40px auto; text-align: right; }
+        .timeline-item { position: relative; padding: 0 30px 30px 0; border-right: 2px solid var(--border-color); }
+        .timeline-item::before { content: ''; position: absolute; right: -7px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent-color); }
+        .timeline-item h3 { color: var(--accent-color); font-size: 1.1rem; margin-bottom: 5px; }
+        .timeline-item p { color: var(--text-muted); font-size: 0.95rem; }
 
-        .card-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-            line-height: 1.5;
-        }
-
-        .card-desc {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        /* --- MODERN MODAL --- */
-        .modal-overlay {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
-            z-index: 2000;
-            display: flex; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none;
-            transition: all 0.4s ease;
-        }
-        .modal-overlay.active { opacity: 1; pointer-events: all; }
-
-        .modal-pane {
-            background: #1e293b;
-            width: 90%; max-width: 650px;
-            max-height: 85vh;
-            border-radius: 30px;
-            border: 1px solid rgba(255,255,255,0.1);
-            overflow-y: auto;
-            position: relative;
-            transform: translateY(50px) scale(0.9);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.8);
-        }
-        .modal-overlay.active .modal-pane { transform: translateY(0) scale(1); }
-
-        .modal-header {
-            padding: 20px;
-            position: sticky; top: 0;
-            background: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border-glass);
-            display: flex; justify-content: space-between; align-items: center;
-            z-index: 10;
-        }
-
-        .close-btn {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            width: 35px; height: 35px; border-radius: 50%;
-            color: white; cursor: pointer;
-            font-size: 1.2rem;
-        }
-
-        .modal-body { padding: 25px; }
-        .modal-img { width: 100%; border-radius: 15px; margin-bottom: 20px; border: 1px solid var(--border-glass); }
+        /* UI Elements */
+        .search-box { width: 100%; max-width: 400px; padding: 12px 20px; border-radius: 30px; border: 1px solid var(--border-color); background: var(--surface-color); color: var(--text-main); outline: none; margin-bottom: 20px; font-size: 1rem; transition: border 0.3s; }
+        .search-box:focus { border-color: var(--accent-color); }
         
-        .download-btn {
-            display: block; width: 100%;
-            background: linear-gradient(90deg, #2563eb, #3b82f6);
-            color: white; text-align: center;
-            padding: 15px; border-radius: 15px;
-            text-decoration: none; font-weight: bold;
-            margin-top: 20px;
-            box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
-        }
+        .btn { padding: 8px 20px; background: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); border-radius: 20px; cursor: pointer; transition: all 0.3s; text-decoration: none; display: inline-block; font-size: 0.9rem; }
+        .btn:hover { background: var(--accent-color); color: var(--bg-color); }
+        .btn-load-more { display: block; margin: 30px auto; }
 
-        /* --- FOOTER --- */
-        .glass-footer {
-            border-top: 1px solid var(--border-glass);
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(10px);
-            padding: 30px 0;
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
+        /* Loaders */
+        .loader-container { position: relative; width: 100%; display: flex; justify-content: center; padding: 30px 0; display: none; }
+        .loader { width: 40px; height: 40px; border: 3px solid var(--border-color); border-top-color: var(--accent-color); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* --- MOBILE TWEAKS --- */
+        /* Grid Layouts */
+        .grid-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .gallery-item { position: relative; cursor: pointer; overflow: hidden; border-radius: 8px; aspect-ratio: 1/1; background: var(--surface-color); }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+        .gallery-item:hover img { transform: scale(1.1); }
+        
+        /* Lists Layouts (HTML & Research) */
+        .list-container { display: flex; flex-direction: column; gap: 15px; }
+        .list-item { background: var(--surface-color); border: 1px solid var(--border-color); padding: 15px 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; transition: border 0.3s; }
+        .list-item:hover { border-color: var(--accent-color); }
+        .item-info { display: flex; align-items: center; gap: 15px; }
+        .item-info i { font-size: 1.5rem; color: var(--accent-color); }
+        .item-actions { display: flex; gap: 10px; }
+        
+        /* Research Folders */
+        .folder-item { cursor: pointer; }
+        .breadcrumb { display: flex; gap: 10px; margin-bottom: 20px; color: var(--text-muted); flex-wrap: wrap; }
+        .breadcrumb span { cursor: pointer; transition: color 0.3s; }
+        .breadcrumb span:hover { color: var(--accent-color); }
+        .breadcrumb span::after { content: '/'; margin-right: 10px; color: var(--border-color); }
+        .breadcrumb span:last-child::after { content: ''; }
+        .breadcrumb span:last-child { color: var(--accent-color); pointer-events: none; }
+
+        /* Lightbox */
+        .lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; display: none; justify-content: center; align-items: center; }
+        .lightbox img, .lightbox video { max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        .lightbox-close { position: absolute; top: 20px; right: 30px; font-size: 2rem; color: #fff; cursor: pointer; }
+
+        /* Footer */
+        footer { border-top: 1px solid var(--border-color); padding: 40px 20px; text-align: center; margin-top: 50px; background: var(--surface-color); }
+        .contact-info { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; flex-wrap: wrap; }
+        .contact-info a { color: var(--text-main); text-decoration: none; display: flex; align-items: center; gap: 10px; transition: color 0.3s; }
+        .contact-info a:hover { color: var(--accent-color); }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .hero-title { font-size: 2rem; }
-            .action-grid { grid-template-columns: 1fr; }
-            .bento-grid { grid-template-columns: 1fr; padding: 0 15px 80px 15px; }
-            .glass-header { width: 95%; top: 10px; padding: 10px 15px; }
-            .modal-pane { width: 100%; height: 100%; max-height: 100%; border-radius: 0; }
+            .nav-links { display: none; position: absolute; top: 100%; left: 0; width: 100%; background: var(--surface-color); flex-direction: column; text-align: center; padding: 20px 0; border-bottom: 1px solid var(--border-color); }
+            .nav-links.active { display: flex; }
+            .mobile-menu-btn { display: block; cursor: pointer; color: var(--accent-color); font-size: 1.5rem; }
+            .list-item { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .item-actions { width: 100%; justify-content: flex-end; }
         }
-
-        /* Loading Animation */
-        .skeleton-loader {
-            background: linear-gradient(90deg, #1e293b 0%, #334155 50%, #1e293b 100%);
-            background-size: 200% 100%;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
+        @media (min-width: 769px) { .mobile-menu-btn { display: none; } }
     </style>
 </head>
 <body>
 
-    <!-- BACKGROUND: Quantum Particles -->
-    <canvas id="quantum-canvas"></canvas>
-
-    <!-- HEADER -->
-    <header class="glass-header">
-        <div class="brand-logo">AMIRHOSSEIN</div>
-        <div style="width: 30px; height: 30px; background: #fff; border-radius: 50%; display:flex; align-items:center; justify-content:center; color:#000; font-weight:bold;">A</div>
+    <header>
+        <div class="nav-container">
+            <a href="#" class="logo" onclick="showSection('home')">امیرحسین دادگستر</a>
+            <div class="mobile-menu-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+            <ul class="nav-links" id="navLinks">
+                <li><a onclick="showSection('home')">درباره من</a></li>
+                <li><a onclick="showSection('gallery')">نگارخانه</a></li>
+                <li><a onclick="showSection('videos')">ویدئوها</a></li>
+                <li><a onclick="showSection('htmls')">پروژه‌ها</a></li>
+                <li><a onclick="showSection('research')">تحقیقات</a></li>
+            </ul>
+        </div>
     </header>
 
-    <!-- MAIN -->
-    <main>
-        <section class="hero-container">
-            <h1 class="hero-title">سایت شخصی</h1>
-            <p class="hero-subtitle">امیرحسین دادگستر |AMIRHOSSEIN </p>
-
-            <!-- 3D BUTTONS -->
-            <div class="action-grid">
-                <!-- Archive Button -->
-                <a href="https://drive.google.com/drive/folders/1mAAdly-AM4pP9YZwIrz_uyKwujTZABHc" target="_blank" class="fluent-card">
-                    <!-- 3D Folder Icon Representation -->
-                    <div class="icon-3d-wrapper">📂</div> 
-                    <span class="btn-text">آرشیو نگاشته‌ها</span>
-                </a>
-                
-                <!-- Images Button -->
-                <a href="https://drive.google.com/drive/folders/11Lc6JcIvYCKmkS8eEmkpdO0kkjLldU0C" target="_blank" class="fluent-card">
-                     <!-- 3D Image Icon Representation -->
-                    <div class="icon-3d-wrapper">🖼️</div>
-                    <span class="btn-text">گالری تصاویر</span>
-                </a>
-            </div>
-
-            <!-- SEARCH -->
-            <div class="search-capsule">
-                <button class="search-btn">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                </button>
-                <input type="text" id="search-input" class="search-input" placeholder="جستجوی هوشمند...">
-            </div>
-        </section>
-
-        <!-- GRID -->
-        <section id="grid-container" class="bento-grid">
-            <!-- JS Injection -->
-        </section>
-
-        <p id="no-results" style="text-align:center; color:#94a3b8; display:none; margin-bottom: 50px;">موردی یافت نشد.</p>
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="glass-footer">
-        <div class="container">
-            <p>© 2026 امیرحسین دادگستر | طراحی شده با تکنولوژی کوانتوم وب</p>
-        </div>
-    </footer>
-
-    <!-- MODAL -->
-    <div id="modal" class="modal-overlay">
-        <div class="modal-pane">
-            <div class="modal-header">
-                <span id="m-title-mini" style="font-weight:bold; color:white;">جزئیات اثر</span>
-                <button onclick="closeModal()" class="close-btn">&times;</button>
-            </div>
-            <div class="modal-body">
-                <img id="m-img" src="" class="modal-img" style="display:none;">
-                <h2 id="m-title" style="margin-bottom:15px; font-size:1.5rem;"></h2>
-                <div style="display:flex; gap:10px; margin-bottom:20px;">
-                    <span id="m-date" style="background:rgba(56, 189, 248, 0.2); color:#38bdf8; padding:5px 10px; border-radius:8px; font-size:0.85rem;"></span>
-                </div>
-                <div id="m-desc" style="color:#cbd5e1; line-height:1.8; white-space:pre-wrap;"></div>
-                <a id="m-link" href="#" target="_blank" class="download-btn">مشاهده و دریافت فایل</a>
+    <!-- Home / Bio Section -->
+    <section id="home" class="active">
+        <div class="hero">
+            <img src="https://irdadgostar.github.io/myimage.jpg" alt="Amirhossein Dadgostar" class="profile-img" onerror="this.src='https://via.placeholder.com/250x250/151a28/cda066?text=Image'">
+            <h1>امیرحسین دادگستر</h1>
+            
+            <div class="philosophy-quote">
+                «باور کرده‌ام که تا ابد قرار نیست در این دنیا بمانم. اما ترس از نیست شدن و نابودی نیز مرا فراگرفته. با این‌حال ترس بودن هم دارم. بخواهیم یا نخواهیم مجبور و محکوم به زندگی و در عین زندگی محکوم به فنائیم. این هیچ، همان هیچ است که تمامِ بود و معنای زندگی را می‌سازد. باور دارم زندگی فرصتی است که به من داده شده. فرصتی در میان عمر طولانی که هستی دارد. من آمدم در حالی‌که هیچ‌گاه کسی مثل من نبوده و می‌روم در حالی‌که هیچ‌گاه کسی عین من نخواهد آمد. عجب فرصت شیرینِ تلخی...»
             </div>
         </div>
+
+        <div class="timeline">
+            <div class="timeline-item">
+                <h3>۱۳۹۳ تا ۱۴۰۳ - جستجوی معنا در علوم انسانی و دینی</h3>
+                <p>مطالعه و ژرف‌اندیشی در حوزه‌های فلسفه، منطق، فقه، حقوق، علم‌النفس، متون مقدس (تورات، انجیل، قرآن)، فرق و ادیان، علوم غریبه، تاریخ اسلام، اخلاق، صرف و نحو.</p>
+            </div>
+            <div class="timeline-item">
+                <h3>از ۱۳۹۵ - سلامت و تعادل</h3>
+                <p>آغاز مطالعات و فعالیت‌های عملی در حوزه طب مکمل.</p>
+            </div>
+            <div class="timeline-item">
+                <h3>از ۱۳۹۸ - در هم‌تنیدگی ذهن و ماشین</h3>
+                <p>ورود به دنیای برنامه‌نویسی وب و کشف ظرفیت‌های هوش مصنوعی.</p>
+            </div>
+            <div class="timeline-item">
+                <h3>از ۱۴۰۰ - شناخت انسان و مسیر تکامل</h3>
+                <p>تمرکز بر روان‌شناسی شخصیت، توسعه فردی، استعدادسنجی و هدایت مسیر شغلی برای درک بهتر پتانسیل‌های انسانی.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery">
+        <h2 class="section-title">نگارخانه تصاویر</h2>
+        <input type="text" class="search-box" id="search-gallery" placeholder="جستجو در تصاویر..." onkeyup="delaySearch('gallery')">
+        <div class="grid-gallery" id="gallery-container"></div>
+        <div class="loader-container" id="loader-gallery"><div class="loader"></div></div>
+        <button class="btn btn-load-more" id="btn-more-gallery" style="display:none;" onclick="loadFiles('gallery')">بارگذاری بیشتر</button>
+    </section>
+
+    <!-- Videos Section -->
+    <section id="videos">
+        <h2 class="section-title">ویدئوها</h2>
+        <input type="text" class="search-box" id="search-videos" placeholder="جستجو در ویدئوها..." onkeyup="delaySearch('videos')">
+        <div class="grid-gallery" id="videos-container"></div>
+        <div class="loader-container" id="loader-videos"><div class="loader"></div></div>
+        <button class="btn btn-load-more" id="btn-more-videos" style="display:none;" onclick="loadFiles('videos')">بارگذاری بیشتر</button>
+    </section>
+
+    <!-- HTML Files Section -->
+    <section id="htmls">
+        <h2 class="section-title">پروژه‌های تعاملی (HTML)</h2>
+        <input type="text" class="search-box" id="search-htmls" placeholder="جستجو در فایل‌ها..." onkeyup="delaySearch('htmls')">
+        <div class="list-container" id="htmls-container"></div>
+        <div class="loader-container" id="loader-htmls"><div class="loader"></div></div>
+        <button class="btn btn-load-more" id="btn-more-htmls" style="display:none;" onclick="loadFiles('htmls')">بارگذاری بیشتر</button>
+    </section>
+
+    <!-- Research Section -->
+    <section id="research">
+        <h2 class="section-title">تحقیقات و مستندات</h2>
+        <div class="breadcrumb" id="research-breadcrumb"></div>
+        <input type="text" class="search-box" id="search-research" placeholder="جستجو در این پوشه..." onkeyup="delaySearch('research')">
+        <div class="list-container" id="research-container"></div>
+        <div class="loader-container" id="loader-research"><div class="loader"></div></div>
+    </section>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+        <div id="lightbox-content"></div>
     </div>
 
+    <!-- Footer -->
+    <footer>
+        <div class="contact-info">
+            <a href="tel:+989136395562"><i class="fas fa-phone"></i> +98 913 639 5562</a>
+            <a href="mailto:Irdadgostar@gmail.com"><i class="fas fa-envelope"></i> Irdadgostar@gmail.com</a>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">تمام حقوق متعلق به امیرحسین دادگستر می‌باشد.</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
     <script>
-        /* =========================================
-           1. QUANTUM PARTICLE BACKGROUND (CANVAS)
-           ========================================= */
-        const canvas = document.getElementById('quantum-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        let width, height;
+        // ==========================================
+        // تنظیمات (شناسه‌های پوشه‌ها و آدرس اسکریپت)
+        // ==========================================
+        
+        // این آدرس را با آدرس Web App گوگل اسکریپت خود جایگزین کنید
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzutYjDxS07wIjQZFUobhWK_ffE1TKkXev4u44b7kw9MuCQTTl-NSVMLmL4TIT2AsYn/exec"; 
+        
+        const FOLDERS = {
+            gallery: "11Lc6JcIvYCKmkS8eEmkpdO0kkjLldU0C",
+            videos: "1kwf45DRbTqkKclL7NajNuBEPvWztfr27",
+            htmls: "1hUnVvX-a3WM_yi5T-k1jEeKUQsnZ0b9q",
+            research: "1DRLUPi6k5vpM2NOi0034moaSo_iKRDYN" // ریشه تحقیقات
+        };
 
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
+        // مدیریت وضعیت (State)
+        let state = {
+            gallery: { page: 1, loaded: false, search: "" },
+            videos: { page: 1, loaded: false, search: "" },
+            htmls: { page: 1, loaded: false, search: "" },
+            research: { currentFolder: FOLDERS.research, path: [{id: FOLDERS.research, name: "تحقیقات اصلی"}], search: "" },
+            searchTimeout: null
+        };
 
-        class Particle {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.vx = (Math.random() - 0.5) * 0.5;
-                this.vy = (Math.random() - 0.5) * 0.5;
-                this.size = Math.random() * 2 + 1;
-            }
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                if (this.x < 0 || this.x > width) this.vx *= -1;
-                if (this.y < 0 || this.y > height) this.vy *= -1;
-            }
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(56, 189, 248, 0.5)'; // Light Blue Glow
-                ctx.fill();
-            }
+        // مدیریت منو و نمایش بخش‌ها
+        function toggleMenu() {
+            document.getElementById('navLinks').classList.toggle('active');
         }
 
-        function initParticles() {
-            particles = [];
-            const count = window.innerWidth < 768 ? 40 : 80; // Fewer on mobile
-            for (let i = 0; i < count; i++) particles.push(new Particle());
+        function showSection(id) {
+            document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('navLinks').classList.remove('active');
+            window.scrollTo(0,0);
+            
+            // بارگذاری داده در صورت نیاز
+            if(id === 'gallery' && !state.gallery.loaded) loadFiles('gallery');
+            if(id === 'videos' && !state.videos.loaded) loadFiles('videos');
+            if(id === 'htmls' && !state.htmls.loaded) loadFiles('htmls');
+            if(id === 'research' && state.research.path.length === 1 && document.getElementById('research-container').innerHTML === "") {
+                loadResearchFolder(FOLDERS.research);
+            }
         }
 
-        function animateParticles() {
-            ctx.clearRect(0, 0, width, height);
-            for (let i = 0; i < particles.length; i++) {
-                particles[i].update();
-                particles[i].draw();
-                // Connect particles
-                for (let j = i; j < particles.length; j++) {
-                    const dx = particles[i].x - particles[j].x;
-                    const dy = particles[i].y - particles[j].y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 150) {
-                        ctx.beginPath();
-                        ctx.strokeStyle = `rgba(56, 189, 248, ${0.1 - dist/1500})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.stroke();
-                    }
+        // نمایش لودینگ درون محدوده‌ی خود بخش
+        function toggleLoader(section, show) {
+            document.getElementById(`loader-${section}`).style.display = show ? 'flex' : 'none';
+        }
+
+        // تاخیر در جستجو برای جلوگیری از ریکوست‌های زیاد به سرور
+        function delaySearch(section) {
+            clearTimeout(state.searchTimeout);
+            state.searchTimeout = setTimeout(() => {
+                let val = document.getElementById(`search-${section}`).value;
+                if(section === 'research') {
+                    state.research.search = val;
+                    loadResearchFolder(state.research.currentFolder);
+                } else {
+                    state[section].search = val;
+                    state[section].page = 1; // ریست کردن صفحه
+                    document.getElementById(`${section}-container`).innerHTML = "";
+                    loadFiles(section);
                 }
-            }
-            requestAnimationFrame(animateParticles);
-        }
-        initParticles();
-        animateParticles();
-
-        /* =========================================
-           2. DATA & LOGIC
-           ========================================= */
-        const SPREADSHEET_ID = '1A1_02ooUIz7c_9deCuUzHXUknM2VpTGY0-W4vMI4kxs';
-        const API_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json`;
-        const grid = document.getElementById('grid-container');
-        let allData = [];
-
-        // Skeleton Loader
-        function showSkeletons() {
-            grid.innerHTML = Array(6).fill('').map(() => `
-                <div class="bento-card" style="pointer-events:none; height:350px;">
-                    <div class="skeleton-loader" style="height:180px; width:100%;"></div>
-                    <div class="card-content">
-                        <div class="skeleton-loader" style="height:20px; width:40%; margin-bottom:10px; border-radius:5px;"></div>
-                        <div class="skeleton-loader" style="height:30px; width:80%; margin-bottom:15px; border-radius:5px;"></div>
-                        <div class="skeleton-loader" style="height:60px; width:100%; border-radius:5px;"></div>
-                    </div>
-                </div>
-            `).join('');
+            }, 800);
         }
 
-        // Fetch Data
-        async function fetchData() {
-            try {
-                const res = await fetch(API_URL);
-                const txt = await res.text();
-                const json = JSON.parse(txt.match(/google\.visualization\.Query\.setResponse\((.*)\)/s)[1]);
-                return json.table.rows.map(row => ({
-                    date: row.c[0]?.v || '',
-                    title: row.c[1]?.v || 'بدون عنوان',
-                    desc: row.c[2]?.v || '',
-                    link: row.c[3]?.v || '#',
-                    image: row.c[4]?.v || null
-                }));
-            } catch (e) { console.error(e); return []; }
-        }
-
-        // Render Cards
-        function render(items) {
-            if (items.length === 0) {
-                grid.innerHTML = '';
-                document.getElementById('no-results').style.display = 'block';
+        // ==========================================
+        // بارگذاری داده‌ها (گالری، ویدئو، HTML)
+        // ==========================================
+        async function loadFiles(type) {
+            if(!SCRIPT_URL || SCRIPT_URL.includes("آدرس_وب_اپ")) {
+                alert("لطفاً آدرس اسکریپت گوگل را در کد وارد کنید.");
                 return;
             }
-            document.getElementById('no-results').style.display = 'none';
 
-            grid.innerHTML = items.map(item => `
-                <article class="bento-card" onclick='openModal(${JSON.stringify(item).replace(/'/g, "&#39;")})'>
-                    ${item.image ? `<div class="card-img-wrap"><img src="${item.image}" class="card-img" loading="lazy"></div>` : `<div class="card-img-wrap" style="display:flex;align-items:center;justify-content:center;color:#fff;"><span>بدون تصویر</span></div>`}
-                    <div class="card-content">
-                        <div class="card-tag">${item.date}</div>
-                        <h3 class="card-title">${item.title}</h3>
-                        <p class="card-desc">${item.desc}</p>
-                    </div>
-                </article>
-            `).join('');
+            const folderId = FOLDERS[type];
+            const page = state[type].page;
+            const search = state[type].search;
+            const container = document.getElementById(`${type}-container`);
+            const btnMore = document.getElementById(`btn-more-${type}`);
+            
+            toggleLoader(type, true);
+            btnMore.style.display = 'none';
+
+            try {
+                let res = await fetch(`${SCRIPT_URL}?action=getFiles&folderId=${folderId}&page=${page}&search=${encodeURIComponent(search)}`);
+                let data = await res.json();
+                
+                if(data.error) { console.error(data.error); toggleLoader(type, false); return; }
+
+                data.files.forEach(file => {
+                    if(type === 'gallery') {
+                        container.innerHTML += `
+                            <div class="gallery-item" onclick="openLightbox('img', '${file.downloadUrl}')">
+                                <img src="${file.thumbnail || file.downloadUrl}" alt="${file.name}" loading="lazy">
+                            </div>`;
+                    } else if (type === 'videos') {
+                        // در صورت نبود تامنیل از یک آیکون استفاده می‌شود
+                        let thumb = file.thumbnail ? `<img src="${file.thumbnail}" alt="${file.name}">` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#1e293b;"><i class="fas fa-play fa-3x" style="color:var(--accent-color)"></i></div>`;
+                        container.innerHTML += `
+                            <div class="gallery-item" onclick="window.open('${file.url}', '_blank')">
+                                ${thumb}
+                            </div>`;
+                    } else if (type === 'htmls') {
+                        container.innerHTML += `
+                            <div class="list-item">
+                                <div class="item-info">
+                                    <i class="fab fa-html5"></i>
+                                    <span>${file.name}</span>
+                                </div>
+                                <div class="item-actions">
+                                    <a href="${file.downloadUrl}" class="btn" target="_blank">دانلود</a>
+                                    <button onclick="viewHTML('${file.id}')" class="btn">نمایش در مرورگر</button>
+                                </div>
+                            </div>`;
+                    }
+                });
+
+                if(data.hasMore) {
+                    btnMore.style.display = 'block';
+                    state[type].page++;
+                }
+                state[type].loaded = true;
+
+            } catch (err) {
+                console.error("Error loading files: ", err);
+            }
+            toggleLoader(type, false);
         }
 
-        // Search
-        document.getElementById('search-input').addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            const filtered = allData.filter(i => i.title.toLowerCase().includes(term) || i.desc.toLowerCase().includes(term));
-            render(filtered);
-        });
+        // ==========================================
+        // بارگذاری تحقیقات (پوشه‌های تودرتو)
+        // ==========================================
+        async function loadResearchFolder(folderId, folderName = null) {
+            const container = document.getElementById('research-container');
+            const search = state.research.search;
+            
+            // مدیریت نویگیشن (Breadcrumb)
+            if(folderName && folderId !== state.research.currentFolder) {
+                // چک کن اگر برگشت به عقب بود
+                let existingIndex = state.research.path.findIndex(p => p.id === folderId);
+                if(existingIndex > -1) {
+                    state.research.path = state.research.path.slice(0, existingIndex + 1);
+                } else {
+                    state.research.path.push({id: folderId, name: folderName});
+                }
+            }
+            state.research.currentFolder = folderId;
+            renderBreadcrumb();
 
-        // Modal Logic
-        const modal = document.getElementById('modal');
-        window.openModal = (item) => {
-            document.getElementById('m-title').textContent = item.title;
-            document.getElementById('m-desc').textContent = item.desc;
-            document.getElementById('m-date').textContent = item.date;
-            document.getElementById('m-link').href = item.link;
-            const img = document.getElementById('m-img');
-            if (item.image) { img.src = item.image; img.style.display = 'block'; } else { img.style.display = 'none'; }
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        };
-        window.closeModal = () => {
-            modal.classList.remove('active');
-            document.body.style.overflow = '';
-        };
+            container.innerHTML = "";
+            toggleLoader('research', true);
 
-        // Initialize
-        showSkeletons();
-        fetchData().then(data => {
-            allData = data;
-            render(data);
-        });
+            try {
+                let res = await fetch(`${SCRIPT_URL}?action=getResearchFolder&folderId=${folderId}&search=${encodeURIComponent(search)}`);
+                let data = await res.json();
+                
+                if(data.error) { console.error(data.error); toggleLoader('research', false); return; }
+
+                // نمایش پوشه‌ها
+                data.folders.forEach(f => {
+                    container.innerHTML += `
+                        <div class="list-item folder-item" onclick="loadResearchFolder('${f.id}', '${f.name}')">
+                            <div class="item-info">
+                                <i class="fas fa-folder"></i>
+                                <span>${f.name}</span>
+                            </div>
+                            <div class="item-actions">
+                                <span style="color:var(--text-muted);font-size:0.8rem">${f.count} فایل</span>
+                            </div>
+                        </div>`;
+                });
+
+                // نمایش فایل‌ها (فقط برای دانلود)
+                data.files.forEach(f => {
+                    container.innerHTML += `
+                        <div class="list-item">
+                            <div class="item-info">
+                                <i class="fas fa-file-alt"></i>
+                                <span>${f.name}</span>
+                            </div>
+                            <div class="item-actions">
+                                <a href="${f.downloadUrl}" class="btn" target="_blank">دانلود فایل</a>
+                            </div>
+                        </div>`;
+                });
+                
+                if(data.folders.length === 0 && data.files.length === 0) {
+                    container.innerHTML = `<p style="text-align:center; color:var(--text-muted);">موردی یافت نشد.</p>`;
+                }
+
+            } catch (err) {
+                console.error("Error loading research: ", err);
+            }
+            toggleLoader('research', false);
+        }
+
+        function renderBreadcrumb() {
+            const bc = document.getElementById('research-breadcrumb');
+            bc.innerHTML = state.research.path.map((p, index) => 
+                `<span onclick="loadResearchFolder('${p.id}', '${p.name}')">${p.name}</span>`
+            ).join('');
+        }
+
+        // ==========================================
+        // منطق نمایش ایمن فایل HTML در مرورگر
+        // ==========================================
+        async function viewHTML(fileId) {
+            // ایجاد یک لودینگ موقت روی دکمه یا صفحه
+            let originalText = event.target.innerText;
+            event.target.innerText = "در حال دریافت...";
+            event.target.disabled = true;
+
+            try {
+                // دریافت محتوای متنی فایل از سرور 
+                let res = await fetch(`${SCRIPT_URL}?action=getHtmlContent&fileId=${fileId}`);
+                let data = await res.json();
+                
+                if(data.content) {
+                    // باز کردن یک پنجره جدید و تزریق دقیق کد HTML
+                    // این روش به طور کامل جاوا اسکریپت و CSS داخل آن را اجرا می‌کند
+                    const newWindow = window.open("", "_blank");
+                    newWindow.document.open();
+                    newWindow.document.write(data.content);
+                    newWindow.document.close();
+                } else {
+                    alert("خطا در دریافت فایل.");
+                }
+            } catch (err) {
+                alert("خطا در ارتباط با سرور");
+            }
+            
+            event.target.innerText = originalText;
+            event.target.disabled = false;
+        }
+
+        // ==========================================
+        // Lightbox (گالری تصاویر)
+        // ==========================================
+        function openLightbox(type, src) {
+            const lb = document.getElementById('lightbox');
+            const content = document.getElementById('lightbox-content');
+            lb.style.display = 'flex';
+            if(type === 'img') {
+                content.innerHTML = `<img src="${src}" alt="Large Image">`;
+            }
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').style.display = 'none';
+            document.getElementById('lightbox-content').innerHTML = '';
+        }
 
     </script>
 </body>
