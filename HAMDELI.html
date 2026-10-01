@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -518,7 +517,7 @@
             border-color: var(--accent-color);
         }
 
-        /* کارت ویدئو */
+        /* کارت ویدئو (پرده نمایش + اطلاعات پایین کارت) */
         .video-card {
             background: var(--surface-color);
             border: 1px solid var(--border-color);
@@ -728,7 +727,7 @@
             font-size: 1.2rem;
             font-weight: 700;
             color: var(--text-main);
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
 
         /* کارت مجزا برای لینک داینامیک */
@@ -795,6 +794,7 @@
             align-items: center;
         }
 
+        /* پلیر ویدئو با آی‌فریم برای تضمین پخش و وجود دکمه بزرگنمایی */
         .native-video-player {
             display: block;
             width: 100%;
@@ -807,6 +807,33 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             border-radius: 12px;
             object-fit: contain;
+        }
+
+        .video-fallback-frame {
+            display: none;
+            width: 100%;
+            aspect-ratio: 16/9;
+            max-height: 95vh;
+            outline: none;
+            border: none;
+            background: #000;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border-radius: 12px;
+        }
+
+        .video-frame-controls {
+            width: 100%;
+            max-width: 1200px;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 12px 16px 0;
+        }
+
+        .video-frame-controls.show {
+            display: flex;
         }
 
         .image-viewer {
@@ -887,7 +914,8 @@
             .contact-group { justify-content: center; }
             
             .modal-close-btn { top: 10px; right: 20px; }
-            .native-video-player { border-radius: 0; }
+            .native-video-player, .video-fallback-frame { border-radius: 0; }
+            .video-frame-controls { padding-bottom: 10px; }
         }
     </style>
 </head>
@@ -1040,20 +1068,14 @@
         </section>
     </main>
 
-    <!-- مدال ویدئو: پخش‌کننده بومی مرورگر + پیام جایگزین (بدون فریم پرده‌دار گوگل) -->
+    <!-- مدال ویدئو: پخش‌کننده بومی مرورگر + مسیر جایگزین Drive فقط در صورت خطا -->
     <div class="viewer-modal" id="videoModal">
         <button class="modal-close-btn" onclick="closeModal('videoModal', 'siteVideoPlayer')" title="بستن">&times;</button>
         <div class="modal-content-wrapper" id="videoWrapper">
             <video id="siteVideoPlayer" class="native-video-player" controls playsinline preload="metadata"></video>
-            <!-- رابط جایگزین به جای iframe مزاحم گوگل -->
-            <div id="videoFallbackUI" style="display:none; flex-direction:column; align-items:center; justify-content:center; background:#000; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border-radius:12px; width:100%; aspect-ratio:16/9; max-height:95vh; color:#fff; padding:20px; text-align:center;">
-                <i class="fas fa-exclamation-triangle" style="font-size:3.5rem; margin-bottom:15px; color:var(--accent-color);"></i>
-                <h3 style="margin-bottom:12px; font-size:1.4rem;">مرورگر قادر به پخش مستقیم این ویدئو نیست</h3>
-                <p style="margin-bottom:25px; color:#aaa; font-size:1.05rem; max-width:500px;">به دلیل محدودیت‌های امنیتی گوگل درایو برای ویدئوهای حجیم، امکان پخش مستقیم در سایت وجود ندارد. لطفاً از گزینه‌های زیر استفاده کنید.</p>
-                <div style="display:flex; gap:15px; flex-wrap:wrap; justify-content:center;">
-                    <button class="btn btn-primary" id="btnOpenDrivePreview" style="padding:12px 24px; font-size:1.05rem;"><i class="fas fa-external-link-alt"></i> پخش در سایت گوگل درایو</button>
-                    <button class="btn" id="btnDownloadFallback" style="padding:12px 24px; font-size:1.05rem; color:#fff; border-color:#fff;"><i class="fas fa-download"></i> دانلود فایل ویدئو</button>
-                </div>
+            <iframe id="siteVideoFrame" class="video-fallback-frame" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen title="پخش ویدئو با فریم Google Drive" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+            <div class="video-frame-controls" id="videoFrameControls">
+                <button type="button" class="btn btn-primary" id="videoDriveFrameButton" onclick="openVideoDriveFrame()"><i class="fab fa-google-drive"></i> پخش با فریم Google Drive</button>
             </div>
         </div>
     </div>
@@ -1181,30 +1203,6 @@
 
         function isCurrentRequest(key, token) {
             return requestTokens[key] === token;
-        }
-
-        // ابزار تبدیل حجم فایل (بایت به مگابایت)
-        function formatBytes(bytes) {
-            if (!bytes || bytes === 0) return 'نامشخص';
-            const k = 1024;
-            const sizes = ['بایت', 'KB', 'MB', 'GB'];
-            const i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), sizes.length - 1);
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        // سیستم تشخیص آیکون برای انواع فایل‌ها
-        function getFileIconClass(mimeType) {
-            mimeType = String(mimeType || '').toLowerCase();
-            if (mimeType.includes('video')) return 'fas fa-file-video';
-            if (mimeType.includes('audio')) return 'fas fa-file-audio';
-            if (mimeType.includes('image')) return 'fas fa-file-image';
-            if (mimeType.includes('pdf')) return 'fas fa-file-pdf';
-            if (mimeType.includes('word') || mimeType.includes('document')) return 'fas fa-file-word';
-            if (mimeType.includes('excel') || mimeType.includes('spreadsheet') || mimeType.includes('sheet')) return 'fas fa-file-excel';
-            if (mimeType.includes('powerpoint') || mimeType.includes('presentation')) return 'fas fa-file-powerpoint';
-            if (mimeType.includes('zip') || mimeType.includes('compressed') || mimeType.includes('rar')) return 'fas fa-file-archive';
-            if (mimeType.includes('text')) return 'fas fa-file-alt';
-            return 'fas fa-file-alt'; // پیش‌فرض
         }
 
         // ================= مدیریت تم (Theme) =================
@@ -1337,6 +1335,15 @@
             }
         }
 
+        // ابزار تبدیل حجم فایل (بایت به مگابایت)
+        function formatBytes(bytes) {
+            if (!bytes || bytes === 0) return 'نامشخص';
+            const k = 1024;
+            const sizes = ['بایت', 'KB', 'MB', 'GB'];
+            const i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), sizes.length - 1);
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
         // ================= سیستم لینک داینامیک پیشرفته =================
         async function copyDynamicLink(fileId, fileType, btnElement, event) {
             if (event) event.stopPropagation();
@@ -1388,14 +1395,14 @@
                 setLocalLoader(targetTab, false);
 
                 if (res.error || !res.id) {
-                    renderNotFoundCard(targetTab, res.error);
+                    renderNotFoundCard(targetTab);
                 } else {
                     renderIsolatedCard(targetTab, res, fileType);
                 }
             } catch (e) {
                 if (!isCurrentRequest(requestKey, req.token)) return;
                 setLocalLoader(targetTab, false);
-                renderNotFoundCard(targetTab, e.message);
+                renderNotFoundCard(targetTab);
             } finally {
                 if (isCurrentRequest(requestKey, req.token)) {
                     requestControllers[requestKey] = null;
@@ -1439,13 +1446,13 @@
                         <img src="${escapeHtml(file.thumbnail)}" alt="${safeName}" loading="lazy" onclick="viewImageDirectly(${fileIdArg})" style="cursor:pointer;" onerror="this.onerror=null; this.src='https://dummyimage.com/600x600/151a28/cda066&text=Image';">
                         <div class="card-link-overlay">
                             <button class="btn-sm-overlay" onclick="copyDynamicLink(${fileIdArg}, 'image', this, event)"><i class="fas fa-link"></i> کپی لینک</button>
-                            <button class="btn-sm-overlay" onclick="downloadDirectly(${fileIdArg}, ${nameArg}, this, event)"><i class="fas fa-download"></i> دانلود</button>
+                            <button class="btn-sm-overlay" onclick="downloadDirectly(${fileIdArg}, ${nameArg}, this, event, ${jsArg(file.resourceKey || '')})"><i class="fas fa-download"></i> دانلود</button>
                         </div>
                     </div>`;
             } else if (sectionType === 'video') {
                 cardHTML += `
                     <div class="video-card" style="max-width: 500px; margin: 0 auto;">
-                        <div class="video-card-top" style="position:relative; cursor:pointer;" onclick="playVideoDirectly(${fileIdArg}, ${jsArg(file.thumbnail)})">
+                        <div class="video-card-top" style="position:relative; cursor:pointer;" onclick="playVideoDirectly(${fileIdArg}, ${jsArg(file.thumbnail)}, ${jsArg(file.previewUrl || '')}, ${jsArg(file.resourceKey || '')})">
                             <img src="${escapeHtml(file.thumbnail)}" alt="${safeName}" class="video-poster" loading="lazy" onerror="this.onerror=null; this.src='https://dummyimage.com/600x338/151a28/cda066&text=Video+Preview';">
                             <div class="video-overlay-icon"><i class="fas fa-play"></i></div>
                         </div>
@@ -1453,7 +1460,7 @@
                             <div class="video-title" title="${safeName}">${safeName}</div>
                             <div class="video-meta"><i class="fas fa-hdd"></i> حجم: ${fSize}</div>
                             <div class="video-actions">
-                                <button onclick="downloadVideoBypass(${fileIdArg}, event)" class="btn btn-primary"><i class="fas fa-download"></i> دانلود مستقیم</button>
+                                <button onclick="downloadVideoBypass(${fileIdArg}, event, ${jsArg(file.resourceKey || '')})" class="btn btn-primary"><i class="fas fa-download"></i> دانلود مستقیم</button>
                                 <button onclick="copyDynamicLink(${fileIdArg}, 'video', this, event)" class="btn"><i class="fas fa-link"></i> کپی لینک</button>
                             </div>
                         </div>
@@ -1469,16 +1476,15 @@
                         </div>
                         <div class="file-actions">
                             <button onclick="copyDynamicLink(${fileIdArg}, 'html', this, event)" class="btn"><i class="fas fa-link"></i> کپی لینک</button>
-                            <button onclick="downloadDirectly(${fileIdArg}, ${nameArg}, this, event)" class="btn"><i class="fas fa-download"></i> دانلود</button>
+                            <button onclick="downloadDirectly(${fileIdArg}, ${nameArg}, this, event, ${jsArg(file.resourceKey || '')})" class="btn"><i class="fas fa-download"></i> دانلود</button>
                             <button onclick="launchInteractiveHTML(${fileIdArg}, this, event)" class="btn btn-primary"><i class="fas fa-desktop"></i> نمایش در مرورگر</button>
                         </div>
                     </div>`;
             } else if (sectionType === 'doc') {
-                const iconClass = getFileIconClass(file.mimeType);
                 cardHTML += `
                     <div class="file-item" style="border-color: var(--accent-color);">
                         <div class="file-info">
-                            <i class="${iconClass}"></i>
+                            <i class="fas fa-file-alt"></i>
                             <div class="file-name-container">
                                 <span class="file-name" title="${safeName}">${safeName}</span>
                                 <span class="file-meta">حجم: ${fSize}</span>
@@ -1486,7 +1492,7 @@
                         </div>
                         <div class="file-actions">
                             <button onclick="copyDynamicLink(${fileIdArg}, 'doc', this, event)" class="btn"><i class="fas fa-link"></i> کپی لینک</button>
-                            <button onclick="downloadDirectly(${fileIdArg}, ${nameArg}, this, event)" class="btn btn-primary"><i class="fas fa-download"></i> دانلود مستقیم</button>
+                            <button onclick="downloadDirectly(${fileIdArg}, ${nameArg}, this, event, ${jsArg(file.resourceKey || '')})" class="btn btn-primary"><i class="fas fa-download"></i> دانلود مستقیم</button>
                         </div>
                     </div>`;
             }
@@ -1500,15 +1506,13 @@
             displayArea.innerHTML = cardHTML;
         }
 
-        function renderNotFoundCard(containerId, errorMsg) {
+        function renderNotFoundCard(containerId) {
             const displayArea = document.getElementById(`dynamic-link-display-${containerId}`);
             if (!displayArea) return;
-            const detailHTML = errorMsg ? `<p style="font-size:0.9rem; color:#888; margin-top:-5px; margin-bottom:15px; direction:ltr; text-align:center;">${escapeHtml(errorMsg)}</p>` : '';
             displayArea.innerHTML = `
                 <div class="dynamic-error-card">
                     <i class="fas fa-exclamation-triangle"></i>
                     <p>فایل مورد نظر در سرور موجود نیست یا حذف شده است.</p>
-                    ${detailHTML}
                     <button class="btn btn-primary" onclick="clearDynamicView('${containerId}')">مشاهده سایر فایل‌ها</button>
                 </div>
             `;
@@ -1526,37 +1530,53 @@
             pushModalHistory('imageModal');
         }
 
-        function playVideoDirectly(fileId, thumbnailUrl) {
+        function buildDrivePreviewUrl(fileId, resourceKey) {
+            let url = `https://drive.google.com/file/d/${encodeURIComponent(fileId)}/preview`;
+            if (resourceKey) {
+                url += `?resourcekey=${encodeURIComponent(resourceKey)}`;
+            }
+            return url;
+        }
+
+        function buildDriveVideoUrl(fileId, resourceKey) {
+            let url = `https://drive.google.com/uc?export=view&id=${encodeURIComponent(fileId)}`;
+            if (resourceKey) {
+                url += `&resourcekey=${encodeURIComponent(resourceKey)}`;
+            }
+            return url;
+        }
+
+        function playVideoDirectly(fileId, thumbnailUrl, previewUrl, resourceKey) {
             const modal = document.getElementById('videoModal');
             const video = document.getElementById('siteVideoPlayer');
-            const fallbackUI = document.getElementById('videoFallbackUI');
-            if (!modal || !video || !fallbackUI) return;
+            const frame = document.getElementById('siteVideoFrame');
+            const frameControls = document.getElementById('videoFrameControls');
+            if (!modal || !video || !frame) return;
 
-            const directUrl = `https://drive.google.com/uc?export=download&id=${encodeURIComponent(fileId)}`;
+            const directUrl = buildDriveVideoUrl(fileId, resourceKey);
+            const resolvedPreviewUrl = previewUrl || buildDrivePreviewUrl(fileId, resourceKey);
             video.pause();
             video.removeAttribute('src');
             video.poster = thumbnailUrl || `https://drive.google.com/thumbnail?sz=w1200&id=${encodeURIComponent(fileId)}`;
             video.load();
 
             video.dataset.fileId = String(fileId);
-            video.dataset.fallbackUrl = `https://drive.google.com/file/d/${encodeURIComponent(fileId)}/view`;
+            video.dataset.resourceKey = resourceKey ? String(resourceKey) : '';
+            video.dataset.fallbackUrl = resolvedPreviewUrl;
             video.dataset.failed = '0';
 
             video.onerror = function() {
                 if (video.dataset.failed === '1') return;
                 video.dataset.failed = '1';
                 video.style.display = 'none';
-                
-                const btnPreview = document.getElementById('btnOpenDrivePreview');
-                const btnDown = document.getElementById('btnDownloadFallback');
-                
-                btnPreview.onclick = () => window.open(video.dataset.fallbackUrl, '_blank', 'noopener');
-                btnDown.onclick = (e) => downloadVideoBypass(video.dataset.fileId, e);
-                
-                fallbackUI.style.display = 'flex';
+                frame.src = video.dataset.fallbackUrl;
+                frame.style.display = 'block';
+                if (frameControls) frameControls.classList.add('show');
             };
 
-            fallbackUI.style.display = 'none';
+            frame.style.display = 'none';
+            frame.src = '';
+            if (frameControls) frameControls.classList.add('show');
             video.style.display = 'block';
             video.src = directUrl;
             video.load();
@@ -1564,6 +1584,22 @@
             modal.style.display = 'flex';
             requestAnimationFrame(() => modal.classList.add('show'));
             pushModalHistory('videoModal');
+        }
+
+        function openVideoDriveFrame() {
+            const video = document.getElementById('siteVideoPlayer');
+            const frame = document.getElementById('siteVideoFrame');
+            const frameControls = document.getElementById('videoFrameControls');
+            if (!video || !frame) return;
+
+            const fileId = video.dataset.fileId;
+            if (!fileId) return;
+
+            try { video.pause(); } catch (e) {}
+            video.style.display = 'none';
+            frame.src = video.dataset.fallbackUrl || buildDrivePreviewUrl(fileId, video.dataset.resourceKey || '');
+            frame.style.display = 'block';
+            if (frameControls) frameControls.classList.add('show');
         }
 
         function pushModalHistory(modalId) {
@@ -1591,10 +1627,20 @@
                     }
                 }
                 if (modalId === 'videoModal') {
-                    const fallbackUI = document.getElementById('videoFallbackUI');
-                    if (fallbackUI) fallbackUI.style.display = 'none';
+                    const frame = document.getElementById('siteVideoFrame');
+                    if (frame) {
+                        frame.src = '';
+                        frame.style.display = 'none';
+                    }
                     const video = document.getElementById('siteVideoPlayer');
-                    if (video) video.style.display = 'block';
+                    if (video) {
+                        video.style.display = 'block';
+                        video.dataset.fileId = '';
+                        video.dataset.resourceKey = '';
+                        video.dataset.fallbackUrl = '';
+                    }
+                    const frameControls = document.getElementById('videoFrameControls');
+                    if (frameControls) frameControls.classList.remove('show');
                 }
                 modal.style.display = 'none';
             }, 300);
@@ -1700,13 +1746,13 @@
                             <img src="${safeThumb}" alt="${safeName}" loading="lazy" decoding="async" onclick="viewImageDirectly(${fileIdArg})" style="cursor:pointer;" onerror="this.onerror=null; this.src='https://dummyimage.com/600x600/151a28/cda066&text=Image';">
                             <div class="card-link-overlay">
                                 <button class="btn-sm-overlay" onclick="copyDynamicLink(${fileIdArg}, 'image', this, event)" title="کپی لینک"><i class="fas fa-link"></i></button>
-                                <button class="btn-sm-overlay" onclick="downloadDirectly(${fileIdArg}, ${nameArg}, this, event)" title="دانلود مستقیم"><i class="fas fa-download"></i></button>
+                                <button class="btn-sm-overlay" onclick="downloadDirectly(${fileIdArg}, ${nameArg}, this, event, ${jsArg(file.resourceKey || '')})" title="دانلود مستقیم"><i class="fas fa-download"></i></button>
                             </div>
                         </div>`);
                 } else if (type === 'videos') {
                     html.push(`
                         <div class="video-card">
-                            <div class="video-card-top" style="position:relative; cursor:pointer;" onclick="playVideoDirectly(${fileIdArg}, ${jsArg(file.thumbnail || '')})">
+                            <div class="video-card-top" style="position:relative; cursor:pointer;" onclick="playVideoDirectly(${fileIdArg}, ${jsArg(file.thumbnail || '')}, ${jsArg(file.previewUrl || '')}, ${jsArg(file.resourceKey || '')})">
                                 <img src="${safeThumb}" alt="${safeName}" class="video-poster" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='https://dummyimage.com/600x338/151a28/cda066&text=Video+Preview';">
                                 <div class="video-overlay-icon"><i class="fas fa-play"></i></div>
                             </div>
@@ -1714,7 +1760,7 @@
                                 <div class="video-title" title="${safeName}">${safeName}</div>
                                 <div class="video-meta"><i class="fas fa-hdd"></i> حجم: ${fSize}</div>
                                 <div class="video-actions">
-                                    <button onclick="downloadVideoBypass(${fileIdArg}, event)" class="btn btn-primary"><i class="fas fa-download"></i> دانلود ویدئو</button>
+                                    <button onclick="downloadVideoBypass(${fileIdArg}, event, ${jsArg(file.resourceKey || '')})" class="btn btn-primary"><i class="fas fa-download"></i> دانلود ویدئو</button>
                                     <button onclick="copyDynamicLink(${fileIdArg}, 'video', this, event)" class="btn"><i class="fas fa-link"></i> کپی لینک</button>
                                 </div>
                             </div>
@@ -1730,7 +1776,7 @@
                             </div>
                             <div class="file-actions">
                                 <button onclick="copyDynamicLink(${fileIdArg}, 'html', this, event)" class="btn"><i class="fas fa-link"></i> کپی لینک</button>
-                                <button onclick="downloadDirectly(${fileIdArg}, ${nameArg}, this, event)" class="btn"><i class="fas fa-download"></i> دانلود</button>
+                                <button onclick="downloadDirectly(${fileIdArg}, ${nameArg}, this, event, ${jsArg(file.resourceKey || '')})" class="btn"><i class="fas fa-download"></i> دانلود</button>
                                 <button onclick="launchInteractiveHTML(${fileIdArg}, this, event)" class="btn btn-primary"><i class="fas fa-desktop"></i> نمایش در مرورگر</button>
                             </div>
                         </div>`);
@@ -1763,6 +1809,11 @@
                 const targetFunction = type === 'research' ? 'loadResearchFolder' : 'loadHtmlFolder';
                 return `<span onclick="${targetFunction}(${jsArg(item.id)}, ${jsArg(item.name)})">${safeName}</span><i class="fas fa-chevron-left"></i>`;
             }).join('');
+        }
+
+        // سازگاری با نام تابع نسخه قبلی
+        function updateBreadcrumb() {
+            updateBreadcrumbFor('research');
         }
 
         function renderFolderResults(type, res) {
@@ -1799,13 +1850,11 @@
                 const idArg = jsArg(doc.id);
                 const nameArg = jsArg(doc.name);
                 const fSize = formatBytes(doc.size);
-                
                 if (type === 'research') {
-                    const iconClass = getFileIconClass(doc.mimeType);
                     html.push(`
                         <div class="file-item">
                             <div class="file-info">
-                                <i class="${iconClass}"></i>
+                                <i class="fas fa-file-alt"></i>
                                 <div class="file-name-container">
                                     <span class="file-name" title="${safeName}">${safeName}</span>
                                     <span class="file-meta">حجم: ${fSize}</span>
@@ -1813,7 +1862,7 @@
                             </div>
                             <div class="file-actions">
                                 <button onclick="copyDynamicLink(${idArg}, 'doc', this, event)" class="btn"><i class="fas fa-link"></i> کپی لینک</button>
-                                <button onclick="downloadDirectly(${idArg}, ${nameArg}, this, event)" class="btn btn-primary"><i class="fas fa-download"></i> دانلود مستقیم</button>
+                                <button onclick="downloadDirectly(${idArg}, ${nameArg}, this, event, ${jsArg(doc.resourceKey || '')})" class="btn btn-primary"><i class="fas fa-download"></i> دانلود مستقیم</button>
                             </div>
                         </div>`);
                 } else {
@@ -1827,7 +1876,7 @@
                             </div>
                             <div class="file-actions">
                                 <button onclick="copyDynamicLink(${idArg}, 'html', this, event)" class="btn"><i class="fas fa-link"></i> کپی لینک</button>
-                                <button onclick="downloadDirectly(${idArg}, ${nameArg}, this, event)" class="btn"><i class="fas fa-download"></i> دانلود</button>
+                                <button onclick="downloadDirectly(${idArg}, ${nameArg}, this, event, ${jsArg(doc.resourceKey || '')})" class="btn"><i class="fas fa-download"></i> دانلود</button>
                                 <button onclick="launchInteractiveHTML(${idArg}, this, event)" class="btn btn-primary"><i class="fas fa-desktop"></i> نمایش در مرورگر</button>
                             </div>
                         </div>`);
@@ -1987,15 +2036,19 @@
         }
 
         // ================= توابع دانلود فایل =================
-        function getDirectDownloadUrl(fileId) {
-            return `https://drive.google.com/uc?export=download&id=${encodeURIComponent(fileId)}`;
+        function getDirectDownloadUrl(fileId, resourceKey) {
+            let url = `https://drive.google.com/uc?export=download&id=${encodeURIComponent(fileId)}`;
+            if (resourceKey) {
+                url += `&resourcekey=${encodeURIComponent(resourceKey)}`;
+            }
+            return url;
         }
 
         function stopButtonEvent(event) {
             if (event) event.stopPropagation();
         }
 
-        async function downloadDirectly(fileId, fileName, btn, event) {
+        async function downloadDirectly(fileId, fileName, btn, event, resourceKey) {
             stopButtonEvent(event);
             if (!btn) return;
 
@@ -2004,7 +2057,8 @@
             btn.disabled = true;
 
             try {
-                const downloadUrl = getDirectDownloadUrl(fileId);
+                // دانلود فایل مستقیماً از Drive؛ مسیر Base64 از Apps Script حذف شد تا فایل از سرور واسط عبور نکند.
+                const downloadUrl = getDirectDownloadUrl(fileId, resourceKey);
                 const a = document.createElement('a');
                 a.href = downloadUrl;
                 a.target = '_blank';
@@ -2014,18 +2068,20 @@
                 a.click();
                 a.remove();
             } catch (e) {
-                window.open(getDirectDownloadUrl(fileId), '_blank', 'noopener');
+                window.open(getDirectDownloadUrl(fileId, resourceKey), '_blank', 'noopener');
             } finally {
                 btn.innerHTML = prevText;
                 btn.disabled = false;
             }
         }
 
-        function downloadVideoBypass(fileId, event) {
+        // دانلود ویدئو با لینک مستقیم؛ داده‌های حجیم از Apps Script عبور نمی‌کنند.
+        function downloadVideoBypass(fileId, event, resourceKey) {
             stopButtonEvent(event);
-            window.open(getDirectDownloadUrl(fileId), '_blank', 'noopener');
+            window.open(getDirectDownloadUrl(fileId, resourceKey), '_blank', 'noopener');
         }
 
+        // فایل HTML در صفحه جدید باز می‌شود و پنجره بلافاصله ساخته می‌شود تا Popup Blocker مانع نشود.
         async function launchInteractiveHTML(fileId, buttonEl, event) {
             stopButtonEvent(event);
             const originalText = buttonEl.innerHTML;
@@ -2143,6 +2199,7 @@
             const dynamicTarget = getDynamicTarget(type);
 
             if (viewId && dynamicTarget) {
+                // برای لینک مستقیم، یک وضعیت داخلی «خانه» ایجاد می‌شود تا دکمه Back موبایل کاربر را از سایت خارج نکند.
                 window.history.replaceState({ tab: 'home' }, document.title, window.location.pathname);
                 window.history.pushState({
                     tab: dynamicTarget,
